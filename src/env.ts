@@ -6,8 +6,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, "Supabase Anon Key is required"),
   
   // Redis (Upstash)
-  UPSTASH_REDIS_REST_URL: z.string().url("Must be a valid Upstash Redis URL").optional(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+  UPSTASH_REDIS_REST_URL: z.string().url("Must be a valid Upstash Redis URL").optional().or(z.literal('')),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional().or(z.literal('')),
   
   // Environment Mode
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
