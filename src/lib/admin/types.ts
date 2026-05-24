@@ -39,6 +39,8 @@ export interface Question {
   videoTitle?: string;
   videoDuration?: string;
   videoThumbnail?: string;
+  status?: 'Published' | 'Draft';
+  createdAt?: string;
 }
 
 export interface SidebarItem {
@@ -50,7 +52,7 @@ export interface SidebarItem {
 }
 
 export interface UserRole {
-  role: 'admin' | 'editor' | 'reviewer';
+  role: 'admin' | 'editor';
   name: string;
   avatar: string;
   email: string;

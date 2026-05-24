@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Lock, Unlock, HelpCircle, Plus, X } from 'lucide-react';
+import { HelpCircle, Plus, X } from 'lucide-react';
 import { Domain } from '@/lib/admin/types';
 
 interface DomainSelectorsProps {
@@ -12,14 +12,6 @@ interface DomainSelectorsProps {
   onChangeDomain: (id: string) => void;
   onChangeSubTopic: (id: string) => void;
   onChangeConcept: (id: string) => void;
-
-  // Batch lock toggles
-  domainLocked: boolean;
-  subTopicLocked: boolean;
-  conceptLocked: boolean;
-  onToggleDomainLock: () => void;
-  onToggleSubTopicLock: () => void;
-  onToggleConceptLock: () => void;
 
   // Add functionality
   onAddDomain: (name: string) => void;
@@ -35,12 +27,6 @@ export default function DomainSelectors({
   onChangeDomain,
   onChangeSubTopic,
   onChangeConcept,
-  domainLocked,
-  subTopicLocked,
-  conceptLocked,
-  onToggleDomainLock,
-  onToggleSubTopicLock,
-  onToggleConceptLock,
   onAddDomain,
   onAddSubTopic,
   onAddConcept
@@ -92,35 +78,12 @@ export default function DomainSelectors({
         <div className="flex items-center justify-between">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
             Domain
-            <HelpCircle className="w-3 h-3 text-slate-300 hover:text-slate-400 cursor-help" />
           </label>
-          <button
-            type="button"
-            onClick={onToggleDomainLock}
-            className={`flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded transition-all duration-100 ${
-              domainLocked
-                ? 'bg-blue-50 text-blue-600 border border-blue-200/50 font-bold'
-                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            {domainLocked ? (
-              <>
-                <Lock className="w-2.5 h-2.5" /> Locked
-              </>
-            ) : (
-              <>
-                <Unlock className="w-2.5 h-2.5" /> Lock Batch
-              </>
-            )}
-          </button>
         </div>
         <select
           value={selectedDomainId}
-          disabled={domainLocked}
           onChange={(e) => onChangeDomain(e.target.value)}
-          className={`w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-            domainLocked ? 'opacity-60 cursor-not-allowed bg-slate-100 border-slate-200' : 'border-slate-200 hover:border-slate-300'
-          }`}
+          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {domains.map((domain) => (
             <option key={domain.id} value={domain.id}>
@@ -130,55 +93,53 @@ export default function DomainSelectors({
         </select>
 
         {/* Inline Add Domain Form */}
-        {!domainLocked && (
-          <div className="mt-1">
-            {isAddingDomain ? (
-              <div className="flex items-center gap-1.5 animate-fadeIn">
-                <input
-                  type="text"
-                  value={newDomainName}
-                  onChange={(e) => setNewDomainName(e.target.value)}
-                  placeholder="New Domain..."
-                  className="flex-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveDomain();
-                    if (e.key === 'Escape') {
-                      setIsAddingDomain(false);
-                      setNewDomainName('');
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={handleSaveDomain}
-                  className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all"
-                >
-                  Add
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
+        <div className="mt-1">
+          {isAddingDomain ? (
+            <div className="flex items-center gap-1.5 animate-fadeIn">
+              <input
+                type="text"
+                value={newDomainName}
+                onChange={(e) => setNewDomainName(e.target.value)}
+                placeholder="New Domain..."
+                className="flex-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveDomain();
+                  if (e.key === 'Escape') {
                     setIsAddingDomain(false);
                     setNewDomainName('');
-                  }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition-all"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
+                  }
+                }}
+              />
               <button
                 type="button"
-                onClick={() => setIsAddingDomain(true)}
-                className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors py-1 px-2 rounded-md hover:bg-blue-50/50 w-fit"
+                onClick={handleSaveDomain}
+                className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all"
               >
-                <Plus className="w-3 h-3" />
-                <span>Add Domain</span>
+                Add
               </button>
-            )}
-          </div>
-        )}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAddingDomain(false);
+                  setNewDomainName('');
+                }}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition-all"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsAddingDomain(true)}
+              className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors py-1 px-2 rounded-md hover:bg-blue-50/50 w-fit"
+            >
+              <Plus className="w-3 h-3" />
+              <span>Add Domain</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Sub-Topic Column */}
@@ -187,33 +148,11 @@ export default function DomainSelectors({
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
             Sub-Topic
           </label>
-          <button
-            type="button"
-            onClick={onToggleSubTopicLock}
-            className={`flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded transition-all duration-100 ${
-              subTopicLocked
-                ? 'bg-blue-50 text-blue-600 border border-blue-200/50 font-bold'
-                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            {subTopicLocked ? (
-              <>
-                <Lock className="w-2.5 h-2.5" /> Locked
-              </>
-            ) : (
-              <>
-                <Unlock className="w-2.5 h-2.5" /> Lock Batch
-              </>
-            )}
-          </button>
         </div>
         <select
           value={selectedSubTopicId}
-          disabled={subTopicLocked}
           onChange={(e) => onChangeSubTopic(e.target.value)}
-          className={`w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-            subTopicLocked ? 'opacity-60 cursor-not-allowed bg-slate-100 border-slate-200' : 'border-slate-200 hover:border-slate-300'
-          }`}
+          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {subTopics.map((topic) => (
             <option key={topic.id} value={topic.id}>
@@ -223,7 +162,7 @@ export default function DomainSelectors({
         </select>
 
         {/* Inline Add Sub-Topic Form */}
-        {!subTopicLocked && currentDomain && (
+        {currentDomain && (
           <div className="mt-1">
             {isAddingSubTopic ? (
               <div className="flex items-center gap-1.5 animate-fadeIn">
@@ -280,33 +219,11 @@ export default function DomainSelectors({
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
             Concept
           </label>
-          <button
-            type="button"
-            onClick={onToggleConceptLock}
-            className={`flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded transition-all duration-100 ${
-              conceptLocked
-                ? 'bg-blue-50 text-blue-600 border border-blue-200/50 font-bold'
-                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            {conceptLocked ? (
-              <>
-                <Lock className="w-2.5 h-2.5" /> Locked
-              </>
-            ) : (
-              <>
-                <Unlock className="w-2.5 h-2.5" /> Lock Batch
-              </>
-            )}
-          </button>
         </div>
         <select
           value={selectedConceptId}
-          disabled={conceptLocked}
           onChange={(e) => onChangeConcept(e.target.value)}
-          className={`w-full px-3 py-2 bg-slate-50 border rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-            conceptLocked ? 'opacity-60 cursor-not-allowed bg-slate-100 border-slate-200' : 'border-slate-200 hover:border-slate-300'
-          }`}
+          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {concepts.map((concept) => (
             <option key={concept.id} value={concept.id}>
@@ -316,7 +233,7 @@ export default function DomainSelectors({
         </select>
 
         {/* Inline Add Concept Form */}
-        {!conceptLocked && currentDomain && currentSubTopic && (
+        {currentDomain && currentSubTopic && (
           <div className="mt-1">
             {isAddingConcept ? (
               <div className="flex items-center gap-1.5 animate-fadeIn">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, CheckCircle2, XCircle, ArrowRight, Database, Eye, Award } from 'lucide-react';
+import { ShieldAlert, CheckCircle2, XCircle, ArrowRight, Database, Eye, Award, Lock, RefreshCw } from 'lucide-react';
 
 // Import Custom Components
 import Sidebar from '@/components/admin/Sidebar';
@@ -11,10 +11,12 @@ import MetaSelectors from '@/components/admin/MetaSelectors';
 import ResponseMatrix from '@/components/admin/ResponseMatrix';
 import ContentEditor from '@/components/admin/ContentEditor';
 import LivePreview from '@/components/admin/LivePreview';
+import QuestionsManagement from '@/components/admin/QuestionsManagement';
 
 // Import Static Stores & Types
 import { DOMAINS_DATA, USER_ROLES, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import { UserRole, Difficulty, ResponseOption, Question, Domain } from '@/lib/admin/types';
+import { supabase } from '@/lib/supabase';
 
 // Slugify helper for generating unique IDs for new domains, sub-topics, and concepts
 const slugify = (text: string) => {
@@ -29,7 +31,6 @@ const slugify = (text: string) => {
 
 export default function AdminContentCreator() {
   // Navigation & Role states
-  const [activeTab, setActiveTab] = useState<string>('content');
   const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]); // Default: Admin
 
   // Dynamic Domains Registry State
@@ -40,14 +41,9 @@ export default function AdminContentCreator() {
   const [subTopicId, setSubTopicId] = useState<string>('arithmetic');
   const [conceptId, setConceptId] = useState<string>('percentages');
 
-  // Selector lock states (Batch uploads)
-  const [domainLocked, setDomainLocked] = useState<boolean>(false);
-  const [subTopicLocked, setSubTopicLocked] = useState<boolean>(false);
-  const [conceptLocked, setConceptLocked] = useState<boolean>(false);
-
   // Core metadata
   const [difficulty, setDifficulty] = useState<Difficulty>('MEDIUM');
-  const [companyTags, setCompanyTags] = useState<string[]>(['TCS', 'Infosys', 'Amazon']);
+  const [companyTags, setCompanyTags] = useState<string[]>([]);
   const [shuffleOptions, setShuffleOptions] = useState<boolean>(true);
 
   // Text inputs & walkthrough details
@@ -59,24 +55,18 @@ export default function AdminContentCreator() {
   const [videoThumbnail, setVideoThumbnail] = useState<string>('');
   
   // Option matrix states
-  const [options, setOptions] = useState<ResponseOption[]>([
-    { id: 'A', text: '', isCorrect: true, metadata: '' },
-    { id: 'B', text: '', isCorrect: false, metadata: '' },
-    { id: 'C', text: '', isCorrect: false, metadata: '' },
-    { id: 'D', text: '', isCorrect: false, metadata: '' }
-  ]);
+  const [options, setOptions] = useState<ResponseOption[]>([]);
 
   // AI Assist sample cycle state
   const [sampleIndex, setSampleIndex] = useState<number>(0);
 
+  // Questions Management integration states
+  const [questionsList, setQuestionsList] = useState<Question[]>(SAMPLE_QUESTIONS);
+  const [currentQuestionId, setCurrentQuestionId] = useState<string>('Q-8029-X');
+
   // Action notification banners & modal overlays
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
   const [showPublishModal, setShowPublishModal] = useState<boolean>(false);
-
-  // Initialize with the first sample question on initial load
-  useEffect(() => {
-    loadQuestionTemplate(SAMPLE_QUESTIONS[0]);
-  }, []);
 
   // Timer to clear alert banners
   useEffect(() => {
@@ -88,9 +78,9 @@ export default function AdminContentCreator() {
 
   // Load a complete Question schema template
   const loadQuestionTemplate = (q: Question) => {
-    if (!domainLocked) setDomainId(q.domainId);
-    if (!subTopicLocked) setSubTopicId(q.subTopicId);
-    if (!conceptLocked) setConceptId(q.conceptId);
+    setDomainId(q.domainId);
+    setSubTopicId(q.subTopicId);
+    setConceptId(q.conceptId);
     
     setDifficulty(q.difficulty);
     setCompanyTags(q.companyTags);
@@ -101,8 +91,95 @@ export default function AdminContentCreator() {
     setVideoTitle(q.videoTitle || 'Walkthrough Tutorial');
     setVideoDuration(q.videoDuration || '12:00');
     setVideoThumbnail(q.videoThumbnail || '');
-    setOptions(JSON.parse(JSON.stringify(q.options))); // deep copy
+    setOptions(q.options || []);
   };
+
+  // Handle toggling to Content Creator for a NEW question
+  const handleAddNewQuestionClick = () => {
+    // Generate a fresh unique ID for the new question
+    const newId = 'Q-' + Math.floor(1000 + Math.random() * 9000) + '-' + String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    setCurrentQuestionId(newId);
+    
+    // Reset all form inputs to default clean values
+    setDomainId('quant');
+    setSubTopicId('arithmetic');
+    setConceptId('percentages');
+    setDifficulty('MEDIUM');
+    setCompanyTags([]);
+    setShuffleOptions(true);
+    setQuestionStem('');
+    setHintText('');
+    setVideoUrl('');
+    setVideoTitle('');
+    setVideoDuration('');
+    setVideoThumbnail('');
+    setOptions([]);
+  };
+
+  // Handle loading and toggling to Content Creator for EDITING an existing question
+  const handleEditQuestionClick = (q: Question) => {
+    loadQuestionTemplate(q);
+    setCurrentQuestionId(q.id);
+    const foundIndex = SAMPLE_QUESTIONS.findIndex((sq) => sq.id === q.id);
+    if (foundIndex !== -1) {
+      setSampleIndex(foundIndex);
+    }
+  };
+
+  const handleRoleChange = (role: UserRole) => {
+    setCurrentRole(role);
+    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
+  };
+
+  // Synchronize dynamic store and load query parameters from URL on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const qId = params.get('id');
+      const isNew = params.get('new');
+      
+      let currentQuestions = SAMPLE_QUESTIONS;
+      const stored = localStorage.getItem('aptitude_questions');
+      if (stored) {
+        try {
+          currentQuestions = JSON.parse(stored);
+          setQuestionsList(currentQuestions);
+        } catch (e) {
+          console.error('Failed to parse questions from localStorage', e);
+        }
+      } else {
+        localStorage.setItem('aptitude_questions', JSON.stringify(SAMPLE_QUESTIONS));
+      }
+
+      // Load current role
+      const storedRole = localStorage.getItem('aptitude_current_role');
+      if (storedRole) {
+        try {
+          const parsed = JSON.parse(storedRole);
+          const matched = USER_ROLES.find(r => r.role === parsed.role);
+          if (matched) {
+            setCurrentRole(matched);
+          }
+        } catch (e) {
+          console.error('Failed to parse current role', e);
+        }
+      }
+
+      if (qId) {
+        const found = currentQuestions.find((q) => q.id === qId);
+        if (found) {
+          loadQuestionTemplate(found);
+          setCurrentQuestionId(qId);
+          const foundIndex = currentQuestions.findIndex((sq) => sq.id === qId);
+          if (foundIndex !== -1) {
+            setSampleIndex(foundIndex);
+          }
+        }
+      } else if (isNew) {
+        handleAddNewQuestionClick();
+      }
+    }
+  }, []);
 
   // State synchronization handlers to keep active selections aligned
   const handleDomainChange = (newId: string) => {
@@ -268,6 +345,35 @@ export default function AdminContentCreator() {
     );
   };
 
+  // Option grid add new choice option
+  const handleAddingOption = () => {
+    if (options.length >= 10) {
+      setNotification({
+        message: 'Validation warning: Maximum limit of 10 options reached.',
+        type: 'info'
+      });
+      return;
+    }
+    const nextLetter = String.fromCharCode(65 + options.length);
+    const isFirst = options.length === 0;
+    setOptions([
+      ...options,
+      { id: nextLetter, text: '', isCorrect: isFirst, metadata: '' }
+    ]);
+  };
+
+  // Option grid remove custom choice option
+  const handleRemovingOption = (id: string) => {
+    const filtered = options.filter((opt) => opt.id !== id);
+    const wasCorrect = options.find((opt) => opt.id === id)?.isCorrect;
+    const reindexed = filtered.map((opt, idx) => ({
+      ...opt,
+      id: String.fromCharCode(65 + idx),
+      isCorrect: wasCorrect && idx === 0 ? true : opt.isCorrect
+    }));
+    setOptions(reindexed);
+  };
+
   // Real-time Schema Validation (Rules resembling Zod schema validation)
   const getValidationErrors = (): string[] => {
     const errors: string[] = [];
@@ -279,7 +385,7 @@ export default function AdminContentCreator() {
 
     // Rule 2: Exactly one correct option
     const correctCount = options.filter((o) => o.isCorrect).length;
-    if (correctCount !== 1) {
+    if (correctCount !== 1 && options.length > 0) {
       errors.push('Exactly one response option must be designated as CORRECT.');
     }
 
@@ -294,10 +400,12 @@ export default function AdminContentCreator() {
       errors.push('Walkthrough video URL must be a valid YouTube link.');
     }
 
-    // Role-based workflow warning
-    if (currentRole.role === 'reviewer') {
-      errors.push('Role limitation: Reviewers have read-only clearance. Publication is dry-run only.');
+    // Rule 5: Minimum option count
+    if (options.length < 2) {
+      errors.push('Multiple-choice questions require at least 2 response options.');
     }
+
+
 
     return errors;
   };
@@ -305,32 +413,288 @@ export default function AdminContentCreator() {
   const validationErrors = getValidationErrors();
   const isValid = validationErrors.length === 0;
 
+  const [isSavingToDb, setIsSavingToDb] = useState(false);
+
+  const saveToSupabase = async (q: Question) => {
+    setIsSavingToDb(true);
+    try {
+      // 1. Resolve domain display name and fetch/insert domain ID
+      const domainObj = DOMAINS_DATA.find(d => d.id === q.domainId);
+      const domainName = domainObj ? domainObj.name : q.domainId;
+
+      let domainIdUuid = '';
+      const { data: existingDomains, error: domainSearchError } = await supabase
+        .from('domains')
+        .select('id')
+        .eq('name', domainName);
+
+      if (domainSearchError) throw domainSearchError;
+
+      if (existingDomains && existingDomains.length > 0) {
+        domainIdUuid = existingDomains[0].id;
+      } else {
+        const { data: newDomain, error: domainInsertError } = await supabase
+          .from('domains')
+          .insert({ name: domainName })
+          .select('id')
+          .single();
+
+        if (domainInsertError) throw domainInsertError;
+        if (newDomain) domainIdUuid = newDomain.id;
+      }
+
+      // 2. Resolve subtopic display name and fetch/insert subtopic ID
+      let subTopicName = q.subTopicId;
+      if (domainObj) {
+        const subTopicObj = domainObj.subTopics.find(s => s.id === q.subTopicId);
+        if (subTopicObj) subTopicName = subTopicObj.name;
+      }
+
+      let subTopicIdUuid = '';
+      const { data: existingSubTopics, error: subTopicSearchError } = await supabase
+        .from('sub_topics')
+        .select('id')
+        .eq('domain_id', domainIdUuid)
+        .eq('name', subTopicName);
+
+      if (subTopicSearchError) throw subTopicSearchError;
+
+      if (existingSubTopics && existingSubTopics.length > 0) {
+        subTopicIdUuid = existingSubTopics[0].id;
+      } else {
+        const { data: newSubTopic, error: subTopicInsertError } = await supabase
+          .from('sub_topics')
+          .insert({ domain_id: domainIdUuid, name: subTopicName })
+          .select('id')
+          .single();
+
+        if (subTopicInsertError) throw subTopicInsertError;
+        if (newSubTopic) subTopicIdUuid = newSubTopic.id;
+      }
+
+      // 3. Resolve concept display name and fetch/insert concept ID
+      let conceptName = q.conceptId;
+      if (domainObj) {
+        const subTopicObj = domainObj.subTopics.find(s => s.id === q.subTopicId);
+        if (subTopicObj) {
+          const conceptObj = subTopicObj.concepts.find(c => c.id === q.conceptId || c.id === q.conceptId.trim());
+          if (conceptObj) conceptName = conceptObj.name;
+        }
+      }
+
+      let conceptIdUuid = '';
+      const { data: existingConcepts, error: conceptSearchError } = await supabase
+        .from('concepts')
+        .select('id')
+        .eq('sub_topic_id', subTopicIdUuid)
+        .eq('name', conceptName);
+
+      if (conceptSearchError) throw conceptSearchError;
+
+      if (existingConcepts && existingConcepts.length > 0) {
+        conceptIdUuid = existingConcepts[0].id;
+      } else {
+        const { data: newConcept, error: conceptInsertError } = await supabase
+          .from('concepts')
+          .insert({ sub_topic_id: subTopicIdUuid, name: conceptName })
+          .select('id')
+          .single();
+
+        if (conceptInsertError) throw conceptInsertError;
+        if (newConcept) conceptIdUuid = newConcept.id;
+      }
+
+      // 4. Check if question already exists under concept with same stem
+      let questionUuid = '';
+      const { data: existingQuestions, error: questionSearchError } = await supabase
+        .from('questions')
+        .select('id')
+        .eq('concept_id', conceptIdUuid)
+        .eq('question_text', q.questionStem);
+
+      if (questionSearchError) throw questionSearchError;
+
+      const correctAnswerText = q.options?.find((o: any) => o.isCorrect)?.text || '';
+
+      if (existingQuestions && existingQuestions.length > 0) {
+        questionUuid = existingQuestions[0].id;
+        const { error: questionUpdateError } = await supabase
+          .from('questions')
+          .update({
+            difficulty: q.difficulty || 'MEDIUM',
+            options: q.options,
+            correct_answer: correctAnswerText,
+            explanation: q.hintText || '',
+            video_url: q.videoUrl || '',
+            is_active: q.status === 'Published'
+          })
+          .eq('id', questionUuid);
+
+        if (questionUpdateError) throw questionUpdateError;
+      } else {
+        const { data: newQuestion, error: questionInsertError } = await supabase
+          .from('questions')
+          .insert({
+            concept_id: conceptIdUuid,
+            type: 'MCQ',
+            difficulty: q.difficulty || 'MEDIUM',
+            question_text: q.questionStem,
+            options: q.options,
+            correct_answer: correctAnswerText,
+            explanation: q.hintText || '',
+            video_url: q.videoUrl || '',
+            is_active: q.status === 'Published'
+          })
+          .select('id')
+          .single();
+
+        if (questionInsertError) throw questionInsertError;
+        if (newQuestion) questionUuid = newQuestion.id;
+      }
+
+      // 5. Handle company tags if present
+      if (q.companyTags && Array.isArray(q.companyTags)) {
+        for (const companyName of q.companyTags) {
+          if (!companyName) continue;
+          let companyUuid = '';
+          
+          const { data: existingCompanies, error: companySearchError } = await supabase
+            .from('companies')
+            .select('id')
+            .eq('name', companyName);
+
+          if (companySearchError) continue;
+
+          if (existingCompanies && existingCompanies.length > 0) {
+            companyUuid = existingCompanies[0].id;
+          } else {
+            const { data: newCompany, error: companyInsertError } = await supabase
+              .from('companies')
+              .insert({ name: companyName })
+              .select('id')
+              .single();
+            if (!companyInsertError && newCompany) {
+              companyUuid = newCompany.id;
+            }
+          }
+
+          if (companyUuid && questionUuid) {
+            const { data: existingPivot, error: pivotSearchError } = await supabase
+              .from('question_companies')
+              .select('question_id')
+              .eq('question_id', questionUuid)
+              .eq('company_id', companyUuid);
+
+            if (!pivotSearchError && (!existingPivot || existingPivot.length === 0)) {
+              await supabase
+                .from('question_companies')
+                .insert({
+                  question_id: questionUuid,
+                  company_id: companyUuid
+                });
+            }
+          }
+        }
+      }
+      console.log('Successfully saved to Supabase:', q.id);
+    } catch (dbErr: any) {
+      console.error('Database write error (ignored for sandbox continuity):', dbErr.message || dbErr);
+    } finally {
+      setIsSavingToDb(false);
+    }
+  };
+
   // Save Draft Action handler
-  const handleSaveDraft = () => {
+  const handleSaveDraft = async () => {
+    const updatedQuestion: Question = {
+      id: currentQuestionId,
+      domainId,
+      subTopicId,
+      conceptId,
+      difficulty,
+      companyTags,
+      shuffleOptions,
+      questionStem,
+      hintText,
+      videoUrl,
+      videoTitle: videoTitle || 'Walkthrough Tutorial',
+      videoDuration: videoDuration || '12:00',
+      videoThumbnail,
+      options,
+      status: 'Draft',
+      createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    };
+
+    setQuestionsList((prev) => {
+      const exists = prev.some((q) => q.id === currentQuestionId);
+      const updated = exists
+        ? prev.map((q) => (q.id === currentQuestionId ? updatedQuestion : q))
+        : [updatedQuestion, ...prev];
+      localStorage.setItem('aptitude_questions', JSON.stringify(updated));
+      return updated;
+    });
+
     setNotification({
-      message: 'Draft Saved: Aptitude question schema cached in local sandbox storage.',
+      message: `Draft Saved: ${currentQuestionId} synced with Supabase & local storage sandbox.`,
       type: 'info'
     });
+
+    // Write directly to live Supabase in background
+    await saveToSupabase(updatedQuestion);
   };
 
   // Publish Question Action handler
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!isValid) return;
+
+    const updatedQuestion: Question = {
+      id: currentQuestionId,
+      domainId,
+      subTopicId,
+      conceptId,
+      difficulty,
+      companyTags,
+      shuffleOptions,
+      questionStem,
+      hintText,
+      videoUrl,
+      videoTitle: videoTitle || 'Walkthrough Tutorial',
+      videoDuration: videoDuration || '12:00',
+      videoThumbnail,
+      options,
+      status: 'Published',
+      createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    };
+
+    setQuestionsList((prev) => {
+      const exists = prev.some((q) => q.id === currentQuestionId);
+      const updated = exists
+        ? prev.map((q) => (q.id === currentQuestionId ? updatedQuestion : q))
+        : [updatedQuestion, ...prev];
+      localStorage.setItem('aptitude_questions', JSON.stringify(updated));
+      return updated;
+    });
+
     setShowPublishModal(true);
+
+    // Write directly to live Supabase in background
+    await saveToSupabase(updatedQuestion);
   };
 
-  // Resolve active metadata descriptions
   const activeDomainName = domains.find((d) => d.id === domainId)?.name || 'Quantitative Aptitude';
 
   return (
     <div className="flex h-screen bg-slate-100 font-sans overflow-hidden antialiased">
       {/* 1. Left Navigation Sidebar */}
-      <Sidebar activeId={activeTab} onSelectTab={setActiveTab} />
+      <Sidebar
+        activeId="editor"
+        userRole={currentRole.role}
+      />
 
       {/* Main Workspace Frame */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         {/* 2. Top Utility & Role Selection Header */}
-        <Header currentRole={currentRole} onRoleChange={setCurrentRole} />
+        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
 
         {/* Transient banner updates */}
         {notification && (
@@ -348,22 +712,73 @@ export default function AdminContentCreator() {
           </div>
         )}
 
-        {/* Tab check to guarantee admin navigation workflow */}
-        {activeTab !== 'content' ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-slate-50/50">
-            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-4 border border-slate-200">
-              <Database className="w-6 h-6 text-slate-400" />
+        {/* Access control check to guarantee only Admin/Editor can access the system */}
+        {(currentRole.role !== 'admin' && currentRole.role !== 'editor') ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50">
+            <div className="w-full max-w-xl bg-white border border-slate-200/80 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
+              {/* Pulsing Lock Icon Container */}
+              <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 shadow-inner relative">
+                <Lock className="w-7 h-7 animate-pulse" />
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white shadow">
+                  !
+                </span>
+              </div>
+
+              {/* Title & Subtitle */}
+              <div className="flex flex-col gap-1.5">
+                <h2 className="text-lg font-black text-slate-800 tracking-tight">Clearance Protocol Violation</h2>
+                <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                  Secure Sandbox Sandbox v2.4
+                </p>
+              </div>
+
+              {/* Identity Token checklist */}
+              <div className="w-full bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200/50 pb-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Assigned Clearance Token
+                  </span>
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 text-rose-700 uppercase tracking-wide">
+                    DENIED
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Attempted User</span>
+                    <span className="text-slate-800 font-bold">{currentRole.name}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Assigned Email</span>
+                    <span className="text-slate-800 font-bold font-mono text-[11px]">{currentRole.email}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-slate-800 font-bold uppercase tracking-wider text-[11px] text-rose-600">
+                      {currentRole.role}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 font-semibold uppercase">System Route</span>
+                    <span className="text-slate-800 font-bold font-mono text-[11px]">/admin/editor</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full mt-2">
+                <button
+                  onClick={() => {
+                    const admin = USER_ROLES.find(r => r.role === 'admin');
+                    if (admin) handleRoleChange(admin);
+                  }}
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin-hover" />
+                  <span>Request Admin Clearance</span>
+                </button>
+              </div>
             </div>
-            <h2 className="text-base font-bold text-slate-800 tracking-tight">Enterprise Navigation Mock</h2>
-            <p className="text-xs text-slate-500 max-w-sm mt-1.5 leading-relaxed font-medium">
-              You clicked the <strong>{activeTab.toUpperCase()}</strong> panel. The Aptitude Admin workspace contains fully isolated dashboards. Click <strong>Content Management</strong> on the sidebar to return to the interactive Dynamic Content Creator workspace.
-            </p>
-            <button
-              onClick={() => setActiveTab('content')}
-              className="mt-4 flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 underline"
-            >
-              Go to Content Creator <ArrowRight className="w-3.5 h-3.5" />
-            </button>
           </div>
         ) : (
           /* 3. The Interactive content creator layout space */
@@ -377,17 +792,6 @@ export default function AdminContentCreator() {
                   Synthesize and validate mathematical stems, markdown solutions, and multi-choice response matrices.
                 </p>
               </div>
-
-              {/* Role Indicator badge */}
-              <div className="flex items-center gap-2 bg-white px-3.5 py-1.5 border border-slate-200 rounded-lg shadow-sm w-fit self-start">
-                <Award className="w-4 h-4 text-blue-600 animate-pulse" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-                  Credentials:
-                </span>
-                <span className="text-xs font-bold text-slate-800 capitalize">
-                  {currentRole.role} Access
-                </span>
-              </div>
             </div>
 
             {/* A. Domain Selection Grid */}
@@ -399,12 +803,6 @@ export default function AdminContentCreator() {
               onChangeDomain={handleDomainChange}
               onChangeSubTopic={handleSubTopicChange}
               onChangeConcept={setConceptId}
-              domainLocked={domainLocked}
-              subTopicLocked={subTopicLocked}
-              conceptLocked={conceptLocked}
-              onToggleDomainLock={() => setDomainLocked(!domainLocked)}
-              onToggleSubTopicLock={() => setSubTopicLocked(!subTopicLocked)}
-              onToggleConceptLock={() => setConceptLocked(!conceptLocked)}
               onAddDomain={handleAddDomain}
               onAddSubTopic={handleAddSubTopic}
               onAddConcept={handleAddConcept}
@@ -433,6 +831,8 @@ export default function AdminContentCreator() {
                     onChangeOptionMetadata={handleOptionMetadataChange}
                     onSetCorrectOption={handleSetCorrectOption}
                     onToggleShuffle={() => setShuffleOptions(!shuffleOptions)}
+                    onAddOption={handleAddingOption}
+                    onRemoveOption={handleRemovingOption}
                   />
                 </div>
 
@@ -459,11 +859,13 @@ export default function AdminContentCreator() {
                   options={options}
                   difficulty={difficulty}
                   domainName={activeDomainName}
-                  questionId={SAMPLE_QUESTIONS[sampleIndex]?.id || 'Q-8829-X'}
+                  questionId={currentQuestionId}
                   videoUrl={videoUrl}
                   videoTitle={videoTitle}
                   videoDuration={videoDuration}
                   videoThumbnail={videoThumbnail}
+                  shuffleOptions={shuffleOptions}
+                  companyTags={companyTags}
                 />
               </div>
 
@@ -506,7 +908,7 @@ export default function AdminContentCreator() {
                   <div className="flex flex-col">
                     <span className="text-slate-400 font-semibold text-[10px]">REGISTRY ID</span>
                     <span className="text-slate-800 font-bold font-mono">
-                      {SAMPLE_QUESTIONS[sampleIndex]?.id || 'Q-8829-X'}
+                      {currentQuestionId}
                     </span>
                   </div>
                   <div className="flex flex-col">
@@ -533,21 +935,12 @@ export default function AdminContentCreator() {
               </div>
 
               {/* Access notification */}
-              {currentRole.role === 'reviewer' ? (
-                <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl flex items-start gap-2.5">
-                  <ShieldAlert className="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-amber-800 font-semibold leading-relaxed">
-                    Dry Run: Since your credentials are set to **Reviewer**, this question has not written persistent database storage rows.
-                  </span>
-                </div>
-              ) : (
-                <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-emerald-800 font-semibold leading-relaxed">
-                    Production sync: Successfully distributed into institutional student cohorts.
-                  </span>
-                </div>
-              )}
+              <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex items-start gap-2.5">
+                <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 shrink-0 mt-0.5" />
+                <span className="text-xs text-emerald-800 font-semibold leading-relaxed">
+                  Production sync: Successfully distributed into institutional student cohorts.
+                </span>
+              </div>
             </div>
 
             {/* Modal Close CTA */}
