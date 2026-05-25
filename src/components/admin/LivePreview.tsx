@@ -1,11 +1,99 @@
 'use client';
 
-import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import rehypeKatex from 'rehype-katex';
-import { Eye, Monitor, Tablet, Smartphone, HelpCircle, Play, Video, ExternalLink, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Eye, Monitor, Tablet, Smartphone, HelpCircle, Play, Video, ExternalLink, Sparkles, XCircle } from 'lucide-react';
 import { ResponseOption, Difficulty } from '@/lib/admin/types';
 import 'katex/dist/katex.min.css'; // Standard katex css for rendering formulas
+import katex from 'katex';
+
+const getYouTubeId = (url: string): string | null => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
+const markdownToHtml = (md: string): string => {
+  if (!md) return '';
+  let html = md;
+  
+  // Escape HTML tags to prevent execution issues
+  html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  
+  // Convert headings
+  html = html.replace(/^### ([\s\S]*?)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## ([\s\S]*?)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# ([\s\S]*?)$/gm, '<h1>$1</h1>');
+
+  // Convert Bold, Italic, Inline Code
+  html = html.replace(/\*\*([\s\S]*?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*([\s\S]*?)\*/g, '<em>$1</em>');
+  html = html.replace(/`([\s\S]*?)`/g, '<code>$1</code>');
+  
+  // Convert LaTeX block math ($$...$$)
+  html = html.replace(/\$\$([\s\S]*?)\$\$/g, '<div class="math-block" style="text-align: center; margin: 12px 0; padding: 8px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-family: \'Times New Roman\', Times, serif; font-style: italic; color: #2563eb;">$1</div>');
+
+  // Convert LaTeX inline math ($...$)
+  html = html.replace(/\$([^\$]+)\$/g, '<span class="math-tex" style="font-family: \'Times New Roman\', Times, serif; font-style: italic; color: #2563eb; background-color: #f8fafc; padding: 1px 4px; border: 1px solid #e2e8f0; border-radius: 4px; font-weight: 500;">$1</span>');
+  
+  // Convert newlines to breaks
+  html = html.replace(/\n/g, '<br/>');
+  
+  return html;
+};
+
+function SafeHtmlWithMath({ html }: { html: string }) {
+  if (!html) return null;
+  const parts = html.split(/(\$\$[\s\S]*?\$\$|\$[^\$]+\$|<span class="math-tex"[^>]*>[\s\S]*?<\/span>|<div class="math-block"[^>]*>[\s\S]*?<\/div>)/g);
+  
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (part.startsWith('<div class="math-block"') && part.includes('</div>')) {
+          const match = part.match(/>([\s\S]*?)<\/div>/);
+          const math = match ? match[1] : '';
+          try {
+            const mathHtml = katex.renderToString(math, { displayMode: true, throwOnError: false });
+            return <div key={index} style={{ textAlign: 'center', margin: '12px 0' }} dangerouslySetInnerHTML={{ __html: mathHtml }} />;
+          } catch (e) {
+            return <code key={index}>{math}</code>;
+          }
+        }
+        else if (part.startsWith('<span class="math-tex"') && part.includes('</span>')) {
+          const match = part.match(/>([\s\S]*?)<\/span>/);
+          const math = match ? match[1] : '';
+          try {
+            const mathHtml = katex.renderToString(math, { displayMode: false, throwOnError: false });
+            return <span key={index} dangerouslySetInnerHTML={{ __html: mathHtml }} />;
+          } catch (e) {
+            return <code key={index}>{math}</code>;
+          }
+        }
+        else if (part.startsWith('$$') && part.endsWith('$$')) {
+          const math = part.slice(2, -2);
+          try {
+            const mathHtml = katex.renderToString(math, { displayMode: true, throwOnError: false });
+            return <div key={index} style={{ textAlign: 'center', margin: '12px 0' }} dangerouslySetInnerHTML={{ __html: mathHtml }} />;
+          } catch (e) {
+            return <code key={index}>{part}</code>;
+          }
+        }
+        else if (part.startsWith('$') && part.endsWith('$')) {
+          const math = part.slice(1, -1);
+          try {
+            const mathHtml = katex.renderToString(math, { displayMode: false, throwOnError: false });
+            return <span key={index} dangerouslySetInnerHTML={{ __html: mathHtml }} />;
+          } catch (e) {
+            return <code key={index}>{part}</code>;
+          }
+        } 
+        else {
+          return <span key={index} dangerouslySetInnerHTML={{ __html: part }} />;
+        }
+      })}
+    </>
+  );
+}
 
 interface LivePreviewProps {
   questionStem: string;
@@ -18,6 +106,8 @@ interface LivePreviewProps {
   videoTitle?: string;
   videoDuration?: string;
   videoThumbnail?: string;
+  shuffleOptions?: boolean;
+  companyTags?: string[];
 }
 
 export default function LivePreview({
@@ -30,11 +120,56 @@ export default function LivePreview({
   videoUrl,
   videoTitle = 'MASTERING APTITUDE TUTORIAL',
   videoDuration = '10:00',
-  videoThumbnail = 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600'
+  videoThumbnail = 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600',
+  shuffleOptions = false,
+  companyTags = []
 }: LivePreviewProps) {
   const [deviceLayout, setDeviceLayout] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [selectedStudentChoice, setSelectedStudentChoice] = useState<string | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [shuffleOrder, setShuffleOrder] = useState<string[]>([]);
+
+  const videoId = getYouTubeId(videoUrl);
+  const resolvedThumbnail = videoId
+    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+    : videoThumbnail;
+
+  // Stable Fisher-Yates Shuffling to prevent jumping while typing
+  useEffect(() => {
+    const ids = options.map((o) => o.id);
+    if (shuffleOptions) {
+      const isDefaultOrder = shuffleOrder.length === ids.length && shuffleOrder.every((val, index) => val === ids[index]);
+      const hasLengthMismatch = shuffleOrder.length !== options.length;
+      const hasMissingIds = !options.every((o) => shuffleOrder.includes(o.id));
+      
+      if (isDefaultOrder || hasLengthMismatch || hasMissingIds) {
+        const shuffledIds = [...ids];
+        for (let i = shuffledIds.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledIds[i], shuffledIds[j]] = [shuffledIds[j], shuffledIds[i]];
+        }
+        setShuffleOrder(shuffledIds);
+      }
+    } else {
+      setShuffleOrder(ids);
+    }
+  }, [options, shuffleOptions]);
+
+  // Resolve display options (shuffles the values, keeping Option ID names in strict alphabetical order)
+  const displayOptions = options.map((option, index) => {
+    if (!shuffleOptions || shuffleOrder.length !== options.length) {
+      return option;
+    }
+    const targetId = shuffleOrder[index];
+    const sourceOption = options.find((o) => o.id === targetId);
+    if (!sourceOption) return option;
+    return {
+      ...option, // Keep original ID (A, B, C, D...)
+      text: sourceOption.text,
+      isCorrect: sourceOption.isCorrect,
+      metadata: sourceOption.metadata
+    };
+  });
 
   // Helper to resolve device styling classes
   const getDeviceWidthClass = () => {
@@ -117,13 +252,28 @@ export default function LivePreview({
             
             {/* Metadata Tags Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded tracking-wide uppercase">
-                  {domainName}
-                </span>
-                <span className={`text-[10px] font-extrabold border px-2 py-0.5 rounded tracking-wide uppercase ${getDifficultyBadge()}`}>
-                  {difficulty}
-                </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded tracking-wide uppercase">
+                    {domainName}
+                  </span>
+                  <span className={`text-[10px] font-extrabold border px-2 py-0.5 rounded tracking-wide uppercase ${getDifficultyBadge()}`}>
+                    {difficulty}
+                  </span>
+                </div>
+                {companyTags && companyTags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 items-center border-l border-slate-200 pl-3 ml-1">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Asked by:</span>
+                    {companyTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[9px] font-black bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded tracking-wide font-sans transition-colors"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">
                 {questionId || 'Q. ID: PENDING'}
@@ -131,9 +281,11 @@ export default function LivePreview({
             </div>
 
             {/* Question Stem Prompt (Rendered beautifully with ReactMarkdown + Katex support) */}
-            <div className="text-slate-800 text-[15px] leading-relaxed font-normal antialiased prose max-w-none prose-slate prose-headings:text-slate-900 prose-code:text-slate-700 prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-50 prose-pre:border prose-pre:border-slate-100">
+            <div className="text-slate-800 text-[15px] leading-relaxed font-normal antialiased prose max-w-none prose-slate prose-headings:text-slate-900 prose-code:text-slate-700 prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-50 prose-pre:border prose-pre:border-slate-100 break-all">
               {questionStem ? (
-                <ReactMarkdown rehypePlugins={[rehypeKatex]}>{questionStem}</ReactMarkdown>
+                <div className="prose max-w-none prose-slate break-all">
+                  <SafeHtmlWithMath html={markdownToHtml(questionStem)} />
+                </div>
               ) : (
                 <p className="text-slate-400 italic font-sans">
                   The formatted question text will render here as you type in the editor...
@@ -143,12 +295,12 @@ export default function LivePreview({
 
             {/* Hint Box (Conditional) */}
             {hintText && (
-              <div className="bg-blue-50/50 border border-blue-100/60 rounded-xl p-4 flex items-start gap-3">
+              <div className="bg-blue-50/50 border border-blue-100/60 rounded-xl p-4 flex items-start gap-3 flex-1 min-w-0">
                 <span className="text-base shrink-0 leading-none">💡</span>
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                   <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Hint</span>
-                  <div className="text-xs text-blue-800 font-medium leading-relaxed prose prose-blue max-w-none">
-                    <ReactMarkdown rehypePlugins={[rehypeKatex]}>{hintText}</ReactMarkdown>
+                  <div className="text-xs text-blue-800 font-medium leading-relaxed prose prose-blue max-w-none break-all">
+                    <SafeHtmlWithMath html={markdownToHtml(hintText)} />
                   </div>
                 </div>
               </div>
@@ -156,7 +308,7 @@ export default function LivePreview({
 
             {/* Options Interactive Selection list */}
             <div className="flex flex-col gap-2.5 mt-2">
-              {options.map((option) => {
+              {displayOptions.map((option) => {
                 const isSelected = selectedStudentChoice === option.id;
                 const isOptionFilled = option.text.trim().length > 0;
                 
@@ -166,7 +318,7 @@ export default function LivePreview({
                     type="button"
                     disabled={!isOptionFilled}
                     onClick={() => setSelectedStudentChoice(option.id)}
-                    className={`w-full flex items-center justify-between p-3.5 border rounded-xl text-left transition-all ${
+                    className={`w-full flex items-start justify-between p-3.5 border rounded-xl text-left transition-all ${
                       !isOptionFilled
                         ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
                         : isSelected
@@ -174,10 +326,10 @@ export default function LivePreview({
                         : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50/30'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
                       {/* Circle Letter label */}
                       <div
-                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                           isSelected
                             ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/10'
                             : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
@@ -185,14 +337,14 @@ export default function LivePreview({
                       >
                         {option.id}
                       </div>
-                      <span className="text-[13px] font-medium leading-tight">
+                      <span className="text-[13px] font-medium leading-tight break-all block flex-1 pr-2">
                         {isOptionFilled ? option.text : `Empty Option ${option.id}`}
                       </span>
                     </div>
 
                     {/* Verification checkmark if option is correct & verified */}
                     {isSelected && (
-                      <span className="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center text-white text-[9px] font-bold shadow-sm">
+                      <span className="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center text-white text-[9px] font-bold shadow-sm shrink-0 mt-1">
                         ✓
                       </span>
                     )}
@@ -211,12 +363,45 @@ export default function LivePreview({
 
               {/* Mock Video Container */}
               <div
-                onClick={() => setIsVideoPlaying(!isVideoPlaying)}
-                className="relative aspect-video rounded-xl bg-slate-900 border border-slate-950 overflow-hidden cursor-pointer group shadow-inner"
+                onClick={!isVideoPlaying ? () => setIsVideoPlaying(true) : undefined}
+                className={`relative aspect-video rounded-xl bg-slate-900 border border-slate-950 overflow-hidden shadow-inner ${
+                  !isVideoPlaying ? 'cursor-pointer group' : ''
+                }`}
               >
-                {isVideoPlaying ? (
-                  // Video Playing State
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-black/95 text-center px-4 relative">
+                {isVideoPlaying && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsVideoPlaying(false);
+                    }}
+                    className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-black/60 hover:bg-black/85 text-white hover:text-rose-400 transition-colors shadow-md flex items-center justify-center cursor-pointer"
+                    title="Close Player"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                )}
+
+                {isVideoPlaying && videoId ? (
+                  // Real Embedded YouTube Player
+                  <div className="w-full h-full relative bg-black">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                      title={videoTitle || "Video solution"}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full absolute inset-0 border-0"
+                    ></iframe>
+                  </div>
+                ) : isVideoPlaying ? (
+                  // Fallback Mock Video Playing State
+                  <div 
+                    onClick={() => setIsVideoPlaying(false)}
+                    className="w-full h-full flex flex-col items-center justify-center bg-black/95 text-center px-4 relative cursor-pointer"
+                  >
                     <div className="absolute top-3 right-3 flex items-center gap-1 bg-red-600 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded tracking-wide animate-pulse">
                       LIVE STREAM
                     </div>
@@ -242,7 +427,7 @@ export default function LivePreview({
                   // Video Thumbnail State
                   <>
                     <img
-                      src={videoThumbnail}
+                      src={resolvedThumbnail}
                       alt="walkthrough thumbnail"
                       className="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-300"
                     />
