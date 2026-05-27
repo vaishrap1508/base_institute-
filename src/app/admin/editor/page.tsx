@@ -17,6 +17,7 @@ import QuestionsManagement from '@/components/admin/QuestionsManagement';
 import { DOMAINS_DATA, USER_ROLES, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import { UserRole, Difficulty, ResponseOption, Question, Domain } from '@/lib/admin/types';
 import { supabase } from '@/lib/supabase';
+import { generate16BitQuestionId, generate16BitBinaryId } from '@/lib/admin/idGenerator';
 
 // Slugify helper for generating unique IDs for new domains, sub-topics, and concepts
 const slugify = (text: string) => {
@@ -131,6 +132,87 @@ export default function AdminContentCreator() {
     localStorage.setItem('aptitude_current_role', JSON.stringify(role));
   };
 
+  const fetchQuestionFromSupabase = async (uuid: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('questions')
+        .select(`
+          id,
+          question_hash_seed,
+          difficulty,
+          question_text,
+          options,
+          explanation,
+          video_url,
+          is_active,
+          concept:concepts (
+            id,
+            name,
+            sub_topic:sub_topics (
+              id,
+              name,
+              domain:domains (id, name)
+            )
+          ),
+          tags:question_companies (
+            company:companies (name)
+          )
+        `)
+        .eq('id', uuid)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        const qData = data as any;
+        const domainId = qData.concept?.sub_topic?.domain?.id || 'quant';
+        const subTopicId = qData.concept?.sub_topic?.id || 'arithmetic';
+        const conceptId = qData.concept?.id || 'percentages';
+
+        const mappedQuestion: Question = {
+          id: qData.id,
+          trackingId: qData.tracking_id || undefined,
+          questionBinaryId: qData.id,
+          questionInternalUuid: qData.id,
+          questionHashSeed: qData.question_hash_seed || 0,
+          domainUuid: domainId,
+          subTopicUuid: subTopicId,
+          conceptUuid: conceptId,
+          domainId,
+          subTopicId,
+          conceptId,
+          difficulty: qData.difficulty || 'MEDIUM',
+          companyTags: qData.tags?.map((t: any) => t.company?.name).filter(Boolean) || [],
+          shuffleOptions: true,
+          questionStem: qData.question_text || '',
+          hintText: qData.explanation || '',
+          options: Array.isArray(qData.options)
+            ? qData.options.map((opt: any, index: number) => ({
+                id: opt.id || String.fromCharCode(65 + index),
+                text: opt.text || '',
+                isCorrect: opt.isCorrect || (opt.text === qData.correct_answer),
+                metadata: opt.metadata || ''
+              }))
+            : [],
+          videoUrl: qData.video_url || '',
+          status: qData.is_active ? 'Published' : 'Draft',
+          createdAt: 'Synced'
+        };
+
+        loadQuestionTemplate(mappedQuestion);
+        setCurrentQuestionId(uuid);
+        
+        // Populate local state catalog so references work instantly
+        setQuestionsList((prev) => {
+          if (prev.some((q) => q.id === uuid)) return prev;
+          return [mappedQuestion, ...prev];
+        });
+      }
+    } catch (err) {
+      console.warn('Failed to load question from Supabase:', err);
+    }
+  };
+
   // Synchronize dynamic store and load query parameters from URL on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -145,7 +227,7 @@ export default function AdminContentCreator() {
           currentQuestions = JSON.parse(stored);
           setQuestionsList(currentQuestions);
         } catch (e) {
-          console.error('Failed to parse questions from localStorage', e);
+          console.warn('Failed to parse questions from localStorage', e);
         }
       } else {
         localStorage.setItem('aptitude_questions', JSON.stringify(SAMPLE_QUESTIONS));
@@ -161,7 +243,7 @@ export default function AdminContentCreator() {
             setCurrentRole(matched);
           }
         } catch (e) {
-          console.error('Failed to parse current role', e);
+          console.warn('Failed to parse current role', e);
         }
       }
 
@@ -174,6 +256,9 @@ export default function AdminContentCreator() {
           if (foundIndex !== -1) {
             setSampleIndex(foundIndex);
           }
+        } else {
+          // If not found in local sandbox, fetch dynamically from Supabase
+          fetchQuestionFromSupabase(qId);
         }
       } else if (isNew) {
         handleAddNewQuestionClick();
@@ -506,11 +591,14 @@ export default function AdminContentCreator() {
 
       // 4. Check if question already exists under concept with same stem
       let questionUuid = '';
-      const { data: existingQuestions, error: questionSearchError } = await supabase
-        .from('questions')
-        .select('id')
-        .eq('concept_id', conceptIdUuid)
-        .eq('question_text', q.questionStem);
+      let savedBinaryId = '';
+      let savedHashSeed = 0;
+      
+      const isExistingId = q.id.includes('-') && q.id.length >= 19;
+
+      const { data: existingQuestions, error: questionSearchError } = isExistingId
+        ? await supabase.from('questions').select('id, question_hash_seed').eq('id', q.id)
+        : await supabase.from('questions').select('id, question_hash_seed').eq('concept_id', conceptIdUuid).eq('question_text', q.questionStem);
 
       if (questionSearchError) throw questionSearchError;
 
@@ -518,7 +606,7 @@ export default function AdminContentCreator() {
 
       if (existingQuestions && existingQuestions.length > 0) {
         questionUuid = existingQuestions[0].id;
-        const { error: questionUpdateError } = await supabase
+        const { data: updatedQuestionRow, error: questionUpdateError } = await supabase
           .from('questions')
           .update({
             difficulty: q.difficulty || 'MEDIUM',
@@ -528,11 +616,18 @@ export default function AdminContentCreator() {
             video_url: q.videoUrl || '',
             is_active: q.status === 'Published'
           })
-          .eq('id', questionUuid);
+          .eq('id', questionUuid)
+          .select('id, question_hash_seed')
+          .single();
 
         if (questionUpdateError) throw questionUpdateError;
+        if (updatedQuestionRow) {
+          questionUuid = updatedQuestionRow.id;
+          savedBinaryId = updatedQuestionRow.id;
+          savedHashSeed = updatedQuestionRow.question_hash_seed;
+        }
       } else {
-        const { data: newQuestion, error: questionInsertError } = await supabase
+        const { data: newQuestionRow, error: questionInsertError } = await supabase
           .from('questions')
           .insert({
             concept_id: conceptIdUuid,
@@ -545,11 +640,15 @@ export default function AdminContentCreator() {
             video_url: q.videoUrl || '',
             is_active: q.status === 'Published'
           })
-          .select('id')
+          .select('id, question_hash_seed')
           .single();
 
         if (questionInsertError) throw questionInsertError;
-        if (newQuestion) questionUuid = newQuestion.id;
+        if (newQuestionRow) {
+          questionUuid = newQuestionRow.id;
+          savedBinaryId = newQuestionRow.id;
+          savedHashSeed = newQuestionRow.question_hash_seed;
+        }
       }
 
       // 5. Handle company tags if present
@@ -596,9 +695,37 @@ export default function AdminContentCreator() {
           }
         }
       }
-      console.log('Successfully saved to Supabase:', q.id);
+
+      // 6. Update local react states and localStorage with the DB-computed values!
+      if (questionUuid) {
+        const syncedQuestion: Question = {
+          ...q,
+          id: questionUuid,
+          questionBinaryId: savedBinaryId,
+          questionHashSeed: savedHashSeed,
+          domainUuid: domainIdUuid,
+          subTopicUuid: subTopicIdUuid,
+          conceptUuid: conceptIdUuid
+        };
+
+        setCurrentQuestionId(questionUuid);
+        
+        setQuestionsList((prev) => {
+          const filtered = prev.filter((item) => item.id !== q.id && item.id !== questionUuid);
+          const updated = [syncedQuestion, ...filtered];
+          localStorage.setItem('aptitude_questions', JSON.stringify(updated));
+          return updated;
+        });
+
+        setNotification({
+          message: `Success: Question fully synced and registered in Supabase. ID: ${savedBinaryId}`,
+          type: 'success'
+        });
+      }
+      
+      console.log('Successfully saved to Supabase:', questionUuid);
     } catch (dbErr: any) {
-      console.error('Database write error (ignored for sandbox continuity):', dbErr.message || dbErr);
+      console.warn('Database write error (ignored for sandbox continuity):', dbErr.message || dbErr);
     } finally {
       setIsSavingToDb(false);
     }
@@ -866,6 +993,12 @@ export default function AdminContentCreator() {
                   videoThumbnail={videoThumbnail}
                   shuffleOptions={shuffleOptions}
                   companyTags={companyTags}
+                  domainId={domainId}
+                  subTopicId={subTopicId}
+                  conceptId={conceptId}
+                  trackingId={questionsList.find((q) => q.id === currentQuestionId)?.trackingId}
+                  domainsList={domains}
+                  allQuestions={questionsList}
                 />
               </div>
 
@@ -908,7 +1041,11 @@ export default function AdminContentCreator() {
                   <div className="flex flex-col">
                     <span className="text-slate-400 font-semibold text-[10px]">REGISTRY ID</span>
                     <span className="text-slate-800 font-bold font-mono">
-                      {currentQuestionId}
+                      {questionsList.find((q) => q.id === currentQuestionId)?.questionBinaryId || (
+                        currentQuestionId.length > 8
+                          ? generate16BitBinaryId(domainId, subTopicId, conceptId, currentQuestionId, 0, domains, questionsList)
+                          : currentQuestionId
+                      )}
                     </span>
                   </div>
                   <div className="flex flex-col">

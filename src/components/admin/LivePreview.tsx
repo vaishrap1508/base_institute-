@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, Monitor, Tablet, Smartphone, HelpCircle, Play, Video, ExternalLink, Sparkles, XCircle } from 'lucide-react';
 import { ResponseOption, Difficulty } from '@/lib/admin/types';
+import { generate16BitQuestionId } from '@/lib/admin/idGenerator';
 import 'katex/dist/katex.min.css'; // Standard katex css for rendering formulas
 import katex from 'katex';
 
@@ -108,6 +109,12 @@ interface LivePreviewProps {
   videoThumbnail?: string;
   shuffleOptions?: boolean;
   companyTags?: string[];
+  domainId?: string;
+  subTopicId?: string;
+  conceptId?: string;
+  trackingId?: string;
+  domainsList?: any[];
+  allQuestions?: any[];
 }
 
 export default function LivePreview({
@@ -122,7 +129,13 @@ export default function LivePreview({
   videoDuration = '10:00',
   videoThumbnail = 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600',
   shuffleOptions = false,
-  companyTags = []
+  companyTags = [],
+  domainId,
+  subTopicId,
+  conceptId,
+  trackingId,
+  domainsList,
+  allQuestions
 }: LivePreviewProps) {
   const [deviceLayout, setDeviceLayout] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [selectedStudentChoice, setSelectedStudentChoice] = useState<string | null>(null);
@@ -132,7 +145,7 @@ export default function LivePreview({
   const videoId = getYouTubeId(videoUrl);
   const resolvedThumbnail = videoId
     ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-    : videoThumbnail;
+    : (videoThumbnail || null);
 
   // Stable Fisher-Yates Shuffling to prevent jumping while typing
   useEffect(() => {
@@ -275,8 +288,17 @@ export default function LivePreview({
                   </div>
                 )}
               </div>
-              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono">
-                {questionId || 'Q. ID: PENDING'}
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono" title={`Original ID: ${questionId}`}>
+                {(() => {
+                  if (trackingId) return trackingId;
+                  if (domainId && subTopicId && conceptId && questionId) {
+                    // Check if it's a UUID (length 36 with hyphens) or standard mock ID
+                    return questionId.length > 8
+                      ? generate16BitQuestionId(domainId, subTopicId, conceptId, questionId, allQuestions)
+                      : questionId;
+                  }
+                  return questionId || 'Q. ID: PENDING';
+                })()}
               </span>
             </div>
 
@@ -426,11 +448,13 @@ export default function LivePreview({
                 ) : (
                   // Video Thumbnail State
                   <>
-                    <img
-                      src={resolvedThumbnail}
-                      alt="walkthrough thumbnail"
-                      className="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-300"
-                    />
+                    {resolvedThumbnail && (
+                      <img
+                        src={resolvedThumbnail}
+                        alt="walkthrough thumbnail"
+                        className="w-full h-full object-cover opacity-80 group-hover:scale-102 transition-transform duration-300"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-slate-900/30 transition-colors" />
 
                     {/* Central Play Button */}
