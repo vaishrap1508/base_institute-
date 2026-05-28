@@ -20,7 +20,7 @@ export default function DashboardPage() {
         const matched = USER_ROLES.find(r => r.role === parsed.role);
         if (matched) setCurrentRole(matched);
       } catch (e) {
-        console.error(e);
+        console.warn(e);
       }
     }
 

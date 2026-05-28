@@ -26,6 +26,13 @@ export interface ResponseOption {
 
 export interface Question {
   id: string;
+  trackingId?: string;
+  questionBinaryId?: string;
+  questionInternalUuid?: string;
+  questionHashSeed?: number;
+  domainUuid?: string;
+  subTopicUuid?: string;
+  conceptUuid?: string;
   domainId: string;
   subTopicId: string;
   conceptId: string;

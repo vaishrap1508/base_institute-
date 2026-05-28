@@ -14,6 +14,7 @@ import QuestionTable from '@/components/admin/directory/QuestionTable';
 import { DOMAINS_DATA, USER_ROLES, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import { UserRole, Question } from '@/lib/admin/types';
 import { supabase } from '@/lib/supabase';
+import { generate16BitQuestionId, generate16BitBinaryId } from '@/lib/admin/idGenerator';
 
 export default function QuestionDirectoryPage() {
   const router = useRouter();
@@ -54,6 +55,7 @@ export default function QuestionDirectoryPage() {
         .from('questions')
         .select(`
           id,
+          question_hash_seed,
           difficulty,
           question_text,
           options,
@@ -61,10 +63,12 @@ export default function QuestionDirectoryPage() {
           video_url,
           is_active,
           concept:concepts (
+            id,
             name,
             sub_topic:sub_topics (
+              id,
               name,
-              domain:domains (name)
+              domain:domains (id, name)
             )
           ),
           tags:question_companies (
@@ -81,6 +85,10 @@ export default function QuestionDirectoryPage() {
           const domainName = q.concept?.sub_topic?.domain?.name || '';
           const subTopicName = q.concept?.sub_topic?.name || '';
           const conceptName = q.concept?.name || '';
+
+          const domainUuid = q.concept?.sub_topic?.domain?.id || '';
+          const subTopicUuid = q.concept?.sub_topic?.id || '';
+          const conceptUuid = q.concept?.id || '';
 
           let resolvedDomainId = 'quant';
           let resolvedSubTopicId = 'arithmetic';
@@ -105,6 +113,13 @@ export default function QuestionDirectoryPage() {
 
           return {
             id: q.id,
+            trackingId: q.tracking_id || undefined,
+            questionBinaryId: q.id,
+            questionInternalUuid: q.id,
+            questionHashSeed: q.question_hash_seed || 0,
+            domainUuid,
+            subTopicUuid,
+            conceptUuid,
             domainId: resolvedDomainId,
             subTopicId: resolvedSubTopicId,
             conceptId: resolvedConceptId,
@@ -140,7 +155,7 @@ export default function QuestionDirectoryPage() {
         setDbSource('Local Storage Sandbox');
       }
     } catch (err) {
-      console.error('Failed to load questions from Supabase, falling back to local storage', err);
+      console.warn('Failed to load questions from Supabase, falling back to local storage', err);
       const stored = localStorage.getItem('aptitude_questions');
       if (stored) {
         setQuestions(JSON.parse(stored));
@@ -168,7 +183,7 @@ export default function QuestionDirectoryPage() {
           setCurrentRole(matched);
         }
       } catch (e) {
-        console.error('Failed to parse current role', e);
+        console.warn('Failed to parse current role', e);
       }
     }
 
@@ -200,7 +215,9 @@ export default function QuestionDirectoryPage() {
       // 1. Text Search Filter (matches ID, stem, difficulty, domain name, sub-topic name, concept name, status, and tags)
       if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase();
-        const matchesId = q.id.toLowerCase().includes(query);
+        const binaryId = q.questionBinaryId || generate16BitBinaryId(q.domainUuid || q.domainId, q.subTopicUuid || q.subTopicId, q.conceptUuid || q.conceptId, q.id, q.questionHashSeed || 0, undefined, questions);
+        const matchesBinaryId = binaryId.replace(/-/g, '').includes(query.replace(/-/g, '')) || binaryId.toLowerCase().includes(query);
+        const matchesId = q.id.toLowerCase().includes(query) || matchesBinaryId;
         const matchesStem = q.questionStem.toLowerCase().includes(query);
 
         // Resolve display names
