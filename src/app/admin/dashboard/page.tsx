@@ -162,8 +162,8 @@ export default function DashboardPage() {
                   <span className="text-[10px] font-extrabold px-2.5 py-1 rounded bg-blue-50 text-blue-700 uppercase tracking-wider">LIVE TELEMETRY</span>
                 </div>
 
-                {/* Aesthetic Inline Graph */}
-                <div className="h-64 flex items-end justify-between gap-2 px-4 bg-slate-50/50 border border-slate-200/50 rounded-xl p-4 relative overflow-hidden">
+                 {/* Aesthetic Inline Graph */}
+                <div className="h-72 pt-10 flex items-end justify-between gap-2 px-4 bg-slate-50/50 border border-slate-200/50 rounded-xl p-4 relative overflow-visible">
                   {/* Grid Lines */}
                   <div className="absolute inset-0 flex flex-col justify-between py-4 pointer-events-none opacity-40">
                     <div className="border-b border-slate-200 w-full" />
@@ -176,49 +176,49 @@ export default function DashboardPage() {
                   <div className="w-full flex items-end justify-around h-full z-10">
                     <div className="flex flex-col items-center gap-1.5 w-8">
                       <div className="bg-gradient-to-t from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all rounded-t-md w-full h-16 shadow-md shadow-blue-500/10 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap">24%</span>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">24%</span>
                       </div>
                       <span className="text-[9px] font-bold text-slate-400">MON</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5 w-8">
                       <div className="bg-gradient-to-t from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all rounded-t-md w-full h-28 shadow-md shadow-blue-500/10 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap">42%</span>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">42%</span>
                       </div>
                       <span className="text-[9px] font-bold text-slate-400">TUE</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5 w-8">
                       <div className="bg-gradient-to-t from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all rounded-t-md w-full h-36 shadow-md shadow-blue-500/10 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap">55%</span>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">55%</span>
                       </div>
                       <span className="text-[9px] font-bold text-slate-400">WED</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5 w-8">
                       <div className="bg-gradient-to-t from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all rounded-t-md w-full h-44 shadow-md shadow-blue-500/10 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap">70%</span>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">70%</span>
                       </div>
                       <span className="text-[9px] font-bold text-slate-400">THU</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5 w-8">
                       <div className="bg-gradient-to-t from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all rounded-t-md w-full h-52 shadow-md shadow-blue-500/15 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap">85%</span>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">85%</span>
                       </div>
                       <span className="text-[9px] font-bold text-slate-400">FRI</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5 w-8">
                       <div className="bg-gradient-to-t from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all rounded-t-md w-full h-48 shadow-md shadow-blue-500/15 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap">78%</span>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">78%</span>
                       </div>
                       <span className="text-[9px] font-bold text-slate-400">SAT</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5 w-8">
                       <div className="bg-gradient-to-t from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all rounded-t-md w-full h-56 shadow-md shadow-emerald-500/15 cursor-pointer group relative animate-pulse">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap">98%</span>
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">98%</span>
                       </div>
                       <span className="text-[9px] font-bold text-slate-500">SUN</span>
                     </div>

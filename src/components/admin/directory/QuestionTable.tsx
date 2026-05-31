@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { ArrowUpDown, Edit3, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Copy, Check, FileSearch, X } from 'lucide-react';
+import { ArrowUpDown, Edit3, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
 import { Question } from '@/lib/admin/types';
 import { DOMAINS_DATA } from '@/lib/admin/store';
 import { generate16BitQuestionId, generate16BitBinaryId } from '@/lib/admin/idGenerator';
@@ -22,10 +22,6 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
-  // Decoder Modal State
-  const [isDecoderOpen, setIsDecoderOpen] = useState(false);
-  const [decodeInput, setDecodeInput] = useState('');
 
   // Helper: Format domain code to friendly readable name
   const getDomainName = (id: string) => {
@@ -54,28 +50,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
     return con ? con.name : conId;
   };
 
-  // Decoder Reverse Lookup Engine
-  const decodedResult = useMemo(() => {
-    if (!decodeInput.trim()) return null;
-    const cleanInput = decodeInput.trim().replace(/-/g, '');
-    
-    const match = questions.find((q) => {
-      const bId = q.questionBinaryId || generate16BitBinaryId(q.domainUuid || q.domainId, q.subTopicUuid || q.subTopicId, q.conceptUuid || q.conceptId, q.id, q.questionHashSeed || 0, undefined, questions);
-      return bId.replace(/-/g, '') === cleanInput;
-    });
 
-    if (match) {
-      return {
-        found: true,
-        question: match,
-        domain: getDomainFullName(match.domainId),
-        subTopic: getSubTopicFullName(match.domainId, match.subTopicId),
-        concept: getConceptFullName(match.domainId, match.subTopicId, match.conceptId),
-      };
-    }
-
-    return { found: false };
-  }, [decodeInput, questions]);
 
   // Helper: Get numeric weights for sorting difficulty
   const getDifficultyWeight = (diff: string) => {
@@ -162,15 +137,6 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
             Listing {questions.length} total active matches
           </span>
         </div>
-
-        {/* Admin Decoder Modal Trigger Button */}
-        <button
-          onClick={() => setIsDecoderOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-650 hover:text-slate-800 rounded-lg text-[11px] font-bold shadow-xs transition-all cursor-pointer select-none"
-        >
-          <FileSearch className="w-3.5 h-3.5" />
-          <span>Decode 16-Bit ID</span>
-        </button>
       </div>
 
       {/* Responsive Table Frame Wrapper */}
@@ -450,118 +416,6 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
             >
               <ChevronRight className="w-4 h-4" />
             </button>
-          </div>
-        </div>
-      )}
-      {/* Admin Decoder Modal Dialog */}
-      {isDecoderOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col p-6 animate-in zoom-in-95 duration-200 relative">
-            
-            {/* Close Button */}
-            <button
-              onClick={() => {
-                setIsDecoderOpen(false);
-                setDecodeInput('');
-              }}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                <FileSearch className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900 leading-tight">Admin Question ID Decoder</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Fixed 16-Bit Reverse Lookup</p>
-              </div>
-            </div>
-
-            {/* Input Field */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Enter Binary Question ID
-              </label>
-              <input
-                type="text"
-                value={decodeInput}
-                onChange={(e) => setDecodeInput(e.target.value)}
-                placeholder="e.g. 0001-1010-1100-0101"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all uppercase"
-                autoFocus
-              />
-            </div>
-
-            {/* Decoded Output Panel */}
-            <div className="mt-5 flex-1 min-h-[140px]">
-              {decodeInput.trim() === '' ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-4 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Awaiting Input</span>
-                  <p className="text-[11px] text-slate-400 font-medium max-w-[200px] mt-1 leading-relaxed">
-                    Type or paste a 16-bit binary question ID to instantly reverse-lookup its metadata hierarchy.
-                  </p>
-                </div>
-              ) : decodedResult?.found ? (
-                <div className="border border-slate-200/90 rounded-xl p-4 bg-slate-50/30 space-y-3.5 text-xs font-semibold text-slate-500 animate-in fade-in duration-200">
-                  <div className="flex items-center justify-between border-b border-slate-150 pb-2">
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider flex items-center gap-1">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      ID Decoded Successfully
-                    </span>
-                    <span className="font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold">
-                      {decodedResult.question ? (decodedResult.question.questionBinaryId || generate16BitBinaryId(decodedResult.question.domainUuid || decodedResult.question.domainId, decodedResult.question.subTopicUuid || decodedResult.question.subTopicId, decodedResult.question.conceptUuid || decodedResult.question.conceptId, decodedResult.question.id, decodedResult.question.questionHashSeed, undefined, questions)) : ''}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Domain</span>
-                      <span className="text-slate-800 text-right max-w-[200px] truncate">{decodedResult.domain}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sub-Topic</span>
-                      <span className="text-slate-800 text-right max-w-[200px] truncate">{decodedResult.subTopic}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Concept</span>
-                      <span className="text-slate-800 text-right max-w-[200px] truncate">{decodedResult.concept}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Difficulty</span>
-                      <span className="text-slate-800 uppercase">{decodedResult.question?.difficulty}</span>
-                    </div>
-                    <div className="flex flex-col bg-white p-2.5 rounded-lg border border-slate-100 space-y-1">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Registry UUID</span>
-                      <span className="text-[10px] font-mono text-slate-600 font-medium select-all break-all">{decodedResult.question?.id}</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="h-full flex flex-col items-center justify-center text-center p-4 border border-dashed border-rose-200 rounded-xl bg-rose-50/20">
-                  <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">No Match Found</span>
-                  <p className="text-[11px] text-rose-500/70 font-semibold max-w-[200px] mt-1 leading-relaxed">
-                    This binary ID does not match any registered question in the database. Double-check your spelling or dashes.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="mt-6 flex justify-end gap-2.5 border-t border-slate-150 pt-4">
-              <button
-                onClick={() => {
-                  setIsDecoderOpen(false);
-                  setDecodeInput('');
-                }}
-                className="px-4 py-2 border border-slate-200 hover:border-slate-300 text-slate-700 bg-white hover:bg-slate-50 font-bold rounded-xl text-xs shadow-xs transition-all cursor-pointer w-full text-center"
-              >
-                Done
-              </button>
-            </div>
-
           </div>
         </div>
       )}
