@@ -268,8 +268,10 @@ export default function LandingPage() {
   
   // Theme tracking state for unified glass dock
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
+    setMounted(true);
     // Sync active theme state based on document class
     const isDark = document.documentElement.classList.contains('dark');
     setTheme(isDark ? 'dark' : 'light');
@@ -1074,8 +1076,9 @@ export default function LandingPage() {
             onClick={toggleTheme}
             className="w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none"
             title="Toggle theme"
+            suppressHydrationWarning
           >
-            {theme === 'light' ? (
+            {mounted && theme === 'light' ? (
               <Sun className="w-[18px] h-[18px] text-amber-400 animate-fadeIn" />
             ) : (
               <Moon className="w-[18px] h-[18px] text-indigo-400 animate-fadeIn" />
