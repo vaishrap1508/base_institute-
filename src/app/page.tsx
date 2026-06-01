@@ -269,6 +269,7 @@ export default function LandingPage() {
   // Theme tracking state for unified glass dock
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mounted, setMounted] = useState(false);
+  const [visibleItems, setVisibleItems] = useState<Record<string, boolean>>({});
   
   useEffect(() => {
     setMounted(true);
@@ -518,7 +519,12 @@ export default function LandingPage() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('reveal-visible');
+          const revealId = entry.target.getAttribute('data-reveal-id');
+          if (revealId) {
+            setVisibleItems((prev) => ({ ...prev, [revealId]: true }));
+          } else {
+            entry.target.classList.add('reveal-visible');
+          }
         }
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
@@ -1534,7 +1540,12 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto space-y-16">
           
           {/* Section title */}
-          <div className="text-center space-y-4 max-w-2xl mx-auto reveal-on-scroll">
+          <div 
+            data-reveal-id="curriculum-title"
+            className={`text-center space-y-4 max-w-2xl mx-auto reveal-on-scroll ${
+              visibleItems['curriculum-title'] ? 'reveal-visible' : ''
+            }`}
+          >
             <div className="inline-flex items-center gap-2 bg-blue-950/40 border border-blue-900/30 px-3.5 py-1 rounded-full text-[9px] font-black text-blue-400 tracking-wider uppercase">
               <span>Interactive Syllabus Journey</span>
             </div>
@@ -1547,7 +1558,12 @@ export default function LandingPage() {
           </div>
 
           {/* Phase Switcher Navigation Tab bar */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-slate-900/40 border border-slate-900 rounded-2xl p-1.5 max-w-3xl mx-auto reveal-on-scroll delay-stagger-1 select-none backdrop-blur-md">
+          <div 
+            data-reveal-id="curriculum-switcher"
+            className={`flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-slate-900/40 border border-slate-900 rounded-2xl p-1.5 max-w-3xl mx-auto reveal-on-scroll delay-stagger-1 select-none backdrop-blur-md ${
+              visibleItems['curriculum-switcher'] ? 'reveal-visible' : ''
+            }`}
+          >
             {[
               { title: '01. Mass Impact', desc: 'Scale Tracker' },
               { title: '02. Interactions', desc: 'Active Solver' },
@@ -1693,8 +1709,11 @@ export default function LandingPage() {
                   <div
                     key={idx}
                     id={`curriculum-card-${idx}`}
+                    data-reveal-id={`curriculum-card-${idx}`}
                     onMouseEnter={() => setActiveCurriculumPhase(idx)}
-                    className={`reveal-on-scroll delay-stagger-${idx + 1} border border-slate-905 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center gap-6 relative overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:scale-[1.01] ${card.color} ${
+                    className={`reveal-on-scroll delay-stagger-${idx + 1} ${
+                      visibleItems[`curriculum-card-${idx}`] ? 'reveal-visible' : ''
+                    } border border-slate-905 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center gap-6 relative overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:scale-[1.01] ${card.color} ${
                       isSelected ? 'border-slate-800 bg-slate-900/20 ring-1 ring-white/5 shadow-2xl' : ''
                     }`}
                   >
