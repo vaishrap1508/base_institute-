@@ -320,6 +320,15 @@ export default function LandingPage() {
   const [companiesCount, setCompaniesCount] = useState(0);
   const [studentsCount, setStudentsCount] = useState(0);
 
+  // Curriculum Interactive States
+  const [activeCurriculumPhase, setActiveCurriculumPhase] = useState<number>(0);
+  const [expandedCardIdx, setExpandedCardIdx] = useState<number | null>(null);
+  const [cohortScale, setCohortScale] = useState<number>(200);
+  const [activeMilestone, setActiveMilestone] = useState<number>(2);
+  const [selectedWorkspaceAns, setSelectedWorkspaceAns] = useState<number | null>(null);
+  const [assessmentStatus, setAssessmentStatus] = useState<'idle' | 'running' | 'submitted'>('idle');
+  const [assessmentProgress, setAssessmentProgress] = useState<number>(80);
+
   // State machine loop for simulated student solver
   useEffect(() => {
     let isMounted = true;
@@ -501,6 +510,20 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // IntersectionObserver for scroll-triggered premium reveal animations
+  useEffect(() => {
+    const revealElements = document.querySelectorAll('.reveal-on-scroll');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    revealElements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   // Trigger temporary floating system notices
   const showNotice = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
@@ -688,7 +711,7 @@ export default function LandingPage() {
 
   // Bento grid mockup visual render helpers
   const renderScaleTracker = () => (
-    <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-3 relative overflow-hidden shadow-inner w-full min-h-[160px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
+    <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-3 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
       <div className="flex items-center justify-between relative z-10">
         <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Cohort Scale Tracker</span>
@@ -700,17 +723,19 @@ export default function LandingPage() {
           <span className="text-[8px] font-bold text-emerald-400 font-mono bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">Live Sync</span>
         </div>
       </div>
+      
+      {/* Interactive Scale progress display */}
       <div className="space-y-3 flex-1 flex flex-col justify-center relative z-10">
         <div className="space-y-1">
           <div className="flex justify-between text-[9px] font-bold text-slate-400">
             <span>Section A (Advanced maps)</span>
-            <div className="relative w-14 h-3 flex items-center justify-end font-mono">
-              <span className="absolute right-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:scale-75 text-blue-400">45% Done</span>
-              <span className="absolute right-0 opacity-0 scale-75 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100 text-blue-400 font-black group-hover:animate-text-glow">92% Done</span>
-            </div>
+            <span className="font-mono text-blue-400">{Math.min(98, Math.floor((cohortScale / 500) * 100))}% Done</span>
           </div>
           <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full w-[45%] group-hover:w-[92%] transition-all duration-1000 ease-out relative overflow-hidden group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)]">
+            <div 
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-350 ease-out relative overflow-hidden"
+              style={{ width: `${Math.min(98, Math.floor((cohortScale / 500) * 100))}%` }}
+            >
               <div className="absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-100%] animate-reflection-sweep" style={{ animationDuration: '3s' }} />
             </div>
           </div>
@@ -718,151 +743,233 @@ export default function LandingPage() {
         <div className="space-y-1">
           <div className="flex justify-between text-[9px] font-bold text-slate-400">
             <span>Section B (Foundations)</span>
-            <div className="relative w-14 h-3 flex items-center justify-end font-mono">
-              <span className="absolute right-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:scale-75 text-indigo-400">30% Done</span>
-              <span className="absolute right-0 opacity-0 scale-75 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100 text-indigo-400 font-black group-hover:animate-text-glow">78% Done</span>
-            </div>
+            <span className="font-mono text-indigo-400">{Math.min(90, Math.floor((cohortScale / 500) * 80))}% Done</span>
           </div>
           <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full w-[30%] group-hover:w-[78%] transition-all duration-1000 ease-out relative overflow-hidden group-hover:shadow-[0_0_8px_rgba(124,58,237,0.6)]">
+            <div 
+              className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-350 ease-out relative overflow-hidden"
+              style={{ width: `${Math.min(90, Math.floor((cohortScale / 500) * 80))}%` }}
+            >
               <div className="absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-100%] animate-reflection-sweep" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
             </div>
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10">
-        <span>Target: 200k Cohorts</span>
-        <span className="text-slate-450 font-mono transition-colors group-hover:text-blue-400">Rate: 1.2M req/s</span>
+
+      {/* Slider Selector input */}
+      <div className="relative z-10 pt-1">
+        <input 
+          type="range" 
+          min="20" 
+          max="500" 
+          value={cohortScale} 
+          onChange={(e) => setCohortScale(Number(e.target.value))}
+          className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none"
+        />
+      </div>
+
+      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-900/60">
+        <span>Target: {cohortScale}k Cohorts</span>
+        <span className="text-blue-400 font-mono">Rate: {(cohortScale * 6).toFixed(1)}k req/s</span>
       </div>
     </div>
   );
 
   const renderQuestionWorkspace = () => (
-    <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[160px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
+    <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
       <div className="flex items-center justify-between relative z-10">
         <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Question Workspace</span>
-        <span className="text-[8px] font-bold text-indigo-400 font-mono bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-900/30">Active Solver</span>
+        <span className="text-[8px] font-bold text-indigo-400 font-mono bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-900/30">Active Brainteaser</span>
       </div>
-      <div className="space-y-1.5 flex-1 flex flex-col justify-center relative z-10">
-        <div className="flex items-center justify-between bg-slate-900/40 border border-slate-900/60 rounded-lg p-1.5 text-[9px] font-bold text-slate-300 hover:bg-slate-900/80 transition-all duration-300 group-hover:border-emerald-500/20 group-hover:shadow-[0_0_8px_rgba(16,185,129,0.05)] group-hover:translate-x-1">
-          <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Linear Arrays & Ratios</span>
-          </div>
-          <span className="text-[8px] text-emerald-400 font-mono px-1 bg-emerald-950/40 rounded border border-emerald-900/30 group-hover:animate-text-glow">100% Correct</span>
+
+      <div className="space-y-2 flex-1 flex flex-col justify-center relative z-10 text-left">
+        <div className="text-[10px] font-extrabold text-slate-300">
+          Find the missing number: 2, 6, 12, 20, ?
         </div>
-        <div className="flex items-center justify-between bg-slate-900/40 border border-slate-900/60 rounded-lg p-1.5 text-[9px] font-bold text-slate-300 hover:bg-slate-900/80 transition-all duration-300 group-hover:border-indigo-500/20 group-hover:shadow-[0_0_8px_rgba(99,102,241,0.05)] group-hover:translate-x-2">
-          <div className="flex items-center gap-1.5">
-            <div className="relative flex h-2 w-2 items-center justify-center">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 transition-all duration-500 group-hover:bg-emerald-400"></span>
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500 transition-all duration-500 group-hover:bg-emerald-500 group-hover:scale-125"></span>
-            </div>
-            <span>Syllogisms & Logic</span>
-          </div>
-          <div className="relative w-16 h-4 flex items-center justify-end font-mono">
-            <span className="absolute right-0 text-[8px] text-blue-400 px-1 bg-blue-950/40 rounded border border-blue-900/30 animate-pulse transition-all duration-500 group-hover:opacity-0 group-hover:scale-75">
-              Solving...
-            </span>
-            <span className="absolute right-0 text-[8px] text-emerald-400 px-1 bg-emerald-950/40 rounded border border-emerald-900/30 opacity-0 scale-75 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100 font-bold group-hover:animate-text-glow">
-              Correct!
-            </span>
-          </div>
+        
+        <div className="grid grid-cols-4 gap-1.5">
+          {[24, 28, 30, 32].map((num) => {
+            const isCorrect = num === 30;
+            const isSelected = selectedWorkspaceAns === num;
+            return (
+              <button
+                key={num}
+                type="button"
+                onClick={() => setSelectedWorkspaceAns(num)}
+                className={`py-1 rounded text-[10px] font-black font-mono transition-all border ${
+                  isSelected 
+                    ? isCorrect 
+                      ? 'bg-emerald-950/60 border-emerald-500 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+                      : 'bg-rose-950/60 border-rose-500 text-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.2)]'
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                }`}
+              >
+                {num}
+              </button>
+            );
+          })}
         </div>
+
+        {selectedWorkspaceAns !== null && (
+          <div className="text-[8px] font-bold text-center transition-all animate-fadeIn">
+            {selectedWorkspaceAns === 30 ? (
+              <span className="text-emerald-400 animate-pulse">✓ Correct! Logic: n*(n+1) or differences +4, +6, +8, +10.</span>
+            ) : (
+              <span className="text-rose-400">✗ Wrong! Hint: Look at differences (+4, +6, +8...).</span>
+            )}
+          </div>
+        )}
       </div>
-      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10">
-        <span>Accuracy: 84% avg</span>
-        <span className="text-slate-400 font-mono transition-colors group-hover:text-indigo-400">Total Solved: 10.4k</span>
+
+      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-900/60">
+        <span>Accuracy: {selectedWorkspaceAns === 30 ? '100%' : '84%'} avg</span>
+        <span className="text-indigo-400 font-mono">Topic: Sequences</span>
       </div>
     </div>
   );
 
-  const renderSyllabusMilestones = () => (
-    <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[160px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
-      <div className="flex items-center justify-between relative z-10">
-        <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Syllabus Milestones</span>
-        <span className="text-[8px] font-bold text-purple-400 font-mono bg-purple-950/40 px-1.5 py-0.5 rounded border border-purple-900/30">Core Banking</span>
-      </div>
-      <div className="flex items-center justify-between gap-1 flex-1 relative px-2 z-10">
-        <svg className="absolute left-6 right-6 top-1/2 -translate-y-1/2 w-[calc(100%-3rem)] h-[2px] z-0 overflow-visible">
-          <line x1="0%" y1="50%" x2="100%" y2="50%" className="stroke-slate-800 stroke-[2px] animate-dotted-flow group-hover:stroke-purple-500/80 group-hover:animate-[dottedMove_0.4s_linear_infinite] transition-all duration-700" />
-        </svg>
-        <div className="flex flex-col items-center gap-1.5 z-10 transition-all duration-300 group-hover:-translate-y-1.5">
-          <div className="w-7 h-7 rounded-full bg-blue-950 border border-blue-800/80 flex items-center justify-center text-[9px] font-black text-blue-400 shadow-md group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-400 group-hover:shadow-[0_0_12px_rgba(59,130,246,0.6)] transition-all duration-300 cursor-default">
-            01
-          </div>
-          <span className="text-[8px] font-bold text-slate-400 tracking-tight transition-colors duration-300 group-hover:text-blue-400">Fintech</span>
-        </div>
-        <div className="flex flex-col items-center gap-1.5 z-10 transition-all duration-300 group-hover:-translate-y-2.5">
-          <div className="w-7 h-7 rounded-full bg-indigo-950 border border-indigo-650 flex items-center justify-center text-[9px] font-black text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.25)] animate-pulse-glow group-hover:scale-115 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-400 group-hover:shadow-[0_0_18px_rgba(99,102,241,0.8)] transition-all duration-300 delay-75 cursor-default relative">
-            <span className="absolute inset-0 rounded-full bg-indigo-500/30 animate-ping" />
-            02
-          </div>
-          <span className="text-[8px] font-bold text-indigo-400 tracking-tight transition-colors duration-300 group-hover:text-indigo-400">Product</span>
-        </div>
-        <div className="flex flex-col items-center gap-1.5 z-10 transition-all duration-300 group-hover:-translate-y-1.5">
-          <div className="w-7 h-7 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-[9px] font-black text-slate-500 shadow-md group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-400 group-hover:shadow-[0_0_12px_rgba(168,85,247,0.6)] transition-all duration-300 delay-150 cursor-default">
-            03
-          </div>
-          <span className="text-[8px] font-bold text-slate-500 tracking-tight transition-colors duration-300 group-hover:text-purple-400">Mock Staging</span>
-        </div>
-      </div>
-      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10">
-        <span>Curriculum Map: Active</span>
-        <span className="text-slate-400 font-mono transition-colors group-hover:text-purple-400">Partnerships: 156+</span>
-      </div>
-    </div>
-  );
+  const renderSyllabusMilestones = () => {
+    const topics = {
+      1: { title: 'Fintech Systems', desc: 'Transaction Ledgers, Distributed Databases, API Gateways.' },
+      2: { title: 'Product Scale', desc: 'Microservices, Caching Matrices, Staging deployment pipelines.' },
+      3: { title: 'Placement Mock', desc: 'Staging placement rounds, live coding evaluations, company mocks.' }
+    };
 
-  const renderAssessmentSim = () => (
-    <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[160px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
-      <div className="flex items-center justify-between relative z-10">
-        <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Assessment Sim</span>
-        <span className="text-[8px] font-bold text-emerald-400 font-mono bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">Active Session</span>
-      </div>
-      <div className="space-y-1 flex-1 flex flex-col justify-center relative z-10">
-        <div className="flex justify-between items-center text-[9px] font-bold text-slate-400">
-          <span>Goldman Sachs Mock</span>
-          <span className="text-amber-400 font-mono flex items-center gap-1 bg-amber-950/20 px-1.5 py-0.5 rounded border border-amber-900/20 group-hover:bg-emerald-950/30 group-hover:text-emerald-400 group-hover:border-emerald-900/40 transition-all duration-500">
-            <span className="relative w-4 h-4 flex items-center justify-center">
-              <span className="absolute opacity-100 group-hover:opacity-0 group-hover:scale-75 transition-all duration-500 inline-block animate-bounce">⏳</span>
-              <span className="absolute opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-75 transition-all duration-500 text-emerald-400 font-black">✓</span>
-            </span>
-            <span className="relative w-14 h-3 flex items-center justify-center font-mono">
-              <span className="absolute left-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:translate-x-[-3px]">14:32 left</span>
-              <span className="absolute left-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0 translate-x-[3px] text-emerald-400 font-bold group-hover:animate-text-glow">Passed</span>
-            </span>
-          </span>
+    return (
+      <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
+        <div className="flex items-center justify-between relative z-10">
+          <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Syllabus Milestones</span>
+          <span className="text-[8px] font-bold text-purple-400 font-mono bg-purple-950/40 px-1.5 py-0.5 rounded border border-purple-900/30">Interactive Roadmap</span>
         </div>
-        <div className="space-y-1 mt-1">
-          <div className="flex justify-between text-[8px] font-extrabold text-slate-500">
-            <span>Progress</span>
-            <div className="relative w-20 h-3 flex items-center justify-end font-mono">
-              <span className="absolute right-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:translate-y-[-5px]">80% Complete</span>
-              <span className="absolute right-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 translate-y-[5px] text-emerald-400 font-black group-hover:animate-text-glow">100% Complete</span>
-            </div>
+
+        <div className="flex items-center justify-between gap-1 relative px-2 z-10">
+          <svg className="absolute left-6 right-6 top-1/2 -translate-y-1/2 w-[calc(100%-3rem)] h-[2px] z-0 overflow-visible">
+            <line 
+              x1="0%" 
+              y1="50%" 
+              x2="100%" 
+              y2="50%" 
+              className={`stroke-[2px] transition-all duration-700 ${
+                activeMilestone === 1 ? 'stroke-blue-500/50' : activeMilestone === 2 ? 'stroke-indigo-500/80' : 'stroke-purple-500'
+              }`} 
+            />
+          </svg>
+          
+          {[1, 2, 3].map((num) => {
+            const labels = ['Fintech', 'Product', 'Mock Staging'];
+            const isActive = activeMilestone === num;
+            return (
+              <button
+                key={num}
+                type="button"
+                onClick={() => setActiveMilestone(num)}
+                className="flex flex-col items-center gap-1.5 z-10 transition-all duration-300 transform hover:scale-105"
+              >
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black shadow-md transition-all duration-300 border ${
+                  isActive 
+                    ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.6)] scale-110'
+                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                }`}>
+                  0{num}
+                </div>
+                <span className={`text-[8px] font-bold tracking-tight transition-colors duration-300 ${
+                  isActive ? 'text-indigo-400 font-black' : 'text-slate-500'
+                }`}>
+                  {labels[num - 1]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Dynamic Milestone details box */}
+        <div className="bg-slate-900/40 border border-slate-900/80 rounded-lg p-2 text-left animate-fadeIn">
+          <span className="text-[7px] font-extrabold uppercase tracking-widest text-slate-500 block">Milestone Topic</span>
+          <span className="text-[10px] font-bold text-slate-200 block mt-0.5">{topics[activeMilestone as 1 | 2 | 3].title}</span>
+          <span className="text-[8px] font-semibold text-slate-400 block leading-tight mt-0.5">{topics[activeMilestone as 1 | 2 | 3].desc}</span>
+        </div>
+
+        <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-900/60">
+          <span>Curriculum Map: Active</span>
+          <span className="text-purple-400 font-mono">Partnerships: 156+</span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAssessmentSim = () => {
+    // A function to trigger the simulated test loading
+    const startAssessmentSim = () => {
+      if (assessmentStatus === 'running') return;
+      setAssessmentStatus('running');
+      setAssessmentProgress(0);
+
+      // Increment progress
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        setAssessmentProgress(progress);
+        if (progress >= 100) {
+          clearInterval(interval);
+          setAssessmentStatus('submitted');
+          showNotice("Staging Assessment Submitted successfully!", "success");
+        }
+      }, 100);
+    };
+
+    return (
+      <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
+        <div className="flex items-center justify-between relative z-10">
+          <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Goldman Sachs Mock Sandbox</span>
+          <span className="text-[8px] font-bold text-emerald-400 font-mono bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">Staging Mode</span>
+        </div>
+
+        <div className="space-y-2 flex-1 flex flex-col justify-center relative z-10">
+          <div className="flex justify-between items-center text-[10px] font-bold text-slate-350">
+            <span>Standard Mock Test</span>
+            <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded border font-bold uppercase transition-all duration-300 ${
+              assessmentStatus === 'idle' ? 'bg-slate-900 text-slate-450 border-slate-800' :
+              assessmentStatus === 'running' ? 'bg-amber-950/30 text-amber-400 border-amber-900/40 animate-pulse' :
+              'bg-emerald-950/30 text-emerald-400 border-emerald-900/40 font-black animate-text-glow'
+             }`}>
+              {assessmentStatus}
+            </span>
           </div>
+
           <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
-            <div className="bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 h-full rounded-full w-[80%] group-hover:w-[100%] transition-all duration-1000 ease-out relative overflow-hidden group-hover:shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-gradient-shift">
-              <div className="absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-100%] animate-reflection-sweep" style={{ animationDuration: '3s' }} />
-            </div>
+            <div 
+              className={`h-full rounded-full transition-all duration-100 ease-out relative overflow-hidden ${
+                assessmentStatus === 'submitted' ? 'bg-gradient-to-r from-emerald-500 to-teal-400 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-gradient-to-r from-blue-500 to-indigo-500'
+              }`}
+              style={{ width: `${assessmentProgress}%` }}
+            />
+          </div>
+
+          {/* Interactive Button */}
+          <div className="pt-0.5">
+            <button
+              type="button"
+              onClick={startAssessmentSim}
+              disabled={assessmentStatus === 'running'}
+              className="w-full py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-900 text-white disabled:text-slate-500 text-[10px] font-black uppercase rounded-lg shadow-md transition-all duration-200 cursor-pointer active:scale-95 border border-transparent disabled:border-slate-800"
+            >
+              {assessmentStatus === 'idle' ? '⚡ Execute Staging Mock' :
+               assessmentStatus === 'running' ? `Running Test ${assessmentProgress}%` :
+               '✓ Re-run Mock Test'}
+            </button>
           </div>
         </div>
-      </div>
-      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10">
-        <div className="relative w-24 h-4">
-          <span className="absolute left-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:translate-y-[-5px]">Score: 320/400</span>
-          <span className="absolute left-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 translate-y-[5px] text-emerald-400 font-bold group-hover:animate-text-glow">Score: 385/400</span>
-        </div>
-        <div className="relative w-24 h-4 text-right">
-          <span className="absolute right-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:translate-y-[-5px]">Status: Running</span>
-          <span className="absolute right-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 translate-y-[5px] text-emerald-400 font-bold group-hover:animate-text-glow">Status: Submitted</span>
+
+        <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-900/60">
+          <span>Score: {assessmentStatus === 'submitted' ? '385/400' : '0/400'}</span>
+          <span className="text-emerald-400 font-mono">Status: {assessmentStatus === 'submitted' ? 'Submitted' : 'Running'}</span>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderMockup = (type: 'scale' | 'workspace' | 'milestones' | 'assessment' | 'none') => {
     switch (type) {
@@ -1407,103 +1514,252 @@ export default function LandingPage() {
       {/* ==========================================
           CURRICULUM (BENTO GRID DETAILS)
           ========================================== */}
-      <section id="curriculum" className="relative w-full py-20 px-6 sm:px-12 bg-slate-950">
+      {/* ==========================================
+          CURRICULUM (INTERACTIVE ROADMAP & BENTO DETAILS)
+          ========================================== */}
+      <section id="curriculum" className="relative w-full py-28 px-6 sm:px-12 bg-slate-950 overflow-hidden">
         
-        <div className="max-w-7xl mx-auto space-y-12">
+        {/* Soft background ambient gradient lights */}
+        <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-purple-600/5 blur-[130px] pointer-events-none" />
+
+        {/* Floating abstract decorative nodes */}
+        <div className="absolute top-12 left-[10%] w-3 h-3 rounded-full bg-blue-500/20 border border-blue-500/10 blur-[1px] animate-float-particle-1" />
+        <div className="absolute top-1/3 right-[8%] w-4 h-4 rounded-full bg-indigo-500/20 border border-indigo-500/10 blur-[2px] animate-float-particle-2" />
+        <div className="absolute bottom-20 left-[15%] w-2.5 h-2.5 rounded-full bg-purple-500/20 border border-purple-500/10 blur-[1px] animate-float-particle-3" />
+
+        <div className="max-w-7xl mx-auto space-y-16">
           
           {/* Section title */}
-          <div className="text-center space-y-2 max-w-xl mx-auto">
-            <h2 className="text-3xl font-black text-white tracking-tight uppercase">
-              Curriculum
+          <div className="text-center space-y-4 max-w-2xl mx-auto reveal-on-scroll">
+            <div className="inline-flex items-center gap-2 bg-blue-950/40 border border-blue-900/30 px-3.5 py-1 rounded-full text-[9px] font-black text-blue-400 tracking-wider uppercase">
+              <span>Interactive Syllabus Journey</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight uppercase">
+              Curriculum Roadmap
             </h2>
-            <p className="text-xs font-semibold text-slate-500">
-              Structured preparation syllabus, active workspace simulations, and mock assessments mapped to recruiting trends.
+            <p className="text-xs sm:text-sm font-semibold text-slate-400 max-w-lg mx-auto leading-relaxed">
+              Experience the structured syllabus pathway. Drag sliders, solve sample logic equations, select milestones, and trigger staging mocks in real time.
             </p>
           </div>
 
-          {/* Bento Grid details layout (Symmetric 2x2 Layout) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 divide-y-2 md:divide-y-0 divide-slate-700/60 md:relative pt-6">
-            {/* Desktop Center Vertical separator line */}
-            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-[2px] bg-slate-700/60 -translate-x-1/2 z-10" />
+          {/* Phase Switcher Navigation Tab bar */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-slate-900/40 border border-slate-900 rounded-2xl p-1.5 max-w-3xl mx-auto reveal-on-scroll delay-stagger-1 select-none backdrop-blur-md">
+            {[
+              { title: '01. Mass Impact', desc: 'Scale Tracker' },
+              { title: '02. Interactions', desc: 'Active Solver' },
+              { title: '03. Workshops', desc: 'Syllabus Mocks' },
+              { title: '04. Assessments', desc: 'Staging Simulator' }
+            ].map((phase, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  setActiveCurriculumPhase(idx);
+                  // Scroll to phase card
+                  const card = document.getElementById(`curriculum-card-${idx}`);
+                  if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }}
+                className={`flex-1 min-w-[130px] py-2 px-3 rounded-xl flex flex-col items-center gap-0.5 text-center transition-all duration-300 cursor-pointer ${
+                  activeCurriculumPhase === idx 
+                    ? 'bg-slate-950 border border-slate-800 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] scale-[1.03] text-white font-black' 
+                    : 'text-slate-450 hover:text-slate-200 border border-transparent'
+                }`}
+              >
+                <span className="text-[10px] tracking-wide">{phase.title}</span>
+                <span className="text-[8px] font-bold text-slate-500">{phase.desc}</span>
+              </button>
+            ))}
+          </div>
 
-            {/* Bento Section 1: Mass Impact */}
-            <div className="pb-10 md:pb-12 md:pr-12 md:border-b-2 md:border-slate-700/60 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(59,130,246,0.06)] border border-transparent hover:border-blue-500/10 transition-all duration-350 ease-out hover:-translate-y-1.5 hover:scale-[1.015]">
-              {/* Theme-colored ambient backdrop glow */}
-              <div className="absolute -right-16 -bottom-16 w-44 h-44 rounded-full bg-blue-500/0 group-hover:bg-blue-600/5 blur-[50px] transition-all duration-500 pointer-events-none" />
-              {/* Card shine reflection sweep */}
-              <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none -skew-x-25 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-out z-0" />
-              <div className="w-9 h-9 rounded-lg bg-blue-950/60 border border-blue-900/40 flex items-center justify-center text-blue-400 group-hover:scale-110 group-hover:bg-blue-650 group-hover:border-blue-700/50 transition-all duration-300 shadow-md">
-                <Users className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-200 tracking-tight transition-colors group-hover:text-blue-400">{content.curriculum_title_1}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  {content.curriculum_desc_1}
-                </p>
-              </div>
+          {/* Timeline Layout Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6 relative">
+            
+            {/* LEFT COLUMN: Animated Vertical Connector Timeline Rail (Desktop only) */}
+            <div className="hidden lg:flex lg:col-span-1 flex-col items-center justify-between relative py-12 select-none h-full min-h-[900px]">
+              {/* Central flow path rail */}
+              <div className="absolute top-0 bottom-0 left-1/2 w-[2px] bg-slate-900 -translate-x-1/2 z-0" />
+              <svg className="absolute top-0 bottom-0 left-1/2 w-[4px] h-full bg-transparent -translate-x-1/2 z-10 overflow-visible pointer-events-none">
+                <line 
+                  x1="50%" 
+                  y1="0%" 
+                  x2="50%" 
+                  y2="100%" 
+                  className="stroke-gradient animate-roadmap-flow stroke-blue-500/40" 
+                  strokeWidth="2"
+                />
+              </svg>
 
-              {/* Visual Panel: Cohort benchmark map */}
-              {renderMockup(content.curriculum_mock_1)}
+              {/* Phase Nodes */}
+              {[0, 1, 2, 3].map((idx) => {
+                const isActive = activeCurriculumPhase === idx;
+                const nodeColors = [
+                  'border-blue-500 text-blue-400 bg-blue-950 shadow-[0_0_15px_rgba(59,130,246,0.5)]',
+                  'border-indigo-500 text-indigo-400 bg-indigo-950 shadow-[0_0_15px_rgba(99,102,241,0.5)]',
+                  'border-purple-500 text-purple-400 bg-purple-950 shadow-[0_0_15px_rgba(168,85,247,0.5)]',
+                  'border-emerald-500 text-emerald-400 bg-emerald-950 shadow-[0_0_15px_rgba(16,185,129,0.5)]'
+                ];
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveCurriculumPhase(idx)}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-[10px] font-black z-20 transition-all duration-300 ${
+                      isActive 
+                        ? nodeColors[idx] + ' scale-125' 
+                        : 'border-slate-800 text-slate-500 bg-slate-950 hover:border-slate-700 hover:text-slate-300'
+                    }`}
+                  >
+                    0{idx + 1}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Bento Section 2: Student Interactions */}
-            <div className="py-10 md:py-0 md:pb-12 md:pl-12 md:border-b-2 md:border-slate-700/60 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(99,102,241,0.06)] border border-transparent hover:border-indigo-500/10 transition-all duration-350 ease-out hover:-translate-y-1.5 hover:scale-[1.015]">
-              {/* Theme-colored ambient backdrop glow */}
-              <div className="absolute -left-16 -bottom-16 w-44 h-44 rounded-full bg-indigo-500/0 group-hover:bg-indigo-600/5 blur-[50px] transition-all duration-500 pointer-events-none" />
-              {/* Card shine reflection sweep */}
-              <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none -skew-x-25 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-out z-0" />
-              <div className="w-9 h-9 rounded-lg bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-650 group-hover:border-indigo-700/50 transition-all duration-300 shadow-md">
-                <Layers className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-200 tracking-tight transition-colors group-hover:text-indigo-400">{content.curriculum_title_2}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  {content.curriculum_desc_2}
-                </p>
-              </div>
+            {/* RIGHT COLUMN: The Curriculum Cards (11 cols on desktop) */}
+            <div className="lg:col-span-11 space-y-8">
+              {[
+                {
+                  title: content.curriculum_title_1,
+                  desc: content.curriculum_desc_1,
+                  mock: content.curriculum_mock_1,
+                  icon: Users,
+                  color: 'hover:border-blue-500/20 hover:shadow-[0_20px_50px_rgba(59,130,246,0.08)] bg-blue-500/0 hover:bg-blue-950/5',
+                  glow: 'bg-blue-600/5',
+                  accentColor: 'text-blue-400',
+                  syllabus: [
+                    'Cohort Management & Staging Directories',
+                    'Real-Time Speed Benchmark Metrics',
+                    'Group Statistics & Visual Scoring Reports',
+                    'Institutional Syllabus Distribution Sync'
+                  ]
+                },
+                {
+                  title: content.curriculum_title_2,
+                  desc: content.curriculum_desc_2,
+                  mock: content.curriculum_mock_2,
+                  icon: Layers,
+                  color: 'hover:border-indigo-500/20 hover:shadow-[0_20px_50px_rgba(99,102,241,0.08)] bg-indigo-500/0 hover:bg-indigo-950/5',
+                  glow: 'bg-indigo-600/5',
+                  accentColor: 'text-indigo-400',
+                  syllabus: [
+                    'Quantitative Aptitude & Number Logic',
+                    'Verbal Comprehension & Grammar Diagnostics',
+                    'Logical Reasoning Puzzle Banks',
+                    'Instant Result Analysis & Hints Engine'
+                  ]
+                },
+                {
+                  title: content.curriculum_title_3,
+                  desc: content.curriculum_desc_3,
+                  mock: content.curriculum_mock_3,
+                  icon: Code2,
+                  color: 'hover:border-purple-500/20 hover:shadow-[0_20px_50px_rgba(168,85,247,0.08)] bg-purple-500/0 hover:bg-purple-950/5',
+                  glow: 'bg-purple-600/5',
+                  accentColor: 'text-purple-400',
+                  syllabus: [
+                    'Core Services placement curriculum mapping',
+                    'Fintech System Architectures & Mock interviews',
+                    'Product company preparation milestones',
+                    'College Partnerships placement syllabus sync'
+                  ]
+                },
+                {
+                  title: content.curriculum_title_4,
+                  desc: content.curriculum_desc_4,
+                  mock: content.curriculum_mock_4,
+                  icon: Trophy,
+                  color: 'hover:border-emerald-500/20 hover:shadow-[0_20px_50px_rgba(16,185,129,0.08)] bg-emerald-500/0 hover:bg-emerald-950/5',
+                  glow: 'bg-emerald-600/5',
+                  accentColor: 'text-emerald-400',
+                  syllabus: [
+                    'Adaptive timing mock tests under pressure',
+                    'Goldman Sachs, TCS, Accenture company mocks',
+                    'Live Staging sandbox simulated assessment',
+                    'Historical mock scores comparison dashboard'
+                  ]
+                }
+              ].map((card, idx) => {
+                const isSelected = activeCurriculumPhase === idx;
+                const isExpanded = expandedCardIdx === idx;
+                const CardIcon = card.icon;
 
-              {/* Visual Panel: Interactive Question Set list */}
-              {renderMockup(content.curriculum_mock_2)}
-            </div>
+                return (
+                  <div
+                    key={idx}
+                    id={`curriculum-card-${idx}`}
+                    onMouseEnter={() => setActiveCurriculumPhase(idx)}
+                    className={`reveal-on-scroll delay-stagger-${idx + 1} border border-slate-905 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center gap-6 relative overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:scale-[1.01] ${card.color} ${
+                      isSelected ? 'border-slate-800 bg-slate-900/20 ring-1 ring-white/5 shadow-2xl' : ''
+                    }`}
+                  >
+                    {/* Glowing card background hover indicator */}
+                    <div className={`absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.01] to-transparent pointer-events-none`} />
+                    <div className={`absolute -right-20 -bottom-20 w-48 h-48 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none ${card.glow}`} />
 
-            {/* Bento Section 3: Live Workshops */}
-            <div className="py-10 md:py-12 md:pr-12 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(168,85,247,0.06)] border border-transparent hover:border-purple-500/10 transition-all duration-350 ease-out hover:-translate-y-1.5 hover:scale-[1.015]">
-              {/* Theme-colored ambient backdrop glow */}
-              <div className="absolute -right-16 -bottom-16 w-44 h-44 rounded-full bg-purple-500/0 group-hover:bg-purple-600/5 blur-[50px] transition-all duration-500 pointer-events-none" />
-              {/* Card shine reflection sweep */}
-              <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none -skew-x-25 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-out z-0" />
-              <div className="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-900/40 flex items-center justify-center text-purple-400 group-hover:scale-110 group-hover:bg-purple-650 group-hover:border-purple-700/50 transition-all duration-300 shadow-md">
-                <Code2 className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-200 tracking-tight transition-colors group-hover:text-purple-400">{content.curriculum_title_3}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  {content.curriculum_desc_3}
-                </p>
-              </div>
+                    {/* Card shine sweep */}
+                    <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/[0.03] to-transparent pointer-events-none -skew-x-25 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-out z-0" />
 
-              {/* Visual Panel: Structured Syllabus Pipeline */}
-              {renderMockup(content.curriculum_mock_3)}
-            </div>
+                    {/* Content Section (Left side in card flex) */}
+                    <div className="flex-1 space-y-4 z-10 text-left">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl bg-slate-900 border border-slate-850 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:bg-slate-950 ${card.accentColor}`}>
+                          <CardIcon className="w-5 h-5" />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Phase 0{idx + 1}</span>
+                      </div>
 
-            {/* Bento Section 4: Mock Assessments */}
-            <div className="pt-10 md:pt-12 md:pl-12 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(16,185,129,0.06)] border border-transparent hover:border-emerald-500/10 transition-all duration-350 ease-out hover:-translate-y-1.5 hover:scale-[1.015]">
-              {/* Theme-colored ambient backdrop glow */}
-              <div className="absolute -left-16 -bottom-16 w-44 h-44 rounded-full bg-emerald-500/0 group-hover:bg-emerald-600/5 blur-[50px] transition-all duration-500 pointer-events-none" />
-              {/* Card shine reflection sweep */}
-              <div className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none -skew-x-25 -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-out z-0" />
-              <div className="w-9 h-9 rounded-lg bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-650 group-hover:border-emerald-700/50 transition-all duration-300 shadow-md">
-                <Trophy className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-200 tracking-tight transition-colors group-hover:text-emerald-400">{content.curriculum_title_4}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  {content.curriculum_desc_4}
-                </p>
-              </div>
+                      <div className="space-y-1.5">
+                        <h3 className={`text-lg sm:text-xl font-black tracking-tight transition-colors duration-300 group-hover:${card.accentColor}`}>
+                          {card.title}
+                        </h3>
+                        <p className="text-xs text-slate-400 leading-relaxed max-w-xl">
+                          {card.desc}
+                        </p>
+                      </div>
 
-              {/* Visual Panel: Interactive Testing Interface Mockup */}
-              {renderMockup(content.curriculum_mock_4)}
+                      {/* Expand / Collapse Actions */}
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setExpandedCardIdx(isExpanded ? null : idx)}
+                          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-white transition-colors cursor-pointer group/btn animate-pulse-glow"
+                        >
+                          <span>{isExpanded ? 'Hide Details' : 'Expand Syllabus Details'}</span>
+                          <span className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'group-hover/btn:translate-y-0.5'}`}>▼</span>
+                        </button>
+                      </div>
+
+                      {/* Expanded Content Panel */}
+                      <div className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                        isExpanded ? 'max-h-[300px] opacity-100 mt-4' : 'max-h-0 opacity-0'
+                      }`}>
+                        <div className="bg-slate-950/60 border border-slate-900/60 rounded-2xl p-4 space-y-3">
+                          <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 block">Syllabus Overview</span>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-350">
+                            {card.syllabus.map((item, key) => (
+                              <div key={key} className="flex items-center gap-2">
+                                <span className={`w-1 h-1 rounded-full group-hover:scale-125 transition-transform ${
+                                  idx === 0 ? 'bg-blue-500' : idx === 1 ? 'bg-indigo-500' : idx === 2 ? 'bg-purple-500' : 'bg-emerald-500'
+                                }`} />
+                                <span>{item}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Interactive Panel Mockup Section (Right side in card flex) */}
+                    <div className="w-full md:w-[280px] shrink-0 z-10">
+                      {renderMockup(card.mock)}
+                    </div>
+
+                  </div>
+                );
+              })}
             </div>
 
           </div>
