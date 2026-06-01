@@ -22,6 +22,18 @@ CREATE TABLE IF NOT EXISTS public.landing_page_settings (
     mentor_badge_2 TEXT,
     mentor_badge_3 TEXT,
     mentor_badge_4 TEXT,
+    curriculum_title_1 TEXT,
+    curriculum_desc_1 TEXT,
+    curriculum_mock_1 TEXT,
+    curriculum_title_2 TEXT,
+    curriculum_desc_2 TEXT,
+    curriculum_mock_2 TEXT,
+    curriculum_title_3 TEXT,
+    curriculum_desc_3 TEXT,
+    curriculum_mock_3 TEXT,
+    curriculum_title_4 TEXT,
+    curriculum_desc_4 TEXT,
+    curriculum_mock_4 TEXT,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
@@ -58,7 +70,11 @@ CREATE POLICY "Allow write/update access on landing_stats_cache"
 INSERT INTO public.landing_page_settings (
     id, hero_title, hero_subtitle, hero_paragraph, cta_title, cta_subtitle, faq_items, marquee_images,
     mentor_name, mentor_designation, mentor_bio, mentor_message, mentor_image,
-    mentor_badge_1, mentor_badge_2, mentor_badge_3, mentor_badge_4
+    mentor_badge_1, mentor_badge_2, mentor_badge_3, mentor_badge_4,
+    curriculum_title_1, curriculum_desc_1, curriculum_mock_1,
+    curriculum_title_2, curriculum_desc_2, curriculum_mock_2,
+    curriculum_title_3, curriculum_desc_3, curriculum_mock_3,
+    curriculum_title_4, curriculum_desc_4, curriculum_mock_4
 )
 VALUES (
     'current',
@@ -94,7 +110,19 @@ Small daily improvements create long-term success.',
     '🏆 Founder',
     '🎯 Placement Mentor',
     '📚 Aptitude Trainer',
-    '⭐ Industry Experience'
+    '⭐ Industry Experience',
+    'Mass Impact',
+    'Personalized technical learning maps configured to benchmark and scale performance across large cohorts of students simultaneously.',
+    'scale',
+    'Student Interactions',
+    'Engaging campuses across standard learning metrics to elevate logical aptitude via interactive question sets and solution analytics.',
+    'workspace',
+    'Live Workshops',
+    'Structured syllabus mapping targeted at real-time recruitment paradigms for core banking, services, and product-focused placement rounds.',
+    'milestones',
+    'Mock Assessments',
+    'Evaluate readiness with adaptive timing evaluations that simulate actual company workflows, validating speed constraints under high pressure.',
+    'assessment'
 )
 ON CONFLICT (id) DO NOTHING;
 

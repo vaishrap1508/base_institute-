@@ -736,3 +736,21 @@ body {
   transition-duration: 300ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* --- CURRICULUM BENTO CUSTOM ANIMATIONS --- */
+@keyframes dottedMove {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -20; }
+}
+.animate-dotted-flow {
+  stroke-dasharray: 4, 4;
+  animation: dottedMove 1s linear infinite;
+}
+@keyframes pulseGlowIcon {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.03); filter: brightness(1.15); }
+}
+.animate-pulse-glow {
+  animation: pulseGlowIcon 2.5s ease-in-out infinite;
+}
+
