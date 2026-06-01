@@ -21,13 +21,10 @@ import {
   Trash2, 
   Save, 
   X,
-  FileText,
-  Bookmark,
   TrendingUp,
   MapPin,
   Clock,
   ExternalLink,
-  Laptop,
   Briefcase,
   Target,
   Check,
@@ -452,7 +449,7 @@ export default function LandingPage() {
         setIsScrolled(false);
       }
 
-      const sections = ['learning-path', 'empowering-campuses', 'coach'];
+      const sections = ['empowering-campuses', 'curriculum', 'coach'];
       const scrollPosition = window.scrollY + 250; // Offset to trigger before section fully hits top
 
       for (const sectionId of sections) {
@@ -704,14 +701,14 @@ export default function LandingPage() {
             }`} />
           </a>
           <a 
-            href="#learning-path" 
+            href="#curriculum" 
             className={`relative py-1 transition-colors duration-200 group/link ${
-              activeSection === 'learning-path' ? 'text-white' : 'text-slate-400 hover:text-white'
+              activeSection === 'curriculum' ? 'text-white' : 'text-slate-400 hover:text-white'
             }`}
           >
             <span>Curriculum</span>
             <span className={`absolute bottom-0 left-0 w-full h-[1.5px] bg-blue-500 transform transition-transform duration-300 origin-left ${
-              activeSection === 'learning-path' ? 'scale-x-100' : 'scale-x-0 group-hover/link:scale-x-100'
+              activeSection === 'curriculum' ? 'scale-x-100' : 'scale-x-0 group-hover/link:scale-x-100'
             }`} />
           </a>
           <a 
@@ -1087,7 +1084,7 @@ export default function LandingPage() {
                 {[...content.marquee_images_row1, ...content.marquee_images_row1].map((img, idx) => (
                   <div 
                     key={`r1-${idx}`} 
-                    className="relative w-72 h-44 rounded-xl overflow-hidden shrink-0 border border-slate-800/80 group shine-hover cursor-pointer"
+                    className="relative w-[300px] h-[360px] rounded-xl overflow-hidden shrink-0 border border-slate-800/80 group shine-hover cursor-pointer"
                   >
                     <img 
                       src={img.url} 
@@ -1095,9 +1092,6 @@ export default function LandingPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 filter brightness-90 group-hover:brightness-100" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/10 to-transparent flex flex-col justify-end p-4">
-                      <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none bg-blue-950/60 border border-blue-900/30 px-2 py-1 rounded self-start mb-2">
-                        {img.category}
-                      </span>
                       <span className="text-xs font-black text-white tracking-tight leading-none group-hover:translate-x-1 transition-transform">{img.caption}</span>
                     </div>
                   </div>
@@ -1111,7 +1105,7 @@ export default function LandingPage() {
                 {[...content.marquee_images_row2, ...content.marquee_images_row2].map((img, idx) => (
                   <div 
                     key={`r2-${idx}`} 
-                    className="relative w-72 h-44 rounded-xl overflow-hidden shrink-0 border border-slate-800/80 group shine-hover cursor-pointer"
+                    className="relative w-[300px] h-[360px] rounded-xl overflow-hidden shrink-0 border border-slate-800/80 group shine-hover cursor-pointer"
                   >
                     <img 
                       src={img.url} 
@@ -1119,9 +1113,6 @@ export default function LandingPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 filter brightness-90 group-hover:brightness-100" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/10 to-transparent flex flex-col justify-end p-4">
-                      <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest leading-none bg-indigo-950/60 border border-indigo-900/30 px-2 py-1 rounded self-start mb-2">
-                        {img.category}
-                      </span>
                       <span className="text-xs font-black text-white tracking-tight leading-none group-hover:translate-x-1 transition-transform">{img.caption}</span>
                     </div>
                   </div>
@@ -1133,64 +1124,6 @@ export default function LandingPage() {
             <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent pointer-events-none z-10" />
             <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-slate-950 via-slate-950/40 to-transparent pointer-events-none z-10" />
           </div>
-
-
-          {/* Bento grid details layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y divide-slate-800/60 md:divide-y-0 md:divide-x divide-slate-800/60 pt-6">
-            
-            {/* Bento Section 1: Mass Impact */}
-            <div className="pb-8 md:pb-0 md:pr-8 md:pl-0 flex flex-col gap-4 relative overflow-hidden">
-              <div className="w-9 h-9 rounded-lg bg-blue-950/60 border border-blue-900/40 flex items-center justify-center text-blue-400">
-                <Users className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-200 tracking-tight">Mass Impact</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Personalized technical learning maps configured to benchmark and scale performance across large cohorts of students simultaneously.
-                </p>
-              </div>
-            </div>
-
-            {/* Bento Section 2: Student Interactions */}
-            <div className="py-8 md:py-0 md:px-8 flex flex-col gap-4 relative overflow-hidden">
-              <div className="w-9 h-9 rounded-lg bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-indigo-400">
-                <Layers className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-200 tracking-tight">Student Interactions</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Engaging campuses across standard learning metrics to elevate logical aptitude via interactive question sets and solution analytics.
-                </p>
-              </div>
-            </div>
-
-            {/* Bento Section 3: Live Workshops */}
-            <div className="pt-8 md:pt-0 md:pl-8 md:pr-0 flex flex-col gap-4 relative overflow-hidden">
-              <div className="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-900/40 flex items-center justify-center text-purple-400">
-                <Code2 className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-200 tracking-tight">Live Workshops</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Structured syllabus mapping targeted at real-time recruitment paradigms for core banking, services, and product-focused placement rounds.
-                </p>
-              </div>
-            </div>
-
-          </div>
-
-
-        </div>
-
-      </section>
-
-      {/* ==========================================
-          DYNAMIC STATS & PARTNERS (Focus Point #2)
-          ========================================== */}
-      <section className="relative w-full py-16 px-6 sm:px-12 bg-slate-950">
-        
-        <div className="max-w-7xl mx-auto space-y-12">
-          
 
 
           {/* CACHED REAL-TIME STATISTICS GRID */}
@@ -1228,10 +1161,217 @@ export default function LandingPage() {
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">College Partnerships</span>
             </div>
 
-
-
           </div>
 
+
+        </div>
+
+      </section>
+
+      {/* ==========================================
+          CURRICULUM (BENTO GRID DETAILS)
+          ========================================== */}
+      <section id="curriculum" className="relative w-full py-20 px-6 sm:px-12 bg-slate-950">
+        
+        <div className="max-w-7xl mx-auto space-y-12">
+          
+          {/* Section title */}
+          <div className="text-center space-y-2 max-w-xl mx-auto">
+            <h2 className="text-3xl font-black text-white tracking-tight uppercase">
+              Curriculum
+            </h2>
+            <p className="text-xs font-semibold text-slate-500">
+              Structured preparation syllabus, active workspace simulations, and mock assessments mapped to recruiting trends.
+            </p>
+          </div>
+
+          {/* Bento Grid details layout (Symmetric 2x2 Layout) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 divide-y-2 md:divide-y-0 divide-slate-700/60 md:relative pt-6">
+            {/* Desktop Center Vertical separator line */}
+            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-[2px] bg-slate-700/60 -translate-x-1/2 z-10" />
+
+            {/* Bento Section 1: Mass Impact */}
+            <div className="pb-10 md:pb-12 md:pr-12 md:border-b-2 md:border-slate-700/60 flex flex-col gap-4 relative overflow-hidden">
+              <div className="w-9 h-9 rounded-lg bg-blue-950/60 border border-blue-900/40 flex items-center justify-center text-blue-400">
+                <Users className="w-4.5 h-4.5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-slate-200 tracking-tight">Mass Impact</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Personalized technical learning maps configured to benchmark and scale performance across large cohorts of students simultaneously.
+                </p>
+              </div>
+
+              {/* Visual Panel: Cohort benchmark map */}
+              <div className="bg-slate-950 border border-slate-900 rounded-xl p-4 mt-2 space-y-3 relative overflow-hidden shadow-inner w-full min-h-[160px] flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Cohort Scale Tracker</span>
+                  <span className="text-[8px] font-bold text-emerald-400 font-mono bg-emerald-950/20 px-1.5 py-0.5 rounded animate-pulse">Live Sync</span>
+                </div>
+                <div className="space-y-2 flex-1 flex flex-col justify-center">
+                  {/* Progress Bar 1 */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[9px] font-bold text-slate-400">
+                      <span>Section A (Advanced maps)</span>
+                      <span className="text-blue-400">92% Done</span>
+                    </div>
+                    <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full w-[92%]" />
+                    </div>
+                  </div>
+                  {/* Progress Bar 2 */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[9px] font-bold text-slate-400">
+                      <span>Section B (Foundations)</span>
+                      <span className="text-indigo-400">78% Done</span>
+                    </div>
+                    <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full w-[78%]" />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500">
+                  <span>Target: 200k Cohorts</span>
+                  <span className="text-slate-400">Rate: 1.2M req/s</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Section 2: Student Interactions */}
+            <div className="py-10 md:py-0 md:pb-12 md:pl-12 md:border-b-2 md:border-slate-700/60 flex flex-col gap-4 relative overflow-hidden">
+              <div className="w-9 h-9 rounded-lg bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-indigo-400">
+                <Layers className="w-4.5 h-4.5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-slate-200 tracking-tight">Student Interactions</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Engaging campuses across standard learning metrics to elevate logical aptitude via interactive question sets and solution analytics.
+                </p>
+              </div>
+
+              {/* Visual Panel: Interactive Question Set list */}
+              <div className="bg-slate-950 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[160px] flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Question Workspace</span>
+                  <span className="text-[8px] font-bold text-blue-400 font-mono bg-blue-950/20 px-1.5 py-0.5 rounded">Active Solver</span>
+                </div>
+                <div className="space-y-1.5 flex-1 flex flex-col justify-center">
+                  {/* Row 1 */}
+                  <div className="flex items-center justify-between bg-slate-900/40 border border-slate-900 rounded-lg p-1.5 text-[9px] font-bold text-slate-300">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span>Linear Arrays & Ratios</span>
+                    </div>
+                    <span className="text-[8px] text-emerald-400 font-mono px-1 bg-emerald-950/40 rounded border border-emerald-900/30">100% Correct</span>
+                  </div>
+                  {/* Row 2 */}
+                  <div className="flex items-center justify-between bg-slate-900/40 border border-slate-900 rounded-lg p-1.5 text-[9px] font-bold text-slate-300">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
+                      <span>Syllogisms & Logic</span>
+                    </div>
+                    <span className="text-[8px] text-blue-400 font-mono px-1 bg-blue-950/40 rounded border border-blue-900/30">Solving...</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500">
+                  <span>Accuracy: 84% avg</span>
+                  <span className="text-slate-400">Total Solved: 10.4k</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Section 3: Live Workshops */}
+            <div className="py-10 md:py-12 md:pr-12 flex flex-col gap-4 relative overflow-hidden">
+              <div className="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-900/40 flex items-center justify-center text-purple-400">
+                <Code2 className="w-4.5 h-4.5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-slate-200 tracking-tight">Live Workshops</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Structured syllabus mapping targeted at real-time recruitment paradigms for core banking, services, and product-focused placement rounds.
+                </p>
+              </div>
+
+              {/* Visual Panel: Structured Syllabus Pipeline */}
+              <div className="bg-slate-950 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[160px] flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Syllabus Milestones</span>
+                  <span className="text-[8px] font-bold text-indigo-400 font-mono bg-indigo-950/20 px-1.5 py-0.5 rounded">Core Banking</span>
+                </div>
+                <div className="flex items-center justify-between gap-1 flex-1 relative px-2">
+                  {/* Connecting Dotted Line */}
+                  <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-[1px] border-t border-dashed border-slate-800 z-0" />
+                  
+                  {/* Step 1 */}
+                  <div className="flex flex-col items-center gap-1 z-10">
+                    <div className="w-6.5 h-6.5 rounded-full bg-blue-950 border border-blue-800/80 flex items-center justify-center text-[9px] font-black text-blue-400 shadow-md">
+                      01
+                    </div>
+                    <span className="text-[8px] font-bold text-slate-400 tracking-tight">Fintech</span>
+                  </div>
+                  {/* Step 2 */}
+                  <div className="flex flex-col items-center gap-1 z-10">
+                    <div className="w-6.5 h-6.5 rounded-full bg-indigo-950 border border-indigo-800/80 flex items-center justify-center text-[9px] font-black text-indigo-400 shadow-md animate-pulse">
+                      02
+                    </div>
+                    <span className="text-[8px] font-bold text-indigo-400 tracking-tight">Product</span>
+                  </div>
+                  {/* Step 3 */}
+                  <div className="flex flex-col items-center gap-1 z-10">
+                    <div className="w-6.5 h-6.5 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-[9px] font-black text-slate-500 shadow-md">
+                      03
+                    </div>
+                    <span className="text-[8px] font-bold text-slate-500 tracking-tight">Mock Staging</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500">
+                  <span>Curriculum Map: Active</span>
+                  <span className="text-slate-400">Partnerships: 156+</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Section 4: Mock Assessments */}
+            <div className="pt-10 md:pt-12 md:pl-12 flex flex-col gap-4 relative overflow-hidden">
+              <div className="w-9 h-9 rounded-lg bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center text-emerald-400">
+                <Trophy className="w-4.5 h-4.5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-slate-200 tracking-tight">Mock Assessments</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Evaluate readiness with adaptive timing evaluations that simulate actual company workflows, validating speed constraints under high pressure.
+                </p>
+              </div>
+
+              {/* Visual Panel: Interactive Testing Interface Mockup */}
+              <div className="bg-slate-950 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[160px] flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Assessment Sim</span>
+                  <span className="text-[8px] font-bold text-emerald-400 font-mono bg-emerald-950/20 px-1.5 py-0.5 rounded">Active Session</span>
+                </div>
+                <div className="space-y-1 flex-1 flex flex-col justify-center">
+                  <div className="flex justify-between items-center text-[9px] font-bold text-slate-400">
+                    <span>Goldman Sachs Prep Mock</span>
+                    <span className="text-amber-400 font-mono animate-pulse">⏳ 14:32 left</span>
+                  </div>
+                  <div className="space-y-1 mt-1">
+                    <div className="flex justify-between text-[8px] font-extrabold text-slate-500">
+                      <span>Progress</span>
+                      <span>80% Complete</span>
+                    </div>
+                    <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full w-[80%]" />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500">
+                  <span>Score: 320/400</span>
+                  <span className="text-slate-400">Status: Running</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
 
         </div>
 
@@ -1341,69 +1481,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ==========================================
-          KINETIC LEARNING MODULES
-          ========================================== */}
-      <section id="learning-path" className="relative w-full py-20 px-6 sm:px-12 bg-slate-950/50">
-        
-        <div className="max-w-7xl mx-auto space-y-12">
-          
-          <div className="text-center space-y-2 max-w-xl mx-auto">
-            <h2 className="text-3xl font-black text-white tracking-tight uppercase">
-              Kinetic Learning Modules
-            </h2>
-            <p className="text-xs font-semibold text-slate-500">
-              Industry-vetted preparation syllabus mapped to recruiting trends.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y divide-slate-800/60 md:divide-y-0 md:divide-x divide-slate-800/60 pt-6">
-            
-            {/* Module Section 1: Quantitative Aptitude */}
-            <div className="pb-8 md:pb-0 md:pr-8 md:pl-0 flex flex-col gap-4 relative overflow-hidden">
-              <div className="w-9 h-9 rounded-lg bg-blue-950/60 border border-blue-900/40 flex items-center justify-center text-blue-400">
-                <FileText className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-sm font-bold text-slate-200">Quantitative Aptitude</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  From Number Systems and Speed Trains to Algebra equations. Master placement stems with structured step-by-step formula analysis.
-                </p>
-              </div>
-            </div>
-
-            {/* Module Section 2: Verbal Ability */}
-            <div className="py-8 md:py-0 md:px-8 flex flex-col gap-4 relative overflow-hidden">
-              <div className="w-9 h-9 rounded-lg bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-indigo-400">
-                <Bookmark className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-sm font-bold text-slate-200">Verbal Ability</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Elevate grammar, contextual reading comprehension, syllogisms, and core inference patterns evaluated in enterprise placements.
-                </p>
-              </div>
-            </div>
-
-            {/* Module Section 3: Mock Assessments */}
-            <div className="pt-8 md:pt-0 md:pl-8 md:pr-0 flex flex-col gap-4 relative overflow-hidden">
-              <div className="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-900/40 flex items-center justify-center text-purple-400">
-                <Laptop className="w-4.5 h-4.5" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-sm font-bold text-slate-200">Mock Assessments</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Evaluate readiness with adaptive timing evaluations that simulate actual company workflows, validating speed constraints.
-                </p>
-              </div>
-            </div>
-
-          </div>
-
-
-        </div>
-
-      </section>
 
       {/* ==========================================
           FREQUENTLY ASKED QUESTIONS (FAQ)
