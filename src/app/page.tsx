@@ -697,14 +697,17 @@ export default function LandingPage() {
           <span className="text-[8px] font-bold text-emerald-400 font-mono bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">Live Sync</span>
         </div>
       </div>
-      <div className="space-y-2 flex-1 flex flex-col justify-center relative z-10">
+      <div className="space-y-3 flex-1 flex flex-col justify-center relative z-10">
         <div className="space-y-1">
           <div className="flex justify-between text-[9px] font-bold text-slate-400">
             <span>Section A (Advanced maps)</span>
-            <span className="text-blue-400 font-mono">92% Done</span>
+            <div className="relative w-14 h-3 flex items-center justify-end font-mono">
+              <span className="absolute right-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:scale-75 text-blue-400">45% Done</span>
+              <span className="absolute right-0 opacity-0 scale-75 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100 text-blue-400 font-black">92% Done</span>
+            </div>
           </div>
           <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full w-[92%] relative overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full w-[45%] group-hover:w-[92%] transition-all duration-1000 ease-out relative overflow-hidden group-hover:shadow-[0_0_8px_rgba(59,130,246,0.6)]">
               <div className="absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-100%] animate-reflection-sweep" style={{ animationDuration: '3s' }} />
             </div>
           </div>
@@ -712,10 +715,13 @@ export default function LandingPage() {
         <div className="space-y-1">
           <div className="flex justify-between text-[9px] font-bold text-slate-400">
             <span>Section B (Foundations)</span>
-            <span className="text-indigo-400 font-mono">78% Done</span>
+            <div className="relative w-14 h-3 flex items-center justify-end font-mono">
+              <span className="absolute right-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:scale-75 text-indigo-400">30% Done</span>
+              <span className="absolute right-0 opacity-0 scale-75 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100 text-indigo-400 font-black">78% Done</span>
+            </div>
           </div>
           <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full w-[78%] relative overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full w-[30%] group-hover:w-[78%] transition-all duration-1000 ease-out relative overflow-hidden group-hover:shadow-[0_0_8px_rgba(124,58,237,0.6)]">
               <div className="absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-100%] animate-reflection-sweep" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
             </div>
           </div>
@@ -723,7 +729,7 @@ export default function LandingPage() {
       </div>
       <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10">
         <span>Target: 200k Cohorts</span>
-        <span className="text-slate-400 font-mono">Rate: 1.2M req/s</span>
+        <span className="text-slate-450 font-mono transition-colors group-hover:text-blue-400">Rate: 1.2M req/s</span>
       </div>
     </div>
   );
@@ -733,27 +739,34 @@ export default function LandingPage() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
       <div className="flex items-center justify-between relative z-10">
         <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Question Workspace</span>
-        <span className="text-[8px] font-bold text-blue-400 font-mono bg-blue-950/40 px-1.5 py-0.5 rounded border border-blue-900/30">Active Solver</span>
+        <span className="text-[8px] font-bold text-indigo-400 font-mono bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-900/30">Active Solver</span>
       </div>
       <div className="space-y-1.5 flex-1 flex flex-col justify-center relative z-10">
-        <div className="flex items-center justify-between bg-slate-900/40 border border-slate-900/60 rounded-lg p-1.5 text-[9px] font-bold text-slate-300 hover:bg-slate-900/80 transition-colors">
+        <div className="flex items-center justify-between bg-slate-900/40 border border-slate-900/60 rounded-lg p-1.5 text-[9px] font-bold text-slate-300 hover:bg-slate-900/80 transition-colors group-hover:border-emerald-500/20 group-hover:shadow-[0_0_8px_rgba(16,185,129,0.05)]">
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>Linear Arrays & Ratios</span>
           </div>
           <span className="text-[8px] text-emerald-400 font-mono px-1 bg-emerald-950/40 rounded border border-emerald-900/30">100% Correct</span>
         </div>
-        <div className="flex items-center justify-between bg-slate-900/40 border border-slate-900/60 rounded-lg p-1.5 text-[9px] font-bold text-slate-300 hover:bg-slate-900/80 transition-colors">
+        <div className="flex items-center justify-between bg-slate-900/40 border border-slate-900/60 rounded-lg p-1.5 text-[9px] font-bold text-slate-300 hover:bg-slate-900/80 transition-all group-hover:border-indigo-500/20 group-hover:shadow-[0_0_8px_rgba(99,102,241,0.05)]">
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping" />
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 transition-all duration-500 group-hover:bg-emerald-500 group-hover:scale-125 animate-pulse" />
             <span>Syllogisms & Logic</span>
           </div>
-          <span className="text-[8px] text-blue-400 font-mono px-1 bg-blue-950/40 rounded border border-blue-900/30 animate-pulse">Solving...</span>
+          <div className="relative w-16 h-4 flex items-center justify-end font-mono">
+            <span className="absolute right-0 text-[8px] text-blue-400 px-1 bg-blue-950/40 rounded border border-blue-900/30 animate-pulse transition-all duration-500 group-hover:opacity-0 group-hover:scale-75">
+              Solving...
+            </span>
+            <span className="absolute right-0 text-[8px] text-emerald-400 px-1 bg-emerald-950/40 rounded border border-emerald-900/30 opacity-0 scale-75 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100 font-bold">
+              Correct!
+            </span>
+          </div>
         </div>
       </div>
       <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10">
         <span>Accuracy: 84% avg</span>
-        <span className="text-slate-400 font-mono">Total Solved: 10.4k</span>
+        <span className="text-slate-400 font-mono transition-colors group-hover:text-indigo-400">Total Solved: 10.4k</span>
       </div>
     </div>
   );
@@ -763,34 +776,34 @@ export default function LandingPage() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
       <div className="flex items-center justify-between relative z-10">
         <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Syllabus Milestones</span>
-        <span className="text-[8px] font-bold text-indigo-400 font-mono bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-900/30">Core Banking</span>
+        <span className="text-[8px] font-bold text-purple-400 font-mono bg-purple-950/40 px-1.5 py-0.5 rounded border border-purple-900/30">Core Banking</span>
       </div>
       <div className="flex items-center justify-between gap-1 flex-1 relative px-2 z-10">
         <svg className="absolute left-6 right-6 top-1/2 -translate-y-1/2 w-[calc(100%-3rem)] h-[2px] z-0 overflow-visible">
-          <line x1="0%" y1="50%" x2="100%" y2="50%" className="stroke-slate-800 stroke-[2px] animate-dotted-flow" />
+          <line x1="0%" y1="50%" x2="100%" y2="50%" className="stroke-slate-800 stroke-[2px] animate-dotted-flow group-hover:stroke-purple-500/80 group-hover:animate-[dottedMove_0.4s_linear_infinite] transition-all duration-700" />
         </svg>
-        <div className="flex flex-col items-center gap-1 z-10">
-          <div className="w-7 h-7 rounded-full bg-blue-950 border border-blue-800/80 flex items-center justify-center text-[9px] font-black text-blue-400 shadow-md hover:scale-110 transition-transform">
+        <div className="flex flex-col items-center gap-1.5 z-10">
+          <div className="w-7 h-7 rounded-full bg-blue-950 border border-blue-800/80 flex items-center justify-center text-[9px] font-black text-blue-400 shadow-md group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-400 group-hover:shadow-[0_0_12px_rgba(59,130,246,0.6)] transition-all duration-300 cursor-default">
             01
           </div>
-          <span className="text-[8px] font-bold text-slate-400 tracking-tight">Fintech</span>
+          <span className="text-[8px] font-bold text-slate-400 tracking-tight transition-colors duration-300 group-hover:text-blue-400">Fintech</span>
         </div>
-        <div className="flex flex-col items-center gap-1 z-10">
-          <div className="w-7 h-7 rounded-full bg-indigo-950 border border-indigo-650 flex items-center justify-center text-[9px] font-black text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.25)] animate-pulse-glow hover:scale-110 transition-all">
+        <div className="flex flex-col items-center gap-1.5 z-10">
+          <div className="w-7 h-7 rounded-full bg-indigo-950 border border-indigo-650 flex items-center justify-center text-[9px] font-black text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.25)] animate-pulse-glow group-hover:scale-115 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-400 group-hover:shadow-[0_0_18px_rgba(99,102,241,0.8)] transition-all duration-300 delay-75 cursor-default">
             02
           </div>
-          <span className="text-[8px] font-bold text-indigo-400 tracking-tight">Product</span>
+          <span className="text-[8px] font-bold text-indigo-400 tracking-tight transition-colors duration-300 group-hover:text-indigo-400">Product</span>
         </div>
-        <div className="flex flex-col items-center gap-1 z-10">
-          <div className="w-7 h-7 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-[9px] font-black text-slate-500 shadow-md hover:scale-110 transition-transform">
+        <div className="flex flex-col items-center gap-1.5 z-10">
+          <div className="w-7 h-7 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-[9px] font-black text-slate-500 shadow-md group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-400 group-hover:shadow-[0_0_12px_rgba(168,85,247,0.6)] transition-all duration-300 delay-150 cursor-default">
             03
           </div>
-          <span className="text-[8px] font-bold text-slate-500 tracking-tight">Mock Staging</span>
+          <span className="text-[8px] font-bold text-slate-500 tracking-tight transition-colors duration-300 group-hover:text-purple-400">Mock Staging</span>
         </div>
       </div>
       <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10">
         <span>Curriculum Map: Active</span>
-        <span className="text-slate-400 font-mono">Partnerships: 156+</span>
+        <span className="text-slate-400 font-mono transition-colors group-hover:text-purple-400">Partnerships: 156+</span>
       </div>
     </div>
   );
@@ -805,25 +818,41 @@ export default function LandingPage() {
       <div className="space-y-1 flex-1 flex flex-col justify-center relative z-10">
         <div className="flex justify-between items-center text-[9px] font-bold text-slate-400">
           <span>Goldman Sachs Mock</span>
-          <span className="text-amber-400 font-mono flex items-center gap-1 bg-amber-950/20 px-1.5 py-0.5 rounded border border-amber-900/20">
-            <span className="inline-block animate-bounce">⏳</span> 14:32 left
+          <span className="text-amber-400 font-mono flex items-center gap-1 bg-amber-950/20 px-1.5 py-0.5 rounded border border-amber-900/20 group-hover:bg-emerald-950/30 group-hover:text-emerald-400 group-hover:border-emerald-900/40 transition-all duration-500">
+            <span className="relative w-4 h-4 flex items-center justify-center">
+              <span className="absolute opacity-100 group-hover:opacity-0 group-hover:scale-75 transition-all duration-500 inline-block animate-bounce">⏳</span>
+              <span className="absolute opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-75 transition-all duration-500 text-emerald-400 font-black">✓</span>
+            </span>
+            <span className="relative w-14 h-3 flex items-center justify-center font-mono">
+              <span className="absolute left-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:translate-x-[-3px]">14:32 left</span>
+              <span className="absolute left-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0 translate-x-[3px] text-emerald-400 font-bold">Passed</span>
+            </span>
           </span>
         </div>
         <div className="space-y-1 mt-1">
           <div className="flex justify-between text-[8px] font-extrabold text-slate-500">
             <span>Progress</span>
-            <span>80% Complete</span>
+            <div className="relative w-20 h-3 flex items-center justify-end font-mono">
+              <span className="absolute right-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:translate-y-[-5px]">80% Complete</span>
+              <span className="absolute right-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 translate-y-[5px] text-emerald-400 font-black">100% Complete</span>
+            </div>
           </div>
           <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full w-[80%] relative overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full w-[80%] group-hover:w-[100%] transition-all duration-1000 ease-out relative overflow-hidden group-hover:shadow-[0_0_8px_rgba(16,185,129,0.6)]">
               <div className="absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-100%] animate-reflection-sweep" style={{ animationDuration: '3s' }} />
             </div>
           </div>
         </div>
       </div>
       <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10">
-        <span>Score: 320/400</span>
-        <span className="text-slate-400 font-mono">Status: Running</span>
+        <div className="relative w-24 h-4">
+          <span className="absolute left-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:translate-y-[-5px]">Score: 320/400</span>
+          <span className="absolute left-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 translate-y-[5px] text-emerald-400 font-bold">Score: 385/400</span>
+        </div>
+        <div className="relative w-24 h-4 text-right">
+          <span className="absolute right-0 opacity-100 transition-all duration-500 group-hover:opacity-0 group-hover:translate-y-[-5px]">Status: Running</span>
+          <span className="absolute right-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0 translate-y-[5px] text-emerald-400 font-bold">Status: Submitted</span>
+        </div>
       </div>
     </div>
   );
@@ -1391,8 +1420,10 @@ export default function LandingPage() {
             <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-[2px] bg-slate-700/60 -translate-x-1/2 z-10" />
 
             {/* Bento Section 1: Mass Impact */}
-            <div className="pb-10 md:pb-12 md:pr-12 md:border-b-2 md:border-slate-700/60 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(59,130,246,0.04)] transition-all duration-350 ease-out hover:-translate-y-1">
-              <div className="w-9 h-9 rounded-lg bg-blue-950/60 border border-blue-900/40 flex items-center justify-center text-blue-400 group-hover:scale-110 group-hover:border-blue-700/50 transition-all duration-300 shadow-md">
+            <div className="pb-10 md:pb-12 md:pr-12 md:border-b-2 md:border-slate-700/60 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(59,130,246,0.06)] border border-transparent hover:border-blue-500/10 transition-all duration-350 ease-out hover:-translate-y-1">
+              {/* Theme-colored ambient backdrop glow */}
+              <div className="absolute -right-16 -bottom-16 w-44 h-44 rounded-full bg-blue-500/0 group-hover:bg-blue-600/5 blur-[50px] transition-all duration-500 pointer-events-none" />
+              <div className="w-9 h-9 rounded-lg bg-blue-950/60 border border-blue-900/40 flex items-center justify-center text-blue-400 group-hover:scale-110 group-hover:bg-blue-650 group-hover:border-blue-700/50 transition-all duration-300 shadow-md">
                 <Users className="w-4.5 h-4.5" />
               </div>
               <div className="space-y-1">
@@ -1407,8 +1438,10 @@ export default function LandingPage() {
             </div>
 
             {/* Bento Section 2: Student Interactions */}
-            <div className="py-10 md:py-0 md:pb-12 md:pl-12 md:border-b-2 md:border-slate-700/60 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(99,102,241,0.04)] transition-all duration-350 ease-out hover:-translate-y-1">
-              <div className="w-9 h-9 rounded-lg bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-indigo-400 group-hover:scale-110 group-hover:border-indigo-700/50 transition-all duration-300 shadow-md">
+            <div className="py-10 md:py-0 md:pb-12 md:pl-12 md:border-b-2 md:border-slate-700/60 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(99,102,241,0.06)] border border-transparent hover:border-indigo-500/10 transition-all duration-350 ease-out hover:-translate-y-1">
+              {/* Theme-colored ambient backdrop glow */}
+              <div className="absolute -left-16 -bottom-16 w-44 h-44 rounded-full bg-indigo-500/0 group-hover:bg-indigo-600/5 blur-[50px] transition-all duration-500 pointer-events-none" />
+              <div className="w-9 h-9 rounded-lg bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-650 group-hover:border-indigo-700/50 transition-all duration-300 shadow-md">
                 <Layers className="w-4.5 h-4.5" />
               </div>
               <div className="space-y-1">
@@ -1423,8 +1456,10 @@ export default function LandingPage() {
             </div>
 
             {/* Bento Section 3: Live Workshops */}
-            <div className="py-10 md:py-12 md:pr-12 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(168,85,247,0.04)] transition-all duration-350 ease-out hover:-translate-y-1">
-              <div className="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-900/40 flex items-center justify-center text-purple-400 group-hover:scale-110 group-hover:border-purple-700/50 transition-all duration-300 shadow-md">
+            <div className="py-10 md:py-12 md:pr-12 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(168,85,247,0.06)] border border-transparent hover:border-purple-500/10 transition-all duration-350 ease-out hover:-translate-y-1">
+              {/* Theme-colored ambient backdrop glow */}
+              <div className="absolute -right-16 -bottom-16 w-44 h-44 rounded-full bg-purple-500/0 group-hover:bg-purple-600/5 blur-[50px] transition-all duration-500 pointer-events-none" />
+              <div className="w-9 h-9 rounded-lg bg-purple-950/60 border border-purple-900/40 flex items-center justify-center text-purple-400 group-hover:scale-110 group-hover:bg-purple-650 group-hover:border-purple-700/50 transition-all duration-300 shadow-md">
                 <Code2 className="w-4.5 h-4.5" />
               </div>
               <div className="space-y-1">
@@ -1439,8 +1474,10 @@ export default function LandingPage() {
             </div>
 
             {/* Bento Section 4: Mock Assessments */}
-            <div className="pt-10 md:pt-12 md:pl-12 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(16,185,129,0.04)] transition-all duration-350 ease-out hover:-translate-y-1">
-              <div className="w-9 h-9 rounded-lg bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:border-emerald-700/50 transition-all duration-300 shadow-md">
+            <div className="pt-10 md:pt-12 md:pl-12 flex flex-col gap-4 relative overflow-hidden group hover:bg-slate-900/10 p-4 sm:p-6 rounded-2xl hover:shadow-[0_20px_50px_rgba(16,185,129,0.06)] border border-transparent hover:border-emerald-500/10 transition-all duration-350 ease-out hover:-translate-y-1">
+              {/* Theme-colored ambient backdrop glow */}
+              <div className="absolute -left-16 -bottom-16 w-44 h-44 rounded-full bg-emerald-500/0 group-hover:bg-emerald-600/5 blur-[50px] transition-all duration-500 pointer-events-none" />
+              <div className="w-9 h-9 rounded-lg bg-emerald-950/60 border border-emerald-900/40 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-650 group-hover:border-emerald-700/50 transition-all duration-300 shadow-md">
                 <Trophy className="w-4.5 h-4.5" />
               </div>
               <div className="space-y-1">
