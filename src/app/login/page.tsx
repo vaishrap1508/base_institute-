@@ -596,9 +596,35 @@ export default function LoginPage() {
                   </div>
                 )}
                 {isRegister && (
-                  <span className="text-[9px] text-slate-450 dark:text-slate-500 block leading-normal mt-1 animate-fadeIn font-semibold">
-                    Password must be at least 8 characters, containing uppercase, numbers & symbols.
-                  </span>
+                  <div className="mt-2.5 space-y-2 bg-slate-50/50 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/80 rounded-xl p-3 animate-fadeIn transition-all duration-300">
+                    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-widest block mb-1 select-none">
+                      Password Requirements
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5">
+                      {[
+                        { label: 'Min. 8 characters', satisfied: password.length >= 8 },
+                        { label: 'Uppercase (A-Z)', satisfied: /[A-Z]/.test(password) },
+                        { label: 'Lowercase (a-z)', satisfied: /[a-z]/.test(password) },
+                        { label: 'Number (0-9)', satisfied: /[0-9]/.test(password) },
+                        { label: 'Special character (!@#...)', satisfied: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) },
+                      ].map((rule, idx) => (
+                        <div key={idx} className="flex items-center gap-1.5 text-[10px] font-semibold transition-all duration-200">
+                          {rule.satisfied ? (
+                            <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0 transform scale-110 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-3.5 h-3.5 text-slate-350 dark:text-slate-700 shrink-0 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                              <circle cx="12" cy="12" r="9" />
+                            </svg>
+                          )}
+                          <span className={rule.satisfied ? 'text-emerald-600 dark:text-emerald-400 transition-colors duration-200' : 'text-slate-450 dark:text-slate-550 transition-colors duration-200'}>
+                            {rule.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
 
