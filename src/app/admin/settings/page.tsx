@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings, Shield, RefreshCw, Server, Lock, ToggleLeft, ToggleRight, Trash2, Database, Save, Cpu, Plus } from 'lucide-react';
+import { Settings, Shield, RefreshCw, Server, Lock, ToggleLeft, ToggleRight, Trash2, Database, Save, Cpu, Plus, BookOpen, Calendar, Clock, MapPin, Target, Edit, Check } from 'lucide-react';
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
 import { USER_ROLES, SAMPLE_QUESTIONS, DOMAINS_DATA } from '@/lib/admin/store';
@@ -15,6 +15,80 @@ export default function SettingsPage() {
   const [sandboxMode, setSandboxMode] = useState(true);
   const [latexRenderer, setLatexRenderer] = useState(true);
   const [shuffleDefault, setShuffleDefault] = useState(true);
+
+  // Dynamic Onboarding Settings States
+  const [goalOptions, setGoalOptions] = useState<any[]>([]);
+  const [timelineOptions, setTimelineOptions] = useState<string[]>([]);
+  const [commitmentOptions, setCommitmentOptions] = useState<string[]>([]);
+  const [preferenceOptions, setPreferenceOptions] = useState<string[]>([]);
+  const [indianStates, setIndianStates] = useState<string[]>([]);
+  const [loadingOnboarding, setLoadingOnboarding] = useState(true);
+  const [activeTab, setActiveTab] = useState<'goals' | 'timelines' | 'commitments' | 'preferences' | 'states'>('goals');
+  const [savingOnboarding, setSavingOnboarding] = useState(false);
+
+  // Form states for adding items
+  const [newGoalId, setNewGoalId] = useState('');
+  const [newGoalLabel, setNewGoalLabel] = useState('');
+  const [newGoalDesc, setNewGoalDesc] = useState('');
+  const [newTimeline, setNewTimeline] = useState('');
+  const [newCommitment, setNewCommitment] = useState('');
+  const [newPreference, setNewPreference] = useState('');
+  const [newState, setNewState] = useState('');
+
+  // Fetch dynamic onboarding settings on mount
+  useEffect(() => {
+    async function loadOnboardingSettings() {
+      try {
+        const { data, error } = await supabase
+          .from('onboarding_settings')
+          .select('*')
+          .eq('id', 'current')
+          .single();
+
+        if (data && !error) {
+          if (Array.isArray(data.goal_options)) setGoalOptions(data.goal_options);
+          if (Array.isArray(data.timeline_options)) setTimelineOptions(data.timeline_options);
+          if (Array.isArray(data.commitment_options)) setCommitmentOptions(data.commitment_options);
+          if (Array.isArray(data.preference_options)) setPreferenceOptions(data.preference_options);
+          if (Array.isArray(data.indian_states)) setIndianStates(data.indian_states);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch onboarding settings:', err);
+      } finally {
+        setLoadingOnboarding(false);
+      }
+    }
+    loadOnboardingSettings();
+  }, []);
+
+  // Save dynamic onboarding settings handler
+  const handleSaveOnboarding = async () => {
+    setSavingOnboarding(true);
+    try {
+      const payload = {
+        id: 'current',
+        goal_options: goalOptions,
+        timeline_options: timelineOptions,
+        commitment_options: commitmentOptions,
+        preference_options: preferenceOptions,
+        indian_states: indianStates,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('onboarding_settings')
+        .upsert(payload);
+
+      if (error) throw error;
+      setNotification("Success: Onboarding Flow configurations saved to database.");
+    } catch (err: any) {
+      console.error(err);
+      setNotification(`Error: Failed to save onboarding configurations: ${err.message || err}`);
+    } finally {
+      setSavingOnboarding(false);
+      setTimeout(() => setNotification(null), 4000);
+    }
+  };
   
   const [notification, setNotification] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -581,6 +655,335 @@ export default function SettingsPage() {
                 </div>
               </div>
 
+            </div>
+
+            {/* NEW SECTION: Onboarding Flow Customizer */}
+            <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-2">
+                  <Target className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-800 tracking-tight">Onboarding Journey Customizer</h3>
+                    <p className="text-[11px] text-slate-400 font-medium">Manage onboarding steps, options, goals, and state filters in real time.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleSaveOnboarding}
+                  disabled={savingOnboarding}
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <Save className={`w-4 h-4 ${savingOnboarding ? 'animate-spin' : ''}`} />
+                  <span>{savingOnboarding ? 'Saving Settings...' : 'Save Onboarding Settings'}</span>
+                </button>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex flex-wrap gap-2 border-b border-slate-100 pb-3 text-xs font-bold text-slate-500">
+                <button
+                  onClick={() => setActiveTab('goals')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'goals' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'hover:bg-slate-50 hover:text-slate-800'}`}
+                >
+                  <Target className="w-4 h-4" />
+                  <span>Goals</span>
+                  <span className="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full">{goalOptions.length}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('states')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'states' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'hover:bg-slate-50 hover:text-slate-800'}`}
+                >
+                  <MapPin className="w-4 h-4" />
+                  <span>States</span>
+                  <span className="text-[10px] bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded-full">{indianStates.length}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('timelines')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'timelines' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'hover:bg-slate-50 hover:text-slate-800'}`}
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span>Timelines</span>
+                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">{timelineOptions.length}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('commitments')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'commitments' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'hover:bg-slate-50 hover:text-slate-800'}`}
+                >
+                  <Clock className="w-4 h-4" />
+                  <span>Commitments</span>
+                  <span className="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">{commitmentOptions.length}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('preferences')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'preferences' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'hover:bg-slate-50 hover:text-slate-800'}`}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>Preferences</span>
+                  <span className="text-[10px] bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded-full">{preferenceOptions.length}</span>
+                </button>
+              </div>
+
+              {/* Loader */}
+              {loadingOnboarding ? (
+                <div className="py-12 flex flex-col items-center justify-center gap-3">
+                  <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+                  <span className="text-xs font-semibold text-slate-400">Loading configurations from database...</span>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Goal Editor */}
+                  {activeTab === 'goals' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        {goalOptions.map((goal, idx) => (
+                          <div key={goal.id || idx} className="p-4 bg-slate-50 border border-slate-200/60 rounded-xl flex items-start justify-between gap-3 text-xs">
+                            <div className="flex flex-col gap-1 min-w-0">
+                              <span className="text-slate-850 font-extrabold uppercase tracking-wider text-[10px]">{goal.id}</span>
+                              <span className="text-slate-900 font-bold">{goal.label}</span>
+                              <p className="text-slate-500 font-medium leading-relaxed pr-2">{goal.desc}</p>
+                            </div>
+                            <button
+                              onClick={() => setGoalOptions(prev => prev.filter((_, i) => i !== idx))}
+                              className="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded-lg transition-all shrink-0 cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add Goal Form */}
+                      <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 space-y-3.5">
+                        <span className="text-[11px] font-black text-slate-450 uppercase tracking-wider">Add Custom Onboarding Goal</span>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <input
+                            type="text"
+                            placeholder="Unique Identifier (e.g. machine-learning)"
+                            value={newGoalId}
+                            onChange={e => setNewGoalId(e.target.value)}
+                            className="bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-blue-600"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Goal Title (e.g. Machine Learning Prep)"
+                            value={newGoalLabel}
+                            onChange={e => setNewGoalLabel(e.target.value)}
+                            className="bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-semibold col-span-2 focus:outline-none focus:border-blue-600"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Brief Description (e.g. Master classification, regression models, and model tuning.)"
+                            value={newGoalDesc}
+                            onChange={e => setNewGoalDesc(e.target.value)}
+                            className="bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-semibold md:col-span-3 focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (!newGoalId.trim() || !newGoalLabel.trim()) return;
+                            setGoalOptions(prev => [...prev, { id: newGoalId.trim(), label: newGoalLabel.trim(), desc: newGoalDesc.trim() }]);
+                            setNewGoalId('');
+                            setNewGoalLabel('');
+                            setNewGoalDesc('');
+                          }}
+                          className="flex items-center gap-1.5 px-4 py-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add Goal Option</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* States Editor */}
+                  {activeTab === 'states' && (
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar p-1">
+                        {indianStates.map((st, idx) => (
+                          <div key={st || idx} className="px-3.5 py-2 bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-200/60 rounded-xl text-xs font-bold text-indigo-900 flex items-center gap-2 animate-scaleUp">
+                            <span>{st}</span>
+                            <button
+                              onClick={() => setIndianStates(prev => prev.filter((_, i) => i !== idx))}
+                              className="text-indigo-400 hover:text-rose-600 p-0.5 rounded transition-all cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add State Form */}
+                      <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+                        <div className="flex-1 space-y-1.5">
+                          <label className="text-[11px] font-black text-slate-455 uppercase tracking-wider">Add Indian State / Union Territory</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Telangana"
+                            value={newState}
+                            onChange={e => setNewState(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (!newState.trim()) return;
+                            if (indianStates.includes(newState.trim())) return;
+                            setIndianStates(prev => [...prev, newState.trim()]);
+                            setNewState('');
+                          }}
+                          className="flex items-center gap-1.5 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-xl transition-all cursor-pointer h-10"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add State</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Timelines Editor */}
+                  {activeTab === 'timelines' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        {timelineOptions.map((time, idx) => (
+                          <div key={time || idx} className="p-3 bg-slate-50 border border-slate-200/60 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-4.5 h-4.5 text-slate-450" />
+                              <span>{time}</span>
+                            </div>
+                            <button
+                              onClick={() => setTimelineOptions(prev => prev.filter((_, i) => i !== idx))}
+                              className="text-rose-500 hover:text-rose-700 hover:bg-rose-55 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add Timeline Form */}
+                      <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+                        <div className="flex-1 space-y-1.5">
+                          <label className="text-[11px] font-black text-slate-455 uppercase tracking-wider">Add Timeline Metric Option</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Within 2 Weeks"
+                            value={newTimeline}
+                            onChange={e => setNewTimeline(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (!newTimeline.trim()) return;
+                            if (timelineOptions.includes(newTimeline.trim())) return;
+                            setTimelineOptions(prev => [...prev, newTimeline.trim()]);
+                            setNewTimeline('');
+                          }}
+                          className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-xl transition-all cursor-pointer h-10"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add Timeline</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Commitments Editor */}
+                  {activeTab === 'commitments' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        {commitmentOptions.map((commit, idx) => (
+                          <div key={commit || idx} className="p-3 bg-slate-50 border border-slate-200/60 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800">
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4.5 h-4.5 text-slate-450" />
+                              <span>{commit}</span>
+                            </div>
+                            <button
+                              onClick={() => setCommitmentOptions(prev => prev.filter((_, i) => i !== idx))}
+                              className="text-rose-500 hover:text-rose-700 hover:bg-rose-55 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add Commitment Form */}
+                      <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+                        <div className="flex-1 space-y-1.5">
+                          <label className="text-[11px] font-black text-slate-455 uppercase tracking-wider">Add Weekly Commitment Option</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 20+ Hours per Week"
+                            value={newCommitment}
+                            onChange={e => setNewCommitment(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (!newCommitment.trim()) return;
+                            if (commitmentOptions.includes(newCommitment.trim())) return;
+                            setCommitmentOptions(prev => [...prev, newCommitment.trim()]);
+                            setNewCommitment('');
+                          }}
+                          className="flex items-center gap-1.5 px-4 py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-bold rounded-xl transition-all cursor-pointer h-10"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add Commitment</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Preferences Editor */}
+                  {activeTab === 'preferences' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        {preferenceOptions.map((pref, idx) => (
+                          <div key={pref || idx} className="p-3 bg-slate-50 border border-slate-200/60 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800">
+                            <div className="flex items-center gap-2">
+                              <BookOpen className="w-4.5 h-4.5 text-slate-450" />
+                              <span>{pref}</span>
+                            </div>
+                            <button
+                              onClick={() => setPreferenceOptions(prev => prev.filter((_, i) => i !== idx))}
+                              className="text-rose-500 hover:text-rose-700 hover:bg-rose-55 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Add Preference Form */}
+                      <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+                        <div className="flex-1 space-y-1.5">
+                          <label className="text-[11px] font-black text-slate-455 uppercase tracking-wider">Add Pedagogical Learning Preference</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Concept-oriented Interactive Lectures"
+                            value={newPreference}
+                            onChange={e => setNewPreference(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-blue-600"
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (!newPreference.trim()) return;
+                            if (preferenceOptions.includes(newPreference.trim())) return;
+                            setPreferenceOptions(prev => [...prev, newPreference.trim()]);
+                            setNewPreference('');
+                          }}
+                          className="flex items-center gap-1.5 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl transition-all cursor-pointer h-10"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Add Preference</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              )}
             </div>
           </div>
         )}
