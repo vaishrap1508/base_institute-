@@ -18,12 +18,32 @@ import {
   GraduationCap,
   Award,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { USER_ROLES } from '@/lib/admin/store';
+import { createClient } from '@/utils/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
+  const supabase = createClient();
+
+  const setCookie = (name: string, value: string, days = 30) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  };
+
+  const deleteCookie = (name: string) => {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax`;
+  };
+
+  // Detect if Supabase is offline/placeholder domain to run in Offline Sandbox Mode
+  const isOfflineSandbox = typeof window !== 'undefined' && 
+    (!process.env.NEXT_PUBLIC_SUPABASE_URL || 
+     process.env.NEXT_PUBLIC_SUPABASE_URL.includes('fxpeswcwjvysarfyquoo') || 
+     localStorage.getItem('aptitude_offline_sandbox') === 'true');
 
   // ==========================================
   // VIEW AND AUTH STATES
@@ -32,8 +52,10 @@ export default function LoginPage() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showCreateAccountSuggest, setShowCreateAccountSuggest] = useState(false);
+  const [showSandboxModeSuggest, setShowSandboxModeSuggest] = useState(false);
   const [notification, setNotification] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
 
   // Pre-seed some emails on mount so existing credentials work out of the box
@@ -132,126 +154,458 @@ export default function LoginPage() {
     }, 1000);
   };
 
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setErrorMsg(null);
+    
+    if (isOfflineSandbox) {
+      console.warn("Supabase auth is offline. Simulating mock Google Login.");
+      const mockGoogleUser = {
+        role: 'STUDENT',
+        name: 'GOOGLE_USER',
+        email: 'google.student@university.edu',
+        avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
+      };
+      localStorage.setItem('aptitude_current_role', JSON.stringify(mockGoogleUser));
+      setCookie('aptitude_mock_auth', JSON.stringify({
+        id: 'mock-google-id',
+        email: 'google.student@university.edu',
+        name: 'GOOGLE_USER',
+        role: 'STUDENT'
+      }));
+      setCookie('aptitude_onboarding_completed', 'false');
+      showNotice('Logged in via mock Google Account (Offline Sandbox Mode)! Redirecting...', 'success');
+      setTimeout(() => {
+        router.push('/onboarding');
+      }, 1500);
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+      if (error) {
+        setErrorMsg(error.message);
+        setGoogleLoading(false);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'An unexpected error occurred during Google sign-in.');
+      setGoogleLoading(false);
+    }
+  };
+
   // ==========================================
   // SIGN IN / SIGN UP SUBMIT HANDLER
   // ==========================================
-  const handleAuthSubmit = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg(null);
 
-    // Simulate network latency (500ms) for high-end loading feedback
-    setTimeout(() => {
-      if (!email || !password) {
-        setErrorMsg('Please fill in all credential fields.');
-        setLoading(false);
-        return;
+    if (!email || !password) {
+      setErrorMsg('Please fill in all credential fields.');
+      setLoading(false);
+      return;
+    }
+
+    // Strict constraint: only small letters allowed for authentication
+    if (/[A-Z]/.test(email)) {
+      setErrorMsg('Authentication failed: Email must be written in small letters only (no capitals).');
+      setLoading(false);
+      return;
+    }
+
+    // If logging in
+    if (!isRegister) {
+      if (isOfflineSandbox) {
+        console.warn("Supabase auth is offline. Logging in via local offline credentials.");
+        const normalizedEmail = email.trim().toLowerCase();
+
+        // Check if it's one of the built-in system mock accounts or registered offline accounts
+        const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com';
+        const isMarcus = normalizedEmail === 'marcus.w@aptitude-ai.com';
+        const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
+        
+        const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
+        const localProfiles = JSON.parse(localProfilesStr);
+        const customProfile = localProfiles[normalizedEmail];
+
+        const isRegisteredOffline = !!customProfile;
+
+        if (isSarah || isMarcus || isStudent || isRegisteredOffline) {
+          if (isRegisteredOffline && customProfile.password !== password) {
+            setErrorMsg('Invalid credentials (Offline Sandbox Mode).');
+            setLoading(false);
+            return;
+          }
+
+          const userRole = (isSarah || isMarcus) ? 'ADMIN' : 'STUDENT';
+          const name = isSarah ? 'Sarah' : isMarcus ? 'Marcus' : customProfile?.fullName || normalizedEmail.split('@')[0].toUpperCase();
+
+          // Set mock auth cookie
+          const mockUser = {
+            id: isSarah ? 'sarah-id' : isMarcus ? 'marcus-id' : isStudent ? 'student-id' : (customProfile?.id || 'mock-student-id'),
+            email: normalizedEmail,
+            name,
+            role: userRole
+          };
+          setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
+          const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
+          setCookie('aptitude_onboarding_completed', completedOnboarding ? 'true' : 'false');
+
+          if (userRole === 'ADMIN') {
+            if (isMarcus) {
+              const editorRole = USER_ROLES.find(r => r.role === 'editor') || USER_ROLES[1];
+              localStorage.setItem('aptitude_current_role', JSON.stringify(editorRole));
+              showNotice('Logged in locally as Marcus (Editor)! Redirecting...', 'success');
+              setTimeout(() => router.push('/admin/editor'), 1000);
+            } else {
+              const adminRole = USER_ROLES.find(r => r.role === 'admin') || USER_ROLES[0];
+              localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
+              showNotice('Logged in locally as Sarah (Admin)! Redirecting...', 'success');
+              setTimeout(() => router.push('/admin/dashboard'), 1000);
+            }
+          } else {
+            const studentRole = {
+              role: 'STUDENT',
+              name,
+              email: normalizedEmail,
+              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+            };
+            localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
+            showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
+            
+            setTimeout(() => {
+              if (completedOnboarding) {
+                router.push('/student/dashboard');
+              } else {
+                router.push('/onboarding');
+              }
+            }, 1000);
+          }
+          setLoading(false);
+          return;
+        } else {
+          setErrorMsg('Account not found in local sandbox directory. Please register first.');
+          setLoading(false);
+          return;
+        }
       }
 
-      // Strict constraint: only small letters allowed for authentication
-      if (/[A-Z]/.test(email)) {
-        setErrorMsg('Authentication failed: Email must be written in small letters only (no capitals).');
-        setLoading(false);
-        return;
-      }
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        });
 
-      // If logging in
-      if (!isRegister) {
-        const emailKey = email.trim().toLowerCase();
-        
-        // Retrieve registered emails list
-        const registeredEmails = JSON.parse(
-          localStorage.getItem('aptitude_registered_emails') || 
-          '["sarah.c@aptitude-ai.com", "marcus.w@aptitude-ai.com", "sriram_neppalli@university.edu", "student@university.edu"]'
-        );
-        
-        if (!registeredEmails.includes(emailKey)) {
-          setErrorMsg('Account is not created.');
-          setShowCreateAccountSuggest(true);
+        if (error) {
+          setErrorMsg(error.message);
           setLoading(false);
           return;
         }
 
-        // Differentiate role based on credential email (Focus Point)
-        if (email.trim() === 'sarah.c@aptitude-ai.com') {
-          const adminRole = USER_ROLES.find(r => r.role === 'admin') || USER_ROLES[0];
-          localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
-          router.push('/admin/dashboard');
-        } else if (email.trim() === 'marcus.w@aptitude-ai.com') {
-          const editorRole = USER_ROLES.find(r => r.role === 'editor') || USER_ROLES[1];
-          localStorage.setItem('aptitude_current_role', JSON.stringify(editorRole));
-          router.push('/admin/editor');
-        } else {
-          // Log in as standard student
-          const studentRole = {
-            role: 'STUDENT',
-            name: email.split('@')[0].toUpperCase(),
-            email: email,
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
-          };
-          localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
-          
-          const completed = localStorage.getItem('aptitude_onboarding_completed');
-          if (completed === 'true') {
-            router.push('/student/dashboard');
+        if (data.user) {
+          deleteCookie('aptitude_mock_auth');
+          deleteCookie('aptitude_onboarding_completed');
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+          const isSarah = data.user.email === 'sarah.c@aptitude-ai.com';
+          const isMarcus = data.user.email === 'marcus.w@aptitude-ai.com';
+          const userRole = (profile?.role === 'ADMIN' || isSarah || isMarcus) ? 'ADMIN' : 'STUDENT';
+
+          if (userRole === 'ADMIN') {
+            if (isMarcus) {
+              const editorRole = USER_ROLES.find(r => r.role === 'editor') || USER_ROLES[1];
+              localStorage.setItem('aptitude_current_role', JSON.stringify(editorRole));
+              router.push('/admin/editor');
+            } else {
+              const adminRole = USER_ROLES.find(r => r.role === 'admin') || USER_ROLES[0];
+              localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
+              router.push('/admin/dashboard');
+            }
           } else {
-            router.push('/onboarding');
+            // Log in as standard student
+            const studentRole = {
+              role: 'STUDENT',
+              name: data.user.email?.split('@')[0].toUpperCase() || 'STUDENT',
+              email: data.user.email!,
+              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+            };
+            localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
+
+            const { data: onboarding } = await supabase
+              .from('onboarding_profile')
+              .select('onboarding_completed')
+              .eq('user_id', data.user.id)
+              .maybeSingle();
+
+            if (onboarding?.onboarding_completed) {
+              router.push('/student/dashboard');
+            } else {
+              router.push('/onboarding');
+            }
           }
         }
-      } else {
-        // If registering as a student or other
-        if (!fullName) {
-          setErrorMsg('Please enter your full name.');
-          setLoading(false);
-          return;
+      } catch (err: any) {
+        const isOffline = err.message?.includes('Failed to fetch') || err.message?.includes('fetch failed');
+        if (isOffline) {
+          console.warn("Supabase auth is offline. Logging in via local offline credentials.");
+          const normalizedEmail = email.trim().toLowerCase();
+
+          // Check if it's one of the built-in system mock accounts or registered offline accounts
+          const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com';
+          const isMarcus = normalizedEmail === 'marcus.w@aptitude-ai.com';
+          const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
+          
+          const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
+          const localProfiles = JSON.parse(localProfilesStr);
+          const customProfile = localProfiles[normalizedEmail];
+
+          const isRegisteredOffline = !!customProfile;
+
+          if (isSarah || isMarcus || isStudent || isRegisteredOffline) {
+            if (isRegisteredOffline && customProfile.password !== password) {
+              setErrorMsg('Invalid credentials (Offline Sandbox Mode).');
+              setLoading(false);
+              return;
+            }
+
+            const userRole = (isSarah || isMarcus) ? 'ADMIN' : 'STUDENT';
+            const name = isSarah ? 'Sarah' : isMarcus ? 'Marcus' : customProfile?.fullName || normalizedEmail.split('@')[0].toUpperCase();
+
+            // Set mock auth cookie
+            const mockUser = {
+              id: isSarah ? 'sarah-id' : isMarcus ? 'marcus-id' : isStudent ? 'student-id' : (customProfile?.id || 'mock-student-id'),
+              email: normalizedEmail,
+              name,
+              role: userRole
+            };
+            setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
+            const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
+            setCookie('aptitude_onboarding_completed', completedOnboarding ? 'true' : 'false');
+
+            if (userRole === 'ADMIN') {
+              if (isMarcus) {
+                const editorRole = USER_ROLES.find(r => r.role === 'editor') || USER_ROLES[1];
+                localStorage.setItem('aptitude_current_role', JSON.stringify(editorRole));
+                showNotice('Logged in locally as Marcus (Editor)! Redirecting...', 'success');
+                setTimeout(() => router.push('/admin/editor'), 1000);
+              } else {
+                const adminRole = USER_ROLES.find(r => r.role === 'admin') || USER_ROLES[0];
+                localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
+                showNotice('Logged in locally as Sarah (Admin)! Redirecting...', 'success');
+                setTimeout(() => router.push('/admin/dashboard'), 1000);
+              }
+            } else {
+              const studentRole = {
+                role: 'STUDENT',
+                name,
+                email: normalizedEmail,
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+              };
+              localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
+              showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
+              
+              setTimeout(() => {
+                if (completedOnboarding) {
+                  router.push('/student/dashboard');
+                } else {
+                  router.push('/onboarding');
+                }
+              }, 1000);
+            }
+            return;
+          } else {
+            setErrorMsg('Account not found in local sandbox directory. Please register first.');
+            setLoading(false);
+            return;
+          }
+        }
+        setErrorMsg(err.message || 'An unexpected error occurred.');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // If registering as a student or other
+      if (!fullName) {
+        setErrorMsg('Please enter your full name.');
+        setLoading(false);
+        return;
+      }
+
+      // Strict strong password validation checks
+      const hasUppercase = /[A-Z]/.test(password);
+      const hasLowercase = /[a-z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+      const isLongEnough = password.length >= 8;
+
+      if (!isLongEnough || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+        setErrorMsg('Password must be at least 8 characters long and contain uppercase, lowercase, numbers, and symbols.');
+        setLoading(false);
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setErrorMsg('Passwords do not match.');
+        setLoading(false);
+        return;
+      }
+
+      if (isOfflineSandbox) {
+        console.warn("Supabase auth is offline. Registering user in local offline session.");
+        const normalizedEmail = email.trim().toLowerCase();
+        
+        const existingStr = localStorage.getItem('aptitude_registered_emails');
+        const emails = existingStr ? JSON.parse(existingStr) : [];
+        if (!emails.includes(normalizedEmail)) {
+          emails.push(normalizedEmail);
+          localStorage.setItem('aptitude_registered_emails', JSON.stringify(emails));
         }
 
-        // Strict strong password validation checks
-        const hasUppercase = /[A-Z]/.test(password);
-        const hasLowercase = /[a-z]/.test(password);
-        const hasNumber = /[0-9]/.test(password);
-        const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-        const isLongEnough = password.length >= 8;
-
-        if (!isLongEnough || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
-          setErrorMsg('Password must be at least 8 characters long and contain uppercase, lowercase, numbers, and symbols.');
-          setLoading(false);
-          return;
-        }
-
-        if (password !== confirmPassword) {
-          setErrorMsg('Passwords do not match.');
-          setLoading(false);
-          return;
-        }
+        const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
+        const localProfiles = JSON.parse(localProfilesStr);
+        localProfiles[normalizedEmail] = {
+          fullName,
+          password
+        };
+        localStorage.setItem('aptitude_mock_profiles', JSON.stringify(localProfiles));
 
         const registeredUser = {
           role: 'STUDENT',
           userType: '',
           name: fullName,
-          email: email,
+          email: normalizedEmail,
           avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
         };
-
         localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
-        
-        // Save new registered email to list
-        const registeredEmails = JSON.parse(
-          localStorage.getItem('aptitude_registered_emails') || 
-          '["sarah.c@aptitude-ai.com", "marcus.w@aptitude-ai.com", "sriram_neppalli@university.edu", "student@university.edu"]'
-        );
-        const emailKey = email.trim().toLowerCase();
-        if (!registeredEmails.includes(emailKey)) {
-          registeredEmails.push(emailKey);
-          localStorage.setItem('aptitude_registered_emails', JSON.stringify(registeredEmails));
-        }
-        
-        // New account registers always go to onboarding
         localStorage.removeItem('aptitude_onboarding_completed');
-        router.push('/onboarding');
+
+        // Set mock cookies
+        const mockUser = {
+          id: 'mock-registered-id',
+          email: normalizedEmail,
+          name: fullName,
+          role: 'STUDENT'
+        };
+        setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
+        setCookie('aptitude_onboarding_completed', 'false');
+
+        showNotice('Account registered locally (Offline Sandbox Mode)! Redirecting to onboarding...', 'success');
+        setTimeout(() => {
+          router.push('/onboarding');
+        }, 1500);
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-    }, 600);
+
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim().toLowerCase(),
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+            }
+          }
+        });
+
+        if (error) {
+          setErrorMsg(error.message);
+          if (error.message.toLowerCase().includes('rate') || error.message.toLowerCase().includes('limit') || error.message.toLowerCase().includes('security') || error.message.toLowerCase().includes('unexpected_failure')) {
+            setShowSandboxModeSuggest(true);
+          }
+          setLoading(false);
+          return;
+        }
+
+        deleteCookie('aptitude_mock_auth');
+        deleteCookie('aptitude_onboarding_completed');
+
+        const registeredUser = {
+          role: 'STUDENT',
+          userType: '',
+          name: fullName,
+          email: email.trim().toLowerCase(),
+          avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a57c6?w=150'
+        };
+        localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
+
+        if (data.session) {
+          localStorage.removeItem('aptitude_onboarding_completed');
+          router.push('/onboarding');
+        } else {
+          showNotice('Account registered! Please verify your email or sign in.', 'success');
+          setIsRegister(false);
+        }
+      } catch (err: any) {
+        const isOffline = err.message?.includes('Failed to fetch') || err.message?.includes('fetch failed');
+        if (isOffline) {
+          console.warn("Supabase auth is offline. Registering user in local offline session.");
+          const normalizedEmail = email.trim().toLowerCase();
+          
+          const existingStr = localStorage.getItem('aptitude_registered_emails');
+          const emails = existingStr ? JSON.parse(existingStr) : [];
+          if (!emails.includes(normalizedEmail)) {
+            emails.push(normalizedEmail);
+            localStorage.setItem('aptitude_registered_emails', JSON.stringify(emails));
+          }
+
+          const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
+          const localProfiles = JSON.parse(localProfilesStr);
+          localProfiles[normalizedEmail] = {
+            fullName,
+            password
+          };
+          localStorage.setItem('aptitude_mock_profiles', JSON.stringify(localProfiles));
+
+          const registeredUser = {
+            role: 'STUDENT',
+            userType: '',
+            name: fullName,
+            email: normalizedEmail,
+            avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
+          };
+          localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
+          localStorage.removeItem('aptitude_onboarding_completed');
+
+          // Set mock cookies
+          const mockUser = {
+            id: 'mock-registered-id',
+            email: normalizedEmail,
+            name: fullName,
+            role: 'STUDENT'
+          };
+          setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
+          setCookie('aptitude_onboarding_completed', 'false');
+
+          showNotice('Account registered locally (Offline Sandbox Mode)! Redirecting to onboarding...', 'success');
+          setTimeout(() => {
+            router.push('/onboarding');
+          }, 1500);
+          return;
+        }
+        setErrorMsg(err.message || 'An unexpected error occurred during registration.');
+        if (err.message?.toLowerCase().includes('rate') || err.message?.toLowerCase().includes('limit') || err.message?.toLowerCase().includes('security') || err.message?.toLowerCase().includes('unexpected_failure')) {
+          setShowSandboxModeSuggest(true);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   return (
@@ -373,18 +727,23 @@ export default function LoginPage() {
             <>
               {/* Social Sign-in Button */}
               <button
-                onClick={() => showNotice("OAuth setup: Redirecting to Google Staging Clearance...", "info")}
+                onClick={handleGoogleLogin}
+                disabled={loading || googleLoading}
                 style={{ textTransform: 'none' }}
-                className="w-full py-3 px-4 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-2.5 font-bold text-xs transition-colors shadow-xs cursor-pointer active:scale-98"
+                className="w-full py-3 px-4 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-2.5 font-bold text-xs transition-colors shadow-xs cursor-pointer active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {/* Inline dynamic colorful Chrome icon */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" width="24" height="24">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                <span>Continue with Google</span>
+                {googleLoading ? (
+                  <RefreshCw className="w-4 h-4 animate-spin text-slate-500 shrink-0" />
+                ) : (
+                  /* Inline dynamic colorful Chrome icon */
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                )}
+                <span>{googleLoading ? 'Connecting to Google...' : 'Continue with Google'}</span>
               </button>
 
               {/* OR divider */}
@@ -490,6 +849,26 @@ export default function LoginPage() {
                         className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center justify-center gap-1.5 group cursor-pointer"
                       >
                         <span>Create New Account</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
+                  )}
+                  {showSandboxModeSuggest && (
+                    <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl text-xs space-y-2.5 animate-fadeIn">
+                      <p className="font-semibold text-blue-800">
+                        Supabase Email limit exceeded. Would you like to run in Local Sandbox Mode to bypass this?
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.setItem('aptitude_offline_sandbox', 'true');
+                          setErrorMsg(null);
+                          setShowSandboxModeSuggest(false);
+                          window.location.reload();
+                        }}
+                        className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center justify-center gap-1.5 group group-hover:translate-x-0.5 cursor-pointer"
+                      >
+                        <span>Activate Local Sandbox Mode</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </div>
@@ -644,6 +1023,26 @@ export default function LoginPage() {
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-mono selection:bg-blue-100"
                     />
                   </div>
+
+                  {confirmPassword && (
+                    <div className={`mt-2 p-3 rounded-xl border flex items-center gap-2.5 transition-all duration-300 animate-fadeIn ${
+                      password === confirmPassword 
+                        ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 shadow-sm shadow-emerald-500/5' 
+                        : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-500 dark:text-rose-450 shadow-sm shadow-rose-500/5'
+                    }`}>
+                      {password === confirmPassword ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                          <span className="text-[10px] font-extrabold uppercase tracking-widest leading-none">Password matched</span>
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle className="w-4 h-4 shrink-0 text-rose-500 animate-pulse" />
+                          <span className="text-[10px] font-extrabold uppercase tracking-widest leading-none">Password mismatch</span>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 

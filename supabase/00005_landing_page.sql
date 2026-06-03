@@ -34,6 +34,22 @@ CREATE TABLE IF NOT EXISTS public.landing_page_settings (
     curriculum_title_4 TEXT,
     curriculum_desc_4 TEXT,
     curriculum_mock_4 TEXT,
+    header_logo_text TEXT,
+    header_logo_subtext TEXT,
+    header_btn_text TEXT,
+    hero_btn_primary TEXT,
+    hero_btn_secondary TEXT,
+    bento_title TEXT,
+    bento_desc TEXT,
+    curriculum_title TEXT,
+    curriculum_desc TEXT,
+    mentor_heading TEXT,
+    faq_title TEXT,
+    faq_desc TEXT,
+    cta_btn_primary TEXT,
+    cta_btn_secondary TEXT,
+    footer_badge_text TEXT,
+    footer_copyright TEXT,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
@@ -74,7 +90,15 @@ INSERT INTO public.landing_page_settings (
     curriculum_title_1, curriculum_desc_1, curriculum_mock_1,
     curriculum_title_2, curriculum_desc_2, curriculum_mock_2,
     curriculum_title_3, curriculum_desc_3, curriculum_mock_3,
-    curriculum_title_4, curriculum_desc_4, curriculum_mock_4
+    curriculum_title_4, curriculum_desc_4, curriculum_mock_4,
+    header_logo_text, header_logo_subtext, header_btn_text,
+    hero_btn_primary, hero_btn_secondary,
+    bento_title, bento_desc,
+    curriculum_title, curriculum_desc,
+    mentor_heading,
+    faq_title, faq_desc,
+    cta_btn_primary, cta_btn_secondary,
+    footer_badge_text, footer_copyright
 )
 VALUES (
     'current',
@@ -122,10 +146,65 @@ Small daily improvements create long-term success.',
     'milestones',
     'Mock Assessments',
     'Evaluate readiness with adaptive timing evaluations that simulate actual company workflows, validating speed constraints under high pressure.',
-    'assessment'
+    'assessment',
+    'KINETIC PLATFORM',
+    'APTITUDE AI',
+    'Join for Free',
+    'Start Preparing for Free',
+    'Watch Platform Demo',
+    'EMPOWERING CAMPUSES',
+    'Interactive workshops, dynamic learning roadmaps, and campus placements engineered to accelerate talent.',
+    'Curriculum Roadmap',
+    'Experience the structured syllabus pathway. Drag sliders, solve sample logic equations, select milestones, and trigger staging mocks in real time.',
+    'Your Mentor, Not Just A Platform Owner',
+    'Frequently Asked Questions',
+    'Have questions about our syllabus, adaptive mock tests, or sandbox staging environments? Find answers below.',
+    'Get Free Access Now',
+    'Contact Support',
+    'Operational Clearance: Sandbox Encrypted',
+    '© 2026 Aptitude AI platform. All rights reserved.'
 )
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.landing_stats_cache (id, active_students, question_pool, company_tags, college_partnerships, last_calculated_at)
 VALUES ('current', 200000, 10000, 500, 150, NOW())
 ON CONFLICT (id) DO NOTHING;
+
+-- 6. Add alter table column checks for existing database schemas to ensure compatibility
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS header_logo_text TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS header_logo_subtext TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS header_btn_text TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS hero_btn_primary TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS hero_btn_secondary TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS bento_title TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS bento_desc TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS curriculum_title TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS curriculum_desc TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS mentor_heading TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS faq_title TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS faq_desc TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS cta_btn_primary TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS cta_btn_secondary TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS footer_badge_text TEXT;
+ALTER TABLE public.landing_page_settings ADD COLUMN IF NOT EXISTS footer_copyright TEXT;
+
+-- 7. Update existing record current settings row to ensure it holds default values if they are null
+UPDATE public.landing_page_settings
+SET 
+    header_logo_text = COALESCE(header_logo_text, 'KINETIC PLATFORM'),
+    header_logo_subtext = COALESCE(header_logo_subtext, 'APTITUDE AI'),
+    header_btn_text = COALESCE(header_btn_text, 'Join for Free'),
+    hero_btn_primary = COALESCE(hero_btn_primary, 'Start Preparing for Free'),
+    hero_btn_secondary = COALESCE(hero_btn_secondary, 'Watch Platform Demo'),
+    bento_title = COALESCE(bento_title, 'EMPOWERING CAMPUSES'),
+    bento_desc = COALESCE(bento_desc, 'Interactive workshops, dynamic learning roadmaps, and campus placements engineered to accelerate talent.'),
+    curriculum_title = COALESCE(curriculum_title, 'Curriculum Roadmap'),
+    curriculum_desc = COALESCE(curriculum_desc, 'Experience the structured syllabus pathway. Drag sliders, solve sample logic equations, select milestones, and trigger staging mocks in real time.'),
+    mentor_heading = COALESCE(mentor_heading, 'Your Mentor, Not Just A Platform Owner'),
+    faq_title = COALESCE(faq_title, 'Frequently Asked Questions'),
+    faq_desc = COALESCE(faq_desc, 'Have questions about our syllabus, adaptive mock tests, or sandbox staging environments? Find answers below.'),
+    cta_btn_primary = COALESCE(cta_btn_primary, 'Get Free Access Now'),
+    cta_btn_secondary = COALESCE(cta_btn_secondary, 'Contact Support'),
+    footer_badge_text = COALESCE(footer_badge_text, 'Operational Clearance: Sandbox Encrypted'),
+    footer_copyright = COALESCE(footer_copyright, '© 2026 Aptitude AI platform. All rights reserved.')
+WHERE id = 'current';

@@ -6,8 +6,10 @@ import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
 import { USER_ROLES, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import { UserRole, Question } from '@/lib/admin/types';
+import { createClient } from '@/utils/supabase/client';
 
 export default function DashboardPage() {
+  const supabase = createClient();
   const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
   const [questions, setQuestions] = useState<Question[]>([]);
 
@@ -23,6 +25,20 @@ export default function DashboardPage() {
         console.warn(e);
       }
     }
+
+    const syncSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const isMarcus = session.user.email === 'marcus.w@aptitude-ai.com';
+        const role = isMarcus ? 'editor' : 'admin';
+        const matched = USER_ROLES.find(r => r.role === role);
+        if (matched) {
+          setCurrentRole(matched);
+          localStorage.setItem('aptitude_current_role', JSON.stringify(matched));
+        }
+      }
+    };
+    syncSession();
 
     // Sync questions
     const storedQuestions = localStorage.getItem('aptitude_questions');

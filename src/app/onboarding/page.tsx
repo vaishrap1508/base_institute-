@@ -21,6 +21,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { INDIAN_STATES, INDIAN_COLLEGES } from '@/data/indianColleges';
 
 // Option lists
@@ -163,21 +164,65 @@ const isUsernameTakenOrSimilar = (name: string) => {
   ];
   
   if (occupied.includes(clean)) {
-    return { taken: true, reason: 'This exact username is already taken.' };
+    return { taken: true, reason: 'Username not available. Try again.' };
   }
   
   for (const existing of occupied) {
     const distance = getLevenshteinDistance(clean, existing);
     if (distance <= 1) {
-      return { taken: true, reason: `This username is too similar to the existing username "${existing}".` };
+      return { taken: true, reason: 'Username not available. Try again.' };
     }
   }
   
   return { taken: false, reason: '' };
 };
 
+const generateUsernameSuggestions = (name: string): string[] => {
+  const clean = name.trim().toLowerCase();
+  if (!clean || clean.length < 2) return [];
+  
+  const suffixes = ['_real', '_me', '_here', '_official', '_hub', '123', '_world'];
+  const prefixes = ['its_', 'the_', 'iam_', 'hey_'];
+  
+  const candidates: string[] = [];
+  
+  // 1. Add suffixes
+  for (const suffix of suffixes) {
+    candidates.push(`${clean}${suffix}`);
+  }
+  
+  // 2. Add prefixes
+  for (const prefix of prefixes) {
+    candidates.push(`${prefix}${clean}`);
+  }
+  
+  // 3. Add random numbers
+  for (let i = 0; i < 3; i++) {
+    candidates.push(`${clean}${Math.floor(Math.random() * 900 + 100)}`);
+  }
+  
+  // Filter candidates: must not be taken, similar, and must have length >= 3
+  const validSuggestions: string[] = [];
+  for (const cand of candidates) {
+    if (cand.length >= 3 && !isUsernameTakenOrSimilar(cand).taken) {
+      validSuggestions.push(cand);
+      if (validSuggestions.length >= 4) break;
+    }
+  }
+  
+  // Fallback if none are valid
+  if (validSuggestions.length < 3) {
+    validSuggestions.push(`${clean}_pro`);
+    validSuggestions.push(`${clean}_free`);
+    validSuggestions.push(`${clean}_user`);
+  }
+  
+  return validSuggestions.slice(0, 4);
+};
+
 export default function OnboardingPage() {
   const router = useRouter();
+  const authSupabase = createAuthClient();
 
   // ==========================================
   // onboarding states
@@ -341,6 +386,25 @@ export default function OnboardingPage() {
         console.warn(e);
       }
     }
+
+    const loadSession = async () => {
+      const { data: { session } } = await authSupabase.auth.getSession();
+      if (session?.user) {
+        const email = session.user.email;
+        const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || email?.split('@')[0] || '';
+        
+        setUserProfile((prev: any) => ({
+          ...prev,
+          email,
+          name: name.toUpperCase()
+        }));
+
+        if (!username) {
+          setUsername(name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''));
+        }
+      }
+    };
+    loadSession();
   }, []);
 
   // Handle validations before moving to next step
@@ -362,7 +426,7 @@ export default function OnboardingPage() {
       }
       const check = isUsernameTakenOrSimilar(username);
       if (check.taken) {
-        setValidationError(`Username rejected: ${check.reason}`);
+        setValidationError(check.reason);
         setShakeField(true);
         setTimeout(() => setShakeField(false), 500);
         return;
@@ -461,6 +525,11 @@ export default function OnboardingPage() {
     localStorage.setItem('aptitude_onboarding_completed', 'true');
     localStorage.setItem('aptitude_onboarding_data', JSON.stringify(completedProfile));
     
+    // Set cookie for middleware access
+    const expires = new Date();
+    expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
+    document.cookie = `aptitude_onboarding_completed=true;expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+    
     // Set current active user details updated
     if (userProfile) {
       const updatedUser = {
@@ -474,7 +543,7 @@ export default function OnboardingPage() {
 
     // Attempt Supabase writes
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await authSupabase.auth.getSession();
       let userId = session?.user?.id;
 
       if (!userId && userProfile?.email) {
@@ -635,9 +704,26 @@ export default function OnboardingPage() {
                     />
                   </div>
                   {username && isUsernameTakenOrSimilar(username).taken && (
-                    <span className="text-[10px] text-rose-500 font-bold block mt-1.5 animate-fadeIn">
-                      ⚠️ {isUsernameTakenOrSimilar(username).reason}
-                    </span>
+                    <div className="space-y-2 mt-2.5 animate-fadeIn">
+                      <span className="text-[10px] text-rose-500 font-bold block">
+                        ⚠️ {isUsernameTakenOrSimilar(username).reason}
+                      </span>
+                      <div className="text-[10px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wider select-none pt-1">
+                        Try one of these suggestions:
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-0.5 select-none">
+                        {generateUsernameSuggestions(username).map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            type="button"
+                            onClick={() => setUsername(suggestion)}
+                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 border border-blue-200/50 dark:border-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-bold transition-all cursor-pointer active:scale-95"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   )}
                   <span className="text-[9px] text-slate-455 block leading-normal mt-1">This is how you will be identified in progress and performance leaderboard tracking.</span>
                 </div>
