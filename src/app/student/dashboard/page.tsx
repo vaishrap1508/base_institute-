@@ -92,7 +92,6 @@ export default function StudentDashboard() {
     { id: 'opt-2', title: 'SWE Intern - Product Engineering', organization: 'Microsoft India', type: 'Internship', deadline: 'August 15', days_remaining: 30, status: 'New', details: '3-month summer internship working with the Azure cloud networking tools team in Hyderabad.', link: 'https://careers.microsoft.com/' },
     { id: 'opt-3', title: 'SSC CGL Executive Officers Recruitment', organization: 'Staff Selection Commission', type: 'Government Exam', deadline: 'June 30', days_remaining: 5, status: 'Open', details: 'Staff Selection Commission Combined Graduate Level Examination for assistant audit officers.', link: 'https://ssc.gov.in/' },
     { id: 'opt-4', title: 'Stripe Global FinTech Hackathon', organization: 'Stripe Inc.', type: 'Hackathon', deadline: 'July 10', days_remaining: 18, status: 'Open', details: 'Build next-generation payment interfaces using API integrations. Total prize pool $50,000.', link: 'https://stripe.com/' },
-    { id: 'opt-5', title: 'General Aptitude Scholarship Test', organization: 'Kinetic Platform', type: 'Scholarship', deadline: 'June 15', days_remaining: 2, status: 'Closing Soon', details: 'Win up to 100% discount on Kinetic Premium preparation models and interview certifications.', link: '#' },
     { id: 'opt-6', title: 'UPSC Civil Services Prelims 2026', organization: 'Union Public Service Commission', type: 'Government Exam', deadline: 'March 15', days_remaining: 0, status: 'Expired', details: 'Union Public Service Commission civil services main stage registration portals.', link: 'https://upsc.gov.in/' }
   ];
 
@@ -594,20 +593,22 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Filter tabs */}
-                  <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-850/80 overflow-x-auto scrollbar-none whitespace-nowrap">
-                    {['All', 'Hiring', 'Internship', 'Government Exam', 'Hackathon', 'Scholarship'].map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setSelectedOpportunityType(type)}
-                        className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
-                          selectedOpportunityType === type 
-                            ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
-                            : 'text-slate-400 hover:text-slate-200'
-                        }`}
-                      >
-                        {type === 'Government Exam' ? 'Gov Exams' : type}
-                      </button>
-                    ))}
+                  <div className="bg-slate-900 p-1 rounded-xl border border-slate-850/80 overflow-hidden max-w-full">
+                    <div className="flex overflow-x-auto scrollbar-none whitespace-nowrap gap-1">
+                      {['All', 'Hiring', 'Internship', 'Government Exam', 'Hackathon'].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => setSelectedOpportunityType(type)}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
+                            selectedOpportunityType === type 
+                              ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
+                              : 'text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          {type === 'Government Exam' ? 'Gov Exams' : type}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
