@@ -19,6 +19,7 @@ export default function ThemeToggle({ floating = false }: ThemeToggleProps) {
   }, []);
 
   const toggleTheme = () => {
+    document.documentElement.classList.add('theme-transitioning');
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
     if (nextTheme === 'dark') {
@@ -28,6 +29,9 @@ export default function ThemeToggle({ floating = false }: ThemeToggleProps) {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning');
+    }, 500);
   };
 
   if (!mounted) {

@@ -2,6 +2,7 @@
 import React from 'react';
 import * as Icons from 'lucide-react';
 import { SIDEBAR_ITEMS } from '@/lib/admin/store';
+import { createClient } from '@/utils/supabase/client';
 
 interface SidebarProps {
   activeId: string;
@@ -10,6 +11,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProps) {
+  const supabase = createClient();
   const visibleItems =
     userRole === 'editor'
       ? SIDEBAR_ITEMS.filter((item) => item.id === 'editor' || item.id === 'logout')
@@ -41,8 +43,19 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
           return (
             <button
               key={item.id}
-              onClick={() => {
+              onClick={async () => {
                 onSelectTab?.(item.id);
+                if (item.id === 'logout') {
+                  await supabase.auth.signOut();
+                  localStorage.removeItem('aptitude_current_role');
+                  
+                  // Clear mock session cookies
+                  document.cookie = 'aptitude_mock_auth=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax';
+                  document.cookie = 'aptitude_onboarding_completed=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax';
+                  
+                  window.location.href = '/';
+                  return;
+                }
                 if (item.href) {
                   window.location.href = item.href;
                 }

@@ -35,11 +35,13 @@ import {
   Briefcase
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import { Question } from '@/lib/admin/types';
 
 export default function StudentDashboard() {
   const router = useRouter();
+  const authSupabase = createAuthClient();
 
   // Onboarding profile states
   const [profile, setProfile] = useState<any>({
@@ -113,6 +115,45 @@ export default function StudentDashboard() {
         console.warn(e);
       }
     }
+
+    const syncSession = async () => {
+      const { data: { session } } = await authSupabase.auth.getSession();
+      if (session?.user) {
+        const { data: profileObj } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        const isSarah = session.user.email === 'sarah.c@aptitude-ai.com';
+        const isMarcus = session.user.email === 'marcus.w@aptitude-ai.com';
+        const userRole = (profileObj?.role === 'ADMIN' || isSarah || isMarcus) ? 'admin' : 'STUDENT';
+        
+        const roleObj = {
+          role: userRole === 'admin' ? (isMarcus ? 'editor' : 'admin') : 'STUDENT',
+          name: session.user.email?.split('@')[0].toUpperCase() || 'STUDENT',
+          email: session.user.email,
+          avatar: session.user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+        };
+        localStorage.setItem('aptitude_current_role', JSON.stringify(roleObj));
+        setCurrentRole(roleObj);
+
+        if (!localStorage.getItem('aptitude_onboarding_data')) {
+          const { data: onboardingData } = await supabase
+            .from('onboarding_profile')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+
+          if (onboardingData) {
+            localStorage.setItem('aptitude_onboarding_completed', 'true');
+            localStorage.setItem('aptitude_onboarding_data', JSON.stringify(onboardingData));
+            setProfile(onboardingData);
+          }
+        }
+      }
+    };
+    syncSession();
 
     // 2. Sync onboarding variables
     const onboardingStored = localStorage.getItem('aptitude_onboarding_data');
@@ -326,8 +367,14 @@ export default function StudentDashboard() {
     setRevealedSolutions(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await authSupabase.auth.signOut();
     localStorage.removeItem('aptitude_current_role');
+    
+    // Clear mock session cookies
+    document.cookie = 'aptitude_mock_auth=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax';
+    document.cookie = 'aptitude_onboarding_completed=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax';
+    
     router.push('/');
   };
 
@@ -420,15 +467,44 @@ export default function StudentDashboard() {
             <span className="text-[9px] font-black bg-blue-950/40 text-blue-400 border border-blue-900/40 px-2.5 py-0.5 rounded-md uppercase tracking-wider">
               {profile.primary_goal}
             </span>
-          </div>
-
-          <div className="flex items-center gap-3.5">
-            <div className="text-right flex flex-col">
-              <span className="text-[11.5px] font-black text-white">{profile.username}</span>
-              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{profile.degree} · {profile.branch}</span>
+          </div>          <div className="flex items-center gap-5">
+            {/* Dribbble-style Preview / Edit Mode Pill Switcher */}
+            <div className="flex bg-slate-100 dark:bg-slate-950 p-0.5 rounded-full border border-slate-200/60 dark:border-slate-800/80 shadow-inner select-none">
+              <button
+                type="button"
+                className="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5"
+              >
+                Preview
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  // Swap role to admin and redirect to admin dashboard
+                  const adminRole = {
+                    role: 'admin',
+                    name: 'SARAH CONNOR',
+                    email: 'sarah.c@aptitude-ai.com',
+                    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+                  };
+                  localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
+                  router.push('/admin/dashboard');
+                }}
+                className="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-450 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 cursor-pointer"
+              >
+                Edit / Admin
+              </button>
             </div>
-            <div className="w-8.5 h-8.5 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center font-black text-xs text-white uppercase shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-              {profile.username ? profile.username[0] : 'S'}
+
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
+
+            <div className="flex items-center gap-3.5">
+              <div className="text-right flex flex-col">
+                <span className="text-[11.5px] font-black text-slate-900 dark:text-white">{profile.username}</span>
+                <span className="text-[9px] text-slate-455 dark:text-slate-500 font-bold uppercase tracking-wider">{profile.degree} · {profile.branch}</span>
+              </div>
+              <div className="w-8.5 h-8.5 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center font-black text-xs text-white uppercase shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                {profile.username ? profile.username[0] : 'S'}
+              </div>
             </div>
           </div>
         </header>
