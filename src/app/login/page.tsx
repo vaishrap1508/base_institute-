@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { USER_ROLES } from '@/lib/admin/store';
 import { createClient } from '@/utils/supabase/client';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -695,6 +696,7 @@ export default function LoginPage() {
 
         {/* Theme Toggle and Staging clearance indicator for user */}
         <div className="absolute top-6 right-6 sm:right-12 flex items-center gap-3">
+          <ThemeToggle />
           <div className="hidden sm:flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-widest">

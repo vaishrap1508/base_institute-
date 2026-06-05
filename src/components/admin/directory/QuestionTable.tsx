@@ -128,12 +128,12 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
   }, [sortedQuestions, currentPage]);
 
   return (
-    <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col transition-colors duration-300">
       {/* Table Title Row */}
-      <div className="px-6 py-4 border-b border-slate-150 flex items-center justify-between bg-slate-50/30">
+      <div className="px-6 py-4 border-b border-slate-150 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-950/20">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
-          <span className="text-xs font-bold text-slate-800 tracking-tight">
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-tight">
             Listing {questions.length} total active matches
           </span>
         </div>
@@ -144,12 +144,12 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
         {/* Responsive Table Frame */}
         <div className="overflow-x-auto overflow-y-scroll max-h-[380px] custom-scrollbar relative">
           <table className="w-full border-collapse text-left">
-          <thead className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur-xs shadow-xs">
-            <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider select-none">
+          <thead className="sticky top-0 z-10 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs shadow-xs">
+            <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
               {/* Question ID Header */}
               <th 
                 onClick={() => handleSort('id')} 
-                className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-32 cursor-pointer hover:bg-slate-100/50 group transition-colors border-b border-slate-200/80"
+                className="sticky top-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs z-10 px-6 py-4.5 w-32 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50 group transition-colors border-b border-slate-200/80 dark:border-slate-800"
               >
                 <div className="flex items-center">
                   <span>Question ID</span>
@@ -160,7 +160,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
               {/* Question Title / Preview Header */}
               <th 
                 onClick={() => handleSort('stem')} 
-                className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 min-w-[320px] cursor-pointer hover:bg-slate-100/50 group transition-colors border-b border-slate-200/80"
+                className="sticky top-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs z-10 px-6 py-4.5 min-w-[320px] cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50 group transition-colors border-b border-slate-200/80 dark:border-slate-800"
               >
                 <div className="flex items-center">
                   <span>Question Preview</span>
@@ -171,7 +171,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
               {/* Domain Header */}
               <th 
                 onClick={() => handleSort('domain')} 
-                className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-36 cursor-pointer hover:bg-slate-100/50 group transition-colors border-b border-slate-200/80"
+                className="sticky top-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs z-10 px-6 py-4.5 w-36 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50 group transition-colors border-b border-slate-200/80 dark:border-slate-800"
               >
                 <div className="flex items-center">
                   <span>Domain</span>
@@ -182,7 +182,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
               {/* Difficulty Header */}
               <th 
                 onClick={() => handleSort('difficulty')} 
-                className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-32 cursor-pointer hover:bg-slate-100/50 group transition-colors border-b border-slate-200/80"
+                className="sticky top-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs z-10 px-6 py-4.5 w-32 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50 group transition-colors border-b border-slate-200/80 dark:border-slate-800"
               >
                 <div className="flex items-center">
                   <span>Difficulty</span>
@@ -191,14 +191,14 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
               </th>
 
               {/* Company Tags Header */}
-              <th className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-44 border-b border-slate-200/80">
+              <th className="sticky top-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs z-10 px-6 py-4.5 w-44 border-b border-slate-200/80 dark:border-slate-800">
                 <span>Company Tags</span>
               </th>
 
               {/* Created Date Header */}
               <th 
                 onClick={() => handleSort('date')} 
-                className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-36 cursor-pointer hover:bg-slate-100/50 group transition-colors border-b border-slate-200/80"
+                className="sticky top-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs z-10 px-6 py-4.5 w-36 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50 group transition-colors border-b border-slate-200/80 dark:border-slate-800"
               >
                 <div className="flex items-center">
                   <span>Created Date</span>
@@ -209,7 +209,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
               {/* Status Header */}
               <th 
                 onClick={() => handleSort('status')} 
-                className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-32 cursor-pointer hover:bg-slate-100/50 group transition-colors border-b border-slate-200/80"
+                className="sticky top-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs z-10 px-6 py-4.5 w-32 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50 group transition-colors border-b border-slate-200/80 dark:border-slate-800"
               >
                 <div className="flex items-center">
                   <span>Status</span>
@@ -218,18 +218,18 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
               </th>
 
               {/* Actions Column */}
-              <th className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-16 text-center border-b border-slate-200/80">
+              <th className="sticky top-0 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xs z-10 px-6 py-4.5 w-16 text-center border-b border-slate-200/80 dark:border-slate-800">
                 <span>Action</span>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-150">
+          <tbody className="divide-y divide-slate-150 dark:divide-slate-800">
             {paginatedQuestions.length > 0 ? (
               paginatedQuestions.map((q) => (
                 <tr
                   key={q.id}
                   onClick={() => onEditQuestion(q)}
-                  className="hover:bg-slate-50/50 transition-colors cursor-pointer group"
+                  className="hover:bg-slate-50/50 dark:hover:bg-slate-950/40 transition-colors cursor-pointer group"
                 >
                   {/* Question ID */}
                   <td className="px-6 py-4">
@@ -238,20 +238,20 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                       return (
                         <div className="flex items-center gap-1.5 group/id relative">
                           <span 
-                            className="bg-blue-50 border border-blue-100/50 text-blue-700 text-[10px] font-bold font-mono px-2 py-0.5 rounded tracking-wider transition-colors cursor-help group-hover/id:bg-blue-100/65 whitespace-nowrap"
+                            className="bg-blue-50 border border-blue-100/50 text-blue-700 dark:bg-blue-950/30 dark:border-blue-900/40 dark:text-blue-400 text-[10px] font-bold font-mono px-2 py-0.5 rounded tracking-wider transition-colors cursor-help group-hover/id:bg-blue-100/65 dark:group-hover/id:bg-blue-900/40 whitespace-nowrap"
                           >
                             {binaryId}
                           </span>
                           
                           {/* Detailed Taxonomical Hover Tooltip */}
-                          <div className="absolute left-0 bottom-full mb-2 hidden group-hover/id:flex flex-col bg-slate-950 text-white text-[10px] font-medium p-2.5 rounded-lg shadow-xl border border-slate-800 z-35 min-w-[200px] leading-relaxed transition-all animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
-                            <span className="font-bold text-blue-400 border-b border-slate-800 pb-1 mb-1 block uppercase">ID Specs</span>
+                          <div className="absolute left-0 bottom-full mb-2 hidden group-hover/id:flex flex-col bg-slate-950 text-white dark:bg-slate-950 text-[10px] font-medium p-2.5 rounded-lg shadow-xl border border-slate-800 dark:border-slate-900 z-35 min-w-[200px] leading-relaxed transition-all animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
+                            <span className="font-bold text-blue-400 border-b border-slate-800 dark:border-slate-900 pb-1 mb-1 block uppercase">ID Specs</span>
                             <div className="space-y-0.5">
                               <div><span className="text-slate-400 font-bold">Domain:</span> {getDomainFullName(q.domainId)}</div>
                               <div><span className="text-slate-400 font-bold">Sub-Topic:</span> {getSubTopicFullName(q.domainId, q.subTopicId)}</div>
                               <div><span className="text-slate-400 font-bold">Concept:</span> {getConceptFullName(q.domainId, q.subTopicId, q.conceptId)}</div>
                               <div><span className="text-slate-400 font-bold font-mono">Seed:</span> {q.questionHashSeed || 0}</div>
-                              <div className="text-[9px] text-slate-500 font-mono mt-1 pt-1 border-t border-slate-900 break-all">UUID: {q.id}</div>
+                              <div className="text-[9px] text-slate-500 font-mono mt-1 pt-1 border-t border-slate-900 dark:border-slate-900 break-all">UUID: {q.id}</div>
                             </div>
                           </div>
 
@@ -263,15 +263,15 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   </td>
 
                   {/* Preview Stem */}
-                  <td className="px-6 py-4 font-semibold text-slate-800 text-xs">
-                    <p className="line-clamp-2 max-w-xl group-hover:text-blue-600 transition-colors leading-relaxed">
+                  <td className="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200 text-xs">
+                    <p className="line-clamp-2 max-w-xl group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-relaxed">
                       {q.questionStem.replace(/[#$*`\n]/g, ' ').trim()}
                     </p>
                   </td>
 
                   {/* Domain */}
                   <td className="px-6 py-4">
-                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">
+                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                       {getDomainName(q.domainId)}
                     </span>
                   </td>
@@ -279,15 +279,15 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   {/* Difficulty Badge */}
                   <td className="px-6 py-4">
                     {q.difficulty === 'EASY' ? (
-                      <span className="bg-blue-50 border border-blue-100/60 text-blue-700 rounded-md px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase">
+                      <span className="bg-blue-50 border border-blue-100/60 text-blue-700 dark:bg-blue-950/40 dark:border-blue-900/30 dark:text-blue-400 rounded-md px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase">
                         Easy
                       </span>
                     ) : q.difficulty === 'MEDIUM' ? (
-                      <span className="bg-amber-50 border border-amber-100/60 text-amber-700 rounded-md px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase">
+                      <span className="bg-amber-50 border border-amber-100/60 text-amber-700 dark:bg-amber-950/40 dark:border-amber-900/30 dark:text-amber-400 rounded-md px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase">
                         Medium
                       </span>
                     ) : (
-                      <span className="bg-rose-50 border border-rose-100/60 text-rose-700 rounded-md px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase">
+                      <span className="bg-rose-50 border border-rose-100/60 text-rose-700 dark:bg-rose-950/40 dark:border-rose-900/30 dark:text-rose-400 rounded-md px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase">
                         Hard
                       </span>
                     )}
@@ -299,7 +299,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                       {q.companyTags.map((tag) => (
                         <span
                           key={tag}
-                          className="bg-slate-100 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wide"
+                          className="bg-slate-100 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 text-slate-600 px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wide"
                         >
                           {tag}
                         </span>
@@ -308,7 +308,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   </td>
 
                   {/* Created Date */}
-                  <td className="px-6 py-4 text-xs font-semibold text-slate-500">
+                  <td className="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {q.createdAt || 'Oct 01, 2023'}
                   </td>
 
@@ -317,17 +317,17 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                     {q.status === 'Draft' ? (
                       <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                        <span className="text-xs font-bold text-slate-500">Draft</span>
+                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Draft</span>
                       </div>
                     ) : q.status === 'Published' ? (
                       <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-xs font-bold text-emerald-700">Published</span>
+                        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Published</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                        <span className="text-xs font-bold text-amber-700">Review Pending</span>
+                        <span className="text-xs font-bold text-amber-700 dark:text-amber-400">Review Pending</span>
                       </div>
                     )}
                   </td>
@@ -336,7 +336,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   <td className="px-6 py-4 text-center">
                     <div className="flex justify-center">
                       <button 
-                        className="p-1.5 rounded bg-slate-50 border border-slate-200/80 text-slate-400 group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50/50 transition-all"
+                        className="p-1.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-400 group-hover:text-blue-600 group-hover:border-blue-200 dark:group-hover:text-blue-400 dark:group-hover:border-blue-900 transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
                           onEditQuestion(q);
@@ -350,7 +350,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-6 py-16 text-center text-xs font-semibold text-slate-400 italic bg-slate-50/10">
+                <td colSpan={8} className="px-6 py-16 text-center text-xs font-semibold text-slate-400 dark:text-slate-500 italic bg-slate-50/10">
                   No questions found matching your filter criteria. Try updating search text or filters.
                 </td>
               </tr>
@@ -359,12 +359,12 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
         </table>
       </div>
       {/* Scrollbar cover next to the sticky header (placed after the scroll container to render on top of the scrollbar) */}
-      <div className="absolute top-0 right-[1px] w-[10px] h-[51px] bg-slate-50 z-20 pointer-events-none" />
+      <div className="absolute top-0 right-[1px] w-[10px] h-[51px] bg-slate-50 dark:bg-slate-950 z-20 pointer-events-none" />
     </div>
 
       {/* Advanced Ellipsis-Enabled Pagination Footer */}
       {totalPages > 1 && (
-        <div className="px-6 py-4.5 bg-slate-50/30 border-t border-slate-200 flex items-center justify-between text-xs font-semibold text-slate-500 select-none">
+        <div className="px-6 py-4.5 bg-slate-50/30 dark:bg-slate-950/20 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 select-none">
           <div>
             Showing {questions.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}–
             {Math.min(currentPage * itemsPerPage, sortedQuestions.length)} of {sortedQuestions.length} questions
@@ -375,7 +375,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-1.5 border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors cursor-pointer text-slate-500"
+              className="p-1.5 border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 disabled:opacity-50 disabled:hover:bg-transparent transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -386,7 +386,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                 return (
                   <span
                     key={`ellipsis-${idx}`}
-                    className="w-7.5 h-7.5 flex items-center justify-center text-slate-400 font-bold"
+                    className="w-7.5 h-7.5 flex items-center justify-center text-slate-400 dark:text-slate-500 font-bold"
                   >
                     ...
                   </span>
@@ -400,7 +400,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   className={`w-7.5 h-7.5 rounded-lg flex items-center justify-center border transition-all cursor-pointer font-bold ${
                     currentPage === page
                       ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                      : 'border-slate-200 hover:bg-slate-100 text-slate-700'
+                      : 'border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300'
                   }`}
                 >
                   {page}
@@ -412,7 +412,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-1.5 border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors cursor-pointer text-slate-500"
+              className="p-1.5 border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 disabled:opacity-50 disabled:hover:bg-transparent transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

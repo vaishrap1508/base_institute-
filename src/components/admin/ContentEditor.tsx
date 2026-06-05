@@ -231,22 +231,22 @@ export default function ContentEditor({
   };
 
   return (
-    <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm flex flex-col h-full overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm flex flex-col h-full overflow-hidden">
       {/* Editor Header & Toolbar */}
-      <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/20">
         <div className="flex items-center gap-2">
           <SquareSlash className="w-4 h-4 text-blue-600 animate-pulse" />
-          <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Content Editor</span>
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-250 uppercase tracking-wider">Content Editor</span>
         </div>
 
         {/* Toolbar formatting buttons */}
-        <div className="flex items-center gap-1 bg-white border border-slate-200 p-0.5 rounded-lg">
+        <div className="flex items-center gap-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 p-0.5 rounded-lg">
           <button
             type="button"
             onMouseDown={handleBold}
             title="Bold"
-            className={`p-1 rounded text-slate-500 hover:text-slate-800 transition-colors cursor-pointer ${
-              activeFormats.bold ? 'bg-blue-50 text-blue-600 border border-blue-100 shadow-sm' : 'hover:bg-slate-100'
+            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer ${
+              activeFormats.bold ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800 shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Bold className="w-3.5 h-3.5" />
@@ -255,8 +255,8 @@ export default function ContentEditor({
             type="button"
             onMouseDown={handleItalic}
             title="Italic"
-            className={`p-1 rounded text-slate-500 hover:text-slate-800 transition-colors cursor-pointer ${
-              activeFormats.italic ? 'bg-blue-50 text-blue-600 border border-blue-100 shadow-sm' : 'hover:bg-slate-100'
+            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer ${
+              activeFormats.italic ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800 shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Italic className="w-3.5 h-3.5" />
@@ -265,8 +265,8 @@ export default function ContentEditor({
             type="button"
             onMouseDown={handleCode}
             title="Inline Code"
-            className={`p-1 rounded text-slate-500 hover:text-slate-800 transition-colors cursor-pointer ${
-              activeFormats.code ? 'bg-blue-50 text-blue-600 border border-blue-100 shadow-sm' : 'hover:bg-slate-100'
+            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer ${
+              activeFormats.code ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800 shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Code className="w-3.5 h-3.5" />
@@ -275,8 +275,8 @@ export default function ContentEditor({
             type="button"
             onMouseDown={handleMath}
             title="LaTeX Math"
-            className={`p-1 rounded text-slate-500 hover:text-slate-800 transition-colors text-xs font-semibold leading-none w-5.5 h-5.5 flex items-center justify-center cursor-pointer ${
-              activeFormats.math ? 'bg-blue-50 text-blue-600 border border-blue-100 shadow-sm' : 'hover:bg-slate-100'
+            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors text-xs font-semibold leading-none w-5.5 h-5.5 flex items-center justify-center cursor-pointer ${
+              activeFormats.math ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800 shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             $$
@@ -288,7 +288,7 @@ export default function ContentEditor({
       <div className="flex-1 p-5 overflow-y-auto space-y-5">
         {/* Question Stem Text Area */}
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
             Question Stem (Visual WYSIWYG Editor)
           </label>
           
@@ -304,11 +304,11 @@ export default function ContentEditor({
                 setIsFocused(false);
                 handleInput();
               }}
-              className="w-full min-h-[14rem] max-h-[16rem] p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 overflow-y-auto resize-none leading-relaxed transition-all prose max-w-none focus:bg-white prose-code:bg-slate-150 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-slate-800"
+              className="w-full min-h-[14rem] max-h-[16rem] p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 overflow-y-auto resize-none leading-relaxed transition-all prose max-w-none focus:bg-white dark:focus:bg-slate-900 prose-code:bg-slate-150 dark:prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-slate-800 dark:prose-code:text-slate-200"
               style={{ outline: 'none' }}
             />
             {!questionStem && (
-              <div className="absolute top-4 left-4 text-sm text-slate-400 pointer-events-none font-sans max-w-[90%]">
+              <div className="absolute top-4 left-4 text-sm text-slate-400 dark:text-slate-500 pointer-events-none font-sans max-w-[90%]">
                 Type your question prompt, mathematical equations in $...$ or $$...$$, and step-by-step solutions here...
               </div>
             )}
@@ -317,7 +317,7 @@ export default function ContentEditor({
 
         {/* Hint Text input */}
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
             Student Hint (Markdown Support)
           </label>
           <textarea
@@ -325,38 +325,38 @@ export default function ContentEditor({
             onChange={(e) => onChangeHintText(e.target.value)}
             placeholder="Enter a helpful tip or prompt suggestion (e.g. Express new price in terms of x)"
             rows={2}
-            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none overflow-y-auto break-words leading-relaxed"
+            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-450 dark:placeholder:text-slate-555 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none overflow-y-auto break-words leading-relaxed"
           />
         </div>
 
         {/* Video solution reference input */}
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
             Video Solution Reference (YouTube URL)
           </label>
           <div className="relative flex items-center">
-            <div className="absolute left-3.5 flex items-center justify-center w-5 h-5 rounded bg-rose-50 border border-rose-200">
-              <Film className="w-3 h-3 text-rose-600" />
+            <div className="absolute left-3.5 flex items-center justify-center w-5 h-5 rounded bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50">
+              <Film className="w-3 h-3 text-rose-600 dark:text-rose-450" />
             </div>
             <input
               type="text"
               value={videoUrl}
               onChange={(e) => onChangeVideoUrl(e.target.value)}
               placeholder="https://youtube.com/watch?v=..."
-              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono"
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-450 dark:placeholder:text-slate-555 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono"
             />
           </div>
         </div>
 
         {/* Validation Errors Panel */}
         {!isValid && validationErrors.length > 0 && (
-          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex flex-col gap-1.5 animate-fadeIn">
-            <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider">
+          <div className="p-3.5 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 rounded-xl flex flex-col gap-1.5 animate-fadeIn">
+            <span className="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">
               Validation Warnings
             </span>
             <ul className="list-disc pl-4 space-y-0.5">
               {validationErrors.map((err, index) => (
-                <li key={index} className="text-xs text-rose-600 font-semibold tracking-tight">
+                <li key={index} className="text-xs text-rose-600 dark:text-rose-450 font-semibold tracking-tight">
                   {err}
                 </li>
               ))}
@@ -366,13 +366,13 @@ export default function ContentEditor({
       </div>
 
       {/* Editor Footer / Action Buttons */}
-      <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30">
+      <div className="px-5 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-950/20">
         <button
           type="button"
           onClick={onSaveDraft}
-          className="flex items-center gap-2 px-4 py-2 border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer"
         >
-          <Save className="w-3.5 h-3.5 text-slate-400" />
+          <Save className="w-3.5 h-3.5 text-slate-400 dark:text-slate-550" />
           <span>Save Draft</span>
         </button>
 

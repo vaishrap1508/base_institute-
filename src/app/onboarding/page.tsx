@@ -23,6 +23,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { INDIAN_STATES, INDIAN_COLLEGES } from '@/data/indianColleges';
+import ThemeToggle from '@/components/ThemeToggle';
 
 // Option lists
 const ALL_COUNTRIES = [
@@ -724,9 +725,10 @@ export default function OnboardingPage() {
           </div>
         </Link>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+            <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-widest">
               SECURE ONBOARDING HUD
             </span>
           </div>
@@ -781,7 +783,7 @@ export default function OnboardingPage() {
           {currentStep === 1 && (
             <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
               <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">Choose Your Username</h3>
+                <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase">Choose Your Username</h3>
                 <p className="text-xs text-slate-450 font-medium">Please choose a unique username to personalize your aptitude tracking experience.</p>
               </div>
 
@@ -833,7 +835,7 @@ export default function OnboardingPage() {
           {currentStep === 2 && (
             <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
               <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">Education Information</h3>
+                <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase">Education Information</h3>
                 <p className="text-xs text-slate-450 font-medium">Add academic records to qualify for corresponding placement templates.</p>
               </div>
 
@@ -1081,7 +1083,7 @@ export default function OnboardingPage() {
           {currentStep === 3 && (
             <div className="space-y-5 flex-1 flex flex-col justify-center animate-scaleUp">
               <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">What is your primary goal?</h3>
+                <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase">What is your primary goal?</h3>
                 <p className="text-xs text-slate-455 font-medium">Select the target destination of your analytical preparations.</p>
               </div>
 
@@ -1146,7 +1148,7 @@ export default function OnboardingPage() {
           {currentStep === 4 && (
             <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
               <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">When do you want to achieve your goal?</h3>
+                <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase">When do you want to achieve your goal?</h3>
                 <p className="text-xs text-slate-450 font-medium">This aligns chronological milestone metrics in your planner.</p>
               </div>
 
@@ -1184,7 +1186,7 @@ export default function OnboardingPage() {
           {currentStep === 5 && (
             <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
               <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">How much time can you dedicate each week?</h3>
+                <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase">How much time can you dedicate each week?</h3>
                 <p className="text-xs text-slate-450 font-medium">We calibrate streak milestones and questions quotas accordingly.</p>
               </div>
 
@@ -1222,7 +1224,7 @@ export default function OnboardingPage() {
           {currentStep === 6 && (
             <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
               <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">How do you prefer to learn?</h3>
+                <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase">How do you prefer to learn?</h3>
                 <p className="text-xs text-slate-455 font-medium">Select your pedagogical preference for practicing aptitude.</p>
               </div>
 
@@ -1307,7 +1309,7 @@ export default function OnboardingPage() {
       </main>
 
       {/* Footer bar */}
-      <footer className="border-t border-slate-200 py-6 px-6 sm:px-12 bg-white flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-450 gap-4">
+      <footer className="border-t border-slate-200 dark:border-slate-800 py-6 px-6 sm:px-12 bg-white dark:bg-slate-900 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-450 gap-4">
         <div className="flex items-center gap-1.5 font-semibold">
           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>Operational Security: SSL Sandboxed</span>
