@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -246,6 +246,97 @@ export default function OnboardingPage() {
   const [collegeSearch, setCollegeSearch] = useState('');
   const [collegeDropdownOpen, setCollegeDropdownOpen] = useState(false);
 
+  const [stateHighlightIndex, setStateHighlightIndex] = useState(-1);
+  const [isTypingState, setIsTypingState] = useState(false);
+  const stateContainerRef = useRef<HTMLDivElement>(null);
+
+  // Sync scroll on highlight index change
+  useEffect(() => {
+    if (stateDropdownOpen && stateContainerRef.current && stateHighlightIndex >= 0) {
+      const activeEl = stateContainerRef.current.querySelector(`[data-index="${stateHighlightIndex}"]`) as HTMLElement;
+      if (activeEl) {
+        const container = stateContainerRef.current;
+        const activeTop = activeEl.offsetTop;
+        const activeBottom = activeTop + activeEl.offsetHeight;
+        const containerTop = container.scrollTop;
+        const containerBottom = containerTop + container.clientHeight;
+
+        if (activeTop < containerTop) {
+          container.scrollTop = activeTop;
+        } else if (activeBottom > containerBottom) {
+          container.scrollTop = activeBottom - container.clientHeight;
+        }
+      }
+    }
+  }, [stateHighlightIndex, stateDropdownOpen]);
+
+  const selectState = (st: string) => {
+    setState(st);
+    setStateSearch(st);
+    setStateDropdownOpen(false);
+    setIsTypingState(false);
+    setStateHighlightIndex(-1);
+  };
+
+  const handleStateKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!stateDropdownOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        setStateDropdownOpen(true);
+        setIsTypingState(false);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setStateHighlightIndex(prev => {
+          const nextIdx = prev + 1;
+          if (nextIdx < filteredStates.length) {
+            return nextIdx;
+          }
+          return prev;
+        });
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setStateHighlightIndex(prev => {
+          const nextIdx = prev - 1;
+          if (nextIdx >= 0) {
+            return nextIdx;
+          }
+          return -1;
+        });
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (stateHighlightIndex >= 0 && stateHighlightIndex < filteredStates.length) {
+          selectState(filteredStates[stateHighlightIndex]);
+        } else if (filteredStates.length > 0) {
+          selectState(filteredStates[0]);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setStateDropdownOpen(false);
+        setStateSearch(state);
+        setIsTypingState(false);
+        setStateHighlightIndex(-1);
+        break;
+      case 'Tab':
+        if (stateHighlightIndex >= 0 && stateHighlightIndex < filteredStates.length) {
+          selectState(filteredStates[stateHighlightIndex]);
+        } else {
+          setStateSearch(state);
+          setStateDropdownOpen(false);
+          setIsTypingState(false);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   // Dynamic colleges dataset
   const [allColleges, setAllColleges] = useState<any[]>(INDIAN_COLLEGES);
   const [loadingColleges, setLoadingColleges] = useState(false);
@@ -310,9 +401,9 @@ export default function OnboardingPage() {
   // Filtered lists for autocomplete suggestions
   const filteredStates = useMemo(() => {
     const query = stateSearch.toLowerCase().trim();
-    if (!query || query === state.toLowerCase().trim()) return indianStates;
+    if (!query || !isTypingState) return indianStates;
     return indianStates.filter(s => s.toLowerCase().includes(query));
-  }, [state, stateSearch, indianStates]);
+  }, [stateSearch, isTypingState, indianStates]);
 
   const filteredColleges = useMemo(() => {
     if (!state) return []; // College dropdown should be empty when no state is selected!
@@ -461,12 +552,16 @@ export default function OnboardingPage() {
       return;
     }
 
-    if (currentStep === 6 && learningPreferences.length === 0) {
-      setValidationError('Please select at least one learning preference.');
+    if (currentStep === 6) {
+      if (learningPreferences.length === 0) {
+        setValidationError('Please select at least one learning preference.');
+        return;
+      }
+      handleOnboardingComplete();
       return;
     }
 
-    setCurrentStep(prev => Math.min(prev + 1, 7));
+    setCurrentStep(prev => Math.min(prev + 1, 6));
   };
 
   const handleBackStep = () => {
@@ -810,36 +905,62 @@ export default function OnboardingPage() {
                       onChange={(e) => {
                         const val = e.target.value;
                         setStateSearch(val);
-                        setState(val);
+                        setIsTypingState(true);
                         setStateDropdownOpen(true);
+                        setStateHighlightIndex(-1);
                       }}
-                      onFocus={() => setStateDropdownOpen(true)}
+                      onFocus={(e) => {
+                        e.target.select();
+                        setStateDropdownOpen(true);
+                        setIsTypingState(false);
+                        setStateHighlightIndex(-1);
+                      }}
                       onBlur={() => {
-                        // Allow click to execute before closing
-                        setTimeout(() => setStateDropdownOpen(false), 200);
+                        setTimeout(() => {
+                          setStateDropdownOpen(false);
+                          setStateSearch(state);
+                          setIsTypingState(false);
+                          setStateHighlightIndex(-1);
+                        }, 200);
                       }}
+                      onKeyDown={handleStateKeyDown}
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3.5 pr-10 text-xs text-slate-850 dark:text-slate-105 focus:outline-none focus:border-blue-600 transition-all font-semibold"
                     />
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 pointer-events-none" />
                     
-                    {stateDropdownOpen && filteredStates.length > 0 && (
-                      <div className="absolute left-0 right-0 mt-1.5 max-h-48 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-30 py-1.5 scrollbar-thin scrollbar-thumb-slate-300">
-                        {filteredStates.map((st) => (
+                    <div 
+                      ref={stateContainerRef}
+                      className={`absolute left-0 right-0 mt-1.5 max-h-48 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-30 py-1.5 scrollbar-thin scrollbar-thumb-slate-300 transition-all duration-200 origin-top ${
+                        stateDropdownOpen 
+                          ? 'opacity-100 scale-y-100 pointer-events-auto' 
+                          : 'opacity-0 scale-y-95 pointer-events-none'
+                      }`}
+                    >
+                      {filteredStates.length > 0 ? (
+                        filteredStates.map((st, idx) => (
                           <button
                             key={st}
                             type="button"
+                            data-index={idx}
                             onMouseDown={() => {
-                              setState(st);
-                              setStateSearch(st);
-                              setStateDropdownOpen(false);
+                              selectState(st);
                             }}
-                            className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            onMouseEnter={() => setStateHighlightIndex(idx)}
+                            className={`w-full text-left px-4 py-2 text-xs font-semibold transition-colors ${
+                              idx === stateHighlightIndex
+                                ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400'
+                                : 'text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-600 dark:hover:text-blue-400'
+                            }`}
                           >
                             {st}
                           </button>
-                        ))}
-                      </div>
-                    )}
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-xs font-semibold text-slate-400 dark:text-slate-500 text-center select-none">
+                          No states found
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -1138,33 +1259,6 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ==========================================
-              STEP 7: COMPLETION SCREEN
-              ========================================== */}
-          {currentStep === 7 && (
-            <div className="space-y-6 flex-1 flex flex-col justify-center items-center text-center animate-scaleUp">
-              <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 flex items-center justify-center text-blue-600 shadow-inner animate-pulse">
-                <CheckCircle2 className="w-10 h-10" />
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">You're All Set, {username}!</h3>
-                <p className="text-xs text-slate-450 font-semibold uppercase tracking-wider">Aptitude & Verbal Analytics generated</p>
-              </div>
-
-              <div className="max-w-md bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-805 rounded-2xl p-5 space-y-3.5 text-xs text-left leading-normal text-slate-655 dark:text-slate-300 font-medium">
-                <span className="text-[10px] font-black text-blue-650 dark:text-blue-400 uppercase tracking-widest block border-b border-slate-200 dark:border-slate-800 pb-1.5 mb-2 select-none">Personalized Study Path Details</span>
-                <p>
-                  Based on your goals (<strong className="text-slate-800 dark:text-slate-100">{primaryGoals.map(g => g === 'Others' && customGoal.trim() ? `Others (${customGoal.trim()})` : g).join(', ')}</strong>) and weekly commitment (<strong className="text-slate-800 dark:text-slate-100">{weeklyCommitment}</strong>), we have configured a dynamic, adaptive curriculum targeting core quantitative models and verbal comprehension matrices.
-                </p>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-505 font-bold uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span>Staging Database seed synced</span>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Stepper Buttons Panel */}
           <div className="border-t border-slate-100 pt-5 flex justify-between items-center select-none">
             {/* Back button */}
@@ -1172,7 +1266,7 @@ export default function OnboardingPage() {
               <button
                 onClick={handleBackStep}
                 disabled={loading}
-                className="py-2.5 px-5 bg-transparent hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent text-slate-505 font-bold text-xs rounded-xl border border-slate-200 transition-colors cursor-pointer select-none"
+                className="py-2.5 px-5 bg-transparent hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent text-slate-550 font-bold text-xs rounded-xl border border-slate-200 transition-colors cursor-pointer select-none"
               >
                 Back
               </button>
@@ -1181,42 +1275,30 @@ export default function OnboardingPage() {
             )}
 
             {/* Step indicators */}
-            {currentStep <= 6 ? (
-              <span className="text-[10px] font-black text-slate-400 tracking-wider">
-                STEP {currentStep} OF 6
-              </span>
-            ) : (
-              <div className="flex items-center gap-1 text-[9px] font-black text-blue-700 tracking-wider uppercase bg-blue-50 border border-blue-100/50 px-2 py-0.5 rounded">
-                <Sparkles className="w-3 h-3 text-blue-650" />
-                <span>Calibrations verified</span>
-              </div>
-            )}
+            <span className="text-[10px] font-black text-slate-400 tracking-wider">
+              STEP {currentStep} OF 6
+            </span>
 
             {/* Next / Complete button */}
-            {currentStep < 7 ? (
-              <button
-                onClick={handleNextStep}
-                disabled={isContinueDisabled()}
-                style={{ textTransform: 'none' }}
-                className={`py-2.5 px-5 font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all select-none active:scale-98 ${
-                  isContinueDisabled()
-                    ? 'bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed shadow-none'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
-                }`}
-              >
-                <span>Continue</span>
-                <ArrowRight className="w-4 h-4 shrink-0" />
-              </button>
-            ) : (
-              <button
-                onClick={handleOnboardingComplete}
-                disabled={loading}
-                className="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer select-none animate-pulse hover:animate-none active:scale-98"
-              >
-                <span>{loading ? 'Bootstrapping...' : 'Go to Dashboard'}</span>
+            <button
+              onClick={handleNextStep}
+              disabled={isContinueDisabled() || loading}
+              style={{ textTransform: 'none' }}
+              className={`py-2.5 px-5 font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all select-none active:scale-98 ${
+                (isContinueDisabled() || loading)
+                  ? 'bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed shadow-none'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+              }`}
+            >
+              <span>{loading ? 'Bootstrapping...' : (currentStep === 6 ? 'Go to Dashboard' : 'Continue')}</span>
+              {loading ? (
+                <div className="w-3.5 h-3.5 border border-white border-t-transparent rounded-full animate-spin shrink-0" />
+              ) : currentStep === 6 ? (
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
-              </button>
-            )}
+              ) : (
+                <ArrowRight className="w-4 h-4 shrink-0" />
+              )}
+            </button>
           </div>
 
         </div>
