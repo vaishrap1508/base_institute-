@@ -636,57 +636,58 @@ export default function OnboardingPage() {
       localStorage.setItem('aptitude_current_role', JSON.stringify(updatedUser));
     }
 
-    // Attempt Supabase writes
-    try {
-      const { data: { session } } = await authSupabase.auth.getSession();
-      let userId = session?.user?.id;
+    // Attempt Supabase writes in the background to prevent blocking the UI
+    (async () => {
+      try {
+        const { data: { session } } = await authSupabase.auth.getSession();
+        let userId = session?.user?.id;
 
-      if (!userId && userProfile?.email) {
-        const { data: profileObj } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', userProfile.email)
-          .maybeSingle();
-        if (profileObj) userId = profileObj.id;
-      }
+        if (!userId && userProfile?.email) {
+          const { data: profileObj } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('email', userProfile.email)
+            .maybeSingle();
+          if (profileObj) userId = profileObj.id;
+        }
 
-      if (userId) {
-        // Try upserting with state first
-        const { error } = await supabase
-          .from('onboarding_profile')
-          .upsert({
-            user_id: userId,
-            ...completedProfile,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id' });
-
-        if (error) {
-          console.warn('Supabase onboarding profile upsert with state failed, retrying without state column...', error.message);
-          
-          // Fallback without state
-          const { state: _, ...completedProfileWithoutState } = completedProfile;
-          const { error: fallbackError } = await supabase
+        if (userId) {
+          // Try upserting with state first
+          const { error } = await supabase
             .from('onboarding_profile')
             .upsert({
               user_id: userId,
-              ...completedProfileWithoutState,
+              ...completedProfile,
               updated_at: new Date().toISOString()
             }, { onConflict: 'user_id' });
 
-          if (fallbackError) {
-            console.warn('Supabase onboarding fallback upsert failed:', fallbackError.message);
+          if (error) {
+            console.warn('Supabase onboarding profile upsert with state failed, retrying without state column...', error.message);
+            
+            // Fallback without state
+            const { state: _, ...completedProfileWithoutState } = completedProfile;
+            const { error: fallbackError } = await supabase
+              .from('onboarding_profile')
+              .upsert({
+                user_id: userId,
+                ...completedProfileWithoutState,
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'user_id' });
+
+            if (fallbackError) {
+              console.warn('Supabase onboarding fallback upsert failed:', fallbackError.message);
+            }
           }
         }
+      } catch (err) {
+        console.warn('Graceful database write fallback triggered:', err);
       }
-    } catch (err) {
-      console.warn('Graceful database write fallback triggered:', err);
-    }
+    })();
 
-    setTimeout(() => {
-      setLoading(false);
-      showNotice('Personalized paths compiled successfully!', 'success');
-      router.push('/student/dashboard');
-    }, 1200);
+    // Perform redirect instantly
+    setLoading(false);
+    showNotice('Personalized paths compiled successfully!', 'success');
+    router.push('/student/dashboard');
   };
 
   return (
