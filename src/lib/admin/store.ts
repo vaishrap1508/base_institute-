@@ -107,7 +107,9 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
   { id: 'directory', label: 'Directory', icon: 'BookOpen', href: '/admin/directory' },
   { id: 'users', label: 'Users & Roles', icon: 'Users', href: '/admin/users' },
   { id: 'analytics', label: 'Performance Analytics', icon: 'BarChart3', href: '/admin/analytics' },
+  { id: 'badges', label: 'Badge Management', icon: 'Award', href: '/admin/badges' },
   { id: 'settings', label: 'System Settings', icon: 'Settings', href: '/admin/settings' },
+  { id: 'email', label: 'Email Management', icon: 'Mail', href: '/admin/email' },
   { id: 'documentation', label: 'API Documentation', icon: 'FileCode', href: '/admin/docs' },
   { id: 'logout', label: 'Log Out', icon: 'LogOut', href: '/' }
 ];

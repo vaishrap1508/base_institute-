@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Layers, 
   Mail, 
@@ -28,6 +28,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const setCookie = (name: string, value: string, days = 30) => {
@@ -57,7 +58,27 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showCreateAccountSuggest, setShowCreateAccountSuggest] = useState(false);
   const [showSandboxModeSuggest, setShowSandboxModeSuggest] = useState(false);
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [resending, setResending] = useState(false);
   const [notification, setNotification] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
+
+  // Detect URL search params for verification, resets, or callback errors
+  React.useEffect(() => {
+    const verified = searchParams.get('verified');
+    const reset = searchParams.get('reset');
+    const errorParam = searchParams.get('error');
+
+    if (verified === 'true') {
+      showNotice('Email verified successfully! You can now log in.', 'success');
+      router.replace('/login');
+    } else if (reset === 'true') {
+      showNotice('Password updated successfully! Log in with your new credentials.', 'success');
+      router.replace('/login');
+    } else if (errorParam) {
+      setErrorMsg(decodeURIComponent(errorParam));
+      router.replace('/login');
+    }
+  }, [searchParams]);
 
   // Pre-seed some emails on mount so existing credentials work out of the box
   React.useEffect(() => {
@@ -78,6 +99,33 @@ export default function LoginPage() {
   const showNotice = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
     setNotification({ text, type });
     setTimeout(() => setNotification(null), 4000);
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      setErrorMsg('Please enter your email address to request a new verification link.');
+      return;
+    }
+    setResending(true);
+    setErrorMsg(null);
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setErrorMsg(data.error || 'Failed to resend verification email.');
+      } else {
+        showNotice(data.message || 'Verification email resent successfully.', 'success');
+        setShowResendVerification(false);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'A network error occurred.');
+    } finally {
+      setResending(false);
+    }
   };
 
   // Form Fields
@@ -147,12 +195,36 @@ export default function LoginPage() {
       return;
     }
 
-    // Simulate recovery email submission with latency
-    setTimeout(() => {
-      showNotice(`A secure recovery link has been dispatched to ${email.trim()}.`, 'success');
-      setLoading(false);
-      setIsForgotPassword(false);
-    }, 1000);
+    if (isOfflineSandbox) {
+      // Simulate recovery email submission with latency
+      setTimeout(() => {
+        showNotice(`A secure recovery link has been dispatched to ${email.trim()}.`, 'success');
+        setLoading(false);
+        setIsForgotPassword(false);
+      }, 1000);
+    } else {
+      fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() })
+      })
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) {
+            setErrorMsg(data.error || 'Password recovery request failed.');
+          } else {
+            showNotice(data.message || 'Password reset link sent successfully.', 'success');
+            setIsForgotPassword(false);
+            setEmail('');
+          }
+        })
+        .catch((err) => {
+          setErrorMsg(err.message || 'A network error occurred.');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -259,7 +331,20 @@ export default function LoginPage() {
             role: userRole
           };
           setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
-          const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
+          
+          const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
+          let registeredEmails = [];
+          try {
+            registeredEmails = JSON.parse(registeredEmailsStr);
+          } catch (_) {}
+          
+          const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
+          
+          if (isEmailAlreadyRegistered) {
+            localStorage.setItem('aptitude_onboarding_completed', 'true');
+          }
+          
+          const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true' || isEmailAlreadyRegistered;
           setCookie('aptitude_onboarding_completed', completedOnboarding ? 'true' : 'false');
 
           if (userRole === 'ADMIN') {
@@ -309,6 +394,9 @@ export default function LoginPage() {
 
         if (error) {
           setErrorMsg(error.message);
+          if (error.message.toLowerCase().includes('confirm') || error.message.toLowerCase().includes('verified') || error.message.toLowerCase().includes('verification')) {
+            setShowResendVerification(true);
+          }
           setLoading(false);
           return;
         }
@@ -319,12 +407,23 @@ export default function LoginPage() {
 
           const { data: profile } = await supabase
             .from('profiles')
-            .select('role')
+            .select('role, email_verified')
             .eq('id', data.user.id)
             .maybeSingle();
 
           const isSarah = data.user.email === 'sarah.c@aptitude-ai.com';
           const isMarcus = data.user.email === 'marcus.w@aptitude-ai.com';
+          const isBypassUser = isSarah || isMarcus;
+
+          // Block unverified non-bypass users from accessing
+          if (profile && !profile.email_verified && !isBypassUser) {
+            setErrorMsg('Your email address has not been verified yet.');
+            setShowResendVerification(true);
+            await supabase.auth.signOut();
+            setLoading(false);
+            return;
+          }
+
           const userRole = (profile?.role === 'ADMIN' || isSarah || isMarcus) ? 'ADMIN' : 'STUDENT';
 
           if (userRole === 'ADMIN') {
@@ -347,15 +446,40 @@ export default function LoginPage() {
             };
             localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
 
+            const normalizedEmail = data.user.email!.trim().toLowerCase();
+            const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
+            
+            const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
+            let registeredEmails = [];
+            try {
+              registeredEmails = JSON.parse(registeredEmailsStr);
+            } catch (_) {}
+            
+            const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
+            const localProfiles = JSON.parse(localProfilesStr);
+            const customProfile = localProfiles[normalizedEmail];
+            const isRegisteredOffline = !!customProfile;
+
+            const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
+
             const { data: onboarding } = await supabase
               .from('onboarding_profile')
               .select('onboarding_completed')
               .eq('user_id', data.user.id)
               .maybeSingle();
 
-            if (onboarding?.onboarding_completed) {
+            const completedOnboarding = onboarding?.onboarding_completed || isEmailAlreadyRegistered;
+
+            if (completedOnboarding) {
+              localStorage.setItem('aptitude_onboarding_completed', 'true');
+              if (!registeredEmails.includes(normalizedEmail)) {
+                registeredEmails.push(normalizedEmail);
+                localStorage.setItem('aptitude_registered_emails', JSON.stringify(registeredEmails));
+              }
+              setCookie('aptitude_onboarding_completed', 'true');
               router.push('/student/dashboard');
             } else {
+              setCookie('aptitude_onboarding_completed', 'false');
               router.push('/onboarding');
             }
           }
@@ -394,40 +518,53 @@ export default function LoginPage() {
               name,
               role: userRole
             };
-            setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
-            const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
-            setCookie('aptitude_onboarding_completed', completedOnboarding ? 'true' : 'false');
-
-            if (userRole === 'ADMIN') {
-              if (isMarcus) {
-                const editorRole = USER_ROLES.find(r => r.role === 'editor') || USER_ROLES[1];
-                localStorage.setItem('aptitude_current_role', JSON.stringify(editorRole));
-                showNotice('Logged in locally as Marcus (Editor)! Redirecting...', 'success');
-                setTimeout(() => router.push('/admin/editor'), 1000);
-              } else {
-                const adminRole = USER_ROLES.find(r => r.role === 'admin') || USER_ROLES[0];
-                localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
-                showNotice('Logged in locally as Sarah (Admin)! Redirecting...', 'success');
-                setTimeout(() => router.push('/admin/dashboard'), 1000);
-              }
-            } else {
-              const studentRole = {
-                role: 'STUDENT',
-                name,
-                email: normalizedEmail,
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
-              };
-              localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
-              showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
-              
-              setTimeout(() => {
-                if (completedOnboarding) {
-                  router.push('/student/dashboard');
-                } else {
-                  router.push('/onboarding');
-                }
-              }, 1000);
-            }
+             setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
+             
+             const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
+             let registeredEmails = [];
+             try {
+               registeredEmails = JSON.parse(registeredEmailsStr);
+             } catch (_) {}
+             
+             const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
+             
+             if (isEmailAlreadyRegistered) {
+               localStorage.setItem('aptitude_onboarding_completed', 'true');
+             }
+             
+             const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true' || isEmailAlreadyRegistered;
+             setCookie('aptitude_onboarding_completed', completedOnboarding ? 'true' : 'false');
+ 
+             if (userRole === 'ADMIN') {
+               if (isMarcus) {
+                 const editorRole = USER_ROLES.find(r => r.role === 'editor') || USER_ROLES[1];
+                 localStorage.setItem('aptitude_current_role', JSON.stringify(editorRole));
+                 showNotice('Logged in locally as Marcus (Editor)! Redirecting...', 'success');
+                 setTimeout(() => router.push('/admin/editor'), 1000);
+               } else {
+                 const adminRole = USER_ROLES.find(r => r.role === 'admin') || USER_ROLES[0];
+                 localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
+                 showNotice('Logged in locally as Sarah (Admin)! Redirecting...', 'success');
+                 setTimeout(() => router.push('/admin/dashboard'), 1000);
+               }
+             } else {
+               const studentRole = {
+                 role: 'STUDENT',
+                 name,
+                 email: normalizedEmail,
+                 avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+               };
+               localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
+               showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
+               
+               setTimeout(() => {
+                 if (completedOnboarding) {
+                   router.push('/student/dashboard');
+                 } else {
+                   router.push('/onboarding');
+                 }
+               }, 1000);
+             }
             return;
           } else {
             setErrorMsg('Account not found in local sandbox directory. Please register first.');
@@ -514,19 +651,16 @@ export default function LoginPage() {
       }
 
       try {
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim().toLowerCase(),
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-            }
-          }
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim().toLowerCase(), password, fullName })
         });
+        const data = await response.json();
 
-        if (error) {
-          setErrorMsg(error.message);
-          if (error.message.toLowerCase().includes('rate') || error.message.toLowerCase().includes('limit') || error.message.toLowerCase().includes('security') || error.message.toLowerCase().includes('unexpected_failure')) {
+        if (!response.ok) {
+          setErrorMsg(data.error || 'Registration failed.');
+          if (data.error?.toLowerCase().includes('rate') || data.error?.toLowerCase().includes('limit') || data.error?.toLowerCase().includes('security') || data.error?.toLowerCase().includes('unexpected_failure')) {
             setShowSandboxModeSuggest(true);
           }
           setLoading(false);
@@ -536,22 +670,14 @@ export default function LoginPage() {
         deleteCookie('aptitude_mock_auth');
         deleteCookie('aptitude_onboarding_completed');
 
-        const registeredUser = {
-          role: 'STUDENT',
-          userType: '',
-          name: fullName,
-          email: email.trim().toLowerCase(),
-          avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a57c6?w=150'
-        };
-        localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
-
-        if (data.session) {
-          localStorage.removeItem('aptitude_onboarding_completed');
-          router.push('/onboarding');
-        } else {
-          showNotice('Account registered! Please verify your email or sign in.', 'success');
-          setIsRegister(false);
-        }
+        showNotice(data.message || 'Account registered! Please verify your email or sign in.', 'success');
+        setIsRegister(false);
+        
+        // Clear registration fields
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setFullName('');
       } catch (err: any) {
         const isOffline = err.message?.includes('Failed to fetch') || err.message?.includes('fetch failed');
         if (isOffline) {
@@ -871,6 +997,22 @@ export default function LoginPage() {
                         className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center justify-center gap-1.5 group group-hover:translate-x-0.5 cursor-pointer"
                       >
                         <span>Activate Local Sandbox Mode</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
+                  )}
+                  {showResendVerification && (
+                    <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl text-xs space-y-2.5 animate-fadeIn">
+                      <p className="font-semibold text-blue-800 font-sans">
+                        Need a new verification link?
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={resending}
+                        className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center justify-center gap-1.5 group cursor-pointer disabled:opacity-50"
+                      >
+                        <span>{resending ? 'Resending Link...' : 'Resend Verification Email'}</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </div>
