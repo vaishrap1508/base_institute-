@@ -90,7 +90,8 @@ export default function DomainsScreen() {
     college: 'Vellore Institute of Technology',
     degree: 'B.Tech',
     branch: 'Computer Science',
-    primary_goal: 'Campus Placements'
+    primary_goal: 'Campus Placements',
+    avatar: 'initial'
   });
 
   const [solvedCount, setSolvedCount] = useState(12);
@@ -112,7 +113,11 @@ export default function DomainsScreen() {
     const onboardingStored = localStorage.getItem('aptitude_onboarding_data');
     if (onboardingStored) {
       try {
-        setProfile(JSON.parse(onboardingStored));
+        const data = JSON.parse(onboardingStored);
+        setProfile({
+          ...data,
+          avatar: data.avatar || 'initial'
+        });
       } catch (e) {
         console.warn("Failed to parse onboarding data:", e);
       }
@@ -130,8 +135,14 @@ export default function DomainsScreen() {
 
         if (onboardingData) {
           localStorage.setItem('aptitude_onboarding_completed', 'true');
-          localStorage.setItem('aptitude_onboarding_data', JSON.stringify(onboardingData));
-          setProfile(onboardingData);
+          localStorage.setItem('aptitude_onboarding_data', JSON.stringify({
+            ...onboardingData,
+            avatar: onboardingData.avatar || 'initial'
+          }));
+          setProfile({
+            ...onboardingData,
+            avatar: onboardingData.avatar || 'initial'
+          });
         }
       }
     };
@@ -217,7 +228,7 @@ export default function DomainsScreen() {
       solved: 68,
       bgGlow: 'hover:shadow-[0_20px_40px_rgba(139,92,246,0.08)] hover:border-purple-200/80 dark:hover:border-purple-900/60 dark:hover:shadow-[0_20px_40px_rgba(139,92,246,0.12)]',
       description: 'Strengthen spatial matrices, circular deduction paths, syllogistic patterns, and sequences.',
-      btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20 dark:bg-purple-50 dark:hover:bg-purple-400',
+      btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20 dark:bg-purple-500 dark:hover:bg-purple-400',
       icon: (
         <svg className="w-16 h-16 text-purple-500 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="none">
           {/* Linked analysis nodes */}
@@ -252,7 +263,7 @@ export default function DomainsScreen() {
       solved: 194,
       bgGlow: 'hover:shadow-[0_20px_40px_rgba(16,185,129,0.08)] hover:border-emerald-200/80 dark:hover:border-emerald-900/60 dark:hover:shadow-[0_20px_40px_rgba(16,185,129,0.12)]',
       description: 'Perfect vocabulary context, verbal modifications, textual inferences, and logic correction.',
-      btnColor: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 dark:bg-emerald-50 dark:hover:bg-emerald-400',
+      btnColor: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 dark:bg-emerald-500 dark:hover:bg-emerald-400',
       icon: (
         <svg className="w-16 h-16 text-emerald-500 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="none">
           {/* Grammar pill layers */}
@@ -280,7 +291,7 @@ export default function DomainsScreen() {
       solved: 32,
       bgGlow: 'hover:shadow-[0_20px_40px_rgba(249,115,22,0.08)] hover:border-orange-200/80 dark:hover:border-orange-900/60 dark:hover:shadow-[0_20px_40px_rgba(249,115,22,0.12)]',
       description: 'Master binary search trees, search recursion, dynamic array branches, and sorting complexities.',
-      btnColor: 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20 dark:bg-orange-50 dark:hover:bg-orange-400',
+      btnColor: 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20 dark:bg-orange-500 dark:hover:bg-orange-400',
       icon: (
         <svg className="w-16 h-16 text-orange-500 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="none">
           {/* Code tags vectors */}
@@ -460,33 +471,61 @@ export default function DomainsScreen() {
               </p>
             </div>
             
-            {/* Header Right utilities: Theme Toggle + User greeting */}
-            <div className="flex items-center gap-4.5 select-none">
+            {/* Header Right utilities: Profile topmost, Toggle & Search below */}
+            <div className="flex flex-col items-end gap-3 select-none">
               
-              {/* Theme Toggle Button */}
-              <button
-                onClick={toggleTheme}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer"
-                title="Toggle theme"
-                suppressHydrationWarning
+              {/* Topmost Right: User Profile (just name and avatar, absolute positioned) */}
+              <div 
+                onClick={() => router.push('/student/dashboard?tab=profile')}
+                className="absolute top-1 right-2 sm:top-2 sm:right-3 flex items-center gap-3 cursor-pointer hover:opacity-85 transition-opacity"
+                title="View Profile Settings"
               >
-                {themeMounted && theme === 'light' ? (
-                  <Sun className="w-[18px] h-[18px] text-amber-500 animate-fadeIn" />
-                ) : (
-                  <Moon className="w-[18px] h-[18px] text-indigo-400 animate-fadeIn" />
-                )}
-              </button>
-
-              <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
-
-              {/* Quick user welcome indicator */}
-              <div className="flex items-center gap-3.5 bg-white border border-slate-200/80 dark:bg-slate-900/10 dark:border-slate-900/50 px-4 py-2.5 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.015)]">
-                <div className="text-right">
-                  <div className="text-[11.5px] font-black text-slate-900 dark:text-white leading-none">{profile.username}</div>
-                  <div className="text-[9px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wider mt-1">{profile.primary_goal}</div>
+                <span className="text-[11.5px] font-black text-slate-905 dark:text-white leading-none uppercase tracking-wider">{profile.username}</span>
+                <div className="w-8 h-8 rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(59,130,246,0.15)] flex items-center justify-center relative">
+                  {profile.avatar && profile.avatar !== 'initial' ? (
+                    <img 
+                      src={profile.avatar} 
+                      alt={profile.username || 'User'} 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center font-black text-xs text-white uppercase">
+                      {profile.username ? profile.username[0] : 'V'}
+                    </div>
+                  )}
                 </div>
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center font-black text-xs text-white uppercase shadow-[0_2px_8px_rgba(59,130,246,0.15)]">
-                  {profile.username ? profile.username[0] : 'V'}
+              </div>
+
+              {/* Below Profile: Toggle Button & Search domains */}
+              <div className="flex items-center gap-3">
+                {/* Theme Toggle Button */}
+                <button
+                  onClick={toggleTheme}
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer"
+                  title="Toggle theme"
+                  suppressHydrationWarning
+                >
+                  {themeMounted && theme === 'light' ? (
+                    <Sun className="w-[18px] h-[18px] text-amber-500 animate-fadeIn" />
+                  ) : (
+                    <Moon className="w-[18px] h-[18px] text-indigo-400 animate-fadeIn" />
+                  )}
+                </button>
+
+                <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
+
+                {/* Search Box placed where the profile welcome box used to be */}
+                <div className="relative w-64 sm:w-80">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                  </span>
+                  <input 
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search learning domains..."
+                    className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
+                  />
                 </div>
               </div>
 
@@ -495,50 +534,32 @@ export default function DomainsScreen() {
 
           {/* Top Utility Row */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 justify-between select-none">
-            
-            {/* 1. Search Box field */}
-            <div className="relative w-full md:w-80">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-              </span>
-              <input 
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search learning domains..."
-                className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
-              />
-            </div>
 
-            {/* 2. Streak Badge & Shortcut row */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-              
-              {/* Daily Streak Badge */}
-              <div className="flex items-center gap-2.5 bg-orange-50 border border-orange-100 dark:bg-orange-950/40 dark:border-orange-900/30 px-4 py-2.5 rounded-2xl shadow-[0_4px_12px_rgba(249,115,22,0.02)]">
-                <div className="relative flex h-2.5 w-2.5 items-center justify-center">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
-                </div>
-                <span className="text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-wider flex items-center gap-1.5 leading-none">
-                  <Flame className="w-4 h-4 fill-orange-500 text-orange-500" /> {streak} Day Streak
-                </span>
+            {/* Continue Last Learning Shortcut */}
+            <button
+              onClick={() => router.push('/student/dashboard?tab=learning')}
+              className="group flex items-center justify-between gap-6 bg-white border border-slate-200/80 dark:bg-slate-900/10 dark:border-slate-900/50 px-6 py-3 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.01)] hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:scale-[1.01] text-left cursor-pointer w-full md:w-[52%] lg:w-[55%] shrink-0"
+            >
+              <div className="space-y-1">
+                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-550 uppercase tracking-widest block leading-none">continue last topic</span>
+                <span className="text-xs font-black text-slate-800 dark:text-slate-200 block leading-none">Percentages (Quantitative)</span>
               </div>
+              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100/30 dark:bg-blue-950/40 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-450 transition-colors group-hover:bg-blue-600 group-hover:text-white shadow-[0_2px_6px_rgba(37,99,235,0.05)]">
+                <Play className="w-4 h-4 fill-current ml-0.5" />
+              </div>
+            </button>
 
-              {/* Continue Last Learning Shortcut */}
-              <button
-                onClick={() => router.push('/student/dashboard?tab=learning')}
-                className="group flex items-center justify-between gap-4 bg-white border border-slate-200/80 dark:bg-slate-900/10 dark:border-slate-900/50 px-4 py-2.5 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.01)] hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:scale-[1.01] text-left cursor-pointer"
-              >
-                <div className="space-y-0.5">
-                  <span className="text-[7.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">continue last topic</span>
-                  <span className="text-[10px] font-extrabold text-slate-700 dark:text-slate-350 block leading-none">Percentages (Quantitative)</span>
-                </div>
-                <div className="w-7.5 h-7.5 rounded-xl bg-blue-50 border border-blue-100/30 dark:bg-blue-950/40 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-450 transition-colors group-hover:bg-blue-600 group-hover:text-white shadow-[0_2px_6px_rgba(37,99,235,0.05)]">
-                  <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-                </div>
-              </button>
-
+            {/* Daily Streak Badge */}
+            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-150 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-5 py-3 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] self-end md:self-auto">
+              <div className="relative flex h-2.5 w-2.5 items-center justify-center">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+              </div>
+              <span className="text-[10.5px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5 leading-none">
+                <Flame className="w-4 h-4 fill-indigo-550 text-indigo-550 dark:fill-indigo-400 dark:text-indigo-400" /> {streak} Day Streak
+              </span>
             </div>
+
           </div>
 
           {/* Main Bento Grid layout (2x2) */}

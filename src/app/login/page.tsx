@@ -237,7 +237,7 @@ export default function LoginPage() {
         role: 'STUDENT',
         name: 'GOOGLE_USER',
         email: 'google.student@university.edu',
-        avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana'
       };
       localStorage.setItem('aptitude_current_role', JSON.stringify(mockGoogleUser));
       setCookie('aptitude_mock_auth', JSON.stringify({
@@ -364,7 +364,7 @@ export default function LoginPage() {
               role: 'STUDENT',
               name,
               email: normalizedEmail,
-              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+              avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
             };
             localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
             showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
@@ -442,7 +442,7 @@ export default function LoginPage() {
               role: 'STUDENT',
               name: data.user.email?.split('@')[0].toUpperCase() || 'STUDENT',
               email: data.user.email!,
-              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+              avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
             };
             localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
 
@@ -552,7 +552,7 @@ export default function LoginPage() {
                  role: 'STUDENT',
                  name,
                  email: normalizedEmail,
-                 avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+                 avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
                };
                localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
                showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
@@ -627,7 +627,7 @@ export default function LoginPage() {
           userType: '',
           name: fullName,
           email: normalizedEmail,
-          avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
+          avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana'
         };
         localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
         localStorage.removeItem('aptitude_onboarding_completed');
@@ -704,7 +704,7 @@ export default function LoginPage() {
             userType: '',
             name: fullName,
             email: normalizedEmail,
-            avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
+            avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana'
           };
           localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
           localStorage.removeItem('aptitude_onboarding_completed');

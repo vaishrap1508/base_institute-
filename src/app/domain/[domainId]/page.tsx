@@ -63,7 +63,8 @@ export default function DomainDetailPage() {
     college: 'Vellore Institute of Technology',
     degree: 'B.Tech',
     branch: 'Computer Science',
-    primary_goal: 'Campus Placements'
+    primary_goal: 'Campus Placements',
+    avatar: 'initial'
   });
   const [solvedGlobal, setSolvedGlobal] = useState(12);
   const [streak, setStreak] = useState(14);
@@ -89,7 +90,11 @@ export default function DomainDetailPage() {
     const onboardingStored = localStorage.getItem('aptitude_onboarding_data');
     if (onboardingStored) {
       try {
-        setProfile(JSON.parse(onboardingStored));
+        const data = JSON.parse(onboardingStored);
+        setProfile({
+          ...data,
+          avatar: data.avatar || 'initial'
+        });
       } catch (e) {
         console.warn('Failed to parse onboarding data:', e);
       }
@@ -331,8 +336,18 @@ export default function DomainDetailPage() {
                     {profile.primary_goal}
                   </div>
                 </div>
-                <div className="w-7 h-7 rounded bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center font-black text-[11px] text-white uppercase shadow-[0_2px_6px_rgba(59,130,246,0.15)]">
-                  {profile.username ? profile.username[0] : 'V'}
+                <div className="w-7 h-7 rounded overflow-hidden flex items-center justify-center relative shadow-[0_2px_6px_rgba(59,130,246,0.15)]">
+                  {profile.avatar && profile.avatar !== 'initial' ? (
+                    <img 
+                      src={profile.avatar} 
+                      alt={profile.username || 'User'} 
+                      className="w-full h-full object-cover rounded"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center font-black text-[11px] text-white uppercase">
+                      {profile.username ? profile.username[0] : 'V'}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

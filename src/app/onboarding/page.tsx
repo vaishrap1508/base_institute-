@@ -614,6 +614,7 @@ export default function OnboardingPage() {
       target_timeline: targetTimeline,
       weekly_commitment: weeklyCommitment,
       learning_preference: learningPreferences.join(', '),
+      avatar: 'initial',
       onboarding_completed: true
     };
 

@@ -16,7 +16,7 @@ export default function UsersPage() {
       role: 'admin',
       clearance: 'L3 clearance',
       status: 'Active',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Lucy',
     },
     {
       name: 'Marcus Wright',
@@ -24,7 +24,7 @@ export default function UsersPage() {
       role: 'editor',
       clearance: 'L2 clearance',
       status: 'Active',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Leo',
     },
     {
       name: 'Kyle Reese',
@@ -32,7 +32,7 @@ export default function UsersPage() {
       role: 'editor',
       clearance: 'L1 restricted',
       status: 'Suspended',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Max',
     }
   ]);
 

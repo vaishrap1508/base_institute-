@@ -46,6 +46,22 @@ import {
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
+
+const AVATAR_PRESETS = [
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack',     // Female
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana',  // Female
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Oliver',   // Female
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Buster',   // Female
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Zoe',      // Female
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Lucy',     // Female
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Aneka',    // Male
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Milo',     // Male
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Leo',      // Male
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Max',      // Male
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Charlie',  // Male
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Toby'      // Male
+];
+
 import { Question } from '@/lib/admin/types';
 
 const MOCK_BADGES_DATA = [
@@ -753,7 +769,8 @@ export default function StudentDashboard() {
     primary_goal: 'Campus Placements',
     target_timeline: 'Within 3 Months',
     weekly_commitment: '5–10 Hours',
-    learning_preference: 'Concept + Practice'
+    learning_preference: 'Concept + Practice',
+    avatar: 'initial'
   });
 
   const [currentRole, setCurrentRole] = useState<any>(null);
@@ -801,6 +818,7 @@ export default function StudentDashboard() {
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']); 
   const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
+  const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
 
   const [badges, setBadges] = useState<any[]>(MOCK_BADGES_DATA);
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<string[]>([]);
@@ -814,6 +832,32 @@ export default function StudentDashboard() {
   const [accentColor, setAccentColor] = useState<string>('blue');
   const [layoutDensity, setLayoutDensity] = useState<'compact' | 'normal' | 'spacious'>('normal');
   const [celebrationActive, setCelebrationActive] = useState<boolean>(false);
+
+  // Time Tracker State (Reference 1 style)
+  const [timeTrackerSeconds, setTimeTrackerSeconds] = useState<number>(5048); // Start at 01:24:08 (5048 seconds)
+  const [timeTrackerIsRunning, setTimeTrackerIsRunning] = useState<boolean>(false);
+
+  useEffect(() => {
+    let interval = null;
+    if (timeTrackerIsRunning) {
+      interval = setInterval(() => {
+        setTimeTrackerSeconds((prev) => prev + 1);
+      }, 1000);
+    } else {
+      if (interval) clearInterval(interval);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timeTrackerIsRunning]);
+
+  // Helper to format seconds as HH:MM:SS
+  const formatTimeTracker = (secondsCount: number) => {
+    const hrs = Math.floor(secondsCount / 3600).toString().padStart(2, '0');
+    const mins = Math.floor((secondsCount % 3600) / 60).toString().padStart(2, '0');
+    const secs = (secondsCount % 60).toString().padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+  };
 
   // Footer state variables
   const [footerBadgeText, setFooterBadgeText] = useState('Operational Clearance: Sandbox Encrypted');
@@ -1135,7 +1179,7 @@ export default function StudentDashboard() {
           role: userRole === 'admin' ? (isMarcus ? 'editor' : 'admin') : 'STUDENT',
           name: session.user.email?.split('@')[0].toUpperCase() || 'STUDENT',
           email: session.user.email,
-          avatar: session.user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+          avatar: session.user.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
         };
 
         // Preserve manually toggled admin/preview role across reloads
@@ -1160,8 +1204,14 @@ export default function StudentDashboard() {
 
           if (onboardingData) {
             localStorage.setItem('aptitude_onboarding_completed', 'true');
-            localStorage.setItem('aptitude_onboarding_data', JSON.stringify(onboardingData));
-            setProfile(onboardingData);
+            localStorage.setItem('aptitude_onboarding_data', JSON.stringify({
+              ...onboardingData,
+              avatar: onboardingData.avatar || 'initial'
+            }));
+            setProfile({
+              ...onboardingData,
+              avatar: onboardingData.avatar || 'initial'
+            });
           }
         }
       } else {
@@ -1185,7 +1235,8 @@ export default function StudentDashboard() {
           primary_goal: data.primary_goal || prev.primary_goal,
           target_timeline: data.target_timeline || prev.target_timeline,
           weekly_commitment: data.weekly_commitment || prev.weekly_commitment,
-          learning_preference: data.learning_preference || prev.learning_preference
+          learning_preference: data.learning_preference || prev.learning_preference,
+          avatar: data.avatar || prev.avatar || 'initial'
         }));
       } catch (e) {
         console.warn(e);
@@ -1454,11 +1505,35 @@ export default function StudentDashboard() {
   };
 
   // Save profile updates
-  const handleProfileSave = (e: React.FormEvent) => {
+  const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem('aptitude_onboarding_data', JSON.stringify(profile));
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
+
+    try {
+      const { data: { session } } = await authSupabase.auth.getSession();
+      if (session?.user) {
+        // Try updating/upserting in Supabase
+        await supabase
+          .from('onboarding_profile')
+          .upsert({
+            user_id: session.user.id,
+            username: profile.username,
+            college: profile.college,
+            degree: profile.degree,
+            branch: profile.branch,
+            graduation_year: profile.graduation_year,
+            primary_goal: profile.primary_goal,
+            weekly_commitment: profile.weekly_commitment,
+            learning_preference: profile.learning_preference,
+            avatar: profile.avatar,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+      }
+    } catch (err) {
+      console.warn('Failed to sync profile updates to Supabase:', err);
+    }
   };
 
   // Calculate dynamic daily challenge progress (Starts at 8, increments up to 15)
@@ -1473,84 +1548,75 @@ export default function StudentDashboard() {
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/5 blur-[140px] pointer-events-none" />
 
-      {/* 1. Left Navigation Sidebar */}
-      <aside className="w-64 bg-white dark:bg-slate-950/80 border-r border-slate-200 dark:border-slate-900 flex flex-col h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-900/60 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-            <Layers className="w-5 h-5" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-black text-slate-900 dark:text-white tracking-tight text-sm leading-tight">
-              KINETIC HUB
-            </span>
-            <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 tracking-widest uppercase mt-0.5">
-              Command Center
-            </span>
-          </div>
+      {/* 1. Left Navigation Sidebar (Reference 2 style) */}
+      <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
+        {/* Top Logo Button */}
+        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title="Kinetic Hub">
+          <Layers className="w-5 h-5" />
         </div>
 
         {/* Sidebar Tabs */}
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 flex flex-col gap-3 items-center w-full overflow-y-auto scrollbar-none">
           
           {/* Dashboard Tab */}
           <button 
             onClick={() => setActiveSidebarTab('dashboard')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Dashboard"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'dashboard'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <Compass className="w-4.5 h-4.5" />
-            <span>Dashboard</span>
+            <Compass className="w-5 h-5" />
           </button>
           
           {/* Domains Tab */}
           <button 
             onClick={() => router.push('/student/domains')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900"
+            title="Domains"
+            className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900 transition-all cursor-pointer"
           >
-            <Layers className="w-4.5 h-4.5" />
-            <span>Domains</span>
+            <Layers className="w-5 h-5" />
           </button>
           
           {/* Learning Tab */}
           <button 
             onClick={() => setActiveSidebarTab('learning')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Learning Roadmap"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'learning'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <BookOpen className="w-4.5 h-4.5" />
-            <span>Learning</span>
+            <BookOpen className="w-5 h-5" />
           </button>
 
           {/* Practice Arena Tab */}
           <button 
             onClick={() => setActiveSidebarTab('practice')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Practice Arena"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'practice'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <BookOpenCheck className="w-4.5 h-4.5" />
-            <span>Practice Arena</span>
+            <BookOpenCheck className="w-5 h-5" />
           </button>
 
           {/* Mock Tests Tab */}
           <button 
             onClick={() => setActiveSidebarTab('mockTests')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Mock Tests"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'mockTests'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <Award className="w-4.5 h-4.5" />
-            <span>Mock Tests</span>
+            <Award className="w-5 h-5" />
           </button>
 
           {/* Career Hub Tab */}
@@ -1559,116 +1625,100 @@ export default function StudentDashboard() {
               setActiveSidebarTab('careerHub');
               setSelectedOpportunityType('All');
             }}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Career Hub"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'careerHub'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <Briefcase className="w-4.5 h-4.5" />
-            <span>Career Hub</span>
+            <Briefcase className="w-5 h-5" />
           </button>
 
           {/* Leaderboards Tab */}
           <button 
             onClick={() => setActiveSidebarTab('leaderboards')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Leaderboard Rankings"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'leaderboards'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <Trophy className="w-4.5 h-4.5" />
-            <span>Leaderboards</span>
+            <Trophy className="w-5 h-5" />
           </button>
 
           {/* Achievements Tab */}
           <button 
             onClick={() => setActiveSidebarTab('badges')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Badges & Achievements"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'badges'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <Award className="w-4.5 h-4.5" />
-            <span>Achievements</span>
+            <Sparkles className="w-5 h-5" />
           </button>
 
           {/* Profile Tab */}
           <button 
             onClick={() => setActiveSidebarTab('profile')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Student Profile"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'profile'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <User className="w-4.5 h-4.5" />
-            <span>Profile</span>
+            <User className="w-5 h-5" />
           </button>
 
           {/* Settings Tab */}
           <button 
             onClick={() => setActiveSidebarTab('settings')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+            title="Settings Hub"
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'settings'
-                ? `${getAccentClass(accentColor, 'combined')} shadow-xs`
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
-            <SettingsIcon className="w-4.5 h-4.5" />
-            <span>Settings</span>
+            <SettingsIcon className="w-5 h-5" />
           </button>
 
           {/* Admin Tools Section */}
           {currentRole?.role === 'admin' && (
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-900 mt-4 space-y-1 select-none animate-fadeIn">
-              <span className="px-4 text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2">Admin Tools</span>
+            <div className="pt-2 border-t border-slate-150 dark:border-slate-900 w-full flex flex-col gap-2 items-center">
               <button 
                 onClick={() => router.push('/admin/editor')}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer text-left"
+                title="Content Creator (Admin)"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-55 dark:hover:bg-blue-900/30 transition-all cursor-pointer"
               >
-                <SettingsIcon className="w-4.5 h-4.5 text-blue-600 dark:text-blue-450" />
-                <span>Content Creator</span>
+                <SettingsIcon className="w-4.5 h-4.5" />
               </button>
               <button 
                 onClick={() => router.push('/admin/dashboard')}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer text-left"
+                title="Admin Dashboard"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-655 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all cursor-pointer"
               >
-                <Layers className="w-4.5 h-4.5 text-blue-600 dark:text-blue-450" />
-                <span>Admin Dashboard</span>
+                <Layers className="w-4.5 h-4.5" />
               </button>
             </div>
           )}
-
-          {/* Core User Stats inside Sidebar */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-900 mt-4 space-y-2.5">
-            <div className="px-4 py-2 bg-slate-50/80 rounded-xl border border-slate-200 dark:bg-slate-900/40 dark:border-slate-900 flex items-center justify-between text-[11px] font-bold">
-              <span className="text-slate-500 dark:text-slate-400">Solved Count</span>
-              <span className="text-blue-600 dark:text-blue-400 font-mono">{solvedCount} items</span>
-            </div>
-            <div className="px-4 py-2 bg-slate-50/80 rounded-xl border border-slate-200 dark:bg-slate-900/40 dark:border-slate-900 flex items-center justify-between text-[11px] font-bold">
-              <span className="text-slate-500 dark:text-slate-400">Active Streak</span>
-              <span className="text-amber-600 dark:text-amber-400 font-mono flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500 animate-pulse" /> {streak} Days
-              </span>
-            </div>
-          </div>
         </nav>
 
         {/* User profile & Logout */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-900/85 space-y-3 shrink-0">
+        <div className="p-4 border-t border-slate-150 dark:border-slate-900 w-full flex flex-col gap-4 items-center shrink-0">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-transparent transition-colors cursor-pointer text-left dark:text-rose-400 dark:hover:text-rose-300 dark:hover:bg-rose-950/20"
+            title="Sign Out"
+            className="w-12 h-12 rounded-full text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 flex items-center justify-center transition-all cursor-pointer"
           >
-            <LogOut className="w-4.5 h-4.5" />
-            <span>Sign Out Profile</span>
+            <LogOut className="w-5 h-5" />
           </button>
-          <div className="flex items-center justify-center gap-1.5 text-[9px] text-slate-400 dark:text-slate-500 font-semibold select-none">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Operational SSL sandbox</span>
+          <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-955/30 border border-emerald-200 dark:border-emerald-900 flex items-center justify-center text-emerald-600 dark:text-emerald-450 text-[10px] font-black" title="SSL Sandbox Clean">
+            ✓
           </div>
         </div>
       </aside>
@@ -1676,18 +1726,51 @@ export default function StudentDashboard() {
       {/* 2. Main Workspace Frame */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
         
-        {/* Top Header */}
-        <header className="h-16 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-widest">Active goal:</span>
-            <span className={`text-[9px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider border transition-all duration-300 ${getAccentClass(accentColor, 'combined')}`}>
-              {profile.primary_goal}
-            </span>
+        {/* Top Header (Reference 2 style) */}
+        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
+          <div className="flex flex-col items-start text-left">
+            <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
+              {activeSidebarTab === 'dashboard' ? (
+                <>Welcome back, {profile.username.split(' ')[0]} 👋</>
+              ) : activeSidebarTab === 'learning' ? (
+                <>Learning Roadmap 🗺️</>
+              ) : activeSidebarTab === 'practice' ? (
+                <>Practice Arena 🎯</>
+              ) : activeSidebarTab === 'mockTests' ? (
+                <>Mock Assessments 🏆</>
+              ) : activeSidebarTab === 'careerHub' ? (
+                <>Career Opportunity Hub 💼</>
+              ) : activeSidebarTab === 'leaderboards' ? (
+                <>Placement Leaderboard 📊</>
+              ) : activeSidebarTab === 'badges' ? (
+                <>Achievements & Credentials 🏅</>
+              ) : activeSidebarTab === 'profile' ? (
+                <>Profile Credentials ⚙️</>
+              ) : (
+                <>Settings Hub ⚙️</>
+              )}
+            </h1>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider mt-0.5">
+              {activeSidebarTab === 'dashboard' ? 'Here is your activities overview for today.' : 'Manage your preparations'}
+            </p>
           </div>
+
           <div className="flex items-center gap-5">
             
+            {/* Search Input Box */}
+            <div className="relative hidden md:block">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-405" />
+              <input
+                type="text"
+                placeholder="Search something..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 pr-4 py-2 w-60 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
+              />
+            </div>
+
             {/* Preview/Edit Switcher */}
-            <div className="flex bg-slate-105 dark:bg-slate-900 p-0.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner select-none mr-2">
+            <div className="flex bg-slate-100 dark:bg-slate-900 p-0.5 rounded-full border border-slate-200 dark:border-slate-850 shadow-inner mr-2">
               <button
                 type="button"
                 onClick={() => {
@@ -1695,15 +1778,15 @@ export default function StudentDashboard() {
                     role: 'STUDENT',
                     name: 'Vaishnavi Raparthy',
                     email: 'student@aptitude-ai.com',
-                    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+                    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
                   };
                   localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
                   setCurrentRole(studentRole);
                 }}
                 className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                   currentRole?.role !== 'admin'
-                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-450 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
+                    : 'text-slate-505 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 Preview
@@ -1715,7 +1798,7 @@ export default function StudentDashboard() {
                     role: 'admin',
                     name: 'SARAH CONNOR',
                     email: 'sarah.c@aptitude-ai.com',
-                    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+                    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
                   };
                   localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
                   setCurrentRole(adminRole);
@@ -1723,8 +1806,8 @@ export default function StudentDashboard() {
                 }}
                 className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                   currentRole?.role === 'admin'
-                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-450 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
+                    : 'text-slate-550 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 Edit / Admin
@@ -1734,7 +1817,7 @@ export default function StudentDashboard() {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-450 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-white hover:scale-105 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 cursor-pointer select-none"
               title="Toggle theme"
               suppressHydrationWarning
             >
@@ -1745,17 +1828,33 @@ export default function StudentDashboard() {
               )}
             </button>
 
-            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-850" />
 
-            <div className="flex items-center gap-3.5">
-              <div className="text-right flex flex-col">
-                <span className="text-[11.5px] font-black text-slate-900 dark:text-white">{profile.username}</span>
-                <span className="text-[9px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-wider">{profile.degree} · {profile.branch}</span>
+            {/* User Profile Display */}
+            <div 
+              onClick={() => setActiveSidebarTab('profile')}
+              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+            >
+              <div className="text-right flex flex-col hidden sm:flex">
+                <span className="text-[11.5px] font-black text-slate-808 dark:text-white">{profile.username}</span>
+                <span className="text-[9px] text-slate-400 dark:text-slate-505 font-bold uppercase tracking-wider">{profile.degree} · {profile.branch}</span>
               </div>
-              <div className="w-8.5 h-8.5 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center font-black text-xs text-white uppercase shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                {profile.username ? profile.username[0] : 'V'}
+              <div className="w-8.5 h-8.5 rounded-full overflow-hidden flex items-center justify-center relative shadow-md group select-none">
+                {profile.avatar && profile.avatar !== 'initial' ? (
+                  <img 
+                    src={profile.avatar} 
+                    alt={profile.username || 'User'} 
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-tr from-blue-600 to-indigo-650 text-white flex items-center justify-center font-black text-xs uppercase rounded-full">
+                    {profile.username ? profile.username[0] : 'V'}
+                  </div>
+                )}
+                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-[#030712]" />
               </div>
             </div>
+
           </div>
         </header>
 
@@ -1769,19 +1868,19 @@ export default function StudentDashboard() {
               1. TAB: DASHBOARD (Duolingo Redesign Layout)
               ==================================================================== */}
           {activeSidebarTab === 'dashboard' && (
-            <div className="w-full space-y-8 animate-fadeIn">
+            <div className="w-full space-y-8 animate-fadeIn text-slate-800 dark:text-slate-200">
               
               {/* Admin Banner Alert */}
               {currentRole?.role === 'admin' && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-blue-50/80 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40 text-blue-800 dark:text-blue-400 animate-fadeIn shadow-xs select-none">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-blue-55/80 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40 text-blue-800 dark:text-blue-400 animate-fadeIn shadow-xs select-none">
                   <div className="flex items-center gap-3">
-                    <span className="p-2 rounded-lg bg-blue-650 text-white shadow-xs">
+                    <span className="p-2 rounded-lg bg-blue-600 text-white shadow-xs">
                       <SettingsIcon className="w-4 h-4 animate-pulse" />
                     </span>
                     <div className="text-left">
                       <h4 className="text-xs font-black uppercase tracking-wider leading-none">Editor Mode Activated</h4>
-                      <p className="text-[10px] font-semibold text-slate-550 dark:text-slate-400 mt-1.5 leading-relaxed">
-                        You are now modifying student view elements. You can edit footer copyright credentials directly in-place or manage platform questions in the editor.
+                      <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                        You are now modifying student view elements. You can edit footer credentials directly in-place or manage platform questions in the editor.
                       </p>
                     </div>
                   </div>
@@ -1794,374 +1893,325 @@ export default function StudentDashboard() {
                   </button>
                 </div>
               )}
-              
-              {/* Hero Progress Card */}
-              <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900/20 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 transition-all duration-300 shadow-md hover:shadow-lg">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.06),transparent_50%)] pointer-events-none" />
+
+              {/* Main 12-Column Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
-                {/* Hero Info (Left) */}
-                <div className="space-y-4 text-center md:text-left relative z-10">
-                  <div className="space-y-1">
-                    <span className={`text-xs font-extrabold uppercase tracking-widest ${getAccentClass(accentColor, 'text')}`}>
-                      Welcome back, {profile.username.split(' ')[0]} 👋
-                    </span>
-                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-tight font-heading">
-                      Continue Your Journey
-                    </h1>
-                    <p className="text-base font-bold text-slate-600 dark:text-slate-350 tracking-tight bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/40 px-3 py-1.5 rounded-xl inline-block">
-                      Percentages → Profit & Loss
-                    </p>
-                  </div>
+                {/* Left Column (8 cols): Activities & Progress */}
+                <div className="lg:col-span-8 space-y-8">
                   
-                  <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-                    <button 
-                      onClick={() => setActiveSidebarTab('learning')}
-                      className={`py-3 px-6 text-white font-bold text-xs rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 duration-200 ${getAccentClass(accentColor, 'button')}`}
-                    >
-                      <Play className="w-4 h-4 fill-white" />
-                      <span>Resume Learning</span>
-                    </button>
-                    <button 
-                      onClick={() => setActiveSidebarTab('practice')}
-                      className="py-3 px-5 border border-slate-200 hover:border-slate-300 text-slate-650 hover:text-slate-900 dark:border-slate-800 dark:hover:border-slate-700 dark:text-slate-300 dark:hover:text-white font-bold text-xs rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 bg-white/50 dark:bg-transparent"
-                    >
-                      <BookOpenCheck className="w-4 h-4" />
-                      <span>Practice Arena</span>
-                    </button>
+                  {/* "Your activities today" Section (Reference 2 style) */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-bold text-slate-800 dark:text-white font-heading">
+                        Your activities today <span className="text-slate-405 font-medium text-sm ml-1.5">(3)</span>
+                      </h2>
+                    </div>
+
+                    {/* Horizontal/Grid Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      
+                      {/* Card 1: Quant Aptitude */}
+                      <div className="bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-48 hover:shadow-lg transition-all duration-300 group">
+                        <div className="flex justify-between items-start">
+                          <span className="bg-white/80 dark:bg-slate-900/60 border border-[#B8DCE7] dark:border-slate-800 px-3 py-1 rounded-full text-[10px] font-black text-[#1E4E5D] dark:text-[#38BDF8] flex items-center gap-1">
+                            ⭐ 4.9 <span className="text-[9px] text-[#558CA0]">Accuracy: 84%</span>
+                          </span>
+                          
+                          {/* Diagonal Arrow button */}
+                          <button 
+                            onClick={() => {
+                              setActiveSidebarTab('practice');
+                              setSelectedDomain('quant');
+                            }}
+                            className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
+                          >
+                            <ChevronRight className="w-5 h-5 text-slate-605 -rotate-45" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-2 text-left">
+                          <h3 className="text-base font-bold text-slate-800 dark:text-white">Quant Aptitude</h3>
+                          <p className="text-[11px] text-[#47707E] dark:text-slate-400 font-semibold leading-relaxed">
+                            Percentages, Profit & Loss, Ratios, Speed & Distance
+                          </p>
+                        </div>
+
+                        {/* Stacked avatars */}
+                        <div className="flex items-center -space-x-2">
+                          <div className="w-6 h-6 rounded-full bg-blue-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">AR</div>
+                          <div className="w-6 h-6 rounded-full bg-purple-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">SN</div>
+                          <div className="w-6 h-6 rounded-full bg-pink-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">KK</div>
+                          <span className="text-[9.5px] text-[#47707E] dark:text-slate-400 font-bold ml-3">+12 others active</span>
+                        </div>
+                      </div>
+
+                      {/* Card 2: Logical Reasoning */}
+                      <div className="bg-[#FDF2F8] dark:bg-[#3B1229]/20 border border-[#FBCFE8] dark:border-[#652047]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-48 hover:shadow-lg transition-all duration-300 group">
+                        <div className="flex justify-between items-start">
+                          <span className="bg-white/80 dark:bg-slate-900/60 border border-[#F9A8D4] dark:border-slate-800 px-3 py-1 rounded-full text-[10px] font-black text-[#9D174D] dark:text-[#F472B6] flex items-center gap-1">
+                            ⭐ 4.8 <span className="text-[9px] text-[#C2410C]">Accuracy: 92%</span>
+                          </span>
+                          
+                          <button 
+                            onClick={() => {
+                              setActiveSidebarTab('practice');
+                              setSelectedDomain('logical');
+                            }}
+                            className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
+                          >
+                            <ChevronRight className="w-5 h-5 text-slate-605 -rotate-45" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-2 text-left">
+                          <h3 className="text-base font-bold text-slate-800 dark:text-white">Logical Reasoning</h3>
+                          <p className="text-[11px] text-[#B04A75] dark:text-slate-400 font-semibold leading-relaxed">
+                            Syllogisms, Blood Relations, Seating arrangements, Series
+                          </p>
+                        </div>
+
+                        <div className="flex items-center -space-x-2">
+                          <div className="w-6 h-6 rounded-full bg-green-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">AS</div>
+                          <div className="w-6 h-6 rounded-full bg-yellow-505 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">RS</div>
+                          <div className="w-6 h-6 rounded-full bg-[#111827] border border-white dark:border-slate-955 text-white text-[9px] font-bold flex items-center justify-center">VR</div>
+                          <span className="text-[9.5px] text-[#B04A75] dark:text-slate-400 font-bold ml-3">+6 others active</span>
+                        </div>
+                      </div>
+
+                    </div>
                   </div>
-                </div>
 
-                {/* Progress Indicators & Mascot (Right) */}
-                <div className="flex items-center gap-8 z-10 shrink-0 select-none flex-col sm:flex-row">
-                  
-                  {/* Mascot SVG */}
-                  <div className="w-24 h-24 hover:scale-105 transition-all duration-300 relative">
-                    <svg viewBox="0 0 100 100" className="w-full h-full filter drop-shadow-[0_4px_12px_rgba(59,130,246,0.2)]">
-                      {/* Mascot body */}
-                      <circle cx="50" cy="50" r="40" fill="url(#gradMascot)" stroke={getHexColor(accentColor)} strokeWidth="2.5" />
-                      
-                      {/* Mascot eyes */}
-                      <ellipse cx="38" cy="42" rx="7" ry="10" fill="#FFFFFF" />
-                      <ellipse cx="62" cy="42" rx="7" ry="10" fill="#FFFFFF" />
-                      
-                      {/* Mascot pupils */}
-                      <ellipse cx="38" cy="42" rx="3" ry="5" fill="#0F172A" />
-                      <ellipse cx="62" cy="42" rx="3" ry="5" fill="#0F172A" />
-                      
-                      {/* Pupil shines */}
-                      <circle cx="36" cy="39" r="1.5" fill="#FFFFFF" />
-                      <circle cx="60" cy="39" r="1.5" fill="#FFFFFF" />
-
-                      {/* Cheek blush */}
-                      <circle cx="28" cy="54" r="3" fill="#F87171" opacity="0.6" />
-                      <circle cx="72" cy="54" r="3" fill="#F87171" opacity="0.6" />
-                      
-                      {/* Mascot friendly smile */}
-                      <path d="M 42 56 Q 50 63 58 56" stroke="#0F172A" strokeWidth="3" fill="transparent" strokeLinecap="round" />
-                      
-                      {/* Graduation Cap */}
-                      <path d="M 22 26 L 50 14 L 78 26 L 50 38 Z" fill={getHexColor(accentColor)} stroke={getHexColor(accentColor)} strokeWidth="1.5" />
-                      <path d="M 36 30 L 36 44 Q 50 48 64 44 L 64 30" fill="transparent" stroke={getHexColor(accentColor)} strokeWidth="2" />
-                      {/* Tassel */}
-                      <path d="M 50 24 L 76 34 L 78 40" fill="transparent" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round" />
-                      <circle cx="78" cy="41" r="1.5" fill="#F59E0B" />
-
-                      {/* Sparkles */}
-                      <path d="M 85 20 L 88 23 L 85 26 L 82 23 Z" fill="#F59E0B" className="animate-pulse" />
-
-                      <defs>
-                        <linearGradient id="gradMascot" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor={getHexColor(accentColor) + '88'} />
-                          <stop offset="100%" stopColor={getHexColor(accentColor)} />
-                        </linearGradient>
-                      </defs>
-                    </svg>
+                  {/* "Learning progress" Section (Reference 2 style) */}
+                  <div className="space-y-4 pt-2">
+                    <h2 className="text-lg font-bold text-slate-800 dark:text-white font-heading">Learning progress</h2>
                     
-                    <div className="absolute -bottom-1 -right-1 bg-amber-500 text-white rounded-full p-1 border-2 border-white dark:border-[#030712] animate-bounce">
-                      <Sparkles className="w-3.5 h-3.5 fill-white text-white" />
-                    </div>
-                  </div>
-
-                  {/* Ring Progress Indicator */}
-                  <div className="relative w-24 h-24 shrink-0 flex items-center justify-center bg-slate-50 dark:bg-slate-950/60 rounded-2xl border border-slate-200 dark:border-slate-800">
-                    <svg className="w-20 h-20 transform -rotate-90">
-                      <circle cx="40" cy="40" r="32" stroke="rgba(226, 232, 240, 0.4)" strokeWidth="5" fill="transparent" className="dark:stroke-slate-850/50" />
-                      <circle cx="40" cy="40" r="32" stroke={getHexColor(accentColor)} strokeWidth="5.5" fill="transparent" strokeDasharray="201" strokeDashoffset={201 - (201 * Math.min(120, dailyXpGoal)) / dailyXpGoal} strokeLinecap="round" className={`transition-all duration-1000 ${getAccentClass(accentColor, 'ring')}`} />
-                    </svg>
-                    <div className="absolute flex flex-col items-center">
-                      <span className="text-base font-black font-mono text-slate-800 dark:text-white">{Math.min(100, Math.round((120 / dailyXpGoal) * 100))}%</span>
-                      <span className="text-[7.5px] font-extrabold text-slate-400 uppercase tracking-wider">Done</span>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* Quick Stats Row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                
-                {/* Daily XP */}
-                <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-2xl p-4 flex items-center gap-3.5 shadow-xs hover:border-amber-500/20 transition-all duration-200 group">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/20 text-amber-500 dark:text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <Sparkles className="w-5 h-5 fill-current" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Daily XP</span>
-                    <span className="text-base font-black text-slate-800 dark:text-white font-mono leading-tight">120 / {dailyXpGoal} XP</span>
-                  </div>
-                </div>
-
-                {/* Streak */}
-                <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-2xl p-4 flex items-center gap-3.5 shadow-xs hover:border-orange-500/20 transition-all duration-200 group">
-                  <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-950/20 text-orange-500 dark:text-orange-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <Flame className="w-5 h-5 fill-current animate-pulse" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Streak</span>
-                    <span className="text-base font-black text-slate-800 dark:text-white font-mono leading-tight">{streak} Days</span>
-                  </div>
-                </div>
-
-                {/* Level */}
-                <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-2xl p-4 flex items-center gap-3.5 shadow-xs hover:border-current/20 transition-all duration-200 group">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform border ${getAccentClass(accentColor, 'combined')}`}>
-                    <Cpu className="w-5 h-5" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Level</span>
-                    <span className="text-base font-black text-slate-800 dark:text-white font-mono leading-tight">Lvl 12</span>
-                  </div>
-                </div>
-
-                {/* Rank */}
-                <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-2xl p-4 flex items-center gap-3.5 shadow-xs hover:border-indigo-500/20 transition-all duration-200 group">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 text-indigo-500 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <Trophy className="w-5 h-5 fill-current" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">College Rank</span>
-                    <span className="text-base font-black text-slate-800 dark:text-white font-mono leading-tight">#14</span>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Grid Layout: Subjects (Left) and Daily Challenge / Career Hub Preview (Right) */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                
-                {/* 4 Major Subject Tracks (Left Column - 7 cols) */}
-                <div className="lg:col-span-7 space-y-6">
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900/80 pb-3">
-                    <h2 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                      <GraduationCap className={`w-4.5 h-4.5 ${getAccentClass(accentColor, 'text')}`} />
-                      <span>Subject Learning Tracks</span>
-                    </h2>
-                    <span className="text-[10px] text-slate-450 dark:text-slate-500 font-extrabold uppercase">4 categories active</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
-                    {/* Quant Aptitude */}
-                    <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/50 rounded-2xl p-5 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-36">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-tight">Quant Aptitude</span>
-                        <span className={`text-[10px] border px-2 py-0.5 rounded-lg font-bold font-mono ${getAccentClass(accentColor, 'combined')}`}>Accuracy: 84%</span>
-                      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                       
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-450">
-                          <span>Overall Progress</span>
-                          <span className="font-mono text-slate-800 dark:text-white font-black">75%</span>
+                      {/* Completed Stat */}
+                      <div className="bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-5 rounded-2xl flex items-center justify-between hover:shadow-md transition-all group">
+                        <div className="space-y-1 text-left">
+                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Completed</span>
+                          <span className="text-xl font-black text-[#065F46] dark:text-[#34D399] font-mono leading-none">{solvedCount} Modules</span>
                         </div>
-                        <div className="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-2.5 overflow-hidden">
-                          <div className={`h-2.5 rounded-full ${getAccentClass(accentColor, 'bg')}`} style={{ width: '75%' }} />
+                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#C7E9E1] dark:border-[#205D4F]/30 flex items-center justify-center text-[#065F46] dark:text-[#34D399] -rotate-45 group-hover:scale-105 transition-transform">
+                          <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>
+
+                      {/* Score Stat */}
+                      <div className="bg-[#FEF3C7] dark:bg-[#3D2C08]/20 border border-[#FDE68A] dark:border-[#6B4E0E]/20 p-5 rounded-2xl flex items-center justify-between hover:shadow-md transition-all group">
+                        <div className="space-y-1 text-left">
+                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Your Streak</span>
+                          <span className="text-xl font-black text-[#92400E] dark:text-[#FBBF24] font-mono leading-none">{streak} Days</span>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#FDE68A] dark:border-[#6B4E0E]/20 flex items-center justify-center text-[#92400E] dark:text-[#FBBF24] -rotate-45 group-hover:scale-105 transition-transform">
+                          <ChevronRight className="w-4 h-4" />
+                        </div>
+                      </div>
+
+                      {/* Active Stat */}
+                      <div className="bg-[#F3E8FF] dark:bg-[#2A154D]/20 border border-[#E9D5FF] dark:border-[#53289E]/20 p-5 rounded-2xl flex items-center justify-between hover:shadow-md transition-all group">
+                        <div className="space-y-1 text-left">
+                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Level</span>
+                          <span className="text-xl font-black text-[#6B21A8] dark:text-[#C084FC] font-mono leading-none">Lvl 12 (#14)</span>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#E9D5FF] dark:border-[#53289E]/20 flex items-center justify-center text-[#6B21A8] dark:text-[#C084FC] -rotate-45 group-hover:scale-105 transition-transform">
+                          <ChevronRight className="w-4 h-4" />
+                        </div>
+                      </div>
+
                     </div>
 
-                    {/* Logical Reasoning */}
-                    <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/50 rounded-2xl p-5 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-36">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-tight">Logical Reasoning</span>
-                        <span className="text-[10px] text-indigo-650 bg-indigo-50 border border-indigo-100 dark:text-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-900/30 px-2 py-0.5 rounded-lg font-bold font-mono">Accuracy: 92%</span>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-450">
-                          <span>Overall Progress</span>
-                          <span className="font-mono text-slate-800 dark:text-white font-black">40%</span>
+                    {/* Large Yellow Active concept banner (Reference 2 style) */}
+                    <div className="bg-[#FFFBEB] dark:bg-[#251E0E]/40 border border-[#FEF3C7] dark:border-[#4B3B18]/30 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:shadow-lg transition-all duration-300">
+                      <div className="space-y-3 text-left flex-1 w-full">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-amber-100 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                            Active Track Unit
+                          </span>
+                          <span className="text-slate-450 dark:text-slate-500 text-[10px] font-semibold">QUANT APTITUDE</span>
                         </div>
-                        <div className="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-2.5 overflow-hidden">
-                          <div className="bg-indigo-600 dark:bg-indigo-500 h-2.5 rounded-full" style={{ width: '40%' }} />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Verbal Ability */}
-                    <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/50 rounded-2xl p-5 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-36">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-tight">Verbal Ability</span>
-                        <span className="text-[10px] text-purple-650 bg-purple-50 border border-purple-100 dark:text-purple-400 dark:bg-purple-950/40 dark:border-purple-900/30 px-2 py-0.5 rounded-lg font-bold font-mono">Accuracy: 78%</span>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-450">
-                          <span>Overall Progress</span>
-                          <span className="font-mono text-slate-800 dark:text-white font-black">85%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-2.5 overflow-hidden">
-                          <div className="bg-purple-600 dark:bg-purple-500 h-2.5 rounded-full" style={{ width: '85%' }} />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Coding & DSA */}
-                    <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/50 rounded-2xl p-5 hover:shadow-md transition-all duration-200 flex flex-col justify-between h-36">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-tight">Coding & DSA</span>
-                        <span className="text-[10px] text-emerald-650 bg-emerald-50 border border-emerald-100 dark:text-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-900/30 px-2 py-0.5 rounded-lg font-bold font-mono">Accuracy: 64%</span>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-450">
-                          <span>Overall Progress</span>
-                          <span className="font-mono text-slate-800 dark:text-white font-black">20%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-2.5 overflow-hidden">
-                          <div className="bg-emerald-600 dark:bg-emerald-500 h-2.5 rounded-full" style={{ width: '20%' }} />
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-                {/* Daily Challenge & Career Hub (Right Column - 5 cols) */}
-                <div className="lg:col-span-5 space-y-8">
-                  
-                  {/* Daily Challenge Card */}
-                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs relative overflow-hidden group hover:border-current/20 transition-all duration-300">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.04),transparent_50%)] pointer-events-none" />
-                    
-                    <div className="flex items-center gap-2 border-b border-slate-105 dark:border-slate-900/60 pb-3 mb-4">
-                      <Target className={`w-4.5 h-4.5 ${getAccentClass(accentColor, 'text')}`} />
-                      <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest">Today's Challenge</h3>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-black text-slate-900 dark:text-white">Solve 15 Quant Questions</h4>
-                        <span className="text-[10.5px] font-bold text-slate-500 dark:text-slate-400">Streak booster: Earn double XP milestones today</span>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs font-bold text-slate-500">
-                          <span>Progress Tracker</span>
-                          <span className="font-mono font-black text-slate-900 dark:text-white">{challengeCompletedCount} / 15 Solved</span>
-                        </div>
-                        <div className="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-2 overflow-hidden">
-                          <div className={`h-2 rounded-full transition-all duration-500 ${getAccentClass(accentColor, 'bg')}`} style={{ width: `${(challengeCompletedCount / 15) * 100}%` }} />
+                        <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase leading-snug">
+                          Percentages → Profit & Loss
+                        </h3>
+                        
+                        {/* Progress Bar */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                            <span>Concept Completion</span>
+                            <span className="font-mono">{challengeCompletedCount} / 15 solved lessons</span>
+                          </div>
+                          <div className="w-full bg-slate-200/60 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-amber-500 h-full rounded-full transition-all duration-500" 
+                              style={{ width: `${(challengeCompletedCount / 15) * 100}%` }}
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => {
-                          setActiveSidebarTab('practice');
-                          setSelectedDomain('quant');
-                        }}
-                        className={`w-full py-2.5 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98 ${getAccentClass(accentColor, 'button')}`}
-                      >
-                        <span>Start Challenge</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Opportunities Section (Career Hub Preview - Max 3) */}
-                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs relative overflow-hidden group hover:border-indigo-500/20 transition-all duration-300">
-                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-3 mb-4">
-                      <div className="flex items-center gap-2">
-                        <Briefcase className="w-4.5 h-4.5 text-indigo-500 dark:text-indigo-400" />
-                        <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest">Active Placements</h3>
-                      </div>
+                      {/* Large diagonal arrow button */}
                       <button 
-                        onClick={() => setActiveSidebarTab('careerHub')}
-                        className="text-[9.5px] font-black text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 uppercase flex items-center gap-0.5 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setActiveSidebarTab('learning');
+                        }}
+                        className="w-12 h-12 rounded-full bg-amber-500 text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
                       >
-                        <span>View All</span>
-                        <ChevronRight className="w-3 h-3" />
+                        <ChevronRight className="w-6 h-6 text-white -rotate-45" />
                       </button>
                     </div>
 
-                    {oppsLoading ? (
-                      <div className="py-6 flex flex-col items-center justify-center text-center">
-                        <div className="w-6 h-6 rounded-full border border-indigo-650 border-t-transparent animate-spin mb-2" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading...</span>
+                  </div>
+
+                </div>
+
+                {/* Right Column (4 cols): Lesson Schedule Calendar, Opportunities & Time Tracker */}
+                <div className="lg:col-span-4 space-y-8">
+                  
+                  {/* 1. Lesson Schedule Calendar Card */}
+                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
+                    <div className="flex items-center justify-between mb-4 pb-1 border-b border-slate-100 dark:border-slate-900/60">
+                      <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Lesson schedule</h3>
+                      <span className="text-xs font-bold text-slate-500">June 2026</span>
+                    </div>
+
+                    {/* Monthly calendar Grid */}
+                    <div className="space-y-3.5">
+                      <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                        <span>Sun</span>
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {opportunities.slice(0, 3).map((o) => {
-                          const statusColor = 
-                            o.status === 'Open' ? 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/25' :
-                            o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-55/60 border-amber-200 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
-                            o.status === 'New' ? 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-900/25' :
-                            'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/20 dark:border-rose-900/25';
+                      
+                      {/* Dates grid for June 2026. Starts on Monday, 30 days */}
+                      <div className="grid grid-cols-7 gap-y-2.5 gap-x-1 text-center text-xs font-bold text-slate-700 dark:text-slate-400">
+                        {/* Day 1 to 30 */}
+                        {[...Array(30)].map((_, i) => {
+                          const dateNum = i + 1;
+                          
+                          // Streak/active study dates (e.g. 2, 4, 6, 8, 9, 14, 15)
+                          const isStreakDay = [2, 4, 6, 8, 14, 15].includes(dateNum);
+                          const isToday = dateNum === 9; // Today is June 9, 2026
 
-                          const typeBadge = 
-                            o.type === 'Hiring' ? 'Hiring' :
-                            o.type === 'Internship' ? 'Intern' :
-                            o.type === 'Government Exam' ? 'Gov Exam' :
-                            o.type === 'Hackathon' ? 'Hackathon' : o.type;
-
-                          const isExpanded = expandedOpportunityId === o.id;
+                          let dateStyles = "w-7 h-7 flex items-center justify-center mx-auto rounded-full transition-colors ";
+                          if (isToday) {
+                            dateStyles += "bg-[#111827] dark:bg-white text-white dark:text-slate-950 font-black shadow-sm";
+                          } else if (isStreakDay) {
+                            dateStyles += "bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-250 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400 font-extrabold";
+                          } else {
+                            dateStyles += "hover:bg-slate-100 dark:hover:bg-slate-900";
+                          }
 
                           return (
-                            <div key={o.id} className="p-3 bg-slate-50/50 dark:bg-slate-950/40 rounded-xl border border-slate-100 dark:border-slate-900/80 space-y-2 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors">
-                              <div className="flex items-center justify-between gap-1 flex-wrap">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[8.5px] font-black bg-indigo-50 border border-indigo-150 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.2 rounded uppercase">
-                                    {typeBadge}
-                                  </span>
-                                  <span className={`text-[8.5px] font-black px-1.5 py-0.2 rounded border uppercase font-mono ${statusColor}`}>
-                                    {o.status}
-                                  </span>
-                                </div>
-                                <span className="text-[8.5px] font-bold text-slate-500">Till {o.deadline}</span>
-                              </div>
-
-                              <div className="space-y-0.5">
-                                <h4 className="text-[11.5px] font-black text-slate-900 dark:text-white leading-tight uppercase">{o.title}</h4>
-                                <span className="text-[10px] text-slate-450 block font-semibold">{o.organization}</span>
-                              </div>
-
-                              {isExpanded && o.details && (
-                                <p className="text-[10.5px] leading-relaxed text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-100 dark:border-slate-850 animate-fadeIn">
-                                  {o.details}
-                                </p>
+                            <div key={dateNum} className="relative">
+                              <span className={dateStyles}>{dateNum}</span>
+                              {isStreakDay && (
+                                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-500" />
                               )}
-
-                              <div className="flex gap-2 pt-1">
-                                <button
-                                  onClick={() => setExpandedOpportunityId(isExpanded ? null : o.id)}
-                                  className="flex-1 py-1.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-[9px] uppercase rounded-lg border border-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 dark:text-slate-300 dark:border-slate-850 transition-colors cursor-pointer text-center"
-                                >
-                                  {isExpanded ? 'Hide' : 'Details'}
-                                </button>
-                                <a 
-                                  href={o.link} 
-                                  target="_blank" 
-                                  rel="noreferrer"
-                                  className="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[9px] uppercase rounded-lg shadow-sm flex items-center justify-center gap-0.5 cursor-pointer transition-all"
-                                >
-                                  <span>Apply</span>
-                                  <ExternalLink className="w-2.5 h-2.5" />
-                                </a>
-                              </div>
                             </div>
                           );
                         })}
                       </div>
-                    )}
+
+                      {/* Webinar / upcoming lessons list (Reference 2 style) */}
+                      <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-900/60">
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest pb-1.5">
+                          <span>Upcoming events</span>
+                          <button onClick={() => setActiveSidebarTab('careerHub')} className="text-blue-500 hover:underline">View All</button>
+                        </div>
+                        
+                        <div className="space-y-2.5">
+                          
+                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
+                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shrink-0">
+                              <BookOpen className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="text-left leading-tight">
+                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">TCS NQT National Mock Test</h4>
+                              <p className="text-[9.5px] text-slate-450 mt-0.5">Tata Consultancy Services · Starts today 2:00 PM</p>
+                            </div>
+                          </div>
+
+                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
+                            <div className="p-2 rounded-lg bg-pink-50 dark:bg-pink-900/30 text-pink-650 dark:text-pink-400 shrink-0">
+                              <Compass className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="text-left leading-tight">
+                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">SWE Intern prep drive</h4>
+                              <p className="text-[9.5px] text-slate-455 mt-0.5">Microsoft India Azure Staging · Till July 15</p>
+                            </div>
+                          </div>
+
+                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
+                            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 shrink-0">
+                              <Layers className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="text-left leading-tight">
+                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">Verbal Reasoning webinar</h4>
+                              <p className="text-[9.5px] text-slate-455 mt-0.5">Content Team Staged Modules · June 12</p>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Time Tracker Stopwatch widget (Reference 1 style) */}
+                  <div className="bg-[#0B3A27] dark:bg-[#062418] text-white border border-[#0A3322] dark:border-[#041B12] rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between h-48 group">
+                    {/* Visual pattern overlay */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.15),transparent_60%)] pointer-events-none" />
+                    
+                    <div className="flex items-center justify-between relative z-10">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#A7F3D0] font-mono">Time Tracker</span>
+                      </div>
+                      <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-[#065F46] rounded-md text-emerald-250">
+                        {timeTrackerIsRunning ? "Active" : "Paused"}
+                      </span>
+                    </div>
+
+                    <div className="text-center py-2 relative z-10">
+                      <span className="text-3xl font-black font-mono tracking-tight leading-none text-white block">
+                        {formatTimeTracker(timeTrackerSeconds)}
+                      </span>
+                      <span className="text-[9px] text-[#A7F3D0]/60 font-semibold mt-1.5 block uppercase tracking-wider">
+                        Active Study Session duration
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2 relative z-10 pt-2 border-t border-[#092B1D]/80">
+                      
+                      {/* Toggle play/pause button */}
+                      <button 
+                        onClick={() => setTimeTrackerIsRunning(!timeTrackerIsRunning)}
+                        className={`flex-1 py-1.8 font-bold text-[10px] uppercase rounded-xl transition-all cursor-pointer text-center ${
+                          timeTrackerIsRunning 
+                            ? "bg-amber-600 hover:bg-amber-500 text-white" 
+                            : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                        }`}
+                      >
+                        {timeTrackerIsRunning ? "Pause Session" : "Start Study"}
+                      </button>
+
+                      {/* Reset button */}
+                      <button 
+                        onClick={() => {
+                          setTimeTrackerIsRunning(false);
+                          setTimeTrackerSeconds(0);
+                        }}
+                        className="py-1.8 px-3 bg-[#092B1D] hover:bg-[#061E14] text-[#A7F3D0] font-bold text-[10px] uppercase rounded-xl border border-[#082419] transition-colors cursor-pointer text-center"
+                      >
+                        Reset
+                      </button>
+
+                    </div>
                   </div>
 
                 </div>
@@ -2171,9 +2221,6 @@ export default function StudentDashboard() {
             </div>
           )}
 
-          {/* ====================================================================
-              2. TAB: LEARNING PATHWAY (Duolingo Style roadmap path map)
-              ==================================================================== */}
           {activeSidebarTab === 'learning' && (
             <div className="w-full space-y-8 animate-fadeIn">
               <div className="text-center space-y-2">
@@ -2181,84 +2228,444 @@ export default function StudentDashboard() {
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">Click on the active lesson nodes to solve matching assessment questions.</p>
               </div>
 
-              {/* Duolingo Winding Roadmap Map */}
-              <div className="relative flex flex-col items-center py-10 space-y-12">
-                
-                {/* Winding Vertical Connector line */}
-                <div className="absolute top-10 bottom-10 w-1 bg-gradient-to-b from-emerald-500 via-blue-500 to-slate-250 dark:to-slate-800 rounded-full z-0" />
-
-                {/* Path Nodes */}
+              {/* Category Tab Switcher */}
+              <div className="flex flex-wrap justify-center gap-2 mb-6 select-none">
                 {[
-                  { id: 1, title: 'Percentages', desc: 'Core fractional relationships', status: 'completed', symbol: '%', color: 'emerald' },
-                  { id: 2, title: 'Ratios & Proportions', desc: 'Comparative scale models', status: 'completed', symbol: '1:2', color: 'emerald' },
-                  { id: 3, title: 'Profit & Loss', desc: 'Commerce margins & calculations', status: 'active', symbol: '₹', color: 'blue' },
-                  { id: 4, title: 'Time & Work', desc: 'Rate equations & tasks efficiency', status: 'locked', symbol: '⏳', color: 'slate' },
-                  { id: 5, title: 'Syllogisms', desc: 'Boolean Venn diagrams deductions', status: 'locked', symbol: 'V', color: 'slate' },
-                  { id: 6, title: 'Blood Relations', desc: 'Structured family maps trees', status: 'locked', symbol: '👪', color: 'slate' },
-                  { id: 7, title: 'Coding: Arrays', desc: 'Linear memory indexing logic', status: 'locked', symbol: '[]', color: 'slate' },
-                  { id: 8, title: 'Coding: Recursion', desc: 'Call stacks and induction checks', status: 'locked', symbol: '()', color: 'slate' }
-                ].map((node, index) => {
-                  
-                  // Winding left/right positioning classes
-                  const offsetClass = 
-                    index % 3 === 0 ? 'translate-x-0' :
-                    index % 3 === 1 ? 'translate-x-12 sm:translate-x-20' :
-                    '-translate-x-12 sm:-translate-x-20';
-
-                  const isCompleted = node.status === 'completed';
-                  const isActive = node.status === 'active';
-
-                  return (
-                    <div key={node.id} className={`flex flex-col items-center relative z-10 transition-all ${offsetClass}`}>
-                      
-                      {/* Active floating indicator badge */}
-                      {isActive && (
-                        <div className="absolute -top-8 bg-blue-600 text-white text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-lg animate-bounce flex items-center gap-1 border border-blue-400">
-                          <Play className="w-2 h-2 fill-current" />
-                          <span>Active Unit</span>
-                        </div>
-                      )}
-
-                      {/* Circular Lesson Node */}
-                      <button
-                        onClick={() => {
-                          if (!node.status.includes('locked')) {
-                            setActiveSidebarTab('practice');
-                            setSelectedDomain('quant');
-                          }
-                        }}
-                        disabled={node.status === 'locked'}
-                        className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-b-4 hover:scale-105 active:scale-95 transition-all select-none cursor-pointer ${
-                          isCompleted 
-                            ? 'bg-emerald-500 border-emerald-700 text-white hover:bg-emerald-400' 
-                            : isActive 
-                            ? 'bg-blue-600 border-blue-800 text-white animate-pulse-glow hover:bg-blue-500 shadow-blue-500/20' 
-                            : 'bg-slate-200 border-slate-350 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-600 cursor-not-allowed'
-                        }`}
-                      >
-                        {isCompleted ? (
-                          <Check className="w-8 h-8 stroke-[3.5]" />
-                        ) : node.status === 'locked' ? (
-                          <Lock className="w-5 h-5" />
-                        ) : (
-                          <span className="text-lg font-black font-mono">{node.symbol}</span>
-                        )}
-                      </button>
-
-                      {/* Node Label card popup on hover */}
-                      <div className="mt-3 text-center bg-white dark:bg-slate-950 p-2.5 rounded-xl border border-slate-150 dark:border-slate-900 shadow-md w-36 max-w-xs transition-colors">
-                        <span className="text-[10px] font-black text-slate-800 dark:text-white block truncate uppercase">{node.title}</span>
-                        <span className="text-[8.5px] text-slate-500 font-semibold block leading-tight mt-0.5">{node.desc}</span>
-                        {isActive && (
-                          <span className="text-[8.5px] text-blue-600 dark:text-blue-400 font-black block mt-1">75% Complete</span>
-                        )}
-                      </div>
-
-                    </div>
-                  );
-                })}
-
+                  { id: 'all', label: 'All Subjects', icon: '🌐' },
+                  { id: 'quant', label: 'Quantitative', icon: '📐' },
+                  { id: 'logical', label: 'Logical Reasoning', icon: '🧩' },
+                  { id: 'verbal', label: 'Verbal Ability', icon: '📚' },
+                  { id: 'coding', label: 'Coding & CS', icon: '💻' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setRoadmapFilter(tab.id as any)}
+                    className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-305 cursor-pointer flex items-center gap-1.5 border ${
+                      roadmapFilter === tab.id
+                        ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-950 border-transparent shadow-md scale-105'
+                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205 border-slate-205 dark:border-slate-800'
+                    }`}
+                  >
+                    <span>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
               </div>
+
+              {/* Gamified Winding Bezier Roadmap Path */}
+              {(() => {
+                const getNodeCoords = (index: number) => {
+                  let x = 50;
+                  let y = 80;
+                  if (index < 3) {
+                    // Row 0: moving left to right
+                    x = index === 0 ? 10 : index === 1 ? 50 : 90;
+                    y = 80;
+                  } else if (index < 6) {
+                    // Row 1: moving right to left
+                    x = index === 3 ? 90 : index === 4 ? 50 : 10;
+                    y = 260;
+                  } else {
+                    // Row 2: moving left to right
+                    x = index === 6 ? 10 : index === 7 ? 50 : 90;
+                    y = 440;
+                  }
+                  return { x, y };
+                };
+
+                const DOMAIN_ROADMAPS: Record<string, any[]> = {
+                  all: [
+                    { id: 1, title: 'Percentages', desc: 'Core fractional relationships', status: 'completed', symbol: '%' },
+                    { id: 2, title: 'Ratios & Proportions', desc: 'Comparative scale models', status: 'completed', symbol: '1:2' },
+                    { id: 3, title: 'Profit & Loss', desc: 'Commerce margins & calculations', status: 'active', symbol: '₹' },
+                    { id: 4, title: 'Time & Work', desc: 'Rate equations & tasks efficiency', status: 'locked', symbol: '⏳' },
+                    { id: 5, title: 'Syllogisms', desc: 'Boolean Venn diagrams deductions', status: 'locked', symbol: 'V' },
+                    { id: 6, title: 'Blood Relations', desc: 'Structured family maps trees', status: 'locked', symbol: '👪' },
+                    { id: 7, title: 'Coding: Arrays', desc: 'Linear memory indexing logic', status: 'locked', symbol: '[]' },
+                    { id: 8, title: 'Coding: Recursion', desc: 'Call stacks and induction checks', status: 'locked', symbol: '()' },
+                    { id: 9, title: 'Mastery Milestone', desc: 'Complete Career Certification', status: 'locked', symbol: '🏆' }
+                  ],
+                  quant: [
+                    { id: 1, title: 'Percentages', desc: 'Core fractional relationships', status: 'completed', symbol: '%' },
+                    { id: 2, title: 'Ratios & Proportions', desc: 'Comparative scale models', status: 'completed', symbol: '1:2' },
+                    { id: 3, title: 'Profit & Loss', desc: 'Commerce margins & calculations', status: 'active', symbol: '₹' },
+                    { id: 4, title: 'Simple Interest', desc: 'Linear accumulation models', status: 'locked', symbol: 'P*R' },
+                    { id: 5, title: 'Compound Interest', desc: 'Exponential curves and compound periods', status: 'locked', symbol: 'A^t' },
+                    { id: 6, title: 'Time & Work', desc: 'Rate equations & tasks efficiency', status: 'locked', symbol: '⏳' },
+                    { id: 7, title: 'Time & Speed', desc: 'Relative velocity equations', status: 'locked', symbol: '🚗' },
+                    { id: 8, title: 'Geometry & Mensuration', desc: 'Shapes properties and formulas', status: 'locked', symbol: '📐' },
+                    { id: 9, title: 'Quant Mastery', desc: 'Aptitude Certification Complete', status: 'locked', symbol: '🏆' }
+                  ],
+                  logical: [
+                    { id: 1, title: 'Series & Analogy', desc: 'Visual progressions logic patterns', status: 'completed', symbol: '1,2' },
+                    { id: 2, title: 'Seating Arrangements', desc: 'Linear coordinates spacing constraints', status: 'completed', symbol: '🪑' },
+                    { id: 3, title: 'Syllogisms', desc: 'Boolean Venn diagrams deductions', status: 'active', symbol: 'V' },
+                    { id: 4, title: 'Blood Relations', desc: 'Structured family maps trees', status: 'locked', symbol: '👪' },
+                    { id: 5, title: 'Clocks & Calendars', desc: 'Periodic time mathematics checks', status: 'locked', symbol: '📅' },
+                    { id: 6, title: 'Coding-Decoding', desc: 'Cipher shifting mapping tables', status: 'locked', symbol: '🔑' },
+                    { id: 7, title: 'Data Sufficiency', desc: 'Logical evaluation prerequisites', status: 'locked', symbol: '📊' },
+                    { id: 8, title: 'Logical Deductions', desc: 'Analytical deduction steps conclusions', status: 'locked', symbol: 'Logic' },
+                    { id: 9, title: 'Logical Mastery', desc: 'Logical Certification Complete', status: 'locked', symbol: '🏆' }
+                  ],
+                  verbal: [
+                    { id: 1, title: 'Spotting Errors', desc: 'Grammar checking logic systems', status: 'completed', symbol: '✏️' },
+                    { id: 2, title: 'Sentence Improvement', desc: 'Syntax phrasing modifications', status: 'completed', symbol: 'ABC' },
+                    { id: 3, title: 'Prepositions', desc: 'Spatial connection structure relationships', status: 'active', symbol: 'Prep' },
+                    { id: 4, title: 'Reading Comprehension', desc: 'Context interpretation mapping paragraphs', status: 'locked', symbol: '📖' },
+                    { id: 5, title: 'Synonyms & Antonyms', desc: 'Contextual semantic vocabulary checks', status: 'locked', symbol: 'Syn' },
+                    { id: 6, title: 'One Word Substitution', desc: 'Noun definitions dictionary compact', status: 'locked', symbol: '1W' },
+                    { id: 7, title: 'Sentence Arrangement', desc: 'Logical paragraph reordering structures', status: 'locked', symbol: 'Sort' },
+                    { id: 8, title: 'Idioms & Phrases', desc: 'Metaphoric language vocabulary banks', status: 'locked', symbol: 'Phrase' },
+                    { id: 9, title: 'Verbal Mastery', desc: 'Verbal Certification Complete', status: 'locked', symbol: '🏆' }
+                  ],
+                  coding: [
+                    { id: 1, title: 'Variables & Loops', desc: 'Flow structures state iterations', status: 'completed', symbol: 'loop' },
+                    { id: 2, title: 'Functions & Scope', desc: 'Modular components calls stack', status: 'completed', symbol: 'fn' },
+                    { id: 3, title: 'Coding: Arrays', desc: 'Linear memory indexing logic', status: 'active', symbol: '[]' },
+                    { id: 4, title: 'Coding: Recursion', desc: 'Call stacks and induction checks', status: 'locked', symbol: '()' },
+                    { id: 5, title: 'Object Oriented Prog', desc: 'Abstraction encapsulation structures', status: 'locked', symbol: 'OOP' },
+                    { id: 6, title: 'Searching & Sorting', desc: 'Divide and conquer speed limits', status: 'locked', symbol: 'Bin' },
+                    { id: 7, title: 'Linked Lists & Queues', desc: 'Dynamic pointer chaining arrays', status: 'locked', symbol: '->' },
+                    { id: 8, title: 'Trees & Graphs', desc: 'Hierarchical node network traversals', status: 'locked', symbol: 'Tree' },
+                    { id: 9, title: 'Coding Mastery', desc: 'Technical Certification Complete', status: 'locked', symbol: '🏆' }
+                  ]
+                };
+ 
+                const nodesList = DOMAIN_ROADMAPS[roadmapFilter] || DOMAIN_ROADMAPS.all;
+ 
+                const illustrationsList = [
+                  { y: 170, x: 25, icon: <Award className="w-5 h-5 text-emerald-500" />, title: "Apex Peak", desc: "Aptitude standards reached" },
+                  { y: 170, x: 75, icon: <Sparkles className="w-5 h-5 text-amber-500" />, title: "Unlock Spark", desc: "Reveal hidden concepts" },
+                  { y: 350, x: 25, icon: <Cpu className="w-5 h-5 text-indigo-500" />, title: "Logic Gate", desc: "Algorithms unlocked" },
+                  { y: 350, x: 75, icon: <Target className="w-5 h-5 text-orange-500" />, title: "Precision Target", desc: "Aim for mastery goals" }
+                ];
+ 
+                const rawSegmentPaths = [
+                  "M 10,80 L 50,80",
+                  "M 50,80 L 90,80",
+                  "M 90,80 C 99,80 99,260 90,260",
+                  "M 90,260 L 50,260",
+                  "M 50,260 L 10,260",
+                  "M 10,260 C 1,260 1,440 10,440",
+                  "M 10,440 L 50,440",
+                  "M 50,440 L 90,440"
+                ];
+
+                const segments = rawSegmentPaths.map((pathStr, idx) => {
+                  const startNode = nodesList[idx];
+                  const endNode = nodesList[idx + 1];
+                  
+                  let status = "locked";
+                  if (startNode.status === 'completed') {
+                    if (endNode && endNode.status === 'completed') {
+                      status = 'completed';
+                    } else if (endNode && endNode.status === 'active') {
+                      status = 'active-transition';
+                    } else {
+                      status = 'completed';
+                    }
+                  } else if (startNode.status === 'active') {
+                    status = 'locked';
+                  }
+
+                  return { d: pathStr, status };
+                });
+
+                // Find active index to compute traveling path coordinates
+                const activeIndex = nodesList.findIndex(n => n.status === 'active');
+                const completedCoords = [];
+                for (let i = 0; i <= (activeIndex !== -1 ? activeIndex : 0); i++) {
+                  const { x, y } = getNodeCoords(i);
+                  completedCoords.push(`${x},${y}`);
+                }
+                const motionPath = completedCoords.length > 1
+                  ? `M ${completedCoords.join(' L ')}`
+                  : `M 10,80 L 10,80`;
+
+                return (
+                  <div 
+                    className="relative w-full h-[520px] select-none my-6 transition-all duration-500 ease-out"
+                    style={{
+                      transform: 'perspective(1200px) rotateX(12deg)',
+                      transformStyle: 'preserve-3d',
+                    }}
+                  >
+                    
+                    {/* SVG Curve Canvas */}
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 520" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="completed-grad" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#10B981" />
+                          <stop offset="100%" stopColor="#059669" />
+                        </linearGradient>
+                        <linearGradient id="active-grad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10B981" />
+                          <stop offset="100%" stopColor="#2563EB" />
+                        </linearGradient>
+                        <filter id="active-glow" x="-30%" y="-30%" width="160%" height="160%">
+                          <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#3B82F6" floodOpacity="0.5" />
+                        </filter>
+                        <filter id="completed-glow" x="-30%" y="-30%" width="160%" height="160%">
+                          <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#10B981" floodOpacity="0.35" />
+                        </filter>
+                      </defs>
+ 
+                      {/* Decorative graphics: background stars & flags */}
+                      <g opacity="0.25" className="text-emerald-500 dark:text-emerald-400">
+                        <path d="M 78,130 L 81,133 L 86,133 L 82,136 L 83,141 L 78,138 L 73,141 L 74,136 L 70,133 L 75,133 Z" fill="currentColor" />
+                        <path d="M 25,360 L 28,363 L 33,363 L 29,366 L 30,371 L 25,368 L 20,371 L 21,366 L 17,363 L 22,363 Z" fill="currentColor" />
+                      </g>
+                      <g opacity="0.3" className="text-blue-500 dark:text-blue-400 animate-pulse">
+                        <path d="M 30,150 L 33,153 L 38,153 L 34,157 L 35,162 L 30,159 L 25,162 L 26,157 L 22,153 L 27,153 Z" fill="currentColor" />
+                        <path d="M 75,320 L 78,323 L 83,323 L 79,326 L 80,331 L 75,328 L 70,331 L 71,326 L 67,323 L 72,323 Z" fill="currentColor" />
+                      </g>
+ 
+                      {/* 3D Road Side Extrusion (Thick Depth Edge) */}
+                      {segments.map((seg, i) => (
+                        <path
+                          key={`extrusion-${i}`}
+                          d={seg.d}
+                          fill="none"
+                          className="stroke-slate-300/40 dark:stroke-[#020617]"
+                          strokeWidth="16"
+                          strokeLinecap="round"
+                          transform="translate(0, 5)"
+                        />
+                      ))}
+ 
+                      {/* Colored Road Side Extrusion for Completed & Active tracks */}
+                      {segments.map((seg, i) => {
+                        if (seg.status === 'completed') {
+                          return (
+                            <path
+                              key={`ext-completed-${i}`}
+                              d={seg.d}
+                              fill="none"
+                              stroke="#047857"
+                              strokeWidth="12"
+                              strokeLinecap="round"
+                              transform="translate(0, 4)"
+                            />
+                          );
+                        } else if (seg.status === 'active-transition') {
+                          return (
+                            <path
+                              key={`ext-active-${i}`}
+                              d={seg.d}
+                              fill="none"
+                              stroke="#1D4ED8"
+                              strokeWidth="12"
+                              strokeLinecap="round"
+                              transform="translate(0, 4)"
+                            />
+                          );
+                        }
+                        return null;
+                      })}
+ 
+                      {/* Background Road Borders & Fill */}
+                      {segments.map((seg, i) => (
+                        <React.Fragment key={`bg-road-${i}`}>
+                          {/* Outer dark grey/slate road border line */}
+                          <path
+                            d={seg.d}
+                            fill="none"
+                            className="stroke-slate-200/50 dark:stroke-slate-900"
+                            strokeWidth="14"
+                            strokeLinecap="round"
+                          />
+                          {/* Inner road background fill */}
+                          <path
+                            d={seg.d}
+                            fill="none"
+                            className="stroke-slate-100 dark:stroke-[#030712]/90"
+                            strokeWidth="10"
+                            strokeLinecap="round"
+                          />
+                        </React.Fragment>
+                      ))}
+ 
+                      {/* Active / Completed Winding Road Colors */}
+                      {segments.map((seg, i) => {
+                        if (seg.status === 'completed') {
+                          return (
+                            <React.Fragment key={`fg-road-${i}`}>
+                              {/* Green colored road segment */}
+                              <path
+                                d={seg.d}
+                                fill="none"
+                                stroke="url(#completed-grad)"
+                                strokeWidth="8"
+                                strokeLinecap="round"
+                                filter="url(#completed-glow)"
+                              />
+                              {/* White dashed highway lane divider lines */}
+                              <path
+                                d={seg.d}
+                                fill="none"
+                                stroke="#FFFFFF"
+                                strokeWidth="1.2"
+                                strokeLinecap="round"
+                                strokeDasharray="4 4"
+                                opacity="0.6"
+                              />
+                            </React.Fragment>
+                          );
+                        } else if (seg.status === 'active-transition') {
+                          return (
+                            <React.Fragment key={`fg-road-${i}`}>
+                              {/* Green to Blue gradient transition road segment */}
+                              <path
+                                d={seg.d}
+                                fill="none"
+                                stroke="url(#active-grad)"
+                                strokeWidth="8"
+                                strokeLinecap="round"
+                                filter="url(#active-glow)"
+                              />
+                              {/* White dashed highway lane divider lines */}
+                              <path
+                                d={seg.d}
+                                fill="none"
+                                stroke="#FFFFFF"
+                                strokeWidth="1.2"
+                                strokeLinecap="round"
+                                strokeDasharray="4 4"
+                                opacity="0.7"
+                              />
+                            </React.Fragment>
+                          );
+                        } else {
+                          return (
+                            <path
+                              key={`fg-road-${i}`}
+                              d={seg.d}
+                              fill="none"
+                              className="stroke-slate-200 dark:stroke-slate-800"
+                              strokeWidth="4"
+                              strokeLinecap="round"
+                              strokeDasharray="8 6"
+                            />
+                          );
+                        }
+                      })}
+ 
+                      {/* Animated Traveling Glow Orb along the completed path */}
+                      <circle r="6" fill="#60A5FA" className="filter drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">
+                        <animateMotion 
+                          dur="5s" 
+                          repeatCount="indefinite" 
+                          path={motionPath} 
+                        />
+                      </circle>
+                    </svg>
+ 
+                    {/* Side decorative Illustration cards in the empty columns */}
+                    {illustrationsList.map((ill, i) => (
+                      <div 
+                        key={i}
+                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-250 dark:border-slate-900/80 p-2.5 rounded-2xl shadow-md w-36 select-none transition-all duration-300 hover:scale-105 pointer-events-none"
+                        style={{ 
+                          left: `${ill.x}%`, 
+                          top: `${ill.y}px`,
+                          transform: 'translate3d(-50%, -50%, 15px)',
+                          boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.3)'
+                        }}
+                      >
+                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center shrink-0 shadow-inner">
+                          {ill.icon}
+                        </div>
+                        <div className="min-w-0 text-left">
+                          <span className="text-[9px] font-black text-slate-800 dark:text-white block uppercase tracking-wide leading-none">{ill.title}</span>
+                          <span className="text-[7.5px] text-slate-450 dark:text-slate-500 font-semibold block leading-tight mt-0.5 truncate">{ill.desc}</span>
+                        </div>
+                      </div>
+                    ))}
+ 
+                    {/* HTML Nodes overlay */}
+                    {nodesList.map((node, index) => {
+                      const { x, y } = getNodeCoords(index);
+                      const isCompleted = node.status === 'completed';
+                      const isActive = node.status === 'active';
+                      const isLocked = node.status === 'locked';
+
+                      const zElevation = isActive ? 35 : isCompleted ? 20 : 5;
+
+                      return (
+                        <div 
+                          key={node.id} 
+                          className="absolute flex flex-col items-center z-10 transition-all duration-300 ease-out"
+                          style={{ 
+                            left: `${x}%`, 
+                            top: `${y}px`,
+                            transform: `translate3d(-50%, -50%, ${zElevation}px)`,
+                            transformStyle: 'preserve-3d',
+                          }}
+                        >
+                          
+                          {/* Active floating indicator badge */}
+                          {isActive && (
+                            <div 
+                              className="absolute -top-10 bg-gradient-to-r from-blue-600 to-indigo-650 text-white text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-lg animate-bounce flex items-center gap-1 border border-blue-400/40 select-none z-20"
+                              style={{
+                                transform: 'translate3d(0, 0, 10px)',
+                              }}
+                            >
+                              <Play className="w-2 h-2 fill-current" />
+                              <span>Active Unit</span>
+                            </div>
+                          )}
+ 
+                          {/* Circular 3D Lesson Node */}
+                          <button
+                            onClick={() => {
+                              if (!isLocked) {
+                                setActiveSidebarTab('practice');
+                                setSelectedDomain('quant');
+                              }
+                            }}
+                            disabled={isLocked}
+                            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 select-none cursor-pointer ${
+                              isCompleted 
+                                ? 'bg-gradient-to-tr from-emerald-555 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px] hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2' 
+                                : isActive 
+                                ? 'bg-gradient-to-tr from-blue-600 to-indigo-550 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:-translate-y-1 active:translate-y-1 active:border-b-4 animate-pulse-glow hover:brightness-110' 
+                                : 'bg-slate-100 border-b-2 border-slate-350 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-650 cursor-not-allowed'
+                            }`}
+                          >
+                            {isCompleted ? (
+                              <Check className="w-7 h-7 stroke-[3.5]" />
+                            ) : node.symbol === '🏆' ? (
+                              <Trophy className={`w-5.5 h-5.5 ${isLocked ? 'text-slate-400 dark:text-slate-605' : 'text-amber-500'}`} />
+                            ) : isLocked ? (
+                              <Lock className="w-4.5 h-4.5" />
+                            ) : (
+                              <span className="text-base font-black font-mono">{node.symbol}</span>
+                            )}
+                          </button>
+ 
+                          {/* Node Label card popup on hover */}
+                          <div 
+                            className="absolute top-16 text-center bg-white/95 dark:bg-slate-900/90 p-2 rounded-xl border border-slate-250 dark:border-slate-800 shadow-md w-34 transition-all duration-300 backdrop-blur-md"
+                            style={{
+                              transform: 'translate3d(0, 0, 15px)',
+                              boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.25)'
+                            }}
+                          >
+                            <span className="text-[9px] font-black text-slate-800 dark:text-white block truncate uppercase">{node.title}</span>
+                            <span className="text-[7.5px] text-slate-505 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
+                            {isActive && (
+                              <span className="text-[7.5px] text-blue-600 dark:text-blue-400 font-black block mt-0.5">75% Complete</span>
+                            )}
+                          </div>
+ 
+                        </div>
+                      );
+                    })}
+
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -2906,6 +3313,68 @@ export default function StudentDashboard() {
                     </select>
                   </div>
 
+                </div>
+
+                {/* Choose Profile Photo */}
+                <div className="pt-4 border-t border-slate-105 dark:border-slate-850 space-y-3">
+                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-505 uppercase tracking-widest block">
+                    Choose Profile Photo / Avatar
+                  </label>
+                  <div className="flex flex-wrap gap-4 items-center">
+                    {/* Option: First Letter Initials */}
+                    <button
+                      type="button"
+                      onClick={() => setProfile({ ...profile, avatar: 'initial' })}
+                      className={`relative w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-650 text-white flex items-center justify-center font-black text-sm uppercase shadow-sm transition-all duration-200 hover:scale-105 cursor-pointer border-2 ${
+                        (!profile.avatar || profile.avatar === 'initial')
+                          ? 'border-blue-600 ring-2 ring-blue-400 dark:ring-blue-700/50 scale-105'
+                          : 'border-transparent opacity-60 hover:opacity-100'
+                      }`}
+                      title="Use Initials"
+                    >
+                      {profile.username ? profile.username[0] : 'V'}
+                    </button>
+
+                    {/* Predefined Avatar Images */}
+                    {AVATAR_PRESETS.map((imgUrl, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setProfile({ ...profile, avatar: imgUrl })}
+                        className={`relative w-12 h-12 rounded-xl overflow-hidden shadow-sm transition-all duration-200 hover:scale-105 cursor-pointer border-2 ${
+                          profile.avatar === imgUrl
+                            ? 'border-blue-600 ring-2 ring-blue-400 dark:ring-blue-700/50 scale-105'
+                            : 'border-transparent opacity-60 hover:opacity-100'
+                        }`}
+                      >
+                        <img 
+                          src={imgUrl} 
+                          alt={`Avatar Option ${idx + 1}`} 
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Custom URL Input */}
+                  <div className="space-y-1.5 max-w-md text-left">
+                    <label className="text-[9px] font-bold text-slate-400 dark:text-slate-505 uppercase tracking-wider block mt-2">
+                      Or use a custom image URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="Paste image URL (e.g. https://example.com/avatar.jpg)"
+                      value={
+                        profile.avatar &&
+                        profile.avatar !== 'initial' &&
+                        !AVATAR_PRESETS.includes(profile.avatar)
+                          ? profile.avatar
+                          : ''
+                      }
+                      onChange={(e) => setProfile({ ...profile, avatar: e.target.value || 'initial' })}
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                    />
+                  </div>
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 dark:border-slate-900">
