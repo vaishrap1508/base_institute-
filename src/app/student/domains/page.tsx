@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Layers, 
@@ -25,7 +25,12 @@ import {
   Sparkles,
   BookMarked,
   Sun,
-  Moon
+  Moon,
+  Bug,
+  List,
+  HelpCircle,
+  Bell,
+  Lock
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
@@ -97,10 +102,26 @@ export default function DomainsScreen() {
   const [solvedCount, setSolvedCount] = useState(12);
   const [streak, setStreak] = useState(14);
   const [searchQuery, setSearchQuery] = useState('');
+  const [userEmail, setUserEmail] = useState('shellysros1922@gmail.com');
 
   // Dark/Light Theme Switcher State
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [themeMounted, setThemeMounted] = useState(false);
+
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Sync profile details, theme and metrics on mount
   useEffect(() => {
@@ -108,6 +129,15 @@ export default function DomainsScreen() {
     setThemeMounted(true);
     const isDark = document.documentElement.classList.contains('dark');
     setTheme(isDark ? 'dark' : 'light');
+
+    // Sync email from active credentials
+    const roleStored = localStorage.getItem('aptitude_current_role');
+    if (roleStored) {
+      try {
+        const roleData = JSON.parse(roleStored);
+        if (roleData.email) setUserEmail(roleData.email);
+      } catch (_) {}
+    }
 
     // 2. Sync global profile info from local storage
     const onboardingStored = localStorage.getItem('aptitude_onboarding_data');
@@ -123,26 +153,28 @@ export default function DomainsScreen() {
       }
     }
 
-    // 3. Sync active credentials and database profile session
     const syncSession = async () => {
       const { data: { session } } = await authSupabase.auth.getSession();
-      if (session?.user && !onboardingStored) {
-        const { data: onboardingData } = await supabase
-          .from('onboarding_profile')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
+      if (session?.user) {
+        if (session.user.email) setUserEmail(session.user.email);
+        if (!onboardingStored) {
+          const { data: onboardingData } = await supabase
+            .from('onboarding_profile')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
 
-        if (onboardingData) {
-          localStorage.setItem('aptitude_onboarding_completed', 'true');
-          localStorage.setItem('aptitude_onboarding_data', JSON.stringify({
-            ...onboardingData,
-            avatar: onboardingData.avatar || 'initial'
-          }));
-          setProfile({
-            ...onboardingData,
-            avatar: onboardingData.avatar || 'initial'
-          });
+          if (onboardingData) {
+            localStorage.setItem('aptitude_onboarding_completed', 'true');
+            localStorage.setItem('aptitude_onboarding_data', JSON.stringify({
+              ...onboardingData,
+              avatar: onboardingData.avatar || 'initial'
+            }));
+            setProfile({
+              ...onboardingData,
+              avatar: onboardingData.avatar || 'initial'
+            });
+          }
         }
       }
     };
@@ -405,23 +437,7 @@ export default function DomainsScreen() {
             <span>Leaderboards</span>
           </button>
 
-          {/* Profile */}
-          <button 
-            onClick={() => router.push('/student/dashboard?tab=profile')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <User className="w-4.5 h-4.5" />
-            <span>Profile</span>
-          </button>
 
-          {/* Settings */}
-          <button 
-            onClick={() => router.push('/student/dashboard?tab=settings')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <SettingsIcon className="w-4.5 h-4.5" />
-            <span>Settings</span>
-          </button>
 
           {/* Sidebar Stats block */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-900 mt-4 space-y-2 select-none">
@@ -438,20 +454,189 @@ export default function DomainsScreen() {
           </div>
         </nav>
 
-        {/* Sidebar Footer Account */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-900/85 space-y-3 shrink-0">
-          <button 
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-transparent transition-colors cursor-pointer text-left dark:text-rose-400 dark:hover:text-rose-350 dark:hover:bg-rose-950/20"
+        {/* User profile popup menu trigger */}
+        <div className="p-4 border-t border-slate-100 dark:border-slate-900/60 w-full flex flex-col items-center shrink-0 relative animate-fadeIn" ref={profileDropdownRef}>
+          <button
+            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            title="User Profile Menu"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all cursor-pointer relative ${profileDropdownOpen ? 'ring-2 ring-blue-500 bg-slate-50 dark:bg-slate-900' : ''}`}
           >
-            <LogOut className="w-4.5 h-4.5" />
-            <span>Sign Out Profile</span>
+            <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden relative border border-slate-205 dark:border-slate-800">
+              {profile.avatar && profile.avatar !== 'initial' ? (
+                <img 
+                  src={profile.avatar} 
+                  alt="User Avatar" 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <User className="w-4.5 h-4.5" />
+              )}
+            </div>
+            
+            <div className="flex flex-col min-w-0 text-left flex-1">
+              <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
+                {profile.username || 'Vaishnavi Raparthy'}
+              </span>
+              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
+                {userEmail}
+              </span>
+            </div>
+
+            {/* Red dot notification badge */}
+            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
           </button>
-          
-          <div className="flex items-center justify-center gap-1.5 text-[9px] text-slate-400 dark:text-slate-550 font-bold select-none">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="uppercase tracking-wide">Operational SSL Sandbox</span>
-          </div>
+
+          {/* User profile dropdown overlay */}
+          {profileDropdownOpen && (
+            <div className="absolute left-4 bottom-16 w-64 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
+              {/* Profile details header */}
+              <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="w-10 h-10 rounded-full bg-slate-105 dark:bg-slate-805 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                  {profile.avatar && profile.avatar !== 'initial' ? (
+                    <img 
+                      src={profile.avatar} 
+                      alt="User Avatar" 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
+                </div>
+                <div className="flex flex-col min-w-0 text-left">
+                  <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
+                    {profile.username || 'Vaishnavi Raparthy'}
+                  </span>
+                  <span className="text-[10px] text-slate-405 dark:text-slate-505 font-semibold truncate leading-normal">
+                    {userEmail}
+                  </span>
+                </div>
+              </div>
+
+              {/* Menu Options */}
+              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-350">
+                
+                {/* My Profile option */}
+                <button
+                  onClick={() => {
+                    router.push('/student/dashboard?tab=profile');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <User className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <span className="flex-1">My Profile</span>
+                </button>
+
+                {/* Account option */}
+                <button
+                  onClick={() => {
+                    router.push('/student/dashboard?tab=settings');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <span className="flex-1">Account</span>
+                </button>
+
+                {/* Buganizer (locked option) */}
+                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-505 opacity-60 select-none font-bold">
+                  <div className="flex items-center gap-3">
+                    <Bug className="w-4 h-4 shrink-0" />
+                    <span>Buganizer</span>
+                  </div>
+                  <Lock className="w-3.5 h-3.5" />
+                </div>
+
+                {/* Sessions (locked option) */}
+                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-555 opacity-60 select-none font-bold">
+                  <div className="flex items-center gap-3">
+                    <List className="w-4 h-4 shrink-0" />
+                    <span>Sessions</span>
+                  </div>
+                  <Lock className="w-3.5 h-3.5" />
+                </div>
+
+                {/* Troubleshooting option */}
+                <button
+                  onClick={() => {
+                    alert('Troubleshooting utility loaded. Sandbox is operating securely.');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <span className="flex-1">Troubleshooting</span>
+                </button>
+
+                {/* New Features option */}
+                <button
+                  onClick={() => {
+                    router.push('/student/dashboard?tab=badges');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <span>New Features</span>
+                  </div>
+                  <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
+                </button>
+
+                {/* Theme Toggle option */}
+                <button
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <span className="flex-1">Light Mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <span className="flex-1">Dark Mode</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Notification option */}
+                <button
+                  onClick={() => {
+                    router.push('/student/dashboard?tab=settings');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <div className="flex items-center gap-3">
+                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <span>Notification</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
+                </button>
+
+                {/* Divider */}
+                <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
+
+                {/* Logout option */}
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-605 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                >
+                  <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
+                  <span className="flex-1 font-extrabold text-rose-605 dark:text-rose-450">Logout</span>
+                </button>
+
+              </div>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -471,64 +656,18 @@ export default function DomainsScreen() {
               </p>
             </div>
             
-            {/* Header Right utilities: Profile topmost, Toggle & Search below */}
-            <div className="flex flex-col items-end gap-3 select-none">
-              
-              {/* Topmost Right: User Profile (just name and avatar, absolute positioned) */}
-              <div 
-                onClick={() => router.push('/student/dashboard?tab=profile')}
-                className="absolute top-1 right-2 sm:top-2 sm:right-3 flex items-center gap-3 cursor-pointer hover:opacity-85 transition-opacity"
-                title="View Profile Settings"
-              >
-                <span className="text-[11.5px] font-black text-slate-905 dark:text-white leading-none uppercase tracking-wider">{profile.username}</span>
-                <div className="w-8 h-8 rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(59,130,246,0.15)] flex items-center justify-center relative">
-                  {profile.avatar && profile.avatar !== 'initial' ? (
-                    <img 
-                      src={profile.avatar} 
-                      alt={profile.username || 'User'} 
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center font-black text-xs text-white uppercase">
-                      {profile.username ? profile.username[0] : 'V'}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Below Profile: Toggle Button & Search domains */}
-              <div className="flex items-center gap-3">
-                {/* Theme Toggle Button */}
-                <button
-                  onClick={toggleTheme}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer"
-                  title="Toggle theme"
-                  suppressHydrationWarning
-                >
-                  {themeMounted && theme === 'light' ? (
-                    <Sun className="w-[18px] h-[18px] text-amber-500 animate-fadeIn" />
-                  ) : (
-                    <Moon className="w-[18px] h-[18px] text-indigo-400 animate-fadeIn" />
-                  )}
-                </button>
-
-                <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
-
-                {/* Search Box placed where the profile welcome box used to be */}
-                <div className="relative w-64 sm:w-80">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-                  </span>
-                  <input 
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search learning domains..."
-                    className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
-                  />
-                </div>
-              </div>
-
+            {/* Search Box */}
+            <div className="relative w-64 sm:w-80 select-none">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+              </span>
+              <input 
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search learning domains..."
+                className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
+              />
             </div>
           </div>
 
