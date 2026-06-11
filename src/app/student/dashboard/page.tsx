@@ -222,32 +222,109 @@ const getBadgeProgress = (badgeName: string, isUnlocked: boolean) => {
   return { current: isUnlocked ? 1 : 0, target: 1, label: 'Progress' };
 };
 
+const getBadgeEarnMethod = (badgeName: string) => {
+  const name = badgeName.toLowerCase();
+  if (name.includes('first step')) {
+    return "Complete any learning activity, lesson, quiz, or question on the platform to take your first step.";
+  }
+  if (name.includes('getting started')) {
+    return "Finish your profile registration, enter academic details, and complete the onboarding setup.";
+  }
+  if (name.includes('curious mind')) {
+    return "Navigate through and explore at least 3 different sections/tabs on your student dashboard.";
+  }
+  if (name.includes('learning begins')) {
+    return "Finish your very first structured learning concept module and mark it as complete.";
+  }
+  if (name.includes('first challenge')) {
+    return "Take initiative and attempt your first mock test or practice aptitude challenge.";
+  }
+  if (name.includes('keep going')) {
+    return "Maintain momentum by finishing 5 learning activities or practice tasks.";
+  }
+  if (name.includes('early bird')) {
+    return "Study on the platform for 3 consecutive days to build a regular learning habit.";
+  }
+  if (name.includes('on track')) {
+    return "Advance through your domain roadmap to achieve 25% completion of your first learning path.";
+  }
+  if (name.includes('not stopping')) {
+    return "Keep pushing forward and complete 10 learning activities or aptitude questions.";
+  }
+  return "Complete relevant platform activities and milestones to unlock this special achievement.";
+};
+
+// Memory cache for processed transparent badge images to enable instant subsequent loads
+const PROCESSED_BADGE_CACHE: Record<string, string> = {};
+
 const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
-  const [processedSrc, setProcessedSrc] = useState<string>(src);
+  const [processedSrc, setProcessedSrc] = useState<string>(() => {
+    if (!src) return '';
+    if (src.startsWith('data:')) return src;
+    
+    // Try memory cache first
+    if (PROCESSED_BADGE_CACHE[src]) {
+      return PROCESSED_BADGE_CACHE[src];
+    }
+    
+    // Try localStorage fallback
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(`processed_badge_v2_${src}`);
+        if (stored) {
+          PROCESSED_BADGE_CACHE[src] = stored;
+          return stored;
+        }
+      } catch (_) {}
+    }
+    return '';
+  });
+
+  const [isReady, setIsReady] = useState(() => !!processedSrc);
 
   useEffect(() => {
-    if (!src || src.startsWith('data:')) {
-      setProcessedSrc(src);
+    if (!src) return;
+    if (processedSrc) {
+      setIsReady(true);
       return;
     }
 
+    setIsReady(false);
     const img = new Image();
     img.crossOrigin = 'Anonymous';
     img.src = src;
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
+      
+      // Limit canvas size to max 512x512 for high clarity and crisp rendering
+      const maxDim = 512;
+      let w = img.width;
+      let h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+      
+      canvas.width = w;
+      canvas.height = h;
+      
       const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) {
+        setProcessedSrc(src);
+        setIsReady(true);
+        return;
+      }
 
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, w, h);
+      const imageData = ctx.getImageData(0, 0, w, h);
       const data = imageData.data;
 
-      const width = canvas.width;
-      const height = canvas.height;
-      const visited = new Uint8Array(width * height);
+      const visited = new Uint8Array(w * h);
       const queue: [number, number][] = [];
 
       const isNearWhite = (r: number, g: number, b: number) => {
@@ -255,28 +332,28 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
       };
 
       // Push all borders to seed flood fill
-      for (let x = 0; x < width; x++) {
+      for (let x = 0; x < w; x++) {
         let idx = x;
         if (isNearWhite(data[idx * 4], data[idx * 4 + 1], data[idx * 4 + 2]) && !visited[idx]) {
           queue.push([x, 0]);
           visited[idx] = 1;
         }
-        idx = (height - 1) * width + x;
+        idx = (h - 1) * w + x;
         if (isNearWhite(data[idx * 4], data[idx * 4 + 1], data[idx * 4 + 2]) && !visited[idx]) {
-          queue.push([x, height - 1]);
+          queue.push([x, h - 1]);
           visited[idx] = 1;
         }
       }
 
-      for (let y = 0; y < height; y++) {
-        let idx = y * width;
+      for (let y = 0; y < h; y++) {
+        let idx = y * w;
         if (isNearWhite(data[idx * 4], data[idx * 4 + 1], data[idx * 4 + 2]) && !visited[idx]) {
           queue.push([0, y]);
           visited[idx] = 1;
         }
-        idx = y * width + (width - 1);
+        idx = y * w + (w - 1);
         if (isNearWhite(data[idx * 4], data[idx * 4 + 1], data[idx * 4 + 2]) && !visited[idx]) {
-          queue.push([width - 1, y]);
+          queue.push([w - 1, y]);
           visited[idx] = 1;
         }
       }
@@ -285,10 +362,9 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
         const curr = queue.shift();
         if (!curr) continue;
         const [cx, cy] = curr;
-        const idx = cy * width + cx;
+        const idx = cy * w + cx;
         const pixelIdx = idx * 4;
 
-        // Set alpha to transparent
         data[pixelIdx + 3] = 0;
 
         const dirs = [
@@ -299,8 +375,8 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
         ];
 
         for (const [nx, ny] of dirs) {
-          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-            const nidx = ny * width + nx;
+          if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+            const nidx = ny * w + nx;
             if (!visited[nidx]) {
               const npixelIdx = nidx * 4;
               if (isNearWhite(data[npixelIdx], data[npixelIdx + 1], data[npixelIdx + 2])) {
@@ -314,16 +390,31 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
 
       ctx.putImageData(imageData, 0, 0);
       try {
-        setProcessedSrc(canvas.toDataURL());
+        const dataUrl = canvas.toDataURL('image/png');
+        setProcessedSrc(dataUrl);
+        PROCESSED_BADGE_CACHE[src] = dataUrl;
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(`processed_badge_v2_${src}`, dataUrl);
+          } catch (_) {}
+        }
       } catch (e) {
         console.warn('Canvas processing error:', e);
         setProcessedSrc(src);
       }
+      setIsReady(true);
     };
     img.onerror = () => {
       setProcessedSrc(src);
+      setIsReady(true);
     };
-  }, [src]);
+  }, [src, processedSrc]);
+
+  if (!isReady || !processedSrc) {
+    return (
+      <div className="w-full h-full rounded-full bg-slate-900/10 dark:bg-slate-800/10 animate-pulse" />
+    );
+  }
 
   return (
     <img 
@@ -335,7 +426,7 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
   );
 };
 
-const BadgeCard = ({ badge, isUnlocked }: { badge: any, isUnlocked: boolean }) => {
+const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boolean, onClick?: () => void }) => {
   const cardRef = React.useRef<HTMLDivElement>(null);
   const imageRef = React.useRef<HTMLDivElement>(null);
 
@@ -441,11 +532,12 @@ const BadgeCard = ({ badge, isUnlocked }: { badge: any, isUnlocked: boolean }) =
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={onClick}
       style={{ transformStyle: 'preserve-3d', transition: 'transform 0.1s ease-out' }}
-      className={`border rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-sm min-h-[280px] ${
+      className={`border rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-sm min-h-[280px] cursor-pointer hover:border-slate-350 dark:hover:border-slate-750 transition-all duration-300 ${
         isUnlocked 
           ? `${style.border} ${style.bg} ${style.glow}` 
-          : 'border-slate-250 bg-slate-50/30 dark:border-slate-850/60 dark:bg-slate-900/40 opacity-70 hover:opacity-100 transition-opacity duration-300'
+          : 'border-slate-250 bg-slate-50/30 dark:border-slate-850/60 dark:bg-slate-900/40 opacity-70 hover:opacity-100'
       }`}
     >
       {/* Lock Icon in Top-Right when Locked */}
@@ -823,6 +915,7 @@ export default function StudentDashboard() {
   const [badges, setBadges] = useState<any[]>(MOCK_BADGES_DATA);
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<string[]>([]);
   const [justUnlockedBadge, setJustUnlockedBadge] = useState<any | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<any | null>(null);
 
   // Custom Settings States
   const [dailyXpGoal, setDailyXpGoal] = useState<number>(100);
@@ -850,6 +943,17 @@ export default function StudentDashboard() {
       if (interval) clearInterval(interval);
     };
   }, [timeTrackerIsRunning]);
+
+  // Listen for Escape key to close badge modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedBadge(null);
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, []);
 
   // Helper to format seconds as HH:MM:SS
   const formatTimeTracker = (secondsCount: number) => {
@@ -3449,7 +3553,20 @@ export default function StudentDashboard() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {badges.map((badge) => {
                     const isUnlocked = unlockedBadgeIds.includes(badge.id);
-                    return <BadgeCard key={badge.id} badge={badge} isUnlocked={isUnlocked} />;
+                    return (
+                      <BadgeCard 
+                        key={badge.id} 
+                        badge={badge} 
+                        isUnlocked={isUnlocked} 
+                        onClick={() => {
+                          setSelectedBadge(badge);
+                          if (isUnlocked) {
+                            playPreviewChime();
+                            triggerCelebration();
+                          }
+                        }} 
+                      />
+                    );
                   })}
                 </div>
               </div>
@@ -3900,6 +4017,180 @@ export default function StudentDashboard() {
               </div>
             </div>
           )}
+
+          {/* Badge Details Modal Popup */}
+          {selectedBadge && (() => {
+            const isSelectedUnlocked = unlockedBadgeIds.includes(selectedBadge.id);
+            const earnMethod = getBadgeEarnMethod(selectedBadge.name);
+            const selectedProgress = getBadgeProgress(selectedBadge.name, isSelectedUnlocked);
+            
+            const getLevelInfo = (lvl: number) => {
+              switch (lvl) {
+                case 1: return { name: 'Bronze Standard', color: 'text-emerald-450 border-emerald-500/20 bg-emerald-500/5' };
+                case 2: return { name: 'Silver Standard', color: 'text-blue-450 border-blue-500/20 bg-blue-500/5' };
+                case 3: return { name: 'Gold Standard', color: 'text-purple-450 border-purple-500/20 bg-purple-500/5' };
+                case 4: return { name: 'Platinum Elite', color: 'text-amber-450 border-amber-500/20 bg-amber-500/5' };
+                case 5: return { name: 'Titanium Master', color: 'text-indigo-450 border-indigo-500/20 bg-indigo-500/5' };
+                default: return { name: 'Standard Badge', color: 'text-slate-400 border-slate-700 bg-slate-800/50' };
+              }
+            };
+
+            const lvlInfo = getLevelInfo(selectedBadge.level);
+
+            return (
+              <div 
+                className="fixed inset-0 bg-slate-955/98 backdrop-blur-2xl z-50 flex items-center justify-center animate-fadeIn"
+                onClick={() => setSelectedBadge(null)}
+              >
+                {/* Floating Background Sparkles */}
+                <div className="absolute top-[12%] left-[8%] text-amber-500 animate-bounce text-xl pointer-events-none select-none opacity-40">✨</div>
+                <div className="absolute top-[20%] right-[12%] text-blue-400 animate-pulse text-2xl pointer-events-none select-none opacity-30">⭐</div>
+                <div className="absolute bottom-[15%] left-[10%] text-purple-400 animate-pulse text-xl pointer-events-none select-none opacity-40">🔥</div>
+                <div className="absolute bottom-[25%] right-[8%] text-emerald-450 animate-bounce text-xl pointer-events-none select-none opacity-30">💡</div>
+                <div className="absolute top-[60%] left-[5%] text-indigo-400 animate-pulse text-lg pointer-events-none select-none opacity-30">✨</div>
+                <div className="absolute top-[8%] right-[45%] text-pink-400 animate-bounce text-lg pointer-events-none select-none opacity-20">⭐</div>
+
+                {/* Modal box */}
+                <div 
+                  className="bg-slate-900 w-full h-full text-white overflow-y-auto relative animate-scaleUp grid grid-cols-1 md:grid-cols-12 rounded-none border-none"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Close button */}
+                  <button 
+                    onClick={() => setSelectedBadge(null)}
+                    className="absolute top-6 right-6 z-50 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-955 p-3.5 rounded-full border border-slate-800 transition-all duration-200 cursor-pointer active:scale-90"
+                    title="Close Dialog"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+
+                  {/* Left Column (Details Info) - Order-2 on mobile, Order-1 on desktop */}
+                  <div className="md:col-span-7 p-8 sm:p-12 md:p-20 lg:p-24 flex flex-col justify-center min-h-[50vh] md:min-h-screen order-2 md:order-1 text-left font-sans">
+                    <div className="max-w-xl md:mx-auto w-full space-y-8">
+                      {/* Meta Tags */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-300 bg-slate-955 border border-slate-800 px-4 py-1.5 rounded-full">
+                          {getCategoryEmoji(selectedBadge.category)} {selectedBadge.category.replace('_', ' ')}
+                        </span>
+                        <span className={`text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-full border ${lvlInfo.color}`}>
+                          Level {selectedBadge.level} · {lvlInfo.name}
+                        </span>
+                      </div>
+
+                      {/* Badge Name & Desc */}
+                      <div className="space-y-3">
+                        <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight font-heading leading-tight animate-pulse-glow">
+                          {selectedBadge.name}
+                        </h3>
+                        <p className="text-sm sm:text-base text-slate-400 font-semibold leading-relaxed italic">
+                          "{selectedBadge.description}"
+                        </p>
+                      </div>
+
+                      {/* How to Earn */}
+                      <div className="space-y-3 pt-6 border-t border-slate-800/80">
+                        <h4 className="text-[11px] font-black text-slate-350 uppercase tracking-widest flex items-center gap-2">
+                          <Award className="w-4 h-4 text-amber-500" />
+                          How it is earned
+                        </h4>
+                        <p className="text-sm text-slate-300 font-semibold leading-relaxed bg-slate-955/35 p-5 rounded-2xl border border-slate-800/50">
+                          {earnMethod}
+                        </p>
+                      </div>
+
+                      {/* Lock/Unlock Progress */}
+                      {(!isSelectedUnlocked || (selectedProgress.current < selectedProgress.target)) && (
+                        <div className="space-y-3 pt-4">
+                          <div className="flex justify-between text-[11px] font-black uppercase text-slate-455 tracking-wider">
+                            <span>Unlock Progress</span>
+                            <span>{selectedProgress.current} / {selectedProgress.target} {selectedProgress.label}</span>
+                          </div>
+                          <div className="w-full bg-slate-955 p-1 rounded-full border border-slate-800/50 overflow-hidden">
+                            <div className="bg-slate-800 h-2 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-500"
+                                style={{ width: `${(selectedProgress.current / selectedProgress.target) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer Buttons */}
+                    <div className="max-w-xl md:mx-auto w-full mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row gap-4">
+                      <button
+                        onClick={() => setSelectedBadge(null)}
+                        className="flex-1 bg-slate-850 hover:bg-slate-800 border border-slate-755 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all active:scale-95 cursor-pointer"
+                      >
+                        Close Details
+                      </button>
+                      {!isSelectedUnlocked && (
+                        <button
+                          onClick={() => {
+                            setSelectedBadge(null);
+                            setActiveSidebarTab('learning');
+                          }}
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-indigo-500/25 active:scale-95 cursor-pointer"
+                        >
+                          Start Learning
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right Column (Badge Image) - Order-1 on mobile, Order-2 on desktop */}
+                  <div className="md:col-span-5 p-8 sm:p-12 md:p-20 flex flex-col items-center justify-center bg-slate-955/40 border-b md:border-b-0 md:border-l border-slate-800/60 relative order-1 md:order-2 overflow-hidden min-h-[45vh] md:min-h-screen">
+                    {/* Shimmer reflection sweep overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full animate-reflection-sweep pointer-events-none z-20" />
+
+                    {/* Ambient Glow */}
+                    <div className={`absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full blur-[100px] opacity-25 pointer-events-none ${
+                      selectedBadge.level === 1 ? 'bg-emerald-500' :
+                      selectedBadge.level === 2 ? 'bg-blue-500' :
+                      selectedBadge.level === 3 ? 'bg-purple-500' :
+                      selectedBadge.level === 4 ? 'bg-amber-500' :
+                      selectedBadge.level === 5 ? 'bg-indigo-500' : 'bg-blue-500'
+                    }`} />
+
+                    <div className="w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center select-none relative z-10 animate-floatSlow">
+                      {selectedBadge.image_url ? (
+                        <TransparentBadgeImage 
+                          src={selectedBadge.image_url} 
+                          alt={selectedBadge.name} 
+                          className={`w-full h-full object-contain transition-all duration-500 ${
+                            isSelectedUnlocked 
+                              ? 'scale-100 drop-shadow-[0_12px_30px_rgba(16,185,129,0.35)] dark:drop-shadow-[0_12px_30px_rgba(52,211,153,0.3)]' 
+                              : 'scale-95 opacity-20 grayscale'
+                          }`} 
+                        />
+                      ) : (
+                        <div className={`w-36 h-36 rounded-full flex items-center justify-center text-6xl border shadow-inner relative ${
+                          isSelectedUnlocked 
+                            ? 'bg-slate-850 border-slate-750 text-white' 
+                            : 'bg-slate-800/40 border-slate-800 text-slate-600'
+                        }`}>
+                          <span className="z-10">{getCategoryEmoji(selectedBadge.category)}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-8 text-center relative z-10">
+                      {isSelectedUnlocked ? (
+                        <span className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 px-5 py-2 rounded-full text-emerald-455 text-[10px] font-black uppercase tracking-widest">
+                          <Check className="w-3.5 h-3.5 stroke-[3]" /> Unlocked Card
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-2 bg-slate-955 border border-slate-800 px-5 py-2 rounded-full text-slate-500 text-[10px] font-black uppercase tracking-widest">
+                          <Lock className="w-3.5 h-3.5" /> Lock Status
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Celebration graphics canvas overlay */}
           {celebrationActive && <CanvasCelebration confettiStyle={confettiStyle} />}
