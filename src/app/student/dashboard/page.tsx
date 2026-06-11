@@ -1965,47 +1965,6 @@ export default function StudentDashboard() {
               </button>
             </div>
 
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-white hover:scale-105 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 cursor-pointer select-none"
-              title="Toggle theme"
-              suppressHydrationWarning
-            >
-              {themeMounted && theme === 'light' ? (
-                <Sun className="w-[18px] h-[18px] text-amber-500 animate-fadeIn" />
-              ) : (
-                <Moon className="w-[18px] h-[18px] text-indigo-400 animate-fadeIn" />
-              )}
-            </button>
-
-            <div className="h-6 w-px bg-slate-200 dark:bg-slate-850" />
-
-            {/* User Profile Display */}
-            <div 
-              onClick={() => setActiveSidebarTab('profile')}
-              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-            >
-              <div className="text-right flex flex-col hidden sm:flex">
-                <span className="text-[11.5px] font-black text-slate-808 dark:text-white">{profile.username}</span>
-                <span className="text-[9px] text-slate-400 dark:text-slate-505 font-bold uppercase tracking-wider">{profile.degree} · {profile.branch}</span>
-              </div>
-              <div className="w-8.5 h-8.5 rounded-full overflow-hidden flex items-center justify-center relative shadow-md group select-none">
-                {profile.avatar && profile.avatar !== 'initial' ? (
-                  <img 
-                    src={profile.avatar} 
-                    alt={profile.username || 'User'} 
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-tr from-blue-600 to-indigo-650 text-white flex items-center justify-center font-black text-xs uppercase rounded-full">
-                    {profile.username ? profile.username[0] : 'V'}
-                  </div>
-                )}
-                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-[#030712]" />
-              </div>
-            </div>
-
           </div>
         </header>
 
