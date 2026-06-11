@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Layers, 
@@ -41,7 +41,9 @@ import {
   Save,
   CheckCircle,
   HelpCircle,
-  BookMarked
+  BookMarked,
+  Bug,
+  List
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
@@ -819,6 +821,21 @@ export default function StudentDashboard() {
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']); 
   const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
+
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const [badges, setBadges] = useState<any[]>(MOCK_BADGES_DATA);
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<string[]>([]);
@@ -1661,32 +1678,6 @@ export default function StudentDashboard() {
             <Sparkles className="w-5 h-5" />
           </button>
 
-          {/* Profile Tab */}
-          <button 
-            onClick={() => setActiveSidebarTab('profile')}
-            title="Student Profile"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'profile'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
-          >
-            <User className="w-5 h-5" />
-          </button>
-
-          {/* Settings Tab */}
-          <button 
-            onClick={() => setActiveSidebarTab('settings')}
-            title="Settings Hub"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'settings'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
-          >
-            <SettingsIcon className="w-5 h-5" />
-          </button>
-
           {/* Admin Tools Section */}
           {currentRole?.role === 'admin' && (
             <div className="pt-2 border-t border-slate-150 dark:border-slate-900 w-full flex flex-col gap-2 items-center">
@@ -1708,18 +1699,178 @@ export default function StudentDashboard() {
           )}
         </nav>
 
-        {/* User profile & Logout */}
-        <div className="p-4 border-t border-slate-150 dark:border-slate-900 w-full flex flex-col gap-4 items-center shrink-0">
-          <button 
-            onClick={handleLogout}
-            title="Sign Out"
-            className="w-12 h-12 rounded-full text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 flex items-center justify-center transition-all cursor-pointer"
+        {/* User profile popup menu trigger */}
+        <div className="p-4 w-full flex flex-col items-center shrink-0 relative" ref={profileDropdownRef}>
+          <button
+            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            title="User Profile Menu"
+            className={`w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative overflow-hidden ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
           >
-            <LogOut className="w-5 h-5" />
+            {profile.avatar && profile.avatar !== 'initial' ? (
+              <img 
+                src={profile.avatar} 
+                alt="User Avatar" 
+                className="w-full h-full object-cover" 
+              />
+            ) : (
+              <User className="w-5 h-5" />
+            )}
+            
+            {/* Red dot notification badge */}
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
           </button>
-          <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-955/30 border border-emerald-200 dark:border-emerald-900 flex items-center justify-center text-emerald-600 dark:text-emerald-450 text-[10px] font-black" title="SSL Sandbox Clean">
-            ✓
-          </div>
+
+          {/* User profile dropdown overlay */}
+          {profileDropdownOpen && (
+            <div className="absolute left-[84px] bottom-0 w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
+              {/* Profile details header */}
+              <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="w-10 h-10 rounded-full bg-slate-105 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                  {profile.avatar && profile.avatar !== 'initial' ? (
+                    <img 
+                      src={profile.avatar} 
+                      alt="User Avatar" 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
+                </div>
+                <div className="flex flex-col min-w-0 text-left">
+                  <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
+                    {profile.username || 'Vaishnavi Raparthy'}
+                  </span>
+                  <span className="text-[10px] text-slate-405 dark:text-slate-505 font-semibold truncate leading-normal">
+                    {currentRole?.email || 'shellysros1922@gmail.com'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Menu Options */}
+              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-350">
+                
+                {/* My Profile option */}
+                <button
+                  onClick={() => {
+                    setActiveSidebarTab('profile');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <User className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <span className="flex-1">My Profile</span>
+                </button>
+
+                {/* Account option */}
+                <button
+                  onClick={() => {
+                    setActiveSidebarTab('settings');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <span className="flex-1">Account</span>
+                </button>
+
+                {/* Buganizer (locked option) */}
+                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
+                  <div className="flex items-center gap-3">
+                    <Bug className="w-4 h-4 shrink-0" />
+                    <span>Buganizer</span>
+                  </div>
+                  <Lock className="w-3.5 h-3.5" />
+                </div>
+
+                {/* Sessions (locked option) */}
+                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-555 opacity-60 select-none font-bold">
+                  <div className="flex items-center gap-3">
+                    <List className="w-4 h-4 shrink-0" />
+                    <span>Sessions</span>
+                  </div>
+                  <Lock className="w-3.5 h-3.5" />
+                </div>
+
+                {/* Troubleshooting option */}
+                <button
+                  onClick={() => {
+                    alert('Troubleshooting utility loaded. Sandbox is operating securely.');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <span className="flex-1">Troubleshooting</span>
+                </button>
+
+                {/* New Features option */}
+                <button
+                  onClick={() => {
+                    setActiveSidebarTab('badges');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <span>New Features</span>
+                  </div>
+                  <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
+                </button>
+
+                {/* Theme Toggle option */}
+                <button
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <span className="flex-1">Light Mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <span className="flex-1">Dark Mode</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Notification option */}
+                <button
+                  onClick={() => {
+                    setActiveSidebarTab('settings');
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  <div className="flex items-center gap-3">
+                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <span>Notification</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
+                </button>
+
+                {/* Divider */}
+                <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
+
+                {/* Logout option */}
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setProfileDropdownOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-605 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                >
+                  <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
+                  <span className="flex-1 font-extrabold text-rose-605 dark:text-rose-450">Logout</span>
+                </button>
+
+              </div>
+            </div>
+          )}
         </div>
       </aside>
 
