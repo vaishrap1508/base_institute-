@@ -103,7 +103,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-emerald-500 border-emerald-400 text-white shadow-emerald-500/20';
       if (type === 'button') return 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg hover:shadow-emerald-500/20';
       if (type === 'ring') return 'stroke-emerald-600 dark:stroke-emerald-400';
-      return 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/30 dark:border-emerald-900 dark:text-emerald-400';
+      return 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400';
     case 'purple':
       if (type === 'bg') return 'bg-purple-500';
       if (type === 'border') return 'border-purple-500';
@@ -111,7 +111,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-purple-600 border-purple-500 text-white shadow-purple-500/20';
       if (type === 'button') return 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg hover:shadow-purple-500/20';
       if (type === 'ring') return 'stroke-purple-600 dark:stroke-purple-400';
-      return 'bg-purple-50 border-purple-300 text-purple-600 dark:bg-purple-955/30 dark:border-purple-900 dark:text-purple-400';
+      return 'bg-purple-50 border-purple-300 text-purple-600 dark:bg-purple-950/30 dark:border-purple-900 dark:text-purple-400';
     case 'amber':
       if (type === 'bg') return 'bg-amber-500';
       if (type === 'border') return 'border-amber-500';
@@ -119,7 +119,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-amber-500 border-amber-400 text-white shadow-amber-500/20';
       if (type === 'button') return 'bg-amber-600 hover:bg-amber-500 text-white shadow-lg hover:shadow-amber-500/20';
       if (type === 'ring') return 'stroke-amber-600 dark:stroke-amber-400';
-      return 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-955/30 dark:border-amber-900 dark:text-amber-400';
+      return 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-400';
     case 'rose':
       if (type === 'bg') return 'bg-rose-500';
       if (type === 'border') return 'border-rose-500';
@@ -127,7 +127,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-rose-500 border-rose-400 text-white shadow-rose-500/20';
       if (type === 'button') return 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg hover:shadow-rose-500/20';
       if (type === 'ring') return 'stroke-rose-600 dark:stroke-rose-400';
-      return 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-955/30 dark:border-rose-900 dark:text-rose-400';
+      return 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-950/30 dark:border-rose-900 dark:text-rose-400';
     case 'orange':
       if (type === 'bg') return 'bg-orange-500';
       if (type === 'border') return 'border-orange-500';
@@ -135,7 +135,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-orange-500 border-orange-400 text-white shadow-orange-500/20';
       if (type === 'button') return 'bg-orange-600 hover:bg-orange-500 text-white shadow-lg hover:shadow-orange-500/20';
       if (type === 'ring') return 'stroke-orange-600 dark:stroke-orange-400';
-      return 'bg-orange-50 border-orange-300 text-orange-600 dark:bg-orange-955/30 dark:border-orange-900 dark:text-orange-400';
+      return 'bg-orange-50 border-orange-300 text-orange-600 dark:bg-orange-950/30 dark:border-orange-900 dark:text-orange-400';
     case 'teal':
       if (type === 'bg') return 'bg-teal-500';
       if (type === 'border') return 'border-teal-500';
@@ -143,15 +143,15 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-teal-500 border-teal-400 text-white shadow-teal-500/20';
       if (type === 'button') return 'bg-teal-600 hover:bg-teal-500 text-white shadow-lg hover:shadow-teal-500/20';
       if (type === 'ring') return 'stroke-teal-600 dark:stroke-teal-400';
-      return 'bg-teal-50 border-teal-300 text-teal-600 dark:bg-teal-955/30 dark:border-teal-900 dark:text-teal-400';
+      return 'bg-teal-50 border-teal-300 text-teal-600 dark:bg-teal-950/30 dark:border-teal-900 dark:text-teal-400';
     case 'indigo':
       if (type === 'bg') return 'bg-indigo-500';
       if (type === 'border') return 'border-indigo-500';
       if (type === 'text') return 'text-indigo-600 dark:text-indigo-400';
-      if (type === 'badge') return 'bg-indigo-605 border-indigo-500 text-white shadow-indigo-500/20';
+      if (type === 'badge') return 'bg-indigo-600 border-indigo-500 text-white shadow-indigo-500/20';
       if (type === 'button') return 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg hover:shadow-indigo-500/20';
       if (type === 'ring') return 'stroke-indigo-600 dark:stroke-indigo-400';
-      return 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-955/30 dark:border-indigo-900 dark:text-indigo-400';
+      return 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-950/30 dark:border-indigo-900 dark:text-indigo-400';
     case 'blue':
     default:
       if (type === 'bg') return 'bg-blue-500';
@@ -160,7 +160,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-blue-600 border-blue-500 text-white shadow-blue-500/20';
       if (type === 'button') return 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg hover:shadow-blue-500/25';
       if (type === 'ring') return 'stroke-blue-600 dark:stroke-blue-400';
-      return 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-955/30 dark:border-blue-900 dark:text-blue-400';
+      return 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-400';
   }
 };
 
@@ -474,7 +474,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-emerald-500/20 dark:border-emerald-500/30',
           bg: 'bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-950/10 dark:to-slate-900',
           glow: 'shadow-emerald-500/5',
-          banner: 'bg-emerald-100/70 dark:bg-emerald-955 text-emerald-800 dark:text-emerald-400',
+          banner: 'bg-emerald-100/70 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400',
           badgeStyle: 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500/20 text-emerald-600',
           emoji: '🌱'
         };
@@ -483,8 +483,8 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-blue-500/20 dark:border-blue-500/30',
           bg: 'bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-slate-900',
           glow: 'shadow-blue-500/5',
-          banner: 'bg-blue-100 dark:bg-blue-955/60 text-blue-800 dark:text-blue-400',
-          badgeStyle: 'bg-blue-50 dark:bg-blue-950/50 border-blue-500/20 text-blue-605',
+          banner: 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-400',
+          badgeStyle: 'bg-blue-50 dark:bg-blue-950/50 border-blue-500/20 text-blue-600',
           emoji: '🛡️'
         };
       case 3:
@@ -492,7 +492,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-purple-500/20 dark:border-purple-500/30',
           bg: 'bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/20 dark:to-slate-900',
           glow: 'shadow-purple-500/5',
-          banner: 'bg-purple-100 dark:bg-purple-955/60 text-purple-800 dark:text-purple-400',
+          banner: 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-400',
           badgeStyle: 'bg-purple-50 dark:bg-purple-950/50 border-purple-500/20 text-purple-600',
           emoji: '🔮'
         };
@@ -501,7 +501,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-amber-500/30 dark:border-amber-500/40',
           bg: 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-slate-900',
           glow: 'shadow-amber-500/10 dark:shadow-amber-500/20',
-          banner: 'bg-amber-100 dark:bg-amber-955 text-amber-805 dark:text-amber-400',
+          banner: 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400',
           badgeStyle: 'bg-amber-50 dark:bg-amber-950/50 border-amber-500/20 text-amber-600',
           emoji: '👑'
         };
@@ -510,17 +510,17 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-indigo-500/40 dark:border-indigo-500/50',
           bg: 'bg-gradient-to-br from-indigo-50 via-white to-pink-50 dark:from-indigo-950/20 dark:via-slate-900 dark:to-pink-950/20',
           glow: 'shadow-indigo-500/15 dark:shadow-indigo-500/30',
-          banner: 'bg-indigo-100 dark:bg-indigo-955 text-indigo-805 dark:text-indigo-400',
+          banner: 'bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-400',
           badgeStyle: 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-500/20 text-indigo-600',
           emoji: '🌌'
         };
       default:
         return {
-          border: 'border-slate-205 dark:border-slate-800',
+          border: 'border-slate-200 dark:border-slate-800',
           bg: 'bg-white dark:bg-slate-900',
           glow: '',
           banner: 'bg-slate-100 dark:bg-slate-800',
-          badgeStyle: 'bg-slate-50 dark:bg-slate-800 border-slate-205 text-slate-500',
+          badgeStyle: 'bg-slate-50 dark:bg-slate-800 border-slate-200 text-slate-500',
           emoji: '🎓'
         };
     }
@@ -539,12 +539,12 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
       className={`border rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-sm min-h-[280px] cursor-pointer hover:border-slate-350 dark:hover:border-slate-750 transition-all duration-300 ${
         isUnlocked 
           ? `${style.border} ${style.bg} ${style.glow}` 
-          : 'border-slate-250 bg-slate-50/30 dark:border-slate-850/60 dark:bg-slate-900/40 opacity-70 hover:opacity-100'
+          : 'border-slate-200 bg-slate-50/30 dark:border-slate-850/60 dark:bg-slate-900/40 opacity-70 hover:opacity-100'
       }`}
     >
       {/* Lock Icon in Top-Right when Locked */}
       {!isUnlocked && (
-        <div className="absolute top-3 right-3 text-slate-400 dark:text-slate-555 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-full border border-slate-200 dark:border-slate-700/50 shadow-sm">
+        <div className="absolute top-3 right-3 text-slate-400 dark:text-slate-500 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-full border border-slate-200 dark:border-slate-700/50 shadow-sm">
           <Lock className="w-3.5 h-3.5" />
         </div>
       )}
@@ -579,7 +579,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
         <h4 className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white font-bold">
           {badge.name}
         </h4>
-        <p className="text-[10px] text-slate-500 dark:text-slate-455 leading-normal font-semibold max-w-[150px] mx-auto min-h-[30px]">
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal font-semibold max-w-[150px] mx-auto min-h-[30px]">
           {badge.description}
         </p>
       </div>
@@ -591,7 +591,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           </span>
         ) : (
           <div className="w-full space-y-1.5">
-            <div className="flex justify-between text-[9px] font-black uppercase text-slate-455 dark:text-slate-500 tracking-wider">
+            <div className="flex justify-between text-[9px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
               <span>Progress</span>
               <span>{progress.current}/{progress.target}</span>
             </div>
@@ -933,6 +933,44 @@ export default function StudentDashboard() {
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<string[]>([]);
   const [justUnlockedBadge, setJustUnlockedBadge] = useState<any | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<any | null>(null);
+  const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(9); // Defaults to June 9, 2026 (Today)
+  const [earnedBadgesHistory, setEarnedBadgesHistory] = useState<any[]>([]);
+
+  // Compute active study days dynamically from history
+  const streakDaysFromHistory = useMemo(() => {
+    const days = new Set<number>();
+    earnedBadgesHistory.forEach(item => {
+      if (!item.earned_at) return;
+      const d = new Date(item.earned_at);
+      // June 2026 (year 2026, month 5)
+      if (d.getFullYear() === 2026 && d.getMonth() === 5) {
+        days.add(d.getDate());
+      }
+    });
+    return Array.from(days);
+  }, [earnedBadgesHistory]);
+
+  // Compute badges earned on selected calendar day with multipliers for duplicate earnings
+  const badgesEarnedOnSelectedDay: Array<{ badge: any; count: number }> = useMemo(() => {
+    const dayHistory = earnedBadgesHistory.filter(item => {
+      if (!item.earned_at) return false;
+      const d = new Date(item.earned_at);
+      return d.getFullYear() === 2026 && d.getMonth() === 5 && d.getDate() === selectedCalendarDay;
+    });
+
+    const badgeCounts: Record<string, number> = {};
+    dayHistory.forEach(item => {
+      badgeCounts[item.badge_id] = (badgeCounts[item.badge_id] || 0) + 1;
+    });
+
+    return Object.entries(badgeCounts).map(([badgeId, count]: [string, number]) => {
+      const badgeDetail = badges.find(b => b.id === badgeId) || MOCK_BADGES_DATA.find(b => b.id === badgeId);
+      return {
+        badge: badgeDetail,
+        count
+      };
+    }).filter((item): item is { badge: any; count: number } => item.badge !== undefined);
+  }, [earnedBadgesHistory, selectedCalendarDay, badges]);
 
   // Custom Settings States
   const [dailyXpGoal, setDailyXpGoal] = useState<number>(100);
@@ -1023,134 +1061,221 @@ export default function StudentDashboard() {
   ];
 
   // Load user badges
-  const loadBadges = async (userId: string) => {
-    try {
-      // 1. Fetch all badges
-      const { data: dbBadges, error: badgesError } = await supabase
-        .from('badges')
-        .select('*')
-        .order('level', { ascending: true });
+    const loadBadges = async (userId: string) => {
+      const DEFAULT_SEED_HISTORY = [
+        { badge_id: 'gs_first_step', earned_at: '2026-06-02T10:00:00.000Z' },
+        { badge_id: 'gs_getting_started', earned_at: '2026-06-04T11:00:00.000Z' },
+        { badge_id: 'gs_curious_mind', earned_at: '2026-06-06T14:30:00.000Z' },
+        { badge_id: 'gs_first_challenge', earned_at: '2026-06-08T09:15:00.000Z' },
+        { badge_id: 'gs_first_challenge', earned_at: '2026-06-08T16:45:00.000Z' }, // x2
+        { badge_id: 'gs_learning_begins', earned_at: '2026-06-09T10:00:00.000Z' },
+        { badge_id: 'gs_keep_going', earned_at: '2026-06-14T15:20:00.000Z' },
+        { badge_id: 'gs_early_bird', earned_at: '2026-06-15T06:10:00.000Z' },
+        { badge_id: 'gs_early_bird', earned_at: '2026-06-15T06:30:00.000Z' }, // x3
+        { badge_id: 'gs_early_bird', earned_at: '2026-06-15T06:50:00.000Z' },
+      ];
 
-      if (badgesError) throw badgesError;
+      try {
+        // 1. Fetch all badges
+        const { data: dbBadges, error: badgesError } = await supabase
+          .from('badges')
+          .select('*')
+          .order('level', { ascending: true });
 
-      let mappedBadges = MOCK_BADGES_DATA;
-      if (dbBadges && dbBadges.length > 0) {
-        mappedBadges = dbBadges
-          .filter((b: any) => (b.badge_category || b.category || '').toLowerCase().includes('started'))
-          .map((b: any) => ({
-            id: b.id,
-            name: b.badge_name || b.name,
-            category: 'getting_started',
-            description: b.description,
-            image_url: b.image_url,
-            level: b.level
-          }));
-      }
-      setBadges(mappedBadges);
+        if (badgesError) throw badgesError;
 
-      // 2. Fetch unlocked user badges
-      const { data: dbUserBadges, error: userBadgesError } = await supabase
-        .from('user_badges')
-        .select('badge_id')
-        .eq('user_id', userId);
+        let mappedBadges = MOCK_BADGES_DATA;
+        if (dbBadges && dbBadges.length > 0) {
+          mappedBadges = dbBadges
+            .filter((b: any) => (b.badge_category || b.category || '').toLowerCase().includes('started'))
+            .map((b: any) => ({
+              id: b.id,
+              name: b.badge_name || b.name,
+              category: 'getting_started',
+              description: b.description,
+              image_url: b.image_url,
+              level: b.level
+            }));
+        }
+        setBadges(mappedBadges);
 
-      if (userBadgesError) throw userBadgesError;
+        // 2. Fetch unlocked user badges
+        const { data: dbUserBadges, error: userBadgesError } = await supabase
+          .from('user_badges')
+          .select('badge_id, earned_at')
+          .eq('user_id', userId);
 
-      if (dbUserBadges) {
-        const ids = dbUserBadges.map((ub: any) => ub.badge_id);
+        if (userBadgesError) throw userBadgesError;
+
+        if (dbUserBadges) {
+          const history = dbUserBadges
+            .map((ub: any) => ({
+              badge_id: ub.badge_id,
+              earned_at: ub.earned_at || ub.created_at
+            }));
+
+          let finalHistory = history;
+          if (history.length === 0) {
+            // If DB history is empty, check localStorage
+            const storedHistory = localStorage.getItem('aptitude_badges_history');
+            if (storedHistory) {
+              try {
+                finalHistory = JSON.parse(storedHistory);
+              } catch (e) {
+                finalHistory = [];
+              }
+            } else {
+              // Seed default history. Map the static badge_id strings to actual database UUIDs by matching name
+              const seed = DEFAULT_SEED_HISTORY.map(item => {
+                const mockBadge = MOCK_BADGES_DATA.find(b => b.id === item.badge_id);
+                if (mockBadge) {
+                  const dbB = mappedBadges.find(b => b.name === mockBadge.name);
+                  if (dbB) {
+                    return { ...item, badge_id: dbB.id };
+                  }
+                }
+                return item;
+              });
+              finalHistory = seed;
+              localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
+            }
+          } else {
+            localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
+          }
+
+          setEarnedBadgesHistory(finalHistory);
+
+          // Also extract unique unlocked badge IDs for unlockedBadgeIds state
+          const uniqueUnlocked: string[] = Array.from(new Set(finalHistory.map((h: any) => h.badge_id as string)));
+
+          // Retrospectively unlock Getting Started if onboarding is completed
+          const hasOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
+          const gettingStartedBadge = mappedBadges.find(b => b.name === 'Getting Started');
+          if (hasOnboarding && gettingStartedBadge && !uniqueUnlocked.includes(gettingStartedBadge.id)) {
+            uniqueUnlocked.push(gettingStartedBadge.id);
+            const nowStr = new Date().toISOString();
+            finalHistory.push({ badge_id: gettingStartedBadge.id, earned_at: nowStr });
+            setEarnedBadgesHistory([...finalHistory]);
+            localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
+            try {
+              await supabase.from('user_badges').insert({
+                user_id: userId,
+                badge_id: gettingStartedBadge.id,
+                earned_at: nowStr,
+                progress_percentage: 100,
+                is_completed: true,
+                current_value: 1,
+                target_value: 1,
+                has_seen_popup: false
+              });
+            } catch (e) {}
+          }
+
+          setUnlockedBadgeIds(uniqueUnlocked);
+          localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(uniqueUnlocked));
+        }
+      } catch (err) {
+        console.warn("Could not load badges from database, checking local storage:", err);
         
-        // Retrospectively unlock Getting Started if onboarding is completed
-        const hasOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
-        const gettingStartedBadge = mappedBadges.find(b => b.name === 'Getting Started');
-        if (hasOnboarding && gettingStartedBadge && !ids.includes(gettingStartedBadge.id)) {
-          ids.push(gettingStartedBadge.id);
+        const storedHistory = localStorage.getItem('aptitude_badges_history');
+        let finalHistory = [];
+        if (storedHistory) {
           try {
-            await supabase.from('user_badges').insert({
-              user_id: userId,
-              badge_id: gettingStartedBadge.id,
-              unlocked_at: new Date().toISOString()
+            finalHistory = JSON.parse(storedHistory);
+          } catch (e) {}
+        } else {
+          finalHistory = DEFAULT_SEED_HISTORY;
+          localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
+        }
+        setEarnedBadgesHistory(finalHistory);
+
+        const uniqueUnlocked: string[] = Array.from(new Set(finalHistory.map((h: any) => h.badge_id as string)));
+        
+        const stored = localStorage.getItem('aptitude_unlocked_badges');
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            parsed.forEach((id: string) => {
+              if (!uniqueUnlocked.includes(id)) {
+                uniqueUnlocked.push(id);
+              }
             });
           } catch (e) {}
+        } else {
+          const hasOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
+          if (hasOnboarding && !uniqueUnlocked.includes('gs_getting_started')) {
+            uniqueUnlocked.push('gs_getting_started');
+          }
         }
 
-        setUnlockedBadgeIds(ids);
-        localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(ids));
+        setUnlockedBadgeIds(uniqueUnlocked);
+        localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(uniqueUnlocked));
       }
-    } catch (err) {
-      console.warn("Could not load badges from database, checking local storage:", err);
-      const stored = localStorage.getItem('aptitude_unlocked_badges');
-      if (stored) {
-        try {
-          setUnlockedBadgeIds(JSON.parse(stored));
-        } catch (e) {}
-      } else {
-        const initialUnlocked = [];
-        if (localStorage.getItem('aptitude_onboarding_completed') === 'true') {
-          initialUnlocked.push('gs_getting_started');
-        }
-        const currentSolved = Number(localStorage.getItem('aptitude_solved_count') || solvedCount);
-        const currentStreak = Number(localStorage.getItem('aptitude_streak') || streak);
-        if (currentSolved >= 1) initialUnlocked.push('gs_first_step');
-        if (currentSolved >= 10) initialUnlocked.push('gs_keep_going');
-        if (currentStreak >= 3) initialUnlocked.push('gs_on_track');
-        if (currentStreak >= 5) initialUnlocked.push('gs_not_stopping');
-
-        setUnlockedBadgeIds(initialUnlocked);
-        localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(initialUnlocked));
-      }
-    }
-  };
-
-  // Unlock / Award badge
-  const awardBadge = async (badgeId: string) => {
-    // 1. Map client-side string ID to real database UUID or name
-    const BADGE_ID_NAME_MAP: Record<string, string> = {
-      'gs_first_step': 'First Step',
-      'gs_getting_started': 'Getting Started',
-      'gs_curious_mind': 'Curious Mind',
-      'gs_learning_begins': 'Learning Begins',
-      'gs_first_challenge': 'First Challenge',
-      'gs_keep_going': 'Keep Going',
-      'gs_early_bird': 'Early Bird',
-      'gs_on_track': 'On Track',
-      'gs_not_stopping': 'Not Stopping',
     };
 
-    const targetName = BADGE_ID_NAME_MAP[badgeId] || badgeId;
-    const badgeDetails = badges.find(b => b.name === targetName || b.id === badgeId) || MOCK_BADGES_DATA.find(b => b.id === badgeId);
+    const awardBadge = async (badgeId: string) => {
+      // 1. Map client-side string ID to real database UUID or name
+      const BADGE_ID_NAME_MAP: Record<string, string> = {
+        'gs_first_step': 'First Step',
+        'gs_getting_started': 'Getting Started',
+        'gs_curious_mind': 'Curious Mind',
+        'gs_learning_begins': 'Learning Begins',
+        'gs_first_challenge': 'First Challenge',
+        'gs_keep_going': 'Keep Going',
+        'gs_early_bird': 'Early Bird',
+        'gs_on_track': 'On Track',
+        'gs_not_stopping': 'Not Stopping',
+      };
 
-    if (!badgeDetails) return;
+      const targetName = BADGE_ID_NAME_MAP[badgeId] || badgeId;
+      const badgeDetails = badges.find(b => b.name === targetName || b.id === badgeId) || MOCK_BADGES_DATA.find(b => b.id === badgeId);
 
-    // Use the badge's actual ID (which will be UUID from db, or gs_ string ID from mock fallback)
-    const dbBadgeId = badgeDetails.id;
+      if (!badgeDetails) return;
 
-    if (unlockedBadgeIds.includes(dbBadgeId)) return;
+      // Use the badge's actual ID (which will be UUID from db, or gs_ string ID from mock fallback)
+      const dbBadgeId = badgeDetails.id;
 
-    console.log(`Unlocking Badge: ${badgeDetails.name} (${dbBadgeId})`);
-    const updated = [...unlockedBadgeIds, dbBadgeId];
-    setUnlockedBadgeIds(updated);
-    localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(updated));
-
-    setJustUnlockedBadge(badgeDetails);
-    // Trigger chime & celebration
-    playPreviewChime();
-    triggerCelebration();
-
-    try {
-      const { data: { session } } = await authSupabase.auth.getSession();
-      if (session?.user) {
-        await supabase.from('user_badges').insert({
-          user_id: session.user.id,
-          badge_id: dbBadgeId,
-          unlocked_at: new Date().toISOString()
-        });
+      console.log(`Awarding/Unlocking Badge: ${badgeDetails.name} (${dbBadgeId})`);
+      
+      // Add to unique unlocked list if not already present
+      if (!unlockedBadgeIds.includes(dbBadgeId)) {
+        const updated = [...unlockedBadgeIds, dbBadgeId];
+        setUnlockedBadgeIds(updated);
+        localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(updated));
       }
-    } catch (err) {
-      console.warn("Could not save unlocked badge in database:", err);
-    }
-  };
 
-  const triggerCelebration = () => {
+      // Push new achievement record with current timestamp into earnedBadgesHistory
+      const nowStr = new Date().toISOString();
+      const newHistoryEntry = { badge_id: dbBadgeId, earned_at: nowStr };
+      const updatedHistory = [...earnedBadgesHistory, newHistoryEntry];
+      setEarnedBadgesHistory(updatedHistory);
+      localStorage.setItem('aptitude_badges_history', JSON.stringify(updatedHistory));
+
+      setJustUnlockedBadge(badgeDetails);
+      // Trigger chime & celebration
+      playPreviewChime();
+      triggerCelebration();
+
+      try {
+        const { data: { session } } = await authSupabase.auth.getSession();
+        if (session?.user) {
+          await supabase.from('user_badges').insert({
+            user_id: session.user.id,
+            badge_id: dbBadgeId,
+            earned_at: nowStr,
+            progress_percentage: 100,
+            is_completed: true,
+            current_value: 1,
+            target_value: 1,
+            has_seen_popup: false
+          });
+        }
+      } catch (err) {
+        console.warn("Could not save unlocked badge in database:", err);
+      }
+    };
+
+    const triggerCelebration = () => {
     if (confettiStyle === 'none') return;
     setCelebrationActive(true);
     setTimeout(() => {
@@ -1686,7 +1811,7 @@ export default function StudentDashboard() {
             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'dashboard'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
             <Compass className="w-5 h-5" />
@@ -1696,7 +1821,7 @@ export default function StudentDashboard() {
           <button 
             onClick={() => router.push('/student/domains')}
             title="Domains"
-            className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900 transition-all cursor-pointer"
+            className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900 transition-all cursor-pointer"
           >
             <Layers className="w-5 h-5" />
           </button>
@@ -1708,7 +1833,7 @@ export default function StudentDashboard() {
             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'learning'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
             <BookOpen className="w-5 h-5" />
@@ -1721,7 +1846,7 @@ export default function StudentDashboard() {
             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'practice'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
             <BookOpenCheck className="w-5 h-5" />
@@ -1734,7 +1859,7 @@ export default function StudentDashboard() {
             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'mockTests'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
             <Award className="w-5 h-5" />
@@ -1750,7 +1875,7 @@ export default function StudentDashboard() {
             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'careerHub'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
             <Briefcase className="w-5 h-5" />
@@ -1763,7 +1888,7 @@ export default function StudentDashboard() {
             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'leaderboards'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
             <Trophy className="w-5 h-5" />
@@ -1776,7 +1901,7 @@ export default function StudentDashboard() {
             className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
               activeSidebarTab === 'badges'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             }`}
           >
             <Sparkles className="w-5 h-5" />
@@ -1795,7 +1920,7 @@ export default function StudentDashboard() {
               <button 
                 onClick={() => router.push('/admin/dashboard')}
                 title="Admin Dashboard"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-655 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all cursor-pointer"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all cursor-pointer"
               >
                 <Layers className="w-4.5 h-4.5" />
               </button>
@@ -1829,7 +1954,7 @@ export default function StudentDashboard() {
             <div className="absolute left-[84px] bottom-0 w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
               {/* Profile details header */}
               <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-slate-105 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
                   {profile.avatar && profile.avatar !== 'initial' ? (
                     <img 
                       src={profile.avatar} 
@@ -1844,7 +1969,7 @@ export default function StudentDashboard() {
                   <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
                     {profile.username || 'Vaishnavi Raparthy'}
                   </span>
-                  <span className="text-[10px] text-slate-405 dark:text-slate-505 font-semibold truncate leading-normal">
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
                     {currentRole?.email || 'shellysros1922@gmail.com'}
                   </span>
                 </div>
@@ -1861,7 +1986,7 @@ export default function StudentDashboard() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <User className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                   <span className="flex-1">My Profile</span>
                 </button>
 
@@ -1873,7 +1998,7 @@ export default function StudentDashboard() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                   <span className="flex-1">Account</span>
                 </button>
 
@@ -1887,7 +2012,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* Sessions (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-555 opacity-60 select-none font-bold">
+                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
                   <div className="flex items-center gap-3">
                     <List className="w-4 h-4 shrink-0" />
                     <span>Sessions</span>
@@ -1903,7 +2028,7 @@ export default function StudentDashboard() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                   <span className="flex-1">Troubleshooting</span>
                 </button>
 
@@ -1916,7 +2041,7 @@ export default function StudentDashboard() {
                   className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
                   <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                     <span>New Features</span>
                   </div>
                   <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
@@ -1931,12 +2056,12 @@ export default function StudentDashboard() {
                 >
                   {theme === 'dark' ? (
                     <>
-                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                       <span className="flex-1">Light Mode</span>
                     </>
                   ) : (
                     <>
-                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                       <span className="flex-1">Dark Mode</span>
                     </>
                   )}
@@ -1951,7 +2076,7 @@ export default function StudentDashboard() {
                   className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
                   <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                     <span>Notification</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
@@ -1966,10 +2091,10 @@ export default function StudentDashboard() {
                     handleLogout();
                     setProfileDropdownOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-605 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
                 >
                   <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
-                  <span className="flex-1 font-extrabold text-rose-605 dark:text-rose-450">Logout</span>
+                  <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
                 </button>
 
               </div>
@@ -2014,7 +2139,7 @@ export default function StudentDashboard() {
             
             {/* Search Input Box */}
             <div className="relative hidden md:block">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-405" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search something..."
@@ -2041,7 +2166,7 @@ export default function StudentDashboard() {
                 className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                   currentRole?.role !== 'admin'
                     ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-450 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-505 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 Preview
@@ -2118,7 +2243,7 @@ export default function StudentDashboard() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h2 className="text-lg font-bold text-slate-800 dark:text-white font-heading">
-                        Your activities today <span className="text-slate-405 font-medium text-sm ml-1.5">(3)</span>
+                        Your activities today <span className="text-slate-400 font-medium text-sm ml-1.5">(3)</span>
                       </h2>
                     </div>
 
@@ -2140,7 +2265,7 @@ export default function StudentDashboard() {
                             }}
                             className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
                           >
-                            <ChevronRight className="w-5 h-5 text-slate-605 -rotate-45" />
+                            <ChevronRight className="w-5 h-5 text-slate-600 -rotate-45" />
                           </button>
                         </div>
 
@@ -2174,7 +2299,7 @@ export default function StudentDashboard() {
                             }}
                             className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
                           >
-                            <ChevronRight className="w-5 h-5 text-slate-605 -rotate-45" />
+                            <ChevronRight className="w-5 h-5 text-slate-600 -rotate-45" />
                           </button>
                         </div>
 
@@ -2187,8 +2312,8 @@ export default function StudentDashboard() {
 
                         <div className="flex items-center -space-x-2">
                           <div className="w-6 h-6 rounded-full bg-green-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">AS</div>
-                          <div className="w-6 h-6 rounded-full bg-yellow-505 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">RS</div>
-                          <div className="w-6 h-6 rounded-full bg-[#111827] border border-white dark:border-slate-955 text-white text-[9px] font-bold flex items-center justify-center">VR</div>
+                          <div className="w-6 h-6 rounded-full bg-yellow-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">RS</div>
+                          <div className="w-6 h-6 rounded-full bg-[#111827] border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">VR</div>
                           <span className="text-[9.5px] text-[#B04A75] dark:text-slate-400 font-bold ml-3">+6 others active</span>
                         </div>
                       </div>
@@ -2308,70 +2433,93 @@ export default function StudentDashboard() {
                         {[...Array(30)].map((_, i) => {
                           const dateNum = i + 1;
                           
-                          // Streak/active study dates (e.g. 2, 4, 6, 8, 9, 14, 15)
-                          const isStreakDay = [2, 4, 6, 8, 14, 15].includes(dateNum);
+                          // Streak/active study dates from dynamic history
+                          const isStreakDay = streakDaysFromHistory.includes(dateNum);
                           const isToday = dateNum === 9; // Today is June 9, 2026
+                          const isSelected = selectedCalendarDay === dateNum;
 
-                          let dateStyles = "w-7 h-7 flex items-center justify-center mx-auto rounded-full transition-colors ";
+                          let dateStyles = "w-7 h-7 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
+                          
                           if (isToday) {
-                            dateStyles += "bg-[#111827] dark:bg-white text-white dark:text-slate-950 font-black shadow-sm";
+                            dateStyles += "bg-[#111827] dark:bg-white text-white dark:text-slate-900 font-black shadow-sm ";
                           } else if (isStreakDay) {
-                            dateStyles += "bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-250 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400 font-extrabold";
+                            dateStyles += "bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-200 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400 font-extrabold ";
                           } else {
-                            dateStyles += "hover:bg-slate-100 dark:hover:bg-slate-900";
+                            dateStyles += "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 ";
+                          }
+
+                          if (isSelected) {
+                            dateStyles += "ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-900 ";
                           }
 
                           return (
-                            <div key={dateNum} className="relative">
+                            <button
+                              key={dateNum}
+                              onClick={() => setSelectedCalendarDay(dateNum)}
+                              className="relative focus:outline-none"
+                              type="button"
+                            >
                               <span className={dateStyles}>{dateNum}</span>
                               {isStreakDay && (
                                 <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-500" />
                               )}
-                            </div>
+                            </button>
                           );
                         })}
                       </div>
 
-                      {/* Webinar / upcoming lessons list (Reference 2 style) */}
-                      <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-900/60">
-                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest pb-1.5">
-                          <span>Upcoming events</span>
-                          <button onClick={() => setActiveSidebarTab('careerHub')} className="text-blue-500 hover:underline">View All</button>
+                      {/* Badges Earned Section */}
+                      <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-900/60">
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
+                          <span>Badges Earned • June {selectedCalendarDay}</span>
+                          <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-black uppercase">
+                            {badgesEarnedOnSelectedDay.reduce((acc: number, item: any) => acc + item.count, 0)} Badges
+                          </span>
                         </div>
-                        
-                        <div className="space-y-2.5">
-                          
-                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
-                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shrink-0">
-                              <BookOpen className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="text-left leading-tight">
-                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">TCS NQT National Mock Test</h4>
-                              <p className="text-[9.5px] text-slate-450 mt-0.5">Tata Consultancy Services · Starts today 2:00 PM</p>
-                            </div>
-                          </div>
 
-                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
-                            <div className="p-2 rounded-lg bg-pink-50 dark:bg-pink-900/30 text-pink-650 dark:text-pink-400 shrink-0">
-                              <Compass className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="text-left leading-tight">
-                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">SWE Intern prep drive</h4>
-                              <p className="text-[9.5px] text-slate-455 mt-0.5">Microsoft India Azure Staging · Till July 15</p>
-                            </div>
+                        {badgesEarnedOnSelectedDay.length > 0 ? (
+                          <div className="grid grid-cols-1 gap-2">
+                            {badgesEarnedOnSelectedDay.map(({ badge, count }: { badge: any; count: number }) => (
+                              <button
+                                key={badge.id}
+                                onClick={() => setSelectedBadge(badge)}
+                                className="w-full text-left bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/40 dark:hover:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between transition-all group cursor-pointer focus:outline-none"
+                                type="button"
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                                    {badge.image_url ? (
+                                      <img src={badge.image_url} alt={badge.name} className="w-6 h-6 object-contain" />
+                                    ) : (
+                                      <span className="text-base">{getCategoryEmoji(badge.category)}</span>
+                                    )}
+                                  </div>
+                                  <div className="leading-tight">
+                                    <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                      {badge.name}
+                                    </h4>
+                                    <p className="text-[9.5px] text-slate-450 mt-0.5 line-clamp-1">{badge.description}</p>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  {count > 1 && (
+                                    <span className="bg-blue-600 text-white dark:bg-blue-500 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                                      x{count}
+                                    </span>
+                                  )}
+                                  <span className="text-[10px] text-blue-500 dark:text-blue-400 font-extrabold group-hover:translate-x-0.5 transition-transform">
+                                    →
+                                  </span>
+                                </div>
+                              </button>
+                            ))}
                           </div>
-
-                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
-                            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 shrink-0">
-                              <Layers className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="text-left leading-tight">
-                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">Verbal Reasoning webinar</h4>
-                              <p className="text-[9.5px] text-slate-455 mt-0.5">Content Team Staged Modules · June 12</p>
-                            </div>
+                        ) : (
+                          <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-5 text-center flex items-center justify-center">
+                            <span className="text-xs text-slate-400 dark:text-slate-500 italic font-medium">No badges earned on this day</span>
                           </div>
-
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2386,7 +2534,7 @@ export default function StudentDashboard() {
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-[#A7F3D0] font-mono">Time Tracker</span>
                       </div>
-                      <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-[#065F46] rounded-md text-emerald-250">
+                      <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-[#065F46] rounded-md text-emerald-200">
                         {timeTrackerIsRunning ? "Active" : "Paused"}
                       </span>
                     </div>
@@ -2454,10 +2602,10 @@ export default function StudentDashboard() {
                   <button
                     key={tab.id}
                     onClick={() => setRoadmapFilter(tab.id as any)}
-                    className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-305 cursor-pointer flex items-center gap-1.5 border ${
+                    className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-1.5 border ${
                       roadmapFilter === tab.id
                         ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-950 border-transparent shadow-md scale-105'
-                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205 border-slate-205 dark:border-slate-800'
+                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-slate-200 dark:border-slate-800'
                     }`}
                   >
                     <span>{tab.icon}</span>
@@ -2778,7 +2926,7 @@ export default function StudentDashboard() {
                     {illustrationsList.map((ill, i) => (
                       <div 
                         key={i}
-                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-250 dark:border-slate-900/80 p-2.5 rounded-2xl shadow-md w-36 select-none transition-all duration-300 hover:scale-105 pointer-events-none"
+                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-200 dark:border-slate-900/80 p-2.5 rounded-2xl shadow-md w-36 select-none transition-all duration-300 hover:scale-105 pointer-events-none"
                         style={{ 
                           left: `${ill.x}%`, 
                           top: `${ill.y}px`,
@@ -2841,7 +2989,7 @@ export default function StudentDashboard() {
                             disabled={isLocked}
                             className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 select-none cursor-pointer ${
                               isCompleted 
-                                ? 'bg-gradient-to-tr from-emerald-555 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px] hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2' 
+                                ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px] hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2' 
                                 : isActive 
                                 ? 'bg-gradient-to-tr from-blue-600 to-indigo-550 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:-translate-y-1 active:translate-y-1 active:border-b-4 animate-pulse-glow hover:brightness-110' 
                                 : 'bg-slate-100 border-b-2 border-slate-350 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-650 cursor-not-allowed'
@@ -2850,7 +2998,7 @@ export default function StudentDashboard() {
                             {isCompleted ? (
                               <Check className="w-7 h-7 stroke-[3.5]" />
                             ) : node.symbol === '🏆' ? (
-                              <Trophy className={`w-5.5 h-5.5 ${isLocked ? 'text-slate-400 dark:text-slate-605' : 'text-amber-500'}`} />
+                              <Trophy className={`w-5.5 h-5.5 ${isLocked ? 'text-slate-400 dark:text-slate-600' : 'text-amber-500'}`} />
                             ) : isLocked ? (
                               <Lock className="w-4.5 h-4.5" />
                             ) : (
@@ -2860,14 +3008,14 @@ export default function StudentDashboard() {
  
                           {/* Node Label card popup on hover */}
                           <div 
-                            className="absolute top-16 text-center bg-white/95 dark:bg-slate-900/90 p-2 rounded-xl border border-slate-250 dark:border-slate-800 shadow-md w-34 transition-all duration-300 backdrop-blur-md"
+                            className="absolute top-16 text-center bg-white/95 dark:bg-slate-900/90 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-md w-34 transition-all duration-300 backdrop-blur-md"
                             style={{
                               transform: 'translate3d(0, 0, 15px)',
                               boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.25)'
                             }}
                           >
                             <span className="text-[9px] font-black text-slate-800 dark:text-white block truncate uppercase">{node.title}</span>
-                            <span className="text-[7.5px] text-slate-505 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
+                            <span className="text-[7.5px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
                             {isActive && (
                               <span className="text-[7.5px] text-blue-600 dark:text-blue-400 font-black block mt-0.5">75% Complete</span>
                             )}
@@ -2958,7 +3106,7 @@ export default function StudentDashboard() {
               ) : filteredQuestions.length === 0 ? (
                 <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl py-14 flex flex-col items-center justify-center text-center p-6 transition-colors duration-300">
                   <Info className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-2.5" />
-                  <span className="text-xs font-bold text-slate-655 dark:text-slate-400 uppercase tracking-widest">No matching questions cataloged</span>
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">No matching questions cataloged</span>
                   <span className="text-[10px] text-slate-500 mt-1 leading-normal">Try clearing domain or difficulty selections.</span>
                 </div>
               ) : (
@@ -2986,8 +3134,8 @@ export default function StudentDashboard() {
                               q.difficulty === 'EASY' 
                                 ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-900/30 dark:text-emerald-450'
                                 : q.difficulty === 'HARD'
-                                ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-455'
-                                : 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900/30 dark:text-amber-455'
+                                ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-400'
+                                : 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900/30 dark:text-amber-400'
                             }`}>
                               {q.difficulty}
                             </span>
@@ -3028,7 +3176,7 @@ export default function StudentDashboard() {
                                 key={opt.id}
                                 onClick={() => !isSubmitted && handleAnswerSelect(q.id, opt.id)}
                                 disabled={isSubmitted}
-                                className={`p-3 rounded-xl border text-left flex items-start justify-between gap-3 text-[11.5px] transition-all duration-155 ${
+                                className={`p-3 rounded-xl border text-left flex items-start justify-between gap-3 text-[11.5px] transition-all duration-150 ${
                                   showCorrectness
                                     ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-2xs dark:border-emerald-500 dark:bg-emerald-950/20 dark:text-emerald-300'
                                     : showIncorrectness
@@ -3043,7 +3191,7 @@ export default function StudentDashboard() {
                                     showCorrectness 
                                       ? 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-800/40 dark:bg-emerald-900/35 dark:text-emerald-450' 
                                       : showIncorrectness 
-                                      ? 'border-rose-250 bg-rose-100 text-rose-700 dark:border-rose-800/40 dark:bg-rose-900/35 dark:text-rose-455'
+                                      ? 'border-rose-200 bg-rose-100 text-rose-700 dark:border-rose-800/40 dark:bg-rose-900/35 dark:text-rose-400'
                                       : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
                                   }`}>
                                     {opt.id}
@@ -3133,7 +3281,7 @@ export default function StudentDashboard() {
                 ].map((test, idx) => {
                   const statusBg = 
                     test.status === 'Completed' ? 'bg-slate-100 text-slate-500 dark:bg-slate-900 border-slate-200' :
-                    test.status === 'Live Soon' ? 'bg-emerald-50 text-emerald-700 border-emerald-250 dark:bg-emerald-950/20 dark:text-emerald-400' :
+                    test.status === 'Live Soon' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400' :
                     'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400';
 
                   return (
@@ -3166,7 +3314,7 @@ export default function StudentDashboard() {
                           disabled={test.status === 'Completed'}
                           className={`py-2 px-5 font-bold text-xs rounded-xl shadow-xs cursor-pointer select-none transition-all ${
                             test.status === 'Completed'
-                              ? 'bg-slate-100 text-slate-450 border border-slate-200 dark:bg-slate-900 dark:text-slate-655 dark:border-slate-950 cursor-not-allowed shadow-none'
+                              ? 'bg-slate-100 text-slate-450 border border-slate-200 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-950 cursor-not-allowed shadow-none'
                               : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/10'
                           }`}
                         >
@@ -3229,7 +3377,7 @@ export default function StudentDashboard() {
                             {a.type}
                           </span>
                           {a.priority === 'High' && (
-                            <span className="text-[8px] font-black bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-455 px-1.5 py-0.2 rounded uppercase animate-pulse">
+                            <span className="text-[8px] font-black bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-400 px-1.5 py-0.2 rounded uppercase animate-pulse">
                               High Priority
                             </span>
                           )}
@@ -3253,9 +3401,9 @@ export default function StudentDashboard() {
                     const isExpanded = expandedOpportunityId === o.id;
                     const statusColor = 
                       o.status === 'Open' ? 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/25' :
-                      o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-55/65 border-amber-250 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
+                      o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-55/65 border-amber-200 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
                       o.status === 'New' ? 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-900/25' :
-                      'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-455 dark:bg-rose-950/20 dark:border-rose-900/25';
+                      'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/20 dark:border-rose-900/25';
 
                     const typeBadge = 
                       o.type === 'Hiring' ? 'Hiring Drive' :
@@ -3270,7 +3418,7 @@ export default function StudentDashboard() {
                       >
                         <div className="space-y-3.5">
                           <div className="flex items-center justify-between gap-1 flex-wrap">
-                            <span className="text-[8.5px] font-black px-2 py-0.5 rounded border bg-indigo-50 border-indigo-150 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 uppercase font-mono">
+                            <span className="text-[8.5px] font-black px-2 py-0.5 rounded border bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 uppercase font-mono">
                               {typeBadge}
                             </span>
                             <span className={`text-[8.5px] font-black px-2 py-0.5 rounded border uppercase font-mono ${statusColor}`}>
@@ -3298,7 +3446,7 @@ export default function StudentDashboard() {
                           </div>
 
                           {isExpanded && o.details && (
-                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 text-[10.5px] text-slate-655 dark:text-slate-400 leading-relaxed border border-slate-250 dark:border-slate-850 animate-fadeIn font-medium">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed border border-slate-200 dark:border-slate-850 animate-fadeIn font-medium">
                               {o.details}
                             </div>
                           )}
@@ -3407,13 +3555,13 @@ export default function StudentDashboard() {
           {activeSidebarTab === 'profile' && (
             <div className="w-full space-y-8 animate-fadeIn">
               
-              <div className="border-b border-slate-250 dark:border-slate-900 pb-4">
+              <div className="border-b border-slate-200 dark:border-slate-900 pb-4">
                 <h1 className="text-xl font-black uppercase text-slate-900 dark:text-white font-heading">Student credentials</h1>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Review onboarding selections and active prep goals.</p>
               </div>
 
               {saveSuccess && (
-                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-450 rounded-2xl p-4 flex items-center gap-3 animate-fadeIn">
+                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-450 rounded-2xl p-4 flex items-center gap-3 animate-fadeIn">
                   <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
                   <span className="text-xs font-bold">Profile onboarding configurations saved successfully!</span>
                 </div>
@@ -3530,8 +3678,8 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* Choose Profile Photo */}
-                <div className="pt-4 border-t border-slate-105 dark:border-slate-850 space-y-3">
-                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-505 uppercase tracking-widest block">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-850 space-y-3">
+                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">
                     Choose Profile Photo / Avatar
                   </label>
                   <div className="flex flex-wrap gap-4 items-center">
@@ -3572,7 +3720,7 @@ export default function StudentDashboard() {
 
                   {/* Custom URL Input */}
                   <div className="space-y-1.5 max-w-md text-left">
-                    <label className="text-[9px] font-bold text-slate-400 dark:text-slate-505 uppercase tracking-wider block mt-2">
+                    <label className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mt-2">
                       Or use a custom image URL
                     </label>
                     <input
@@ -3713,7 +3861,7 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* 3D tilt Toggle */}
-                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-105 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5 text-left">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Dynamic 3D Hover Tilt</span>
                         <p className="text-[10px] text-slate-450 leading-relaxed max-w-[220px]">Enable smooth interactive mouse-coordinate perspective card rotation.</p>
@@ -3751,7 +3899,7 @@ export default function StudentDashboard() {
                             }}
                             className={`py-2 px-3 text-[10px] font-black uppercase tracking-wider rounded-xl border transition-all cursor-pointer ${
                               confettiStyle === style
-                                ? 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-955/30 dark:border-blue-900 dark:text-blue-400'
+                                ? 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-400'
                                 : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-900 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
                             }`}
                           >
@@ -3796,7 +3944,7 @@ export default function StudentDashboard() {
                             }}
                             className={`py-2 px-1 text-[10px] flex flex-col items-center justify-center rounded-xl border transition-all cursor-pointer ${
                               dailyXpGoal === item.value
-                                ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/30 dark:border-emerald-900 dark:text-emerald-400'
+                                ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400'
                                 : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-900 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
                             }`}
                           >
@@ -3808,10 +3956,10 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Theme display mode toggle */}
-                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-955/40 p-4 rounded-2xl border border-slate-105 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5 text-left">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Active Display Mode</span>
-                        <p className="text-[10px] text-slate-455 leading-relaxed">Switch workspace lighting themes in real-time.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">Switch workspace lighting themes in real-time.</p>
                       </div>
                       
                       <button 
@@ -3836,7 +3984,7 @@ export default function StudentDashboard() {
                     <div className="space-y-2.5 text-left" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Brand Accent Color</span>
-                        <p className="text-[10px] text-slate-455 leading-relaxed">Switch component preview accent color schema overrides.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">Switch component preview accent color schema overrides.</p>
                       </div>
                       
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -3845,7 +3993,7 @@ export default function StudentDashboard() {
                           { id: 'emerald', label: 'Emerald', bg: 'bg-emerald-500', activeClass: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/10' },
                           { id: 'purple', label: 'Cyberpunk', bg: 'bg-purple-500', activeClass: 'border-purple-500/50 bg-purple-500/10 text-purple-600 dark:text-purple-400 dark:bg-purple-500/10' },
                           { id: 'amber', label: 'Amber', bg: 'bg-amber-500', activeClass: 'border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/10' },
-                          { id: 'rose', label: 'Crimson', bg: 'bg-rose-500', activeClass: 'border-rose-500/50 bg-rose-500/10 text-rose-600 dark:text-rose-450 dark:bg-rose-500/10' },
+                          { id: 'rose', label: 'Crimson', bg: 'bg-rose-500', activeClass: 'border-rose-500/50 bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/10' },
                           { id: 'orange', label: 'Sunset', bg: 'bg-orange-500', activeClass: 'border-orange-500/50 bg-orange-500/10 text-orange-600 dark:text-orange-400 dark:bg-orange-500/10' },
                           { id: 'teal', label: 'Teal', bg: 'bg-teal-500', activeClass: 'border-teal-500/50 bg-teal-500/10 text-teal-600 dark:text-teal-400 dark:bg-teal-500/10' },
                           { id: 'indigo', label: 'Indigo', bg: 'bg-indigo-500', activeClass: 'border-indigo-500/50 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 dark:bg-indigo-500/10' }
@@ -3856,7 +4004,7 @@ export default function StudentDashboard() {
                             className={`flex items-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer justify-center ${
                               accentColor === color.id
                                 ? `${color.activeClass} shadow-md`
-                                : 'bg-transparent border-slate-200/40 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-705 dark:text-slate-300'
+                                : 'bg-transparent border-slate-200/40 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300'
                             }`}
                           >
                             <span className={`w-3 h-3 rounded-full ${color.bg} shrink-0`} />
@@ -3870,7 +4018,7 @@ export default function StudentDashboard() {
                     <div className="space-y-2.5 text-left" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Workspace Layout Density</span>
-                        <p className="text-[10px] text-slate-455 leading-relaxed">Change padding scale inside elements and tables.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">Change padding scale inside elements and tables.</p>
                       </div>
                       
                       <div className="grid grid-cols-3 gap-2">
@@ -3881,7 +4029,7 @@ export default function StudentDashboard() {
                             className={`py-2 px-3 text-[10px] font-black uppercase tracking-wider rounded-xl border transition-all cursor-pointer ${
                               layoutDensity === density
                                 ? getAccentClass(accentColor, 'combined')
-                                : 'bg-white border-slate-250 text-slate-500 dark:bg-slate-950 dark:border-slate-900 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
+                                : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-900 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
                             }`}
                           >
                             {density === 'compact' ? '🔍 Compact' : density === 'normal' ? '⚖️ Normal' : '📖 Spacious'}
@@ -3929,7 +4077,7 @@ export default function StudentDashboard() {
                     <div className="absolute -bottom-10 -left-10 w-[150px] h-[150px] bg-purple-500/10 rounded-full blur-[50px] pointer-events-none" />
 
                     <div>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-955 border border-blue-900/40 px-3 py-1 rounded-full">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-950 border border-blue-900/40 px-3 py-1 rounded-full">
                         3D Live Isometric Previewer
                       </span>
                       <p className="text-[10px] text-slate-500 mt-2 font-semibold">Hover to tilt; updates colors, density, and bounds in real-time.</p>
@@ -3959,7 +4107,7 @@ export default function StudentDashboard() {
                             <div className="text-xs font-black text-white mt-0.5 font-mono">{dailyXpGoal} XP</div>
                           </div>
                           
-                          <div className="bg-slate-955 p-2 rounded-xl flex items-center justify-between border border-slate-850">
+                          <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-850">
                             <div className="text-[7.5px] text-slate-400 font-semibold uppercase">Tilt Response</div>
                             <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-md ${
                               tiltEnabled ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-500'
@@ -3968,7 +4116,7 @@ export default function StudentDashboard() {
                             </span>
                           </div>
 
-                          <div className="bg-slate-955 p-2 rounded-xl flex items-center justify-between border border-slate-850">
+                          <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-850">
                             <div className="text-[7.5px] text-slate-400 font-semibold uppercase">Confetti Style</div>
                             <span className="text-[7px] font-black uppercase text-blue-400">
                               {confettiStyle}
@@ -3998,15 +4146,15 @@ export default function StudentDashboard() {
                       <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest">Acoustic Sound Hub</h3>
                     </div>
 
-                    <p className="text-[10px] text-slate-505 leading-normal font-semibold" style={{ transform: 'translateZ(10px)' }}>
+                    <p className="text-[10px] text-slate-500 leading-normal font-semibold" style={{ transform: 'translateZ(10px)' }}>
                       Play high-fidelity synthesized chime sounds. Bouncing equalizers visualize frequency pulses.
                     </p>
 
                     {/* Sound control block */}
-                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4.5 rounded-2xl border border-slate-105 dark:border-slate-900" style={{ transform: 'translateZ(15px)' }}>
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4.5 rounded-2xl border border-slate-100 dark:border-slate-900" style={{ transform: 'translateZ(15px)' }}>
                       <button 
                         onClick={playPreviewChime}
-                        className="py-2.5 px-4 bg-rose-600 hover:bg-rose-550 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
+                        className="py-2.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
                       >
                         Play Preview Chime
                       </button>
@@ -4048,7 +4196,7 @@ export default function StudentDashboard() {
                     setFooterBadgeText(e.target.value);
                     localStorage.setItem('aptitude_footer_badge_text', e.target.value);
                   }}
-                  className="bg-transparent border-b border-dashed border-slate-405 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-705 dark:text-slate-300 w-64"
+                  className="bg-transparent border-b border-dashed border-slate-400 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 w-64"
                   title="Edit Footer Badge Text"
                 />
               ) : (
@@ -4063,7 +4211,7 @@ export default function StudentDashboard() {
                   setFooterCopyright(e.target.value);
                   localStorage.setItem('aptitude_footer_copyright', e.target.value);
                 }}
-                className="bg-transparent border-b border-dashed border-slate-405 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-705 dark:text-slate-300 text-right w-80"
+                className="bg-transparent border-b border-dashed border-slate-400 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 text-right w-80"
                 title="Edit Footer Copyright"
               />
             ) : (
@@ -4091,7 +4239,7 @@ export default function StudentDashboard() {
                     🏆
                   </div>
 
-                  <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-455 bg-amber-50 dark:bg-amber-955/60 border border-amber-255 dark:border-amber-900 px-3 py-1 rounded-full mb-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 px-3 py-1 rounded-full mb-3">
                     NEW ACHIEVEMENT UNLOCKED!
                   </span>
 
@@ -4103,7 +4251,7 @@ export default function StudentDashboard() {
                     Level {justUnlockedBadge.level} · {justUnlockedBadge.category}
                   </span>
 
-                  <p className="text-xs text-slate-500 dark:text-slate-405 leading-relaxed max-w-[260px] mb-6 font-semibold">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-[260px] mb-6 font-semibold">
                     "{justUnlockedBadge.description}"
                   </p>
 
@@ -4119,7 +4267,7 @@ export default function StudentDashboard() {
 
                   <button
                     onClick={() => setJustUnlockedBadge(null)}
-                    className="text-[10px] font-extrabold uppercase text-slate-400 hover:text-slate-655 dark:hover:text-slate-350 transition-colors py-2 block cursor-pointer"
+                    className="text-[10px] font-extrabold uppercase text-slate-400 hover:text-slate-600 dark:hover:text-slate-350 transition-colors py-2 block cursor-pointer"
                   >
                     Dismiss
                   </button>
@@ -4138,7 +4286,7 @@ export default function StudentDashboard() {
               switch (lvl) {
                 case 1: return { name: 'Bronze Standard', color: 'text-emerald-450 border-emerald-500/20 bg-emerald-500/5' };
                 case 2: return { name: 'Silver Standard', color: 'text-blue-450 border-blue-500/20 bg-blue-500/5' };
-                case 3: return { name: 'Gold Standard', color: 'text-purple-450 border-purple-500/20 bg-purple-500/5' };
+                case 3: return { name: 'Gold Standard', color: 'text-purple-400 border-purple-500/20 bg-purple-500/5' };
                 case 4: return { name: 'Platinum Elite', color: 'text-amber-450 border-amber-500/20 bg-amber-500/5' };
                 case 5: return { name: 'Titanium Master', color: 'text-indigo-450 border-indigo-500/20 bg-indigo-500/5' };
                 default: return { name: 'Standard Badge', color: 'text-slate-400 border-slate-700 bg-slate-800/50' };
@@ -4149,7 +4297,7 @@ export default function StudentDashboard() {
 
             return (
               <div 
-                className="fixed inset-0 bg-slate-955/98 backdrop-blur-2xl z-50 flex items-center justify-center animate-fadeIn"
+                className="fixed inset-0 bg-slate-950/98 backdrop-blur-2xl z-50 flex items-center justify-center animate-fadeIn"
                 onClick={() => setSelectedBadge(null)}
               >
                 {/* Floating Background Sparkles */}
@@ -4168,7 +4316,7 @@ export default function StudentDashboard() {
                   {/* Close button */}
                   <button 
                     onClick={() => setSelectedBadge(null)}
-                    className="absolute top-6 right-6 z-50 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-955 p-3.5 rounded-full border border-slate-800 transition-all duration-200 cursor-pointer active:scale-90"
+                    className="absolute top-6 right-6 z-50 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-950 p-3.5 rounded-full border border-slate-800 transition-all duration-200 cursor-pointer active:scale-90"
                     title="Close Dialog"
                   >
                     <X className="w-5 h-5" />
@@ -4179,7 +4327,7 @@ export default function StudentDashboard() {
                     <div className="max-w-xl md:mx-auto w-full space-y-8">
                       {/* Meta Tags */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-300 bg-slate-955 border border-slate-800 px-4 py-1.5 rounded-full">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-300 bg-slate-950 border border-slate-800 px-4 py-1.5 rounded-full">
                           {getCategoryEmoji(selectedBadge.category)} {selectedBadge.category.replace('_', ' ')}
                         </span>
                         <span className={`text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-full border ${lvlInfo.color}`}>
@@ -4203,7 +4351,7 @@ export default function StudentDashboard() {
                           <Award className="w-4 h-4 text-amber-500" />
                           How it is earned
                         </h4>
-                        <p className="text-sm text-slate-300 font-semibold leading-relaxed bg-slate-955/35 p-5 rounded-2xl border border-slate-800/50">
+                        <p className="text-sm text-slate-300 font-semibold leading-relaxed bg-slate-950/35 p-5 rounded-2xl border border-slate-800/50">
                           {earnMethod}
                         </p>
                       </div>
@@ -4211,11 +4359,11 @@ export default function StudentDashboard() {
                       {/* Lock/Unlock Progress */}
                       {(!isSelectedUnlocked || (selectedProgress.current < selectedProgress.target)) && (
                         <div className="space-y-3 pt-4">
-                          <div className="flex justify-between text-[11px] font-black uppercase text-slate-455 tracking-wider">
+                          <div className="flex justify-between text-[11px] font-black uppercase text-slate-400 tracking-wider">
                             <span>Unlock Progress</span>
                             <span>{selectedProgress.current} / {selectedProgress.target} {selectedProgress.label}</span>
                           </div>
-                          <div className="w-full bg-slate-955 p-1 rounded-full border border-slate-800/50 overflow-hidden">
+                          <div className="w-full bg-slate-950 p-1 rounded-full border border-slate-800/50 overflow-hidden">
                             <div className="bg-slate-800 h-2 rounded-full overflow-hidden">
                               <div 
                                 className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-500"
@@ -4231,7 +4379,7 @@ export default function StudentDashboard() {
                     <div className="max-w-xl md:mx-auto w-full mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row gap-4">
                       <button
                         onClick={() => setSelectedBadge(null)}
-                        className="flex-1 bg-slate-850 hover:bg-slate-800 border border-slate-755 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all active:scale-95 cursor-pointer"
+                        className="flex-1 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all active:scale-95 cursor-pointer"
                       >
                         Close Details
                       </button>
@@ -4250,7 +4398,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Right Column (Badge Image) - Order-1 on mobile, Order-2 on desktop */}
-                  <div className="md:col-span-5 p-8 sm:p-12 md:p-20 flex flex-col items-center justify-center bg-slate-955/40 border-b md:border-b-0 md:border-l border-slate-800/60 relative order-1 md:order-2 overflow-hidden min-h-[45vh] md:min-h-screen">
+                  <div className="md:col-span-5 p-8 sm:p-12 md:p-20 flex flex-col items-center justify-center bg-slate-950/40 border-b md:border-b-0 md:border-l border-slate-800/60 relative order-1 md:order-2 overflow-hidden min-h-[45vh] md:min-h-screen">
                     {/* Shimmer reflection sweep overlay */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full animate-reflection-sweep pointer-events-none z-20" />
 
@@ -4287,11 +4435,11 @@ export default function StudentDashboard() {
 
                     <div className="mt-8 text-center relative z-10">
                       {isSelectedUnlocked ? (
-                        <span className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 px-5 py-2 rounded-full text-emerald-455 text-[10px] font-black uppercase tracking-widest">
+                        <span className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 px-5 py-2 rounded-full text-emerald-400 text-[10px] font-black uppercase tracking-widest">
                           <Check className="w-3.5 h-3.5 stroke-[3]" /> Unlocked Card
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-2 bg-slate-955 border border-slate-800 px-5 py-2 rounded-full text-slate-500 text-[10px] font-black uppercase tracking-widest">
+                        <span className="inline-flex items-center gap-2 bg-slate-950 border border-slate-800 px-5 py-2 rounded-full text-slate-500 text-[10px] font-black uppercase tracking-widest">
                           <Lock className="w-3.5 h-3.5" /> Lock Status
                         </span>
                       )}
