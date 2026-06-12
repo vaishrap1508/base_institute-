@@ -2,24 +2,24 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Layers, 
-  User, 
-  GraduationCap, 
-  Target, 
-  Clock, 
-  Calendar, 
-  BookOpen, 
-  Search, 
-  ChevronRight, 
-  ChevronDown, 
-  Play, 
-  Cpu, 
-  Award, 
-  Bookmark, 
-  Flame, 
-  Check, 
-  X, 
+import {
+  Layers,
+  User,
+  GraduationCap,
+  Target,
+  Clock,
+  Calendar,
+  BookOpen,
+  Search,
+  ChevronRight,
+  ChevronDown,
+  Play,
+  Cpu,
+  Award,
+  Bookmark,
+  Flame,
+  Check,
+  X,
   LogOut,
   Info,
   ExternalLink,
@@ -228,7 +228,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-emerald-500 border-emerald-400 text-white shadow-emerald-500/20';
       if (type === 'button') return 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg hover:shadow-emerald-500/20';
       if (type === 'ring') return 'stroke-emerald-600 dark:stroke-emerald-400';
-      return 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/30 dark:border-emerald-900 dark:text-emerald-400';
+      return 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400';
     case 'purple':
       if (type === 'bg') return 'bg-purple-500';
       if (type === 'border') return 'border-purple-500';
@@ -236,7 +236,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-purple-600 border-purple-500 text-white shadow-purple-500/20';
       if (type === 'button') return 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg hover:shadow-purple-500/20';
       if (type === 'ring') return 'stroke-purple-600 dark:stroke-purple-400';
-      return 'bg-purple-50 border-purple-300 text-purple-600 dark:bg-purple-955/30 dark:border-purple-900 dark:text-purple-400';
+      return 'bg-purple-50 border-purple-300 text-purple-600 dark:bg-purple-950/30 dark:border-purple-900 dark:text-purple-400';
     case 'amber':
       if (type === 'bg') return 'bg-amber-500';
       if (type === 'border') return 'border-amber-500';
@@ -244,7 +244,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-amber-500 border-amber-400 text-white shadow-amber-500/20';
       if (type === 'button') return 'bg-amber-600 hover:bg-amber-500 text-white shadow-lg hover:shadow-amber-500/20';
       if (type === 'ring') return 'stroke-amber-600 dark:stroke-amber-400';
-      return 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-955/30 dark:border-amber-900 dark:text-amber-400';
+      return 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-400';
     case 'rose':
       if (type === 'bg') return 'bg-rose-500';
       if (type === 'border') return 'border-rose-500';
@@ -252,7 +252,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-rose-500 border-rose-400 text-white shadow-rose-500/20';
       if (type === 'button') return 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg hover:shadow-rose-500/20';
       if (type === 'ring') return 'stroke-rose-600 dark:stroke-rose-400';
-      return 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-955/30 dark:border-rose-900 dark:text-rose-400';
+      return 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-950/30 dark:border-rose-900 dark:text-rose-400';
     case 'orange':
       if (type === 'bg') return 'bg-orange-500';
       if (type === 'border') return 'border-orange-500';
@@ -260,7 +260,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-orange-500 border-orange-400 text-white shadow-orange-500/20';
       if (type === 'button') return 'bg-orange-600 hover:bg-orange-500 text-white shadow-lg hover:shadow-orange-500/20';
       if (type === 'ring') return 'stroke-orange-600 dark:stroke-orange-400';
-      return 'bg-orange-50 border-orange-300 text-orange-600 dark:bg-orange-955/30 dark:border-orange-900 dark:text-orange-400';
+      return 'bg-orange-50 border-orange-300 text-orange-600 dark:bg-orange-950/30 dark:border-orange-900 dark:text-orange-400';
     case 'teal':
       if (type === 'bg') return 'bg-teal-500';
       if (type === 'border') return 'border-teal-500';
@@ -268,15 +268,15 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-teal-500 border-teal-400 text-white shadow-teal-500/20';
       if (type === 'button') return 'bg-teal-600 hover:bg-teal-500 text-white shadow-lg hover:shadow-teal-500/20';
       if (type === 'ring') return 'stroke-teal-600 dark:stroke-teal-400';
-      return 'bg-teal-50 border-teal-300 text-teal-600 dark:bg-teal-955/30 dark:border-teal-900 dark:text-teal-400';
+      return 'bg-teal-50 border-teal-300 text-teal-600 dark:bg-teal-950/30 dark:border-teal-900 dark:text-teal-400';
     case 'indigo':
       if (type === 'bg') return 'bg-indigo-500';
       if (type === 'border') return 'border-indigo-500';
       if (type === 'text') return 'text-indigo-600 dark:text-indigo-400';
-      if (type === 'badge') return 'bg-indigo-605 border-indigo-500 text-white shadow-indigo-500/20';
+      if (type === 'badge') return 'bg-indigo-600 border-indigo-500 text-white shadow-indigo-500/20';
       if (type === 'button') return 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg hover:shadow-indigo-500/20';
       if (type === 'ring') return 'stroke-indigo-600 dark:stroke-indigo-400';
-      return 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-955/30 dark:border-indigo-900 dark:text-indigo-400';
+      return 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-950/30 dark:border-indigo-900 dark:text-indigo-400';
     case 'blue':
     default:
       if (type === 'bg') return 'bg-blue-500';
@@ -285,7 +285,7 @@ const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combi
       if (type === 'badge') return 'bg-blue-600 border-blue-500 text-white shadow-blue-500/20';
       if (type === 'button') return 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg hover:shadow-blue-500/25';
       if (type === 'ring') return 'stroke-blue-600 dark:stroke-blue-400';
-      return 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-955/30 dark:border-blue-900 dark:text-blue-400';
+      return 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-400';
   }
 };
 
@@ -306,7 +306,7 @@ const getHexColor = (colorId: string) => {
 
 const getBadgeProgress = (badgeName: string, isUnlocked: boolean) => {
   const name = badgeName.toLowerCase();
-  
+
   const hasOnboarding = typeof window !== 'undefined' ? (localStorage.getItem('aptitude_onboarding_completed') === 'true') : false;
   const currentSolved = typeof window !== 'undefined' ? Number(localStorage.getItem('aptitude_solved_count') || 12) : 12;
   const currentStreak = typeof window !== 'undefined' ? Number(localStorage.getItem('aptitude_streak') || 14) : 14;
@@ -345,7 +345,7 @@ const getBadgeProgress = (badgeName: string, isUnlocked: boolean) => {
   if (name.includes('not stopping')) {
     return { current: isUnlocked ? 10 : Math.min(10, currentSolved), target: 10, label: 'Learning Activities' };
   }
-  
+
   return { current: isUnlocked ? 1 : 0, target: 1, label: 'Progress' };
 };
 
@@ -388,12 +388,12 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
   const [processedSrc, setProcessedSrc] = useState<string>(() => {
     if (!src) return '';
     if (src.startsWith('data:')) return src;
-    
+
     // Try memory cache first
     if (PROCESSED_BADGE_CACHE[src]) {
       return PROCESSED_BADGE_CACHE[src];
     }
-    
+
     // Try localStorage fallback
     if (typeof window !== 'undefined') {
       try {
@@ -402,7 +402,7 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
           PROCESSED_BADGE_CACHE[src] = stored;
           return stored;
         }
-      } catch (_) {}
+      } catch (_) { }
     }
     return '';
   });
@@ -422,7 +422,7 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
     img.src = src;
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      
+
       // Limit canvas size to max 512x512 for high clarity and crisp rendering
       const maxDim = 512;
       let w = img.width;
@@ -436,10 +436,10 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
           h = maxDim;
         }
       }
-      
+
       canvas.width = w;
       canvas.height = h;
-      
+
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         setProcessedSrc(src);
@@ -523,7 +523,7 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
         if (typeof window !== 'undefined') {
           try {
             localStorage.setItem(`processed_badge_v2_${src}`, dataUrl);
-          } catch (_) {}
+          } catch (_) { }
         }
       } catch (e) {
         console.warn('Canvas processing error:', e);
@@ -544,10 +544,10 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
   }
 
   return (
-    <img 
-      src={processedSrc} 
-      alt={alt} 
-      className={className} 
+    <img
+      src={processedSrc}
+      alt={alt}
+      className={className}
       style={style}
     />
   );
@@ -566,13 +566,13 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
     const y = e.clientY - rect.top;
     const xc = rect.width / 2;
     const yc = rect.height / 2;
-    
+
     // Calculate rotation angles (max tilt ~12 degrees for visible 3D effect)
     const rotateX = -(y - yc) / (rect.height / 15);
     const rotateY = (x - xc) / (rect.width / 15);
-    
+
     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.04, 1.04, 1.04)`;
-    
+
     // Parallax Lift on the image container to pop out of the card
     if (imgContainer) {
       imgContainer.style.transform = `translateZ(30px) scale(1.1) rotateX(${-rotateX * 0.2}deg) rotateY(${-rotateY * 0.2}deg)`;
@@ -585,7 +585,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
     if (!card) return;
     card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
     card.style.transition = 'transform 0.4s ease-out';
-    
+
     if (imgContainer) {
       imgContainer.style.transform = 'translateZ(0px) scale(1)';
       imgContainer.style.transition = 'transform 0.4s ease-out';
@@ -599,7 +599,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-emerald-500/20 dark:border-emerald-500/30',
           bg: 'bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-950/10 dark:to-slate-900',
           glow: 'shadow-emerald-500/5',
-          banner: 'bg-emerald-100/70 dark:bg-emerald-955 text-emerald-800 dark:text-emerald-400',
+          banner: 'bg-emerald-100/70 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400',
           badgeStyle: 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500/20 text-emerald-600',
           emoji: '🌱'
         };
@@ -608,8 +608,8 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-blue-500/20 dark:border-blue-500/30',
           bg: 'bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-slate-900',
           glow: 'shadow-blue-500/5',
-          banner: 'bg-blue-100 dark:bg-blue-955/60 text-blue-800 dark:text-blue-400',
-          badgeStyle: 'bg-blue-50 dark:bg-blue-950/50 border-blue-500/20 text-blue-605',
+          banner: 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-400',
+          badgeStyle: 'bg-blue-50 dark:bg-blue-950/50 border-blue-500/20 text-blue-600',
           emoji: '🛡️'
         };
       case 3:
@@ -617,7 +617,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-purple-500/20 dark:border-purple-500/30',
           bg: 'bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/20 dark:to-slate-900',
           glow: 'shadow-purple-500/5',
-          banner: 'bg-purple-100 dark:bg-purple-955/60 text-purple-800 dark:text-purple-400',
+          banner: 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-400',
           badgeStyle: 'bg-purple-50 dark:bg-purple-950/50 border-purple-500/20 text-purple-600',
           emoji: '🔮'
         };
@@ -626,7 +626,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-amber-500/30 dark:border-amber-500/40',
           bg: 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-slate-900',
           glow: 'shadow-amber-500/10 dark:shadow-amber-500/20',
-          banner: 'bg-amber-100 dark:bg-amber-955 text-amber-805 dark:text-amber-400',
+          banner: 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400',
           badgeStyle: 'bg-amber-50 dark:bg-amber-950/50 border-amber-500/20 text-amber-600',
           emoji: '👑'
         };
@@ -635,17 +635,17 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           border: 'border-indigo-500/40 dark:border-indigo-500/50',
           bg: 'bg-gradient-to-br from-indigo-50 via-white to-pink-50 dark:from-indigo-950/20 dark:via-slate-900 dark:to-pink-950/20',
           glow: 'shadow-indigo-500/15 dark:shadow-indigo-500/30',
-          banner: 'bg-indigo-100 dark:bg-indigo-955 text-indigo-805 dark:text-indigo-400',
+          banner: 'bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-400',
           badgeStyle: 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-500/20 text-indigo-600',
           emoji: '🌌'
         };
       default:
         return {
-          border: 'border-slate-205 dark:border-slate-800',
+          border: 'border-slate-200 dark:border-slate-800',
           bg: 'bg-white dark:bg-slate-900',
           glow: '',
           banner: 'bg-slate-100 dark:bg-slate-800',
-          badgeStyle: 'bg-slate-50 dark:bg-slate-800 border-slate-205 text-slate-500',
+          badgeStyle: 'bg-slate-50 dark:bg-slate-800 border-slate-200 text-slate-500',
           emoji: '🎓'
         };
     }
@@ -655,45 +655,42 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
   const progress = getBadgeProgress(badge.name, isUnlocked);
 
   return (
-    <div 
+    <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       style={{ transformStyle: 'preserve-3d', transition: 'transform 0.1s ease-out' }}
-      className={`border rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-sm min-h-[280px] cursor-pointer hover:border-slate-350 dark:hover:border-slate-750 transition-all duration-300 ${
-        isUnlocked 
-          ? `${style.border} ${style.bg} ${style.glow}` 
-          : 'border-slate-250 bg-slate-50/30 dark:border-slate-850/60 dark:bg-slate-900/40 opacity-70 hover:opacity-100'
-      }`}
+      className={`border rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-sm min-h-[280px] cursor-pointer hover:border-slate-350 dark:hover:border-slate-750 transition-all duration-300 ${isUnlocked
+          ? `${style.border} ${style.bg} ${style.glow}`
+          : 'border-slate-200 bg-slate-50/30 dark:border-slate-850/60 dark:bg-slate-900/40 opacity-70 hover:opacity-100'
+        }`}
     >
       {/* Lock Icon in Top-Right when Locked */}
       {!isUnlocked && (
-        <div className="absolute top-3 right-3 text-slate-400 dark:text-slate-555 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-full border border-slate-200 dark:border-slate-700/50 shadow-sm">
+        <div className="absolute top-3 right-3 text-slate-400 dark:text-slate-500 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-full border border-slate-200 dark:border-slate-700/50 shadow-sm">
           <Lock className="w-3.5 h-3.5" />
         </div>
       )}
 
 
-      <div 
+      <div
         ref={imageRef}
         style={{ transformStyle: 'preserve-3d', transition: 'transform 0.2s ease-out' }}
         className="w-20 h-20 mb-4 relative flex items-center justify-center select-none"
       >
         {badge.image_url ? (
-          <TransparentBadgeImage 
-            src={badge.image_url} 
-            alt={badge.name} 
-            className={`w-full h-full object-contain transition-all duration-300 ${
-              isUnlocked 
-                ? 'scale-100 drop-shadow-[0_4px_10px_rgba(16,185,129,0.25)] dark:drop-shadow-[0_4px_10px_rgba(52,211,153,0.2)]' 
+          <TransparentBadgeImage
+            src={badge.image_url}
+            alt={badge.name}
+            className={`w-full h-full object-contain transition-all duration-300 ${isUnlocked
+                ? 'scale-100 drop-shadow-[0_4px_10px_rgba(16,185,129,0.25)] dark:drop-shadow-[0_4px_10px_rgba(52,211,153,0.2)]'
                 : 'scale-95 opacity-30 grayscale-[80%]'
-            }`} 
+              }`}
           />
         ) : (
-          <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border shadow-inner relative ${
-            isUnlocked ? style.badgeStyle : 'bg-slate-100 border-slate-300 text-slate-400'
-          }`}>
+          <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border shadow-inner relative ${isUnlocked ? style.badgeStyle : 'bg-slate-100 border-slate-300 text-slate-400'
+            }`}>
             <span className="z-10">{getCategoryEmoji(badge.category)}</span>
             <span className="absolute bottom-0 right-0 text-xs">{style.emoji}</span>
           </div>
@@ -704,7 +701,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
         <h4 className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white font-bold">
           {badge.name}
         </h4>
-        <p className="text-[10px] text-slate-500 dark:text-slate-455 leading-normal font-semibold max-w-[150px] mx-auto min-h-[30px]">
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal font-semibold max-w-[150px] mx-auto min-h-[30px]">
           {badge.description}
         </p>
       </div>
@@ -716,12 +713,12 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
           </span>
         ) : (
           <div className="w-full space-y-1.5">
-            <div className="flex justify-between text-[9px] font-black uppercase text-slate-455 dark:text-slate-500 tracking-wider">
+            <div className="flex justify-between text-[9px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
               <span>Progress</span>
               <span>{progress.current}/{progress.target}</span>
             </div>
             <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="bg-blue-500 h-full rounded-full transition-all duration-500"
                 style={{ width: `${(progress.current / progress.target) * 100}%` }}
               />
@@ -899,16 +896,16 @@ const CanvasCelebration = ({ confettiStyle }: { confettiStyle: 'confetti' | 'fir
         }
       } else if (confettiStyle === 'fireworks') {
         let activeFireworks = 0;
-        
+
         fireworks.forEach((fw) => {
           if (!fw.exploded) {
             fw.y += fw.speedY;
-            
+
             ctx.beginPath();
             ctx.arc(fw.x, fw.y, 3, 0, Math.PI * 2);
             ctx.fillStyle = '#FFFFFF';
             ctx.fill();
-            
+
             ctx.beginPath();
             ctx.moveTo(fw.x, fw.y);
             ctx.lineTo(fw.x, fw.y - fw.speedY * 2);
@@ -1035,7 +1032,7 @@ export default function StudentDashboard() {
 
   const [solvedCount, setSolvedCount] = useState(12);
   const [streak, setStreak] = useState(14); // Simulated active streak
-  const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']); 
+  const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
 
@@ -1044,15 +1041,15 @@ export default function StudentDashboard() {
   const [activeNodeId, setActiveNodeId] = useState<number>(3);
   const [justUnlockedNodeId, setJustUnlockedNodeId] = useState<number | null>(null);
   const [shakeNodeId, setShakeNodeId] = useState<number | null>(null);
-  
+
   const [animatedXp, setAnimatedXp] = useState<number>(0);
   const [animatedProgress, setAnimatedProgress] = useState<number>(0);
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
-  
+
   const [activeChallengeNode, setActiveChallengeNode] = useState<any | null>(null);
   const [challengeAnswers, setChallengeAnswers] = useState<Record<number, string>>({});
   const [challengeSubmitted, setChallengeSubmitted] = useState<Record<number, boolean>>({});
-  
+
   const [showXpBurst, setShowXpBurst] = useState<any | null>(null); // { x: number, y: number, amount: number }
   const [showConfettiBurst, setShowConfettiBurst] = useState<boolean>(false);
 
@@ -1076,7 +1073,7 @@ export default function StudentDashboard() {
     setShowConfettiBurst(true);
     setShowXpBurst(node.id);
     setAnimatedXp(prev => prev + 150);
-    
+
     setTimeout(() => {
       setCompletedNodeIds(prev => {
         if (!prev.includes(node.id)) {
@@ -1087,12 +1084,12 @@ export default function StudentDashboard() {
         }
         return prev;
       });
-      
+
       const nextNodeId = node.id + 1;
       if (nextNodeId <= 9) {
         setJustUnlockedNodeId(nextNodeId);
         setActiveNodeId(nextNodeId);
-        
+
         setTimeout(() => {
           setJustUnlockedNodeId(null);
         }, 3000);
@@ -1118,10 +1115,10 @@ export default function StudentDashboard() {
     if (activeSidebarTab === 'learning') {
       // Animate XP from 0 to 12450 over 1 second
       const targetXp = 12450;
-      const durationXp = 1000; 
+      const durationXp = 1000;
       const stepTimeXp = 15;
       const startTimeXp = Date.now();
-      
+
       const xpInterval = setInterval(() => {
         const elapsed = Date.now() - startTimeXp;
         if (elapsed >= durationXp) {
@@ -1138,7 +1135,7 @@ export default function StudentDashboard() {
       const targetProg = 72;
       const durationProg = 1500;
       const startTimeProg = Date.now();
-      
+
       const progInterval = setInterval(() => {
         const elapsed = Date.now() - startTimeProg;
         if (elapsed >= durationProg) {
@@ -1180,6 +1177,44 @@ export default function StudentDashboard() {
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<string[]>([]);
   const [justUnlockedBadge, setJustUnlockedBadge] = useState<any | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<any | null>(null);
+  const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(9); // Defaults to June 9, 2026 (Today)
+  const [earnedBadgesHistory, setEarnedBadgesHistory] = useState<any[]>([]);
+
+  // Compute active study days dynamically from history
+  const streakDaysFromHistory = useMemo(() => {
+    const days = new Set<number>();
+    earnedBadgesHistory.forEach(item => {
+      if (!item.earned_at) return;
+      const d = new Date(item.earned_at);
+      // June 2026 (year 2026, month 5)
+      if (d.getFullYear() === 2026 && d.getMonth() === 5) {
+        days.add(d.getDate());
+      }
+    });
+    return Array.from(days);
+  }, [earnedBadgesHistory]);
+
+  // Compute badges earned on selected calendar day with multipliers for duplicate earnings
+  const badgesEarnedOnSelectedDay: Array<{ badge: any; count: number }> = useMemo(() => {
+    const dayHistory = earnedBadgesHistory.filter(item => {
+      if (!item.earned_at) return false;
+      const d = new Date(item.earned_at);
+      return d.getFullYear() === 2026 && d.getMonth() === 5 && d.getDate() === selectedCalendarDay;
+    });
+
+    const badgeCounts: Record<string, number> = {};
+    dayHistory.forEach(item => {
+      badgeCounts[item.badge_id] = (badgeCounts[item.badge_id] || 0) + 1;
+    });
+
+    return Object.entries(badgeCounts).map(([badgeId, count]: [string, number]) => {
+      const badgeDetail = badges.find(b => b.id === badgeId) || MOCK_BADGES_DATA.find(b => b.id === badgeId);
+      return {
+        badge: badgeDetail,
+        count
+      };
+    }).filter((item): item is { badge: any; count: number } => item.badge !== undefined);
+  }, [earnedBadgesHistory, selectedCalendarDay, badges]);
 
   // Custom Settings States
   const [dailyXpGoal, setDailyXpGoal] = useState<number>(100);
@@ -1271,6 +1306,19 @@ export default function StudentDashboard() {
 
   // Load user badges
   const loadBadges = async (userId: string) => {
+    const DEFAULT_SEED_HISTORY = [
+      { badge_id: 'gs_first_step', earned_at: '2026-06-02T10:00:00.000Z' },
+      { badge_id: 'gs_getting_started', earned_at: '2026-06-04T11:00:00.000Z' },
+      { badge_id: 'gs_curious_mind', earned_at: '2026-06-06T14:30:00.000Z' },
+      { badge_id: 'gs_first_challenge', earned_at: '2026-06-08T09:15:00.000Z' },
+      { badge_id: 'gs_first_challenge', earned_at: '2026-06-08T16:45:00.000Z' }, // x2
+      { badge_id: 'gs_learning_begins', earned_at: '2026-06-09T10:00:00.000Z' },
+      { badge_id: 'gs_keep_going', earned_at: '2026-06-14T15:20:00.000Z' },
+      { badge_id: 'gs_early_bird', earned_at: '2026-06-15T06:10:00.000Z' },
+      { badge_id: 'gs_early_bird', earned_at: '2026-06-15T06:30:00.000Z' }, // x3
+      { badge_id: 'gs_early_bird', earned_at: '2026-06-15T06:50:00.000Z' },
+    ];
+
     try {
       // 1. Fetch all badges
       const { data: dbBadges, error: badgesError } = await supabase
@@ -1298,57 +1346,117 @@ export default function StudentDashboard() {
       // 2. Fetch unlocked user badges
       const { data: dbUserBadges, error: userBadgesError } = await supabase
         .from('user_badges')
-        .select('badge_id')
+        .select('badge_id, earned_at')
         .eq('user_id', userId);
 
       if (userBadgesError) throw userBadgesError;
 
       if (dbUserBadges) {
-        const ids = dbUserBadges.map((ub: any) => ub.badge_id);
-        
+        const history = dbUserBadges
+          .map((ub: any) => ({
+            badge_id: ub.badge_id,
+            earned_at: ub.earned_at || ub.created_at
+          }));
+
+        let finalHistory = history;
+        if (history.length === 0) {
+          // If DB history is empty, check localStorage
+          const storedHistory = localStorage.getItem('aptitude_badges_history');
+          if (storedHistory) {
+            try {
+              finalHistory = JSON.parse(storedHistory);
+            } catch (e) {
+              finalHistory = [];
+            }
+          } else {
+            // Seed default history. Map the static badge_id strings to actual database UUIDs by matching name
+            const seed = DEFAULT_SEED_HISTORY.map(item => {
+              const mockBadge = MOCK_BADGES_DATA.find(b => b.id === item.badge_id);
+              if (mockBadge) {
+                const dbB = mappedBadges.find(b => b.name === mockBadge.name);
+                if (dbB) {
+                  return { ...item, badge_id: dbB.id };
+                }
+              }
+              return item;
+            });
+            finalHistory = seed;
+            localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
+          }
+        } else {
+          localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
+        }
+
+        setEarnedBadgesHistory(finalHistory);
+
+        // Also extract unique unlocked badge IDs for unlockedBadgeIds state
+        const uniqueUnlocked: string[] = Array.from(new Set(finalHistory.map((h: any) => h.badge_id as string)));
+
         // Retrospectively unlock Getting Started if onboarding is completed
         const hasOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
         const gettingStartedBadge = mappedBadges.find(b => b.name === 'Getting Started');
-        if (hasOnboarding && gettingStartedBadge && !ids.includes(gettingStartedBadge.id)) {
-          ids.push(gettingStartedBadge.id);
+        if (hasOnboarding && gettingStartedBadge && !uniqueUnlocked.includes(gettingStartedBadge.id)) {
+          uniqueUnlocked.push(gettingStartedBadge.id);
+          const nowStr = new Date().toISOString();
+          finalHistory.push({ badge_id: gettingStartedBadge.id, earned_at: nowStr });
+          setEarnedBadgesHistory([...finalHistory]);
+          localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
           try {
             await supabase.from('user_badges').insert({
               user_id: userId,
               badge_id: gettingStartedBadge.id,
-              unlocked_at: new Date().toISOString()
+              earned_at: nowStr,
+              progress_percentage: 100,
+              is_completed: true,
+              current_value: 1,
+              target_value: 1,
+              has_seen_popup: false
             });
-          } catch (e) {}
+          } catch (e) { }
         }
 
-        setUnlockedBadgeIds(ids);
-        localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(ids));
+        setUnlockedBadgeIds(uniqueUnlocked);
+        localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(uniqueUnlocked));
       }
     } catch (err) {
       console.warn("Could not load badges from database, checking local storage:", err);
+
+      const storedHistory = localStorage.getItem('aptitude_badges_history');
+      let finalHistory = [];
+      if (storedHistory) {
+        try {
+          finalHistory = JSON.parse(storedHistory);
+        } catch (e) { }
+      } else {
+        finalHistory = DEFAULT_SEED_HISTORY;
+        localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
+      }
+      setEarnedBadgesHistory(finalHistory);
+
+      const uniqueUnlocked: string[] = Array.from(new Set(finalHistory.map((h: any) => h.badge_id as string)));
+
       const stored = localStorage.getItem('aptitude_unlocked_badges');
       if (stored) {
         try {
-          setUnlockedBadgeIds(JSON.parse(stored));
-        } catch (e) {}
+          const parsed = JSON.parse(stored);
+          parsed.forEach((id: string) => {
+            if (!uniqueUnlocked.includes(id)) {
+              uniqueUnlocked.push(id);
+            }
+          });
+        } catch (e) { }
       } else {
-        const initialUnlocked = [];
-        if (localStorage.getItem('aptitude_onboarding_completed') === 'true') {
-          initialUnlocked.push('gs_getting_started');
+        const hasOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
+        if (hasOnboarding && !uniqueUnlocked.includes('gs_getting_started')) {
+          uniqueUnlocked.push('gs_getting_started');
         }
-        const currentSolved = Number(localStorage.getItem('aptitude_solved_count') || solvedCount);
-        const currentStreak = Number(localStorage.getItem('aptitude_streak') || streak);
-        if (currentSolved >= 1) initialUnlocked.push('gs_first_step');
-        if (currentSolved >= 10) initialUnlocked.push('gs_keep_going');
-        if (currentStreak >= 3) initialUnlocked.push('gs_on_track');
-        if (currentStreak >= 5) initialUnlocked.push('gs_not_stopping');
-
-        setUnlockedBadgeIds(initialUnlocked);
-        localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(initialUnlocked));
       }
+
+      setUnlockedBadgeIds(uniqueUnlocked);
+      localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(uniqueUnlocked));
     }
   };
 
-  // Unlock / Award badge
   const awardBadge = async (badgeId: string) => {
     // 1. Map client-side string ID to real database UUID or name
     const BADGE_ID_NAME_MAP: Record<string, string> = {
@@ -1371,12 +1479,21 @@ export default function StudentDashboard() {
     // Use the badge's actual ID (which will be UUID from db, or gs_ string ID from mock fallback)
     const dbBadgeId = badgeDetails.id;
 
-    if (unlockedBadgeIds.includes(dbBadgeId)) return;
+    console.log(`Awarding/Unlocking Badge: ${badgeDetails.name} (${dbBadgeId})`);
 
-    console.log(`Unlocking Badge: ${badgeDetails.name} (${dbBadgeId})`);
-    const updated = [...unlockedBadgeIds, dbBadgeId];
-    setUnlockedBadgeIds(updated);
-    localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(updated));
+    // Add to unique unlocked list if not already present
+    if (!unlockedBadgeIds.includes(dbBadgeId)) {
+      const updated = [...unlockedBadgeIds, dbBadgeId];
+      setUnlockedBadgeIds(updated);
+      localStorage.setItem('aptitude_unlocked_badges', JSON.stringify(updated));
+    }
+
+    // Push new achievement record with current timestamp into earnedBadgesHistory
+    const nowStr = new Date().toISOString();
+    const newHistoryEntry = { badge_id: dbBadgeId, earned_at: nowStr };
+    const updatedHistory = [...earnedBadgesHistory, newHistoryEntry];
+    setEarnedBadgesHistory(updatedHistory);
+    localStorage.setItem('aptitude_badges_history', JSON.stringify(updatedHistory));
 
     setJustUnlockedBadge(badgeDetails);
     // Trigger chime & celebration
@@ -1389,7 +1506,12 @@ export default function StudentDashboard() {
         await supabase.from('user_badges').insert({
           user_id: session.user.id,
           badge_id: dbBadgeId,
-          unlocked_at: new Date().toISOString()
+          earned_at: nowStr,
+          progress_percentage: 100,
+          is_completed: true,
+          current_value: 1,
+          target_value: 1,
+          has_seen_popup: false
         });
       }
     } catch (err) {
@@ -1411,7 +1533,7 @@ export default function StudentDashboard() {
       if (!AudioContext) return;
       const ctx = new AudioContext();
       const now = ctx.currentTime;
-      
+
       // Note 1 (E5)
       const osc1 = ctx.createOscillator();
       const gain1 = ctx.createGain();
@@ -1450,7 +1572,7 @@ export default function StudentDashboard() {
       gain3.connect(ctx.destination);
       osc3.start(now + 0.2);
       osc3.stop(now + 1.2);
-      
+
       setSoundWaveActive(true);
       setTimeout(() => {
         setSoundWaveActive(false);
@@ -1480,7 +1602,7 @@ export default function StudentDashboard() {
     const yc = rect.height / 2;
     const rotateX = -(y - yc) / (rect.height / 10);
     const rotateY = (x - xc) / (rect.width / 10);
-    
+
     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
     card.style.transition = 'transform 0.05s ease-out';
   };
@@ -1496,7 +1618,7 @@ export default function StudentDashboard() {
     // Load footer settings from localStorage
     const savedFooterBadge = localStorage.getItem('aptitude_footer_badge_text');
     if (savedFooterBadge) setFooterBadgeText(savedFooterBadge);
-    
+
     const savedFooterCopyright = localStorage.getItem('aptitude_footer_copyright');
     if (savedFooterCopyright) setFooterCopyright(savedFooterCopyright);
 
@@ -1542,7 +1664,7 @@ export default function StudentDashboard() {
         const isSarah = session.user.email === 'sarah.c@aptitude-ai.com';
         const isMarcus = session.user.email === 'marcus.w@aptitude-ai.com';
         const userRole = (profileObj?.role === 'ADMIN' || isSarah || isMarcus) ? 'admin' : 'STUDENT';
-        
+
         const roleObj = {
           role: userRole === 'admin' ? (isMarcus ? 'editor' : 'admin') : 'STUDENT',
           name: session.user.email?.split('@')[0].toUpperCase() || 'STUDENT',
@@ -1557,7 +1679,7 @@ export default function StudentDashboard() {
             const parsed = JSON.parse(roleStored);
             roleObj.role = parsed.role;
             roleObj.name = parsed.name || roleObj.name;
-          } catch (_) {}
+          } catch (_) { }
         }
 
         localStorage.setItem('aptitude_current_role', JSON.stringify(roleObj));
@@ -1655,13 +1777,13 @@ export default function StudentDashboard() {
               shuffleOptions: false,
               questionStem: q.question_text || '',
               hintText: q.explanation || '',
-              options: Array.isArray(q.options) 
+              options: Array.isArray(q.options)
                 ? q.options.map((opt: any, index: number) => ({
-                    id: opt.id || String.fromCharCode(65 + index),
-                    text: opt.text || '',
-                    isCorrect: opt.isCorrect || false,
-                    metadata: opt.metadata || ''
-                  }))
+                  id: opt.id || String.fromCharCode(65 + index),
+                  text: opt.text || '',
+                  isCorrect: opt.isCorrect || false,
+                  metadata: opt.metadata || ''
+                }))
                 : [],
               videoUrl: q.video_url || '',
               status: q.is_active ? 'Published' : 'Draft',
@@ -1774,12 +1896,12 @@ export default function StudentDashboard() {
   const filteredOpportunities = useMemo(() => {
     if (selectedOpportunityType === 'All') return opportunities;
     // Map custom sub-tabs in career hub to opportunity types
-    const mappedType = 
+    const mappedType =
       selectedOpportunityType === 'Hiring Drives' ? 'Hiring' :
-      selectedOpportunityType === 'Internships' ? 'Internship' :
-      selectedOpportunityType === 'Government Exams' ? 'Government Exam' :
-      selectedOpportunityType === 'Hackathons' ? 'Hackathon' :
-      selectedOpportunityType;
+        selectedOpportunityType === 'Internships' ? 'Internship' :
+          selectedOpportunityType === 'Government Exams' ? 'Government Exam' :
+            selectedOpportunityType === 'Hackathons' ? 'Hackathon' :
+              selectedOpportunityType;
     return opportunities.filter(o => o.type === mappedType);
   }, [opportunities, selectedOpportunityType]);
 
@@ -1864,11 +1986,11 @@ export default function StudentDashboard() {
   const handleLogout = async () => {
     await authSupabase.auth.signOut();
     localStorage.removeItem('aptitude_current_role');
-    
+
     // Clear mock session cookies
     document.cookie = 'aptitude_mock_auth=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax';
     document.cookie = 'aptitude_onboarding_completed=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax';
-    
+
     router.push('/');
   };
 
@@ -1911,7 +2033,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
-      
+
       {/* Glow Backdrops */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/5 blur-[140px] pointer-events-none" />
@@ -1925,106 +2047,99 @@ export default function StudentDashboard() {
 
         {/* Sidebar Tabs */}
         <nav className="flex-1 flex flex-col gap-3 items-center w-full overflow-y-auto scrollbar-none">
-          
+
           {/* Dashboard Tab */}
-          <button 
+          <button
             onClick={() => setActiveSidebarTab('dashboard')}
             title="Dashboard"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'dashboard'
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'dashboard'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+              }`}
           >
             <Compass className="w-5 h-5" />
           </button>
-          
+
           {/* Domains Tab */}
-          <button 
+          <button
             onClick={() => router.push('/student/domains')}
             title="Domains"
-            className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900 transition-all cursor-pointer"
+            className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900 transition-all cursor-pointer"
           >
             <Layers className="w-5 h-5" />
           </button>
-          
+
           {/* Learning Tab */}
-          <button 
+          <button
             onClick={() => setActiveSidebarTab('learning')}
             title="Learning Roadmap"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'learning'
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'learning'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+              }`}
           >
             <BookOpen className="w-5 h-5" />
           </button>
 
           {/* Practice Arena Tab */}
-          <button 
+          <button
             onClick={() => setActiveSidebarTab('practice')}
             title="Practice Arena"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'practice'
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'practice'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+              }`}
           >
             <BookOpenCheck className="w-5 h-5" />
           </button>
 
           {/* Mock Tests Tab */}
-          <button 
+          <button
             onClick={() => setActiveSidebarTab('mockTests')}
             title="Mock Tests"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'mockTests'
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'mockTests'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+              }`}
           >
             <Award className="w-5 h-5" />
           </button>
 
           {/* Career Hub Tab */}
-          <button 
+          <button
             onClick={() => {
               setActiveSidebarTab('careerHub');
               setSelectedOpportunityType('All');
             }}
             title="Career Hub"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'careerHub'
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'careerHub'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+              }`}
           >
             <Briefcase className="w-5 h-5" />
           </button>
 
           {/* Leaderboards Tab */}
-          <button 
+          <button
             onClick={() => setActiveSidebarTab('leaderboards')}
             title="Leaderboard Rankings"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'leaderboards'
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'leaderboards'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+              }`}
           >
             <Trophy className="w-5 h-5" />
           </button>
 
           {/* Achievements Tab */}
-          <button 
+          <button
             onClick={() => setActiveSidebarTab('badges')}
             title="Badges & Achievements"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-              activeSidebarTab === 'badges'
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'badges'
                 ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-505 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-            }`}
+                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
+              }`}
           >
             <Sparkles className="w-5 h-5" />
           </button>
@@ -2032,17 +2147,17 @@ export default function StudentDashboard() {
           {/* Admin Tools Section */}
           {currentRole?.role === 'admin' && (
             <div className="pt-2 border-t border-slate-150 dark:border-slate-900 w-full flex flex-col gap-2 items-center">
-              <button 
+              <button
                 onClick={() => router.push('/admin/editor')}
                 title="Content Creator (Admin)"
                 className="w-10 h-10 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-55 dark:hover:bg-blue-900/30 transition-all cursor-pointer"
               >
                 <SettingsIcon className="w-4.5 h-4.5" />
               </button>
-              <button 
+              <button
                 onClick={() => router.push('/admin/dashboard')}
                 title="Admin Dashboard"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-655 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all cursor-pointer"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all cursor-pointer"
               >
                 <Layers className="w-4.5 h-4.5" />
               </button>
@@ -2058,15 +2173,15 @@ export default function StudentDashboard() {
             className={`w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative overflow-hidden ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
           >
             {profile.avatar && profile.avatar !== 'initial' ? (
-              <img 
-                src={profile.avatar} 
-                alt="User Avatar" 
-                className="w-full h-full object-cover" 
+              <img
+                src={profile.avatar}
+                alt="User Avatar"
+                className="w-full h-full object-cover"
               />
             ) : (
               <User className="w-5 h-5" />
             )}
-            
+
             {/* Red dot notification badge */}
             <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
           </button>
@@ -2076,12 +2191,12 @@ export default function StudentDashboard() {
             <div className="absolute left-[84px] bottom-0 w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
               {/* Profile details header */}
               <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-slate-105 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
                   {profile.avatar && profile.avatar !== 'initial' ? (
-                    <img 
-                      src={profile.avatar} 
-                      alt="User Avatar" 
-                      className="w-full h-full object-cover" 
+                    <img
+                      src={profile.avatar}
+                      alt="User Avatar"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <User className="w-5 h-5" />
@@ -2091,7 +2206,7 @@ export default function StudentDashboard() {
                   <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
                     {profile.username || 'Vaishnavi Raparthy'}
                   </span>
-                  <span className="text-[10px] text-slate-405 dark:text-slate-505 font-semibold truncate leading-normal">
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
                     {currentRole?.email || 'shellysros1922@gmail.com'}
                   </span>
                 </div>
@@ -2099,7 +2214,7 @@ export default function StudentDashboard() {
 
               {/* Menu Options */}
               <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-350">
-                
+
                 {/* My Profile option */}
                 <button
                   onClick={() => {
@@ -2108,7 +2223,7 @@ export default function StudentDashboard() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <User className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                   <span className="flex-1">My Profile</span>
                 </button>
 
@@ -2120,7 +2235,7 @@ export default function StudentDashboard() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                   <span className="flex-1">Account</span>
                 </button>
 
@@ -2134,7 +2249,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* Sessions (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-555 opacity-60 select-none font-bold">
+                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
                   <div className="flex items-center gap-3">
                     <List className="w-4 h-4 shrink-0" />
                     <span>Sessions</span>
@@ -2150,7 +2265,7 @@ export default function StudentDashboard() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                   <span className="flex-1">Troubleshooting</span>
                 </button>
 
@@ -2163,7 +2278,7 @@ export default function StudentDashboard() {
                   className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
                   <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                     <span>New Features</span>
                   </div>
                   <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
@@ -2178,12 +2293,12 @@ export default function StudentDashboard() {
                 >
                   {theme === 'dark' ? (
                     <>
-                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                       <span className="flex-1">Light Mode</span>
                     </>
                   ) : (
                     <>
-                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                       <span className="flex-1">Dark Mode</span>
                     </>
                   )}
@@ -2198,7 +2313,7 @@ export default function StudentDashboard() {
                   className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
                   <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                     <span>Notification</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
@@ -2213,10 +2328,10 @@ export default function StudentDashboard() {
                     handleLogout();
                     setProfileDropdownOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-605 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
                 >
                   <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
-                  <span className="flex-1 font-extrabold text-rose-605 dark:text-rose-450">Logout</span>
+                  <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
                 </button>
 
               </div>
@@ -2227,7 +2342,7 @@ export default function StudentDashboard() {
 
       {/* 2. Main Workspace Frame */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
-        
+
         {/* Top Header (Reference 2 style) */}
         <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
           <div className="flex flex-col items-start text-left">
@@ -2258,10 +2373,10 @@ export default function StudentDashboard() {
           </div>
 
           <div className="flex items-center gap-5">
-            
+
             {/* Search Input Box */}
             <div className="relative hidden md:block">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-405" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search something..."
@@ -2285,11 +2400,10 @@ export default function StudentDashboard() {
                   localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
                   setCurrentRole(studentRole);
                 }}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                  currentRole?.role !== 'admin'
+                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role !== 'admin'
                     ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-450 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-505 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                }`}
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                  }`}
               >
                 Preview
               </button>
@@ -2306,11 +2420,10 @@ export default function StudentDashboard() {
                   setCurrentRole(adminRole);
                   router.push('/admin/editor');
                 }}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                  currentRole?.role === 'admin'
+                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role === 'admin'
                     ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-450 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
                     : 'text-slate-550 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                }`}
+                  }`}
               >
                 Edit / Admin
               </button>
@@ -2320,9 +2433,8 @@ export default function StudentDashboard() {
         </header>
 
         {/* Scrollable Panel Area */}
-        <div className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${
-          layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
-        }`}>
+        <div className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
+          }`}>
 
 
           {/* ====================================================================
@@ -2330,7 +2442,7 @@ export default function StudentDashboard() {
               ==================================================================== */}
           {activeSidebarTab === 'dashboard' && (
             <div className="w-full space-y-8 animate-fadeIn text-slate-800 dark:text-slate-200">
-              
+
               {/* Admin Banner Alert */}
               {currentRole?.role === 'admin' && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-blue-55/80 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40 text-blue-800 dark:text-blue-400 animate-fadeIn shadow-xs select-none">
@@ -2357,37 +2469,37 @@ export default function StudentDashboard() {
 
               {/* Main 12-Column Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
+
                 {/* Left Column (8 cols): Activities & Progress */}
                 <div className="lg:col-span-8 space-y-8">
-                  
+
                   {/* "Your activities today" Section (Reference 2 style) */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h2 className="text-lg font-bold text-slate-800 dark:text-white font-heading">
-                        Your activities today <span className="text-slate-405 font-medium text-sm ml-1.5">(3)</span>
+                        Your activities today <span className="text-slate-400 font-medium text-sm ml-1.5">(3)</span>
                       </h2>
                     </div>
 
                     {/* Horizontal/Grid Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      
+
                       {/* Card 1: Quant Aptitude */}
                       <div className="bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-48 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex justify-between items-start">
                           <span className="bg-white/80 dark:bg-slate-900/60 border border-[#B8DCE7] dark:border-slate-800 px-3 py-1 rounded-full text-[10px] font-black text-[#1E4E5D] dark:text-[#38BDF8] flex items-center gap-1">
                             ⭐ 4.9 <span className="text-[9px] text-[#558CA0]">Accuracy: 84%</span>
                           </span>
-                          
+
                           {/* Diagonal Arrow button */}
-                          <button 
+                          <button
                             onClick={() => {
                               setActiveSidebarTab('practice');
                               setSelectedDomain('quant');
                             }}
                             className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
                           >
-                            <ChevronRight className="w-5 h-5 text-slate-605 -rotate-45" />
+                            <ChevronRight className="w-5 h-5 text-slate-600 -rotate-45" />
                           </button>
                         </div>
 
@@ -2413,15 +2525,15 @@ export default function StudentDashboard() {
                           <span className="bg-white/80 dark:bg-slate-900/60 border border-[#F9A8D4] dark:border-slate-800 px-3 py-1 rounded-full text-[10px] font-black text-[#9D174D] dark:text-[#F472B6] flex items-center gap-1">
                             ⭐ 4.8 <span className="text-[9px] text-[#C2410C]">Accuracy: 92%</span>
                           </span>
-                          
-                          <button 
+
+                          <button
                             onClick={() => {
                               setActiveSidebarTab('practice');
                               setSelectedDomain('logical');
                             }}
                             className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
                           >
-                            <ChevronRight className="w-5 h-5 text-slate-605 -rotate-45" />
+                            <ChevronRight className="w-5 h-5 text-slate-600 -rotate-45" />
                           </button>
                         </div>
 
@@ -2434,8 +2546,8 @@ export default function StudentDashboard() {
 
                         <div className="flex items-center -space-x-2">
                           <div className="w-6 h-6 rounded-full bg-green-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">AS</div>
-                          <div className="w-6 h-6 rounded-full bg-yellow-505 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">RS</div>
-                          <div className="w-6 h-6 rounded-full bg-[#111827] border border-white dark:border-slate-955 text-white text-[9px] font-bold flex items-center justify-center">VR</div>
+                          <div className="w-6 h-6 rounded-full bg-yellow-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">RS</div>
+                          <div className="w-6 h-6 rounded-full bg-[#111827] border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">VR</div>
                           <span className="text-[9.5px] text-[#B04A75] dark:text-slate-400 font-bold ml-3">+6 others active</span>
                         </div>
                       </div>
@@ -2446,9 +2558,9 @@ export default function StudentDashboard() {
                   {/* "Learning progress" Section (Reference 2 style) */}
                   <div className="space-y-4 pt-2">
                     <h2 className="text-lg font-bold text-slate-800 dark:text-white font-heading">Learning progress</h2>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                      
+
                       {/* Completed Stat */}
                       <div className="bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-5 rounded-2xl flex items-center justify-between hover:shadow-md transition-all group">
                         <div className="space-y-1 text-left">
@@ -2496,7 +2608,7 @@ export default function StudentDashboard() {
                         <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase leading-snug">
                           Percentages → Profit & Loss
                         </h3>
-                        
+
                         {/* Progress Bar */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -2504,8 +2616,8 @@ export default function StudentDashboard() {
                             <span className="font-mono">{challengeCompletedCount} / 15 solved lessons</span>
                           </div>
                           <div className="w-full bg-slate-200/60 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                            <div 
-                              className="bg-amber-500 h-full rounded-full transition-all duration-500" 
+                            <div
+                              className="bg-amber-500 h-full rounded-full transition-all duration-500"
                               style={{ width: `${(challengeCompletedCount / 15) * 100}%` }}
                             />
                           </div>
@@ -2513,7 +2625,7 @@ export default function StudentDashboard() {
                       </div>
 
                       {/* Large diagonal arrow button */}
-                      <button 
+                      <button
                         onClick={() => {
                           setActiveSidebarTab('learning');
                         }}
@@ -2529,7 +2641,7 @@ export default function StudentDashboard() {
 
                 {/* Right Column (4 cols): Lesson Schedule Calendar, Opportunities & Time Tracker */}
                 <div className="lg:col-span-4 space-y-8">
-                  
+
                   {/* 1. Lesson Schedule Calendar Card */}
                   <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
                     <div className="flex items-center justify-between mb-4 pb-1 border-b border-slate-100 dark:border-slate-900/60">
@@ -2548,77 +2660,100 @@ export default function StudentDashboard() {
                         <span>Sat</span>
                         <span>Sun</span>
                       </div>
-                      
+
                       {/* Dates grid for June 2026. Starts on Monday, 30 days */}
                       <div className="grid grid-cols-7 gap-y-2.5 gap-x-1 text-center text-xs font-bold text-slate-700 dark:text-slate-400">
                         {/* Day 1 to 30 */}
                         {[...Array(30)].map((_, i) => {
                           const dateNum = i + 1;
-                          
-                          // Streak/active study dates (e.g. 2, 4, 6, 8, 9, 14, 15)
-                          const isStreakDay = [2, 4, 6, 8, 14, 15].includes(dateNum);
-                          const isToday = dateNum === 9; // Today is June 9, 2026
 
-                          let dateStyles = "w-7 h-7 flex items-center justify-center mx-auto rounded-full transition-colors ";
+                          // Streak/active study dates from dynamic history
+                          const isStreakDay = streakDaysFromHistory.includes(dateNum);
+                          const isToday = dateNum === 9; // Today is June 9, 2026
+                          const isSelected = selectedCalendarDay === dateNum;
+
+                          let dateStyles = "w-7 h-7 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
+
                           if (isToday) {
-                            dateStyles += "bg-[#111827] dark:bg-white text-white dark:text-slate-950 font-black shadow-sm";
+                            dateStyles += "bg-[#111827] dark:bg-white text-white dark:text-slate-900 font-black shadow-sm ";
                           } else if (isStreakDay) {
-                            dateStyles += "bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-250 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400 font-extrabold";
+                            dateStyles += "bg-emerald-50 dark:bg-emerald-950/35 border border-emerald-200 dark:border-emerald-900 text-emerald-600 dark:text-emerald-400 font-extrabold ";
                           } else {
-                            dateStyles += "hover:bg-slate-100 dark:hover:bg-slate-900";
+                            dateStyles += "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 ";
+                          }
+
+                          if (isSelected) {
+                            dateStyles += "ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-900 ";
                           }
 
                           return (
-                            <div key={dateNum} className="relative">
+                            <button
+                              key={dateNum}
+                              onClick={() => setSelectedCalendarDay(dateNum)}
+                              className="relative focus:outline-none"
+                              type="button"
+                            >
                               <span className={dateStyles}>{dateNum}</span>
                               {isStreakDay && (
                                 <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-500" />
                               )}
-                            </div>
+                            </button>
                           );
                         })}
                       </div>
 
-                      {/* Webinar / upcoming lessons list (Reference 2 style) */}
-                      <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-900/60">
-                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest pb-1.5">
-                          <span>Upcoming events</span>
-                          <button onClick={() => setActiveSidebarTab('careerHub')} className="text-blue-500 hover:underline">View All</button>
+                      {/* Badges Earned Section */}
+                      <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-900/60">
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
+                          <span>Badges Earned • June {selectedCalendarDay}</span>
+                          <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-black uppercase">
+                            {badgesEarnedOnSelectedDay.reduce((acc: number, item: any) => acc + item.count, 0)} Badges
+                          </span>
                         </div>
-                        
-                        <div className="space-y-2.5">
-                          
-                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
-                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 shrink-0">
-                              <BookOpen className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="text-left leading-tight">
-                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">TCS NQT National Mock Test</h4>
-                              <p className="text-[9.5px] text-slate-450 mt-0.5">Tata Consultancy Services · Starts today 2:00 PM</p>
-                            </div>
-                          </div>
 
-                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
-                            <div className="p-2 rounded-lg bg-pink-50 dark:bg-pink-900/30 text-pink-650 dark:text-pink-400 shrink-0">
-                              <Compass className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="text-left leading-tight">
-                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">SWE Intern prep drive</h4>
-                              <p className="text-[9.5px] text-slate-455 mt-0.5">Microsoft India Azure Staging · Till July 15</p>
-                            </div>
-                          </div>
+                        {badgesEarnedOnSelectedDay.length > 0 ? (
+                          <div className="grid grid-cols-1 gap-2">
+                            {badgesEarnedOnSelectedDay.map(({ badge, count }: { badge: any; count: number }) => (
+                              <button
+                                key={badge.id}
+                                onClick={() => setSelectedBadge(badge)}
+                                className="w-full text-left bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/40 dark:hover:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between transition-all group cursor-pointer focus:outline-none"
+                                type="button"
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                                    {badge.image_url ? (
+                                      <img src={badge.image_url} alt={badge.name} className="w-6 h-6 object-contain" />
+                                    ) : (
+                                      <span className="text-base">{getCategoryEmoji(badge.category)}</span>
+                                    )}
+                                  </div>
+                                  <div className="leading-tight">
+                                    <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                      {badge.name}
+                                    </h4>
+                                    <p className="text-[9.5px] text-slate-450 mt-0.5 line-clamp-1">{badge.description}</p>
+                                  </div>
+                                </div>
 
-                          <div className="bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-start gap-2.5">
-                            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 shrink-0">
-                              <Layers className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="text-left leading-tight">
-                              <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug">Verbal Reasoning webinar</h4>
-                              <p className="text-[9.5px] text-slate-455 mt-0.5">Content Team Staged Modules · June 12</p>
-                            </div>
+                                <div className="flex items-center gap-2">
+                                  {count > 1 && (
+                                    <span className="bg-blue-600 text-white dark:bg-blue-500 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                                      x{count}
+                                    </span>
+                                  )}
+                                  <span className="text-[10px] text-blue-500 dark:text-blue-400 font-extrabold group-hover:translate-x-0.5 transition-transform">
+                                    →
+                                  </span>
+                                </div>
+                              </button>
+                            ))}
                           </div>
-
-                        </div>
+                        ) : (
+                          <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-5 text-center flex items-center justify-center">
+                            <span className="text-xs text-slate-400 dark:text-slate-500 italic font-medium">No badges earned on this day</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2627,13 +2762,13 @@ export default function StudentDashboard() {
                   <div className="bg-[#0B3A27] dark:bg-[#062418] text-white border border-[#0A3322] dark:border-[#041B12] rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between h-48 group">
                     {/* Visual pattern overlay */}
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.15),transparent_60%)] pointer-events-none" />
-                    
+
                     <div className="flex items-center justify-between relative z-10">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-[#A7F3D0] font-mono">Time Tracker</span>
                       </div>
-                      <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-[#065F46] rounded-md text-emerald-250">
+                      <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-[#065F46] rounded-md text-emerald-200">
                         {timeTrackerIsRunning ? "Active" : "Paused"}
                       </span>
                     </div>
@@ -2648,21 +2783,20 @@ export default function StudentDashboard() {
                     </div>
 
                     <div className="flex gap-2 relative z-10 pt-2 border-t border-[#092B1D]/80">
-                      
+
                       {/* Toggle play/pause button */}
-                      <button 
+                      <button
                         onClick={() => setTimeTrackerIsRunning(!timeTrackerIsRunning)}
-                        className={`flex-1 py-1.8 font-bold text-[10px] uppercase rounded-xl transition-all cursor-pointer text-center ${
-                          timeTrackerIsRunning 
-                            ? "bg-amber-600 hover:bg-amber-500 text-white" 
+                        className={`flex-1 py-1.8 font-bold text-[10px] uppercase rounded-xl transition-all cursor-pointer text-center ${timeTrackerIsRunning
+                            ? "bg-amber-600 hover:bg-amber-500 text-white"
                             : "bg-emerald-600 hover:bg-emerald-500 text-white"
-                        }`}
+                          }`}
                       >
                         {timeTrackerIsRunning ? "Pause Session" : "Start Study"}
                       </button>
 
                       {/* Reset button */}
-                      <button 
+                      <button
                         onClick={() => {
                           setTimeTrackerIsRunning(false);
                           setTimeTrackerSeconds(0);
@@ -2684,7 +2818,7 @@ export default function StudentDashboard() {
 
           {activeSidebarTab === 'learning' && (
             <div className="w-full space-y-8 relative overflow-hidden p-6 rounded-3xl bg-slate-50/50 dark:bg-[#020617]/50 border border-slate-200/60 dark:border-slate-800/40 backdrop-blur-xl transition-all duration-300">
-              
+
               {/* Ambient Background Particles and Orbs */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="bg-emerald-500/10 dark:bg-emerald-500/5 w-64 h-64 rounded-full blur-3xl absolute -left-20 -top-20 pointer-events-none" />
@@ -2715,7 +2849,7 @@ export default function StudentDashboard() {
               </div>
 
               {/* Hero Title & Subtitle with Blur-Fade-Up Reveal */}
-              <motion.div 
+              <motion.div
                 initial={reducedMotion ? {} : { opacity: 0, y: 15, filter: "blur(4px)" }}
                 animate={reducedMotion ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.6 }}
@@ -2805,14 +2939,11 @@ export default function StudentDashboard() {
                 ].map((tab) => (
                   <motion.button
                     key={tab.id}
-                    onClick={() => handleFilterChange(tab.id)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-1.5 border ${
-                      roadmapFilter === tab.id
-                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-transparent shadow-md'
-                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-slate-200 dark:border-slate-800'
-                    }`}
+                    onClick={() => setRoadmapFilter(tab.id as any)}
+                    className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-305 cursor-pointer flex items-center gap-1.5 border ${roadmapFilter === tab.id
+                        ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-950 border-transparent shadow-md scale-105'
+                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205 border-slate-205 dark:border-slate-800'
+                      }`}
                   >
                     <span>{tab.icon}</span>
                     <span>{tab.label}</span>
@@ -2856,7 +2987,7 @@ export default function StudentDashboard() {
                 const segments = rawSegmentPaths.map((pathStr: string, idx: number) => {
                   const startNode = nodesList[idx];
                   const endNode = nodesList[idx + 1];
-                  
+
                   let status = "locked";
                   if (startNode.status === 'completed') {
                     if (endNode && endNode.status === 'completed') {
@@ -2885,14 +3016,14 @@ export default function StudentDashboard() {
                   : `M 10,80 L 10,80`;
 
                 return (
-                  <div 
+                  <div
                     className="relative w-full h-[520px] select-none my-6 transition-all duration-500 ease-out"
                     style={{
                       transform: 'perspective(1200px) rotateX(12deg)',
                       transformStyle: 'preserve-3d',
                     }}
                   >
-                    
+
                     {/* SVG Curve Canvas */}
                     <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 520" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2050/svg">
                       <defs>
@@ -3093,10 +3224,10 @@ export default function StudentDashboard() {
                       {/* Animated Traveling Glow Orb along the completed path */}
                       {completedCoords.length > 1 && (
                         <circle r="6" fill="#60A5FA" className="filter drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">
-                          <animateMotion 
-                            dur="5s" 
-                            repeatCount="indefinite" 
-                            path={motionPath} 
+                          <animateMotion
+                            dur="5s"
+                            repeatCount="indefinite"
+                            path={motionPath}
                           />
                         </circle>
                       )}
@@ -3104,11 +3235,11 @@ export default function StudentDashboard() {
 
                     {/* Side decorative Illustration cards in the empty columns */}
                     {illustrationsList.map((ill: any, i: number) => (
-                      <motion.div 
+                      <motion.div
                         key={i}
-                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-205 dark:border-slate-800/80 p-2.5 rounded-2xl shadow-md w-38 select-none pointer-events-auto cursor-help"
-                        style={{ 
-                          left: `${ill.x}%`, 
+                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-250 dark:border-slate-900/80 p-2.5 rounded-2xl shadow-md w-36 select-none transition-all duration-300 hover:scale-105 pointer-events-none"
+                        style={{
+                          left: `${ill.x}%`,
                           top: `${ill.y}px`,
                           transform: 'translate3d(-50%, -50%, 15px)',
                           boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.3)'
@@ -3116,14 +3247,14 @@ export default function StudentDashboard() {
                         initial={{ opacity: 0, y: ill.y + 20, scale: 0.9 }}
                         animate={{ opacity: 1, y: ill.y, scale: 1 }}
                         transition={{ delay: 0.4 + i * 0.15, duration: 0.6, type: "spring" }}
-                        whileHover={{ 
-                          scale: 1.08, 
+                        whileHover={{
+                          scale: 1.08,
                           y: ill.y - 4,
                           boxShadow: '0 15px 30px -5px rgba(0,0,0,0.2), 0 0 15px rgba(245,158,11,0.2)',
                         }}
                       >
                         <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center shrink-0 shadow-inner relative overflow-hidden group">
-                          <motion.div 
+                          <motion.div
                             className="absolute top-0 bottom-0 left-0 w-2 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
                             animate={{
                               left: ["-20%", "120%"]
@@ -3155,17 +3286,17 @@ export default function StudentDashboard() {
                       const zElevation = isActive ? 35 : isCompleted ? 20 : 5;
 
                       return (
-                        <div 
-                          key={node.id} 
+                        <div
+                          key={node.id}
                           className="absolute flex flex-col items-center z-10 group"
-                          style={{ 
-                            left: `${x}%`, 
+                          style={{
+                            left: `${x}%`,
                             top: `${y}px`,
                             transform: `translate3d(-50%, -50%, ${zElevation}px)`,
                             transformStyle: 'preserve-3d',
                           }}
                         >
-                          
+
                           {/* Pulsing Active glow */}
                           {isActive && (
                             <motion.div
@@ -3206,11 +3337,11 @@ export default function StudentDashboard() {
                           <motion.button
                             variants={shakeVariants}
                             animate={
-                              shakeNodeId === node.id 
-                                ? "shake" 
-                                : isJustUnlocked 
-                                ? { scale: [0.8, 1.2, 1], rotate: [0, -5, 5, 0] } 
-                                : "idle"
+                              shakeNodeId === node.id
+                                ? "shake"
+                                : isJustUnlocked
+                                  ? { scale: [0.8, 1.2, 1], rotate: [0, -5, 5, 0] }
+                                  : "idle"
                             }
                             onAnimationComplete={() => setShakeNodeId(null)}
                             onClick={() => {
@@ -3220,57 +3351,41 @@ export default function StudentDashboard() {
                                 setActiveChallengeNode(node);
                               }
                             }}
-                            whileHover={!isLocked ? { 
-                              y: -6, 
-                              scale: 1.05, 
-                              boxShadow: "0px 10px 25px rgba(59, 130, 246, 0.3)" 
+                            whileHover={!isLocked ? {
+                              y: -6,
+                              scale: 1.05,
+                              boxShadow: "0px 10px 25px rgba(59, 130, 246, 0.3)"
                             } : {}}
                             initial={isJustUnlocked ? { scale: 0.8 } : false}
                             transition={{ duration: 0.8, ease: "easeInOut" }}
-                            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 select-none cursor-pointer ${
-                              isCompleted 
-                                ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px]' 
-                                : isActive 
-                                ? 'bg-gradient-to-tr from-blue-600 to-indigo-550 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:brightness-110' 
-                                : 'bg-slate-100 border-b-2 border-slate-350 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-650 cursor-not-allowed'
-                            }`}
+                            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 select-none cursor-pointer ${isCompleted
+                                ? 'bg-gradient-to-tr from-emerald-555 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px] hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2'
+                                : isActive
+                                  ? 'bg-gradient-to-tr from-blue-600 to-indigo-550 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:brightness-110'
+                                  : 'bg-slate-100 border-b-2 border-slate-350 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-650 cursor-not-allowed'
+                              }`}
                           >
-                            <AnimatePresence mode="wait">
-                              {isCompleted ? (
-                                <motion.div 
-                                  key="check" 
-                                  initial={{ scale: 0, rotate: -45 }} 
-                                  animate={{ scale: 1, rotate: 0 }} 
-                                  transition={{ type: "spring", stiffness: 300, damping: 12 }}
-                                >
-                                  <Check className="w-7 h-7 stroke-[3.5]" />
-                                </motion.div>
-                              ) : isLocked && !isJustUnlocked ? (
-                                <motion.div key="lock" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                                  <Lock className="w-4.5 h-4.5" />
-                                </motion.div>
-                              ) : (
-                                <motion.div key="symbol" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 15 }}>
-                                  {node.symbol === '🏆' ? (
-                                    <Trophy className="w-5.5 h-5.5 text-amber-500" />
-                                  ) : (
-                                    <span className="text-base font-black font-mono">{node.symbol}</span>
-                                  )}
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
+                            {isCompleted ? (
+                              <Check className="w-7 h-7 stroke-[3.5]" />
+                            ) : node.symbol === '🏆' ? (
+                              <Trophy className={`w-5.5 h-5.5 ${isLocked ? 'text-slate-400 dark:text-slate-605' : 'text-amber-500'}`} />
+                            ) : isLocked ? (
+                              <Lock className="w-4.5 h-4.5" />
+                            ) : (
+                              <span className="text-base font-black font-mono">{node.symbol}</span>
+                            )}
                           </motion.button>
 
                           {/* Node Label card popup on hover */}
-                          <div 
-                            className="absolute top-16 text-center bg-white/95 dark:bg-slate-900/90 p-2 rounded-xl border border-slate-250 dark:border-slate-800 shadow-md w-34 transition-all duration-300 backdrop-blur-md"
+                          <div
+                            className="absolute top-16 text-center bg-white/95 dark:bg-slate-900/90 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-md w-34 transition-all duration-300 backdrop-blur-md"
                             style={{
                               transform: 'translate3d(0, 0, 15px)',
                               boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.25)'
                             }}
                           >
                             <span className="text-[9px] font-black text-slate-800 dark:text-white block truncate uppercase">{node.title}</span>
-                            <span className="text-[7.5px] text-slate-550 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
+                            <span className="text-[7.5px] text-slate-505 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
                             {isActive && (
                               <span className="text-[7.5px] text-blue-600 dark:text-blue-400 font-black block mt-0.5">75% Complete</span>
                             )}
@@ -3315,7 +3430,7 @@ export default function StudentDashboard() {
               ==================================================================== */}
           {activeSidebarTab === 'practice' && (
             <div className="space-y-6 pt-2 animate-fadeIn w-full">
-              
+
               {/* Section Title & Filter Tabs */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-900 pb-5 transition-colors duration-300">
                 <div>
@@ -3329,8 +3444,8 @@ export default function StudentDashboard() {
                 {/* Search Bar */}
                 <div className="relative w-full md:w-64">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Search question stems..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -3347,11 +3462,10 @@ export default function StudentDashboard() {
                     <button
                       key={domain}
                       onClick={() => setSelectedDomain(domain)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${
-                        selectedDomain === domain 
-                          ? 'bg-blue-600 text-white shadow-sm' 
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${selectedDomain === domain
+                          ? 'bg-blue-600 text-white shadow-sm'
                           : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                      }`}
+                        }`}
                     >
                       {domain === 'All' ? 'All Domains' : domain === 'quant' ? 'Quantitative' : domain === 'logical' ? 'Logical' : 'Verbal'}
                     </button>
@@ -3364,11 +3478,10 @@ export default function StudentDashboard() {
                     <button
                       key={diff}
                       onClick={() => setSelectedDifficulty(diff)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${
-                        selectedDifficulty === diff 
-                          ? 'bg-slate-200 text-slate-850 dark:bg-slate-800 dark:text-slate-100 shadow-xs' 
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${selectedDifficulty === diff
+                          ? 'bg-slate-200 text-slate-850 dark:bg-slate-800 dark:text-slate-100 shadow-xs'
                           : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                      }`}
+                        }`}
                     >
                       {diff}
                     </button>
@@ -3385,7 +3498,7 @@ export default function StudentDashboard() {
               ) : filteredQuestions.length === 0 ? (
                 <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl py-14 flex flex-col items-center justify-center text-center p-6 transition-colors duration-300">
                   <Info className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-2.5" />
-                  <span className="text-xs font-bold text-slate-655 dark:text-slate-400 uppercase tracking-widest">No matching questions cataloged</span>
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">No matching questions cataloged</span>
                   <span className="text-[10px] text-slate-500 mt-1 leading-normal">Try clearing domain or difficulty selections.</span>
                 </div>
               ) : (
@@ -3399,7 +3512,7 @@ export default function StudentDashboard() {
                     const domainLabel = q.domainId === 'quant' ? 'QUANT' : q.domainId === 'logical' ? 'LOGICAL' : 'VERBAL';
 
                     return (
-                      <div 
+                      <div
                         key={q.id}
                         className="bg-white border border-slate-200 dark:bg-slate-950/40 dark:border-slate-900 rounded-2xl p-6 space-y-4 hover:border-slate-350 dark:hover:border-slate-800 transition-all duration-150 shadow-xs relative overflow-hidden"
                       >
@@ -3409,13 +3522,12 @@ export default function StudentDashboard() {
                             <span className="text-[9px] font-black bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/35 px-2 py-0.5 rounded tracking-wide uppercase transition-colors duration-300">
                               {domainLabel}
                             </span>
-                            <span className={`text-[9px] font-black px-2 py-0.5 rounded border transition-colors duration-300 ${
-                              q.difficulty === 'EASY' 
+                            <span className={`text-[9px] font-black px-2 py-0.5 rounded border transition-colors duration-300 ${q.difficulty === 'EASY'
                                 ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-900/30 dark:text-emerald-450'
                                 : q.difficulty === 'HARD'
-                                ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-455'
-                                : 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900/30 dark:text-amber-455'
-                            }`}>
+                                  ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-400'
+                                  : 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900/30 dark:text-amber-400'
+                              }`}>
                               {q.difficulty}
                             </span>
                             <span className="font-mono text-[9.5px] text-slate-500 font-bold uppercase tracking-wider">#{q.id}</span>
@@ -3425,11 +3537,10 @@ export default function StudentDashboard() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => toggleBookmark(q.id)}
-                              className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                                isBookmarked 
-                                  ? 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-500' 
+                              className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${isBookmarked
+                                  ? 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-500'
                                   : 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-400 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800 dark:text-slate-450'
-                              }`}
+                                }`}
                             >
                               <Bookmark className="w-3.5 h-3.5 stroke-[2.5]" />
                             </button>
@@ -3455,24 +3566,22 @@ export default function StudentDashboard() {
                                 key={opt.id}
                                 onClick={() => !isSubmitted && handleAnswerSelect(q.id, opt.id)}
                                 disabled={isSubmitted}
-                                className={`p-3 rounded-xl border text-left flex items-start justify-between gap-3 text-[11.5px] transition-all duration-155 ${
-                                  showCorrectness
+                                className={`p-3 rounded-xl border text-left flex items-start justify-between gap-3 text-[11.5px] transition-all duration-150 ${showCorrectness
                                     ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-2xs dark:border-emerald-500 dark:bg-emerald-950/20 dark:text-emerald-300'
                                     : showIncorrectness
-                                    ? 'border-rose-500 bg-rose-50 text-rose-800 shadow-2xs dark:border-rose-500 dark:bg-rose-950/20 dark:text-rose-300'
-                                    : isOptionSelected
-                                    ? 'border-blue-600 bg-blue-50/30 text-slate-900 dark:border-blue-600 dark:bg-blue-950/30 dark:text-white'
-                                    : 'border-slate-200 bg-slate-50/55 hover:border-slate-350 hover:bg-slate-50 text-slate-700 dark:border-slate-900 dark:bg-slate-950/20 dark:hover:border-slate-800 dark:hover:bg-slate-900/30 dark:text-slate-300 disabled:opacity-60 disabled:hover:border-slate-900'
-                                }`}
+                                      ? 'border-rose-500 bg-rose-50 text-rose-800 shadow-2xs dark:border-rose-500 dark:bg-rose-950/20 dark:text-rose-300'
+                                      : isOptionSelected
+                                        ? 'border-blue-600 bg-blue-50/30 text-slate-900 dark:border-blue-600 dark:bg-blue-950/30 dark:text-white'
+                                        : 'border-slate-200 bg-slate-50/55 hover:border-slate-350 hover:bg-slate-50 text-slate-700 dark:border-slate-900 dark:bg-slate-950/20 dark:hover:border-slate-800 dark:hover:bg-slate-900/30 dark:text-slate-300 disabled:opacity-60 disabled:hover:border-slate-900'
+                                  }`}
                               >
                                 <div className="flex items-start gap-2.5 min-w-0">
-                                  <span className={`w-5 h-5 rounded-md flex items-center justify-center font-mono font-black text-[10px] shrink-0 border transition-colors duration-300 ${
-                                    showCorrectness 
-                                      ? 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-800/40 dark:bg-emerald-900/35 dark:text-emerald-450' 
-                                      : showIncorrectness 
-                                      ? 'border-rose-250 bg-rose-100 text-rose-700 dark:border-rose-800/40 dark:bg-rose-900/35 dark:text-rose-455'
-                                      : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
-                                  }`}>
+                                  <span className={`w-5 h-5 rounded-md flex items-center justify-center font-mono font-black text-[10px] shrink-0 border transition-colors duration-300 ${showCorrectness
+                                      ? 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-800/40 dark:bg-emerald-900/35 dark:text-emerald-450'
+                                      : showIncorrectness
+                                        ? 'border-rose-200 bg-rose-100 text-rose-700 dark:border-rose-800/40 dark:bg-rose-900/35 dark:text-rose-400'
+                                        : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
+                                    }`}>
                                     {opt.id}
                                   </span>
                                   <span className="font-semibold leading-normal break-words mt-0.5">{opt.text}</span>
@@ -3506,11 +3615,11 @@ export default function StudentDashboard() {
                               <span>{showSolution ? 'Hide' : 'Show'} Step-by-Step Explanation</span>
                               {showSolution ? <ChevronDown className="w-4 h-4 shrink-0" /> : <ChevronRight className="w-4 h-4 shrink-0" />}
                             </button>
-                            
+
                             {q.videoUrl && (
-                              <a 
-                                href={q.videoUrl} 
-                                target="_blank" 
+                              <a
+                                href={q.videoUrl}
+                                target="_blank"
                                 rel="noreferrer"
                                 className="text-[10px] font-black uppercase text-slate-450 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-450 flex items-center gap-1 transition-colors select-none"
                               >
@@ -3558,10 +3667,10 @@ export default function StudentDashboard() {
                   { title: 'Goldman Sachs Simulation Staging', difficulty: 'HARD', duration: '120 mins', questions: '45 Questions', participants: '820 candidates registered', date: 'Scheduled: June 8, 10:00 AM', status: 'Register Open' },
                   { title: 'Daily Logic Challenge - Arrays & Matrices', difficulty: 'HARD', duration: '20 mins', questions: '10 Questions', participants: '450 candidates completed', date: 'Daily Challenge Topic', status: 'Completed' }
                 ].map((test, idx) => {
-                  const statusBg = 
+                  const statusBg =
                     test.status === 'Completed' ? 'bg-slate-100 text-slate-500 dark:bg-slate-900 border-slate-200' :
-                    test.status === 'Live Soon' ? 'bg-emerald-50 text-emerald-700 border-emerald-250 dark:bg-emerald-950/20 dark:text-emerald-400' :
-                    'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400';
+                      test.status === 'Live Soon' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400' :
+                        'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400';
 
                   return (
                     <div key={idx} className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/50 p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-md transition-all">
@@ -3570,14 +3679,13 @@ export default function StudentDashboard() {
                           <span className={`text-[8.5px] font-black px-2 py-0.5 rounded border uppercase tracking-wide font-mono ${statusBg}`}>
                             {test.status}
                           </span>
-                          <span className={`text-[8.5px] font-black px-2 py-0.5 rounded border uppercase tracking-wide ${
-                            test.difficulty === 'HARD' ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/10 dark:text-rose-400' : 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/10 dark:text-amber-400'
-                          }`}>
+                          <span className={`text-[8.5px] font-black px-2 py-0.5 rounded border uppercase tracking-wide ${test.difficulty === 'HARD' ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/10 dark:text-rose-400' : 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/10 dark:text-amber-400'
+                            }`}>
                             {test.difficulty}
                           </span>
                         </div>
                         <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase leading-snug">{test.title}</h3>
-                        
+
                         <div className="flex flex-wrap gap-4 text-[10.5px] text-slate-500 font-semibold">
                           <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {test.duration}</span>
                           <span>•</span>
@@ -3589,13 +3697,12 @@ export default function StudentDashboard() {
 
                       <div className="text-left md:text-right flex flex-col items-start md:items-end justify-between shrink-0 gap-3">
                         <span className="text-[10px] font-bold text-slate-500 font-mono">{test.date}</span>
-                        <button 
+                        <button
                           disabled={test.status === 'Completed'}
-                          className={`py-2 px-5 font-bold text-xs rounded-xl shadow-xs cursor-pointer select-none transition-all ${
-                            test.status === 'Completed'
-                              ? 'bg-slate-100 text-slate-450 border border-slate-200 dark:bg-slate-900 dark:text-slate-655 dark:border-slate-950 cursor-not-allowed shadow-none'
+                          className={`py-2 px-5 font-bold text-xs rounded-xl shadow-xs cursor-pointer select-none transition-all ${test.status === 'Completed'
+                              ? 'bg-slate-100 text-slate-450 border border-slate-200 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-950 cursor-not-allowed shadow-none'
                               : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/10'
-                          }`}
+                            }`}
                         >
                           {test.status === 'Completed' ? 'Challenge Done' : 'Enter Staging'}
                         </button>
@@ -3612,7 +3719,7 @@ export default function StudentDashboard() {
               ==================================================================== */}
           {activeSidebarTab === 'careerHub' && (
             <div className="w-full space-y-8 animate-fadeIn">
-              
+
               {/* Header */}
               <div className="border-b border-slate-200 dark:border-slate-900 pb-5">
                 <h1 className="text-xl font-black uppercase text-slate-900 dark:text-white font-heading flex items-center gap-2">
@@ -3628,11 +3735,10 @@ export default function StudentDashboard() {
                   <button
                     key={type}
                     onClick={() => setSelectedOpportunityType(type)}
-                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${
-                      selectedOpportunityType === type 
-                        ? 'bg-blue-600 text-white shadow-sm' 
+                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${selectedOpportunityType === type
+                        ? 'bg-blue-600 text-white shadow-sm'
                         : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                    }`}
+                      }`}
                   >
                     {type}
                   </button>
@@ -3656,7 +3762,7 @@ export default function StudentDashboard() {
                             {a.type}
                           </span>
                           {a.priority === 'High' && (
-                            <span className="text-[8px] font-black bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-455 px-1.5 py-0.2 rounded uppercase animate-pulse">
+                            <span className="text-[8px] font-black bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-400 px-1.5 py-0.2 rounded uppercase animate-pulse">
                               High Priority
                             </span>
                           )}
@@ -3678,26 +3784,26 @@ export default function StudentDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredOpportunities.map((o) => {
                     const isExpanded = expandedOpportunityId === o.id;
-                    const statusColor = 
+                    const statusColor =
                       o.status === 'Open' ? 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/25' :
-                      o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-55/65 border-amber-250 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
-                      o.status === 'New' ? 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-900/25' :
-                      'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-455 dark:bg-rose-950/20 dark:border-rose-900/25';
+                        o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-55/65 border-amber-200 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
+                          o.status === 'New' ? 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-900/25' :
+                            'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/20 dark:border-rose-900/25';
 
-                    const typeBadge = 
+                    const typeBadge =
                       o.type === 'Hiring' ? 'Hiring Drive' :
-                      o.type === 'Internship' ? 'Internship' :
-                      o.type === 'Government Exam' ? 'Government Exam' :
-                      o.type === 'Hackathon' ? 'Hackathon' : o.type;
+                        o.type === 'Internship' ? 'Internship' :
+                          o.type === 'Government Exam' ? 'Government Exam' :
+                            o.type === 'Hackathon' ? 'Hackathon' : o.type;
 
                     return (
-                      <div 
+                      <div
                         key={o.id}
                         className="bg-white border border-slate-200 hover:border-slate-350 dark:bg-slate-900/10 dark:border-slate-900 dark:hover:border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all duration-200"
                       >
                         <div className="space-y-3.5">
                           <div className="flex items-center justify-between gap-1 flex-wrap">
-                            <span className="text-[8.5px] font-black px-2 py-0.5 rounded border bg-indigo-50 border-indigo-150 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 uppercase font-mono">
+                            <span className="text-[8.5px] font-black px-2 py-0.5 rounded border bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 uppercase font-mono">
                               {typeBadge}
                             </span>
                             <span className={`text-[8.5px] font-black px-2 py-0.5 rounded border uppercase font-mono ${statusColor}`}>
@@ -3725,7 +3831,7 @@ export default function StudentDashboard() {
                           </div>
 
                           {isExpanded && o.details && (
-                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 text-[10.5px] text-slate-655 dark:text-slate-400 leading-relaxed border border-slate-250 dark:border-slate-850 animate-fadeIn font-medium">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed border border-slate-200 dark:border-slate-850 animate-fadeIn font-medium">
                               {o.details}
                             </div>
                           )}
@@ -3737,9 +3843,9 @@ export default function StudentDashboard() {
                             >
                               {isExpanded ? 'Hide' : 'Details'}
                             </button>
-                            <a 
-                              href={o.link} 
-                              target="_blank" 
+                            <a
+                              href={o.link}
+                              target="_blank"
                               rel="noreferrer"
                               className="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] uppercase rounded-lg shadow-sm flex items-center justify-center gap-1 cursor-pointer transition-all"
                             >
@@ -3761,25 +3867,24 @@ export default function StudentDashboard() {
               ==================================================================== */}
           {activeSidebarTab === 'leaderboards' && (
             <div className="w-full space-y-6 animate-fadeIn">
-              
+
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
                 <div className="flex items-center gap-2">
                   <Trophy className="w-5 h-5 text-amber-500" />
                   <h1 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Active Rankings</h1>
                 </div>
-                
+
                 {/* Leaderboard sub-tabs */}
                 <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900">
                   {['college', 'global', 'friends'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveLeaderboardTab(tab as any)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${
-                        activeLeaderboardTab === tab
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${activeLeaderboardTab === tab
                           ? 'bg-blue-600 text-white'
                           : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                      }`}
+                        }`}
                     >
                       {tab}
                     </button>
@@ -3797,26 +3902,24 @@ export default function StudentDashboard() {
                   { rank: 5, name: 'Kunal Kapoor', xp: '13,500 XP', progress: '80%', self: false },
                   { rank: 14, name: 'Vaishnavi Raparthy (You)', xp: '12,450 XP', progress: '72%', self: true }
                 ].map((item, idx) => (
-                  <div 
+                  <div
                     key={idx}
-                    className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
-                      item.self 
-                        ? 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-900/10 dark:border-blue-950 dark:text-blue-400 shadow-sm' 
+                    className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${item.self
+                        ? 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-900/10 dark:border-blue-950 dark:text-blue-400 shadow-sm'
                         : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 dark:bg-slate-950/20 dark:border-slate-900/60 dark:hover:bg-slate-900/40 dark:text-slate-350'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-4">
-                      <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-xs ${
-                        item.rank === 1 ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' :
-                        item.rank === 2 ? 'bg-slate-200 text-slate-700 dark:bg-slate-400/20 dark:text-slate-450' :
-                        item.rank === 3 ? 'bg-amber-50 text-amber-900 dark:bg-amber-700/20 dark:text-amber-700' :
-                        'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'
-                      }`}>
+                      <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-xs ${item.rank === 1 ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' :
+                          item.rank === 2 ? 'bg-slate-200 text-slate-700 dark:bg-slate-400/20 dark:text-slate-450' :
+                            item.rank === 3 ? 'bg-amber-50 text-amber-900 dark:bg-amber-700/20 dark:text-amber-700' :
+                              'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'
+                        }`}>
                         {item.rank}
                       </span>
                       <span className="text-sm font-bold text-slate-900 dark:text-white">{item.name}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-4 text-xs">
                       <span className="text-slate-500 font-semibold font-mono">{item.xp}</span>
                       <span className="font-mono font-black text-blue-600 dark:text-blue-400">{item.progress}</span>
@@ -3833,28 +3936,28 @@ export default function StudentDashboard() {
               ==================================================================== */}
           {activeSidebarTab === 'profile' && (
             <div className="w-full space-y-8 animate-fadeIn">
-              
-              <div className="border-b border-slate-250 dark:border-slate-900 pb-4">
+
+              <div className="border-b border-slate-200 dark:border-slate-900 pb-4">
                 <h1 className="text-xl font-black uppercase text-slate-900 dark:text-white font-heading">Student credentials</h1>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Review onboarding selections and active prep goals.</p>
               </div>
 
               {saveSuccess && (
-                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-450 rounded-2xl p-4 flex items-center gap-3 animate-fadeIn">
+                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-450 rounded-2xl p-4 flex items-center gap-3 animate-fadeIn">
                   <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
                   <span className="text-xs font-bold">Profile onboarding configurations saved successfully!</span>
                 </div>
               )}
 
               <form onSubmit={handleProfileSave} className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 p-6 rounded-3xl space-y-5">
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  
+
                   {/* Student Name */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Student Name</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={profile.username}
                       onChange={(e) => setProfile({ ...profile, username: e.target.value })}
                       required
@@ -3865,8 +3968,8 @@ export default function StudentDashboard() {
                   {/* College */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">College Name</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={profile.college}
                       onChange={(e) => setProfile({ ...profile, college: e.target.value })}
                       required
@@ -3877,8 +3980,8 @@ export default function StudentDashboard() {
                   {/* Degree */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Degree</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={profile.degree}
                       onChange={(e) => setProfile({ ...profile, degree: e.target.value })}
                       required
@@ -3889,8 +3992,8 @@ export default function StudentDashboard() {
                   {/* Branch */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Branch</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={profile.branch}
                       onChange={(e) => setProfile({ ...profile, branch: e.target.value })}
                       required
@@ -3901,8 +4004,8 @@ export default function StudentDashboard() {
                   {/* Graduation Year */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Graduation Year</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       value={profile.graduation_year}
                       onChange={(e) => setProfile({ ...profile, graduation_year: parseInt(e.target.value) || 2026 })}
                       required
@@ -3913,7 +4016,7 @@ export default function StudentDashboard() {
                   {/* Primary Goal */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Preparation Goal</label>
-                    <select 
+                    <select
                       value={profile.primary_goal}
                       onChange={(e) => setProfile({ ...profile, primary_goal: e.target.value })}
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600 transition-colors"
@@ -3928,7 +4031,7 @@ export default function StudentDashboard() {
                   {/* Commit Commitment */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Weekly Commitment</label>
-                    <select 
+                    <select
                       value={profile.weekly_commitment}
                       onChange={(e) => setProfile({ ...profile, weekly_commitment: e.target.value })}
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600 transition-colors"
@@ -3943,7 +4046,7 @@ export default function StudentDashboard() {
                   {/* Preferences */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Learning Preference</label>
-                    <select 
+                    <select
                       value={profile.learning_preference}
                       onChange={(e) => setProfile({ ...profile, learning_preference: e.target.value })}
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600 transition-colors"
@@ -3957,8 +4060,8 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* Choose Profile Photo */}
-                <div className="pt-4 border-t border-slate-105 dark:border-slate-850 space-y-3">
-                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-505 uppercase tracking-widest block">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-850 space-y-3">
+                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">
                     Choose Profile Photo / Avatar
                   </label>
                   <div className="flex flex-wrap gap-4 items-center">
@@ -3966,11 +4069,10 @@ export default function StudentDashboard() {
                     <button
                       type="button"
                       onClick={() => setProfile({ ...profile, avatar: 'initial' })}
-                      className={`relative w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-650 text-white flex items-center justify-center font-black text-sm uppercase shadow-sm transition-all duration-200 hover:scale-105 cursor-pointer border-2 ${
-                        (!profile.avatar || profile.avatar === 'initial')
+                      className={`relative w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-650 text-white flex items-center justify-center font-black text-sm uppercase shadow-sm transition-all duration-200 hover:scale-105 cursor-pointer border-2 ${(!profile.avatar || profile.avatar === 'initial')
                           ? 'border-blue-600 ring-2 ring-blue-400 dark:ring-blue-700/50 scale-105'
                           : 'border-transparent opacity-60 hover:opacity-100'
-                      }`}
+                        }`}
                       title="Use Initials"
                     >
                       {profile.username ? profile.username[0] : 'V'}
@@ -3982,15 +4084,14 @@ export default function StudentDashboard() {
                         key={idx}
                         type="button"
                         onClick={() => setProfile({ ...profile, avatar: imgUrl })}
-                        className={`relative w-12 h-12 rounded-xl overflow-hidden shadow-sm transition-all duration-200 hover:scale-105 cursor-pointer border-2 ${
-                          profile.avatar === imgUrl
+                        className={`relative w-12 h-12 rounded-xl overflow-hidden shadow-sm transition-all duration-200 hover:scale-105 cursor-pointer border-2 ${profile.avatar === imgUrl
                             ? 'border-blue-600 ring-2 ring-blue-400 dark:ring-blue-700/50 scale-105'
                             : 'border-transparent opacity-60 hover:opacity-100'
-                        }`}
+                          }`}
                       >
-                        <img 
-                          src={imgUrl} 
-                          alt={`Avatar Option ${idx + 1}`} 
+                        <img
+                          src={imgUrl}
+                          alt={`Avatar Option ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
                       </button>
@@ -3999,7 +4100,7 @@ export default function StudentDashboard() {
 
                   {/* Custom URL Input */}
                   <div className="space-y-1.5 max-w-md text-left">
-                    <label className="text-[9px] font-bold text-slate-400 dark:text-slate-505 uppercase tracking-wider block mt-2">
+                    <label className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mt-2">
                       Or use a custom image URL
                     </label>
                     <input
@@ -4007,8 +4108,8 @@ export default function StudentDashboard() {
                       placeholder="Paste image URL (e.g. https://example.com/avatar.jpg)"
                       value={
                         profile.avatar &&
-                        profile.avatar !== 'initial' &&
-                        !AVATAR_PRESETS.includes(profile.avatar)
+                          profile.avatar !== 'initial' &&
+                          !AVATAR_PRESETS.includes(profile.avatar)
                           ? profile.avatar
                           : ''
                       }
@@ -4019,7 +4120,7 @@ export default function StudentDashboard() {
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 dark:border-slate-900">
-                  <button 
+                  <button
                     type="submit"
                     className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                   >
@@ -4069,8 +4170,8 @@ export default function StudentDashboard() {
                   </div>
                   {/* Progress bar */}
                   <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-amber-500 to-amber-300 h-full rounded-full transition-all duration-500" 
+                    <div
+                      className="bg-gradient-to-r from-amber-500 to-amber-300 h-full rounded-full transition-all duration-500"
                       style={{ width: `${badges.length > 0 ? (unlockedBadgeIds.length / badges.length) * 100 : 0}%` }}
                     />
                   </div>
@@ -4091,17 +4192,17 @@ export default function StudentDashboard() {
                   {badges.map((badge) => {
                     const isUnlocked = unlockedBadgeIds.includes(badge.id);
                     return (
-                      <BadgeCard 
-                        key={badge.id} 
-                        badge={badge} 
-                        isUnlocked={isUnlocked} 
+                      <BadgeCard
+                        key={badge.id}
+                        badge={badge}
+                        isUnlocked={isUnlocked}
                         onClick={() => {
                           setSelectedBadge(badge);
                           if (isUnlocked) {
                             playPreviewChime();
                             triggerCelebration();
                           }
-                        }} 
+                        }}
                       />
                     );
                   })}
@@ -4115,7 +4216,7 @@ export default function StudentDashboard() {
               ==================================================================== */}
           {activeSidebarTab === 'settings' && (
             <div className="w-full space-y-8 animate-fadeIn text-slate-800 dark:text-slate-200">
-              
+
               <div className="border-b border-slate-200 dark:border-slate-900 pb-4 text-left">
                 <h1 className="text-xl font-black uppercase text-slate-900 dark:text-white font-heading">Settings Hub</h1>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Configure advanced dashboard properties, 3D interactions, sound nodes, and live customizations.</p>
@@ -4123,12 +4224,12 @@ export default function StudentDashboard() {
 
               {/* Two Column Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                
+
                 {/* Left Column: Settings Customizations (7 cols on lg) */}
                 <div className="lg:col-span-7 space-y-6">
-                  
+
                   {/* Card 1: 3D Tilts & Celebrations */}
-                  <div 
+                  <div
                     onMouseMove={handleMouseMove3D}
                     onMouseLeave={handleMouseLeave3D}
                     className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900 p-6 rounded-3xl space-y-5 shadow-xs transition-all duration-300"
@@ -4140,22 +4241,21 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* 3D tilt Toggle */}
-                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-105 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5 text-left">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Dynamic 3D Hover Tilt</span>
                         <p className="text-[10px] text-slate-450 leading-relaxed max-w-[220px]">Enable smooth interactive mouse-coordinate perspective card rotation.</p>
                       </div>
-                      <button 
+                      <button
                         onClick={() => {
                           const nextVal = !tiltEnabled;
                           setTiltEnabled(nextVal);
                           localStorage.setItem('aptitude_tilt_enabled', String(nextVal));
                         }}
-                        className={`py-1.5 px-4 rounded-xl text-xs font-extrabold uppercase transition-all duration-300 cursor-pointer ${
-                          tiltEnabled 
-                            ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md' 
+                        className={`py-1.5 px-4 rounded-xl text-xs font-extrabold uppercase transition-all duration-300 cursor-pointer ${tiltEnabled
+                            ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md'
                             : 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-400'
-                        }`}
+                          }`}
                       >
                         {tiltEnabled ? 'Enabled' : 'Disabled'}
                       </button>
@@ -4167,7 +4267,7 @@ export default function StudentDashboard() {
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Confetti Celebration Blast</span>
                         <p className="text-[10px] text-slate-450 leading-relaxed">Choose canvas animation style to launch upon achieving a badge milestone.</p>
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-2">
                         {(['confetti', 'fireworks', 'none'] as const).map((style) => (
                           <button
@@ -4176,11 +4276,10 @@ export default function StudentDashboard() {
                               setConfettiStyle(style);
                               localStorage.setItem('aptitude_confetti_style', style);
                             }}
-                            className={`py-2 px-3 text-[10px] font-black uppercase tracking-wider rounded-xl border transition-all cursor-pointer ${
-                              confettiStyle === style
-                                ? 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-955/30 dark:border-blue-900 dark:text-blue-400'
+                            className={`py-2 px-3 text-[10px] font-black uppercase tracking-wider rounded-xl border transition-all cursor-pointer ${confettiStyle === style
+                                ? 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-400'
                                 : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-900 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
-                            }`}
+                              }`}
                           >
                             {style === 'confetti' ? '🎉 Confetti' : style === 'fireworks' ? '🎆 Fireworks' : '🚫 None'}
                           </button>
@@ -4190,7 +4289,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Card 2: Personal Goals & Appearance */}
-                  <div 
+                  <div
                     onMouseMove={handleMouseMove3D}
                     onMouseLeave={handleMouseLeave3D}
                     className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900 p-6 rounded-3xl space-y-5 shadow-xs transition-all duration-300"
@@ -4207,7 +4306,7 @@ export default function StudentDashboard() {
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Daily XP Milestone Goal</span>
                         <p className="text-[10px] text-slate-450 leading-relaxed">Determine your daily target value. Updates dashboard trackers dynamically.</p>
                       </div>
-                      
+
                       <div className="grid grid-cols-4 gap-2">
                         {([
                           { label: 'Casual', value: 50 },
@@ -4221,11 +4320,10 @@ export default function StudentDashboard() {
                               setDailyXpGoal(item.value);
                               localStorage.setItem('aptitude_daily_xp_goal', String(item.value));
                             }}
-                            className={`py-2 px-1 text-[10px] flex flex-col items-center justify-center rounded-xl border transition-all cursor-pointer ${
-                              dailyXpGoal === item.value
-                                ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/30 dark:border-emerald-900 dark:text-emerald-400'
+                            className={`py-2 px-1 text-[10px] flex flex-col items-center justify-center rounded-xl border transition-all cursor-pointer ${dailyXpGoal === item.value
+                                ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400'
                                 : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-900 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
-                            }`}
+                              }`}
                           >
                             <span className="font-extrabold uppercase tracking-tight">{item.label}</span>
                             <span className="text-[9px] font-mono opacity-80 mt-0.5">{item.value} XP</span>
@@ -4235,13 +4333,13 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Theme display mode toggle */}
-                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-955/40 p-4 rounded-2xl border border-slate-105 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5 text-left">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Active Display Mode</span>
-                        <p className="text-[10px] text-slate-455 leading-relaxed">Switch workspace lighting themes in real-time.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">Switch workspace lighting themes in real-time.</p>
                       </div>
-                      
-                      <button 
+
+                      <button
                         onClick={toggleTheme}
                         className="py-2 px-4 bg-slate-200 hover:bg-slate-300 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer"
                       >
@@ -4263,16 +4361,16 @@ export default function StudentDashboard() {
                     <div className="space-y-2.5 text-left" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Brand Accent Color</span>
-                        <p className="text-[10px] text-slate-455 leading-relaxed">Switch component preview accent color schema overrides.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">Switch component preview accent color schema overrides.</p>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {([
                           { id: 'blue', label: 'Sapphire', bg: 'bg-blue-500', activeClass: 'border-blue-500/50 bg-blue-500/10 text-blue-600 dark:text-blue-400 dark:bg-blue-500/10' },
                           { id: 'emerald', label: 'Emerald', bg: 'bg-emerald-500', activeClass: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/10' },
                           { id: 'purple', label: 'Cyberpunk', bg: 'bg-purple-500', activeClass: 'border-purple-500/50 bg-purple-500/10 text-purple-600 dark:text-purple-400 dark:bg-purple-500/10' },
                           { id: 'amber', label: 'Amber', bg: 'bg-amber-500', activeClass: 'border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/10' },
-                          { id: 'rose', label: 'Crimson', bg: 'bg-rose-500', activeClass: 'border-rose-500/50 bg-rose-500/10 text-rose-600 dark:text-rose-450 dark:bg-rose-500/10' },
+                          { id: 'rose', label: 'Crimson', bg: 'bg-rose-500', activeClass: 'border-rose-500/50 bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/10' },
                           { id: 'orange', label: 'Sunset', bg: 'bg-orange-500', activeClass: 'border-orange-500/50 bg-orange-500/10 text-orange-600 dark:text-orange-400 dark:bg-orange-500/10' },
                           { id: 'teal', label: 'Teal', bg: 'bg-teal-500', activeClass: 'border-teal-500/50 bg-teal-500/10 text-teal-600 dark:text-teal-400 dark:bg-teal-500/10' },
                           { id: 'indigo', label: 'Indigo', bg: 'bg-indigo-500', activeClass: 'border-indigo-500/50 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 dark:bg-indigo-500/10' }
@@ -4280,11 +4378,10 @@ export default function StudentDashboard() {
                           <button
                             key={color.id}
                             onClick={() => handleAccentColorChange(color.id)}
-                            className={`flex items-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer justify-center ${
-                              accentColor === color.id
+                            className={`flex items-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer justify-center ${accentColor === color.id
                                 ? `${color.activeClass} shadow-md`
-                                : 'bg-transparent border-slate-200/40 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-705 dark:text-slate-300'
-                            }`}
+                                : 'bg-transparent border-slate-200/40 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300'
+                              }`}
                           >
                             <span className={`w-3 h-3 rounded-full ${color.bg} shrink-0`} />
                             <span className="text-[9px] font-black uppercase tracking-wider">{color.label}</span>
@@ -4297,19 +4394,18 @@ export default function StudentDashboard() {
                     <div className="space-y-2.5 text-left" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Workspace Layout Density</span>
-                        <p className="text-[10px] text-slate-455 leading-relaxed">Change padding scale inside elements and tables.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">Change padding scale inside elements and tables.</p>
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-2">
                         {(['compact', 'normal', 'spacious'] as const).map((density) => (
                           <button
                             key={density}
                             onClick={() => handleDensityChange(density)}
-                            className={`py-2 px-3 text-[10px] font-black uppercase tracking-wider rounded-xl border transition-all cursor-pointer ${
-                              layoutDensity === density
+                            className={`py-2 px-3 text-[10px] font-black uppercase tracking-wider rounded-xl border transition-all cursor-pointer ${layoutDensity === density
                                 ? getAccentClass(accentColor, 'combined')
-                                : 'bg-white border-slate-250 text-slate-500 dark:bg-slate-950 dark:border-slate-900 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
-                            }`}
+                                : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-900 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
+                              }`}
                           >
                             {density === 'compact' ? '🔍 Compact' : density === 'normal' ? '⚖️ Normal' : '📖 Spacious'}
                           </button>
@@ -4319,7 +4415,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Sandbox Security credentials logs */}
-                  <div 
+                  <div
                     onMouseMove={handleMouseMove3D}
                     onMouseLeave={handleMouseLeave3D}
                     className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900 p-5 rounded-3xl space-y-3 shadow-xs transition-all duration-300"
@@ -4348,7 +4444,7 @@ export default function StudentDashboard() {
 
                 {/* Right Column: 3D Isometric Preview & Audio Hub (5 cols on lg) */}
                 <div className="lg:col-span-5 space-y-6">
-                  
+
                   {/* Isometric Live Dashboard Preview widget */}
                   <div className="bg-slate-950 border border-slate-900 p-6 rounded-3xl text-left space-y-4 shadow-xl relative overflow-hidden flex flex-col justify-between aspect-[4/3] group/preview">
                     {/* Glowing lights background */}
@@ -4356,7 +4452,7 @@ export default function StudentDashboard() {
                     <div className="absolute -bottom-10 -left-10 w-[150px] h-[150px] bg-purple-500/10 rounded-full blur-[50px] pointer-events-none" />
 
                     <div>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-955 border border-blue-900/40 px-3 py-1 rounded-full">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-blue-400 bg-blue-950 border border-blue-900/40 px-3 py-1 rounded-full">
                         3D Live Isometric Previewer
                       </span>
                       <p className="text-[10px] text-slate-500 mt-2 font-semibold">Hover to tilt; updates colors, density, and bounds in real-time.</p>
@@ -4364,7 +4460,7 @@ export default function StudentDashboard() {
 
                     {/* Isometric tilted miniature card */}
                     <div className="flex-1 flex items-center justify-center [perspective:1000px] py-4">
-                      <div 
+                      <div
                         className={`w-64 bg-slate-900 border border-slate-800/80 rounded-2xl shadow-2xl relative transition-all duration-500 [transform:rotateX(25deg)_rotateY(-35deg)_rotateZ(5deg)] hover:[transform:rotateX(15deg)_rotateY(-20deg)_rotateZ(2deg)] group-hover/preview:shadow-[0_20px_50px_rgba(8,112,184,0.15)]`}
                         style={{
                           transformStyle: 'preserve-3d',
@@ -4385,25 +4481,24 @@ export default function StudentDashboard() {
                             <div className="text-[8px] text-slate-500 uppercase tracking-widest font-extrabold">Student XP Goal</div>
                             <div className="text-xs font-black text-white mt-0.5 font-mono">{dailyXpGoal} XP</div>
                           </div>
-                          
-                          <div className="bg-slate-955 p-2 rounded-xl flex items-center justify-between border border-slate-850">
+
+                          <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-850">
                             <div className="text-[7.5px] text-slate-400 font-semibold uppercase">Tilt Response</div>
-                            <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-md ${
-                              tiltEnabled ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-500'
-                            }`}>
+                            <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-md ${tiltEnabled ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-500'
+                              }`}>
                               {tiltEnabled ? 'Active' : 'Muted'}
                             </span>
                           </div>
 
-                          <div className="bg-slate-955 p-2 rounded-xl flex items-center justify-between border border-slate-850">
+                          <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-850">
                             <div className="text-[7.5px] text-slate-400 font-semibold uppercase">Confetti Style</div>
                             <span className="text-[7px] font-black uppercase text-blue-400">
                               {confettiStyle}
                             </span>
                           </div>
                         </div>
-                        
-                        <div 
+
+                        <div
                           className={`absolute -right-3 -top-3 w-7 h-7 rounded-lg flex items-center justify-center text-xs border shadow-lg transition-all duration-300 ${getAccentClass(accentColor, 'badge')}`}
                           style={{ transform: 'translateZ(30px)' }}
                         >
@@ -4414,7 +4509,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Audio Hub widget */}
-                  <div 
+                  <div
                     onMouseMove={handleMouseMove3D}
                     onMouseLeave={handleMouseLeave3D}
                     className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900 p-6 rounded-3xl text-left space-y-5 shadow-xs transition-all duration-300"
@@ -4425,15 +4520,15 @@ export default function StudentDashboard() {
                       <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest">Acoustic Sound Hub</h3>
                     </div>
 
-                    <p className="text-[10px] text-slate-505 leading-normal font-semibold" style={{ transform: 'translateZ(10px)' }}>
+                    <p className="text-[10px] text-slate-500 leading-normal font-semibold" style={{ transform: 'translateZ(10px)' }}>
                       Play high-fidelity synthesized chime sounds. Bouncing equalizers visualize frequency pulses.
                     </p>
 
                     {/* Sound control block */}
-                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4.5 rounded-2xl border border-slate-105 dark:border-slate-900" style={{ transform: 'translateZ(15px)' }}>
-                      <button 
+                    <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4.5 rounded-2xl border border-slate-100 dark:border-slate-900" style={{ transform: 'translateZ(15px)' }}>
+                      <button
                         onClick={playPreviewChime}
-                        className="py-2.5 px-4 bg-rose-600 hover:bg-rose-550 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
+                        className="py-2.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
                       >
                         Play Preview Chime
                       </button>
@@ -4441,11 +4536,10 @@ export default function StudentDashboard() {
                       {/* Equalizer Visualizer */}
                       <div className="flex items-end gap-1 h-6">
                         {[...Array(6)].map((_, i) => (
-                          <div 
-                            key={i} 
-                            className={`w-1 rounded-full bg-rose-500 transition-all duration-150 ${
-                              soundWaveActive ? 'animate-equalizer h-6' : 'h-1.5'
-                            }`}
+                          <div
+                            key={i}
+                            className={`w-1 rounded-full bg-rose-500 transition-all duration-150 ${soundWaveActive ? 'animate-equalizer h-6' : 'h-1.5'
+                              }`}
                             style={{
                               animationDelay: `${i * 0.1}s`,
                               animationDuration: `${0.45 + i * 0.08}s`
@@ -4463,7 +4557,40 @@ export default function StudentDashboard() {
             </div>
           )}
 
-
+          {/* Footer */}
+          <footer className="mt-12 border-t border-slate-200 dark:border-slate-900/60 pt-6 flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider select-none shrink-0">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              {currentRole?.role === 'admin' ? (
+                <input
+                  type="text"
+                  value={footerBadgeText}
+                  onChange={(e) => {
+                    setFooterBadgeText(e.target.value);
+                    localStorage.setItem('aptitude_footer_badge_text', e.target.value);
+                  }}
+                  className="bg-transparent border-b border-dashed border-slate-405 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-705 dark:text-slate-300 w-64"
+                  title="Edit Footer Badge Text"
+                />
+              ) : (
+                <span>{footerBadgeText}</span>
+              )}
+            </div>
+            {currentRole?.role === 'admin' ? (
+              <input
+                type="text"
+                value={footerCopyright}
+                onChange={(e) => {
+                  setFooterCopyright(e.target.value);
+                  localStorage.setItem('aptitude_footer_copyright', e.target.value);
+                }}
+                className="bg-transparent border-b border-dashed border-slate-405 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-705 dark:text-slate-300 text-right w-80"
+                title="Edit Footer Copyright"
+              />
+            ) : (
+              <span>{footerCopyright}</span>
+            )}
+          </footer>
 
           {/* Real-time Badge Unlock Celebration Popup Modal */}
           {justUnlockedBadge && (
@@ -4485,7 +4612,7 @@ export default function StudentDashboard() {
                     🏆
                   </div>
 
-                  <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-455 bg-amber-50 dark:bg-amber-955/60 border border-amber-255 dark:border-amber-900 px-3 py-1 rounded-full mb-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 px-3 py-1 rounded-full mb-3">
                     NEW ACHIEVEMENT UNLOCKED!
                   </span>
 
@@ -4497,7 +4624,7 @@ export default function StudentDashboard() {
                     Level {justUnlockedBadge.level} · {justUnlockedBadge.category}
                   </span>
 
-                  <p className="text-xs text-slate-500 dark:text-slate-405 leading-relaxed max-w-[260px] mb-6 font-semibold">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-[260px] mb-6 font-semibold">
                     "{justUnlockedBadge.description}"
                   </p>
 
@@ -4513,7 +4640,7 @@ export default function StudentDashboard() {
 
                   <button
                     onClick={() => setJustUnlockedBadge(null)}
-                    className="text-[10px] font-extrabold uppercase text-slate-400 hover:text-slate-655 dark:hover:text-slate-350 transition-colors py-2 block cursor-pointer"
+                    className="text-[10px] font-extrabold uppercase text-slate-400 hover:text-slate-600 dark:hover:text-slate-350 transition-colors py-2 block cursor-pointer"
                   >
                     Dismiss
                   </button>
@@ -4527,12 +4654,12 @@ export default function StudentDashboard() {
             const isSelectedUnlocked = unlockedBadgeIds.includes(selectedBadge.id);
             const earnMethod = getBadgeEarnMethod(selectedBadge.name);
             const selectedProgress = getBadgeProgress(selectedBadge.name, isSelectedUnlocked);
-            
+
             const getLevelInfo = (lvl: number) => {
               switch (lvl) {
                 case 1: return { name: 'Bronze Standard', color: 'text-emerald-450 border-emerald-500/20 bg-emerald-500/5' };
                 case 2: return { name: 'Silver Standard', color: 'text-blue-450 border-blue-500/20 bg-blue-500/5' };
-                case 3: return { name: 'Gold Standard', color: 'text-purple-450 border-purple-500/20 bg-purple-500/5' };
+                case 3: return { name: 'Gold Standard', color: 'text-purple-400 border-purple-500/20 bg-purple-500/5' };
                 case 4: return { name: 'Platinum Elite', color: 'text-amber-450 border-amber-500/20 bg-amber-500/5' };
                 case 5: return { name: 'Titanium Master', color: 'text-indigo-450 border-indigo-500/20 bg-indigo-500/5' };
                 default: return { name: 'Standard Badge', color: 'text-slate-400 border-slate-700 bg-slate-800/50' };
@@ -4542,8 +4669,8 @@ export default function StudentDashboard() {
             const lvlInfo = getLevelInfo(selectedBadge.level);
 
             return (
-              <div 
-                className="fixed inset-0 bg-slate-955/98 backdrop-blur-2xl z-50 flex items-center justify-center animate-fadeIn"
+              <div
+                className="fixed inset-0 bg-slate-950/98 backdrop-blur-2xl z-50 flex items-center justify-center animate-fadeIn"
                 onClick={() => setSelectedBadge(null)}
               >
                 {/* Floating Background Sparkles */}
@@ -4555,14 +4682,14 @@ export default function StudentDashboard() {
                 <div className="absolute top-[8%] right-[45%] text-pink-400 animate-bounce text-lg pointer-events-none select-none opacity-20">⭐</div>
 
                 {/* Modal box */}
-                <div 
+                <div
                   className="bg-slate-900 w-full h-full text-white overflow-y-auto relative animate-scaleUp grid grid-cols-1 md:grid-cols-12 rounded-none border-none"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Close button */}
-                  <button 
+                  <button
                     onClick={() => setSelectedBadge(null)}
-                    className="absolute top-6 right-6 z-50 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-955 p-3.5 rounded-full border border-slate-800 transition-all duration-200 cursor-pointer active:scale-90"
+                    className="absolute top-6 right-6 z-50 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-950 p-3.5 rounded-full border border-slate-800 transition-all duration-200 cursor-pointer active:scale-90"
                     title="Close Dialog"
                   >
                     <X className="w-5 h-5" />
@@ -4573,7 +4700,7 @@ export default function StudentDashboard() {
                     <div className="max-w-xl md:mx-auto w-full space-y-8">
                       {/* Meta Tags */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-300 bg-slate-955 border border-slate-800 px-4 py-1.5 rounded-full">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-300 bg-slate-950 border border-slate-800 px-4 py-1.5 rounded-full">
                           {getCategoryEmoji(selectedBadge.category)} {selectedBadge.category.replace('_', ' ')}
                         </span>
                         <span className={`text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-full border ${lvlInfo.color}`}>
@@ -4597,7 +4724,7 @@ export default function StudentDashboard() {
                           <Award className="w-4 h-4 text-amber-500" />
                           How it is earned
                         </h4>
-                        <p className="text-sm text-slate-300 font-semibold leading-relaxed bg-slate-955/35 p-5 rounded-2xl border border-slate-800/50">
+                        <p className="text-sm text-slate-300 font-semibold leading-relaxed bg-slate-950/35 p-5 rounded-2xl border border-slate-800/50">
                           {earnMethod}
                         </p>
                       </div>
@@ -4605,13 +4732,13 @@ export default function StudentDashboard() {
                       {/* Lock/Unlock Progress */}
                       {(!isSelectedUnlocked || (selectedProgress.current < selectedProgress.target)) && (
                         <div className="space-y-3 pt-4">
-                          <div className="flex justify-between text-[11px] font-black uppercase text-slate-455 tracking-wider">
+                          <div className="flex justify-between text-[11px] font-black uppercase text-slate-400 tracking-wider">
                             <span>Unlock Progress</span>
                             <span>{selectedProgress.current} / {selectedProgress.target} {selectedProgress.label}</span>
                           </div>
-                          <div className="w-full bg-slate-955 p-1 rounded-full border border-slate-800/50 overflow-hidden">
+                          <div className="w-full bg-slate-950 p-1 rounded-full border border-slate-800/50 overflow-hidden">
                             <div className="bg-slate-800 h-2 rounded-full overflow-hidden">
-                              <div 
+                              <div
                                 className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-500"
                                 style={{ width: `${(selectedProgress.current / selectedProgress.target) * 100}%` }}
                               />
@@ -4625,7 +4752,7 @@ export default function StudentDashboard() {
                     <div className="max-w-xl md:mx-auto w-full mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row gap-4">
                       <button
                         onClick={() => setSelectedBadge(null)}
-                        className="flex-1 bg-slate-850 hover:bg-slate-800 border border-slate-755 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all active:scale-95 cursor-pointer"
+                        className="flex-1 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all active:scale-95 cursor-pointer"
                       >
                         Close Details
                       </button>
@@ -4644,36 +4771,33 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Right Column (Badge Image) - Order-1 on mobile, Order-2 on desktop */}
-                  <div className="md:col-span-5 p-8 sm:p-12 md:p-20 flex flex-col items-center justify-center bg-slate-955/40 border-b md:border-b-0 md:border-l border-slate-800/60 relative order-1 md:order-2 overflow-hidden min-h-[45vh] md:min-h-screen">
+                  <div className="md:col-span-5 p-8 sm:p-12 md:p-20 flex flex-col items-center justify-center bg-slate-950/40 border-b md:border-b-0 md:border-l border-slate-800/60 relative order-1 md:order-2 overflow-hidden min-h-[45vh] md:min-h-screen">
                     {/* Shimmer reflection sweep overlay */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full animate-reflection-sweep pointer-events-none z-20" />
 
                     {/* Ambient Glow */}
-                    <div className={`absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full blur-[100px] opacity-25 pointer-events-none ${
-                      selectedBadge.level === 1 ? 'bg-emerald-500' :
-                      selectedBadge.level === 2 ? 'bg-blue-500' :
-                      selectedBadge.level === 3 ? 'bg-purple-500' :
-                      selectedBadge.level === 4 ? 'bg-amber-500' :
-                      selectedBadge.level === 5 ? 'bg-indigo-500' : 'bg-blue-500'
-                    }`} />
+                    <div className={`absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full blur-[100px] opacity-25 pointer-events-none ${selectedBadge.level === 1 ? 'bg-emerald-500' :
+                        selectedBadge.level === 2 ? 'bg-blue-500' :
+                          selectedBadge.level === 3 ? 'bg-purple-500' :
+                            selectedBadge.level === 4 ? 'bg-amber-500' :
+                              selectedBadge.level === 5 ? 'bg-indigo-500' : 'bg-blue-500'
+                      }`} />
 
                     <div className="w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 flex items-center justify-center select-none relative z-10 animate-floatSlow">
                       {selectedBadge.image_url ? (
-                        <TransparentBadgeImage 
-                          src={selectedBadge.image_url} 
-                          alt={selectedBadge.name} 
-                          className={`w-full h-full object-contain transition-all duration-500 ${
-                            isSelectedUnlocked 
-                              ? 'scale-100 drop-shadow-[0_12px_30px_rgba(16,185,129,0.35)] dark:drop-shadow-[0_12px_30px_rgba(52,211,153,0.3)]' 
+                        <TransparentBadgeImage
+                          src={selectedBadge.image_url}
+                          alt={selectedBadge.name}
+                          className={`w-full h-full object-contain transition-all duration-500 ${isSelectedUnlocked
+                              ? 'scale-100 drop-shadow-[0_12px_30px_rgba(16,185,129,0.35)] dark:drop-shadow-[0_12px_30px_rgba(52,211,153,0.3)]'
                               : 'scale-95 opacity-20 grayscale'
-                          }`} 
+                            }`}
                         />
                       ) : (
-                        <div className={`w-36 h-36 rounded-full flex items-center justify-center text-6xl border shadow-inner relative ${
-                          isSelectedUnlocked 
-                            ? 'bg-slate-850 border-slate-750 text-white' 
+                        <div className={`w-36 h-36 rounded-full flex items-center justify-center text-6xl border shadow-inner relative ${isSelectedUnlocked
+                            ? 'bg-slate-850 border-slate-750 text-white'
                             : 'bg-slate-800/40 border-slate-800 text-slate-600'
-                        }`}>
+                          }`}>
                           <span className="z-10">{getCategoryEmoji(selectedBadge.category)}</span>
                         </div>
                       )}
@@ -4681,11 +4805,11 @@ export default function StudentDashboard() {
 
                     <div className="mt-8 text-center relative z-10">
                       {isSelectedUnlocked ? (
-                        <span className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 px-5 py-2 rounded-full text-emerald-455 text-[10px] font-black uppercase tracking-widest">
+                        <span className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 px-5 py-2 rounded-full text-emerald-400 text-[10px] font-black uppercase tracking-widest">
                           <Check className="w-3.5 h-3.5 stroke-[3]" /> Unlocked Card
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-2 bg-slate-955 border border-slate-800 px-5 py-2 rounded-full text-slate-500 text-[10px] font-black uppercase tracking-widest">
+                        <span className="inline-flex items-center gap-2 bg-slate-950 border border-slate-800 px-5 py-2 rounded-full text-slate-500 text-[10px] font-black uppercase tracking-widest">
                           <Lock className="w-3.5 h-3.5" /> Lock Status
                         </span>
                       )}
@@ -4743,7 +4867,7 @@ export default function StudentDashboard() {
                 >
                   {/* Glow decoration */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
-                  
+
                   {/* Header */}
                   <div className="flex justify-between items-start mb-4">
                     <div>
@@ -4783,7 +4907,7 @@ export default function StudentDashboard() {
                           {challenge.options.map((opt, oIdx) => {
                             const isOptSelected = selectedOption === oIdx.toString();
                             let btnStyle = "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50";
-                            
+
                             if (isOptSelected) {
                               if (isSubmitted) {
                                 if (oIdx === challenge.correctIndex) {
