@@ -2988,7 +2988,7 @@ export default function LandingPage() {
               </Link>
               <button 
                 onClick={() => showNotice("Connecting to support sandbox queue...", "info")}
-                className="w-full sm:flex-1 py-3 px-6 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 dark:text-slate-300 dark:border-slate-800 rounded-xl transition-all cursor-pointer"
+                className="w-full sm:flex-1 py-3 px-6 bg-surface hover:bg-surface-2 text-text-desc font-bold text-xs border border-border-default rounded-xl transition-all cursor-pointer"
               >
                 {content.cta_btn_secondary}
               </button>
@@ -2998,16 +2998,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-             {/* ==========================================
-          FOOTER
-          ========================================== */}
-      <footer className="border-t border-slate-200 dark:border-slate-900/60 pt-10 pb-52 w-[90%] md:w-[80%] max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-600 gap-4 bg-transparent">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-500" />
-          <span>{content.footer_badge_text}</span>
-        </div>
-        <span>{content.footer_copyright}</span>
-      </footer>
 
       {/* ==========================================
           VISUAL IN-PAGE ADMIN EDITOR WIDGET

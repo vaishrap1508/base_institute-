@@ -1101,14 +1101,7 @@ export default function DomainDetailPage() {
             </div>
           )}
 
-          {/* Premium Footer */}
-          <footer className="border-t border-slate-200/60 dark:border-slate-900/80 pt-6 pb-2 flex items-center justify-between text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider select-none shrink-0 transition-colors duration-300">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Operational Clearance: Sandbox Encrypted</span>
-            </div>
-            <span>© 2026 Aptitude AI platform. All rights reserved.</span>
-          </footer>
+
         </div>
       </main>
     </div>

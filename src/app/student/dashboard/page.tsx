@@ -43,11 +43,136 @@ import {
   HelpCircle,
   BookMarked,
   Bug,
-  List
+  List,
+  Rocket
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
+
+const ROADMAP_CHALLENGES: Record<string, { question: string, options: string[], correctIndex: number, solution: string }> = {
+  'Percentages': {
+    question: "A laptop price drops from ₹40,000 to ₹34,000. What is the percentage decrease in the price?",
+    options: ["10%", "12%", "15%", "18%"],
+    correctIndex: 2,
+    solution: "Decrease = 40,000 - 34,000 = 6,000. Percentage = (6,000 / 40,000) * 100 = 15%."
+  },
+  'Ratios & Proportions': {
+    question: "If 3A = 4B = 5C, what is the ratio A : B : C?",
+    options: ["3 : 4 : 5", "20 : 15 : 12", "5 : 4 : 3", "12 : 15 : 20"],
+    correctIndex: 1,
+    solution: "Divide by LCM of 3, 4, 5 (which is 60). A/20 = B/15 = C/12. So ratio is 20 : 15 : 12."
+  },
+  'Profit & Loss': {
+    question: "By selling an item for ₹600, a merchant makes a profit of 20%. What is the Cost Price (CP) of the item?",
+    options: ["₹480", "₹500", "₹520", "₹540"],
+    correctIndex: 1,
+    solution: "SP = CP * 1.20 => 600 = CP * 1.20 => CP = 600 / 1.20 = ₹500."
+  },
+  'Time & Work': {
+    question: "A can complete a project in 12 days and B can do it in 24 days. How many days will they take working together?",
+    options: ["6 days", "8 days", "9 days", "10 days"],
+    correctIndex: 1,
+    solution: "Together rate = 1/12 + 1/24 = 3/24 = 1/8. So working together they will take 8 days."
+  },
+  'Syllogisms': {
+    question: "Statements: All stars are planets. Some planets are moons. Conclusion: Are some stars moons?",
+    options: ["Yes, definitely", "No, definitely", "Maybe, not certain", "None of the above"],
+    correctIndex: 2,
+    solution: "There is no connection given between stars and moons, so it is possible but not logically certain."
+  },
+  'Blood Relations': {
+    question: "Anil introduces a man as 'He is the son of the only son of my father'. How is Anil related to the man?",
+    options: ["Brother", "Uncle", "Father", "Cousin"],
+    correctIndex: 2,
+    solution: "The 'only son of Anil's father' is Anil himself. So the man is Anil's son, making Anil his Father."
+  },
+  'Coding: Arrays': {
+    question: "What is the worst-case time complexity of inserting an element into a dynamic array (vector) of size N?",
+    options: ["O(1)", "O(log N)", "O(N)", "O(N log N)"],
+    correctIndex: 2,
+    solution: "In the worst case, the array is full, requiring copying all N elements to a new location, taking O(N)."
+  },
+  'Coding: Recursion': {
+    question: "What is the time complexity of the standard recursive Fibonacci function (F(n) = F(n-1) + F(n-2))?",
+    options: ["O(log N)", "O(N)", "O(N^2)", "O(2^N)"],
+    correctIndex: 3,
+    solution: "The recursion tree splits into 2 branches at each level, resulting in an exponential O(2^N) time complexity."
+  },
+  'Mastery Milestone': {
+    question: "Which sorting algorithm has O(N log N) worst-case time complexity and O(N) space complexity?",
+    options: ["Merge Sort", "Quick Sort", "Heap Sort", "Bubble Sort"],
+    correctIndex: 0,
+    solution: "Merge Sort has a guaranteed O(N log N) time complexity in all cases but requires O(N) auxiliary space."
+  }
+};
+
+const shakeVariants = {
+  shake: {
+    x: [0, -6, 6, -6, 6, -4, 4, 0],
+    transition: { duration: 0.5 }
+  },
+  idle: { x: 0 }
+};
+
+const DOMAIN_ROADMAPS: Record<string, any[]> = {
+  all: [
+    { id: 1, title: 'Percentages', desc: 'Core fractional relationships', symbol: '%' },
+    { id: 2, title: 'Ratios & Proportions', desc: 'Comparative scale models', symbol: '1:2' },
+    { id: 3, title: 'Profit & Loss', desc: 'Commerce margins & calculations', symbol: '₹' },
+    { id: 4, title: 'Time & Work', desc: 'Rate equations & tasks efficiency', symbol: '⏳' },
+    { id: 5, title: 'Syllogisms', desc: 'Boolean Venn diagrams deductions', symbol: 'V' },
+    { id: 6, title: 'Blood Relations', desc: 'Structured family maps trees', symbol: '👪' },
+    { id: 7, title: 'Coding: Arrays', desc: 'Linear memory indexing logic', symbol: '[]' },
+    { id: 8, title: 'Coding: Recursion', desc: 'Call stacks and induction checks', symbol: '()' },
+    { id: 9, title: 'Mastery Milestone', desc: 'Complete Career Certification', symbol: '🏆' }
+  ],
+  quant: [
+    { id: 1, title: 'Percentages', desc: 'Core fractional relationships', symbol: '%' },
+    { id: 2, title: 'Ratios & Proportions', desc: 'Comparative scale models', symbol: '1:2' },
+    { id: 3, title: 'Profit & Loss', desc: 'Commerce margins & calculations', symbol: '₹' },
+    { id: 4, title: 'Simple Interest', desc: 'Linear accumulation models', symbol: 'P*R' },
+    { id: 5, title: 'Compound Interest', desc: 'Exponential curves and compound periods', symbol: 'A^t' },
+    { id: 6, title: 'Time & Work', desc: 'Rate equations & tasks efficiency', symbol: '⏳' },
+    { id: 7, title: 'Time & Speed', desc: 'Relative velocity equations', symbol: '🚗' },
+    { id: 8, title: 'Geometry & Mensuration', desc: 'Shapes properties and formulas', symbol: '📐' },
+    { id: 9, title: 'Quant Mastery', desc: 'Aptitude Certification Complete', symbol: '🏆' }
+  ],
+  logical: [
+    { id: 1, title: 'Series & Analogy', desc: 'Visual progressions logic patterns', symbol: '1,2' },
+    { id: 2, title: 'Seating Arrangements', desc: 'Linear coordinates spacing constraints', symbol: '🪑' },
+    { id: 3, title: 'Syllogisms', desc: 'Boolean Venn diagrams deductions', symbol: 'V' },
+    { id: 4, title: 'Blood Relations', desc: 'Structured family maps trees', symbol: '👪' },
+    { id: 5, title: 'Clocks & Calendars', desc: 'Periodic time mathematics checks', symbol: '📅' },
+    { id: 6, title: 'Coding-Decoding', desc: 'Cipher shifting mapping tables', symbol: '🔑' },
+    { id: 7, title: 'Data Sufficiency', desc: 'Logical evaluation prerequisites', symbol: '📊' },
+    { id: 8, title: 'Logical Deductions', desc: 'Analytical deduction steps conclusions', symbol: 'Logic' },
+    { id: 9, title: 'Logical Mastery', desc: 'Logical Certification Complete', symbol: '🏆' }
+  ],
+  verbal: [
+    { id: 1, title: 'Spotting Errors', desc: 'Grammar checking logic systems', symbol: '✏️' },
+    { id: 2, title: 'Sentence Improvement', desc: 'Syntax phrasing modifications', symbol: 'ABC' },
+    { id: 3, title: 'Prepositions', desc: 'Spatial connection structure relationships', symbol: 'Prep' },
+    { id: 4, title: 'Reading Comprehension', desc: 'Context interpretation mapping paragraphs', symbol: '📖' },
+    { id: 5, title: 'Synonyms & Antonyms', desc: 'Contextual semantic vocabulary checks', symbol: 'Syn' },
+    { id: 6, title: 'One Word Substitution', desc: 'Noun definitions dictionary compact', symbol: '1W' },
+    { id: 7, title: 'Sentence Arrangement', desc: 'Logical paragraph reordering structures', symbol: 'Sort' },
+    { id: 8, title: 'Idioms & Phrases', desc: 'Metaphoric language vocabulary banks', symbol: 'Phrase' },
+    { id: 9, title: 'Verbal Mastery', desc: 'Verbal Certification Complete', symbol: '🏆' }
+  ],
+  coding: [
+    { id: 1, title: 'Variables & Loops', desc: 'Flow structures state iterations', symbol: 'loop' },
+    { id: 2, title: 'Functions & Scope', desc: 'Modular components calls stack', symbol: 'fn' },
+    { id: 3, title: 'Coding: Arrays', desc: 'Linear memory indexing logic', symbol: '[]' },
+    { id: 4, title: 'Coding: Recursion', desc: 'Call stacks and induction checks', symbol: '()' },
+    { id: 5, title: 'Object Oriented Prog', desc: 'Abstraction encapsulation structures', symbol: 'OOP' },
+    { id: 6, title: 'Searching & Sorting', desc: 'Divide and conquer speed limits', symbol: 'Bin' },
+    { id: 7, title: 'Linked Lists & Queues', desc: 'Dynamic pointer chaining arrays', symbol: '->' },
+    { id: 8, title: 'Trees & Graphs', desc: 'Hierarchical node network traversals', symbol: 'Tree' },
+    { id: 9, title: 'Coding Mastery', desc: 'Technical Certification Complete', symbol: '🏆' }
+  ]
+};
 
 const AVATAR_PRESETS = [
   'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack',     // Female
@@ -913,6 +1038,128 @@ export default function StudentDashboard() {
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']); 
   const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
+
+  // Gamified Roadmap and animation states
+  const [completedNodeIds, setCompletedNodeIds] = useState<number[]>([1, 2]);
+  const [activeNodeId, setActiveNodeId] = useState<number>(3);
+  const [justUnlockedNodeId, setJustUnlockedNodeId] = useState<number | null>(null);
+  const [shakeNodeId, setShakeNodeId] = useState<number | null>(null);
+  
+  const [animatedXp, setAnimatedXp] = useState<number>(0);
+  const [animatedProgress, setAnimatedProgress] = useState<number>(0);
+  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+  
+  const [activeChallengeNode, setActiveChallengeNode] = useState<any | null>(null);
+  const [challengeAnswers, setChallengeAnswers] = useState<Record<number, string>>({});
+  const [challengeSubmitted, setChallengeSubmitted] = useState<Record<number, boolean>>({});
+  
+  const [showXpBurst, setShowXpBurst] = useState<any | null>(null); // { x: number, y: number, amount: number }
+  const [showConfettiBurst, setShowConfettiBurst] = useState<boolean>(false);
+
+  const getNodeCoords = (index: number) => {
+    let x = 50;
+    let y = 80;
+    if (index < 3) {
+      x = index === 0 ? 10 : index === 1 ? 50 : 90;
+      y = 80;
+    } else if (index < 6) {
+      x = index === 3 ? 90 : index === 4 ? 50 : 10;
+      y = 260;
+    } else {
+      x = index === 6 ? 10 : index === 7 ? 50 : 90;
+      y = 440;
+    }
+    return { x, y };
+  };
+
+  const handleChallengeSuccess = (node: any) => {
+    setShowConfettiBurst(true);
+    setShowXpBurst(node.id);
+    setAnimatedXp(prev => prev + 150);
+    
+    setTimeout(() => {
+      setCompletedNodeIds(prev => {
+        if (!prev.includes(node.id)) {
+          const nextList = [...prev, node.id];
+          const percentage = Math.round((nextList.length / 9) * 100);
+          setAnimatedProgress(percentage);
+          return nextList;
+        }
+        return prev;
+      });
+      
+      const nextNodeId = node.id + 1;
+      if (nextNodeId <= 9) {
+        setJustUnlockedNodeId(nextNodeId);
+        setActiveNodeId(nextNodeId);
+        
+        setTimeout(() => {
+          setJustUnlockedNodeId(null);
+        }, 3000);
+      }
+    }, 1000);
+  };
+
+  const handleFilterChange = (id: any) => {
+    setRoadmapFilter(id);
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setReducedMotion(mediaQuery.matches);
+      const listener = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+      mediaQuery.addEventListener('change', listener);
+      return () => mediaQuery.removeEventListener('change', listener);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeSidebarTab === 'learning') {
+      // Animate XP from 0 to 12450 over 1 second
+      const targetXp = 12450;
+      const durationXp = 1000; 
+      const stepTimeXp = 15;
+      const startTimeXp = Date.now();
+      
+      const xpInterval = setInterval(() => {
+        const elapsed = Date.now() - startTimeXp;
+        if (elapsed >= durationXp) {
+          setAnimatedXp(targetXp);
+          clearInterval(xpInterval);
+        } else {
+          const progressRatio = elapsed / durationXp;
+          const easeOutQuad = progressRatio * (2 - progressRatio);
+          setAnimatedXp(Math.floor(easeOutQuad * targetXp));
+        }
+      }, stepTimeXp);
+
+      // Animate Progress Ring from 0 to 72 over 1.5 seconds
+      const targetProg = 72;
+      const durationProg = 1500;
+      const startTimeProg = Date.now();
+      
+      const progInterval = setInterval(() => {
+        const elapsed = Date.now() - startTimeProg;
+        if (elapsed >= durationProg) {
+          setAnimatedProgress(targetProg);
+          clearInterval(progInterval);
+        } else {
+          const progressRatio = elapsed / durationProg;
+          const easeOutQuad = progressRatio * (2 - progressRatio);
+          setAnimatedProgress(Math.floor(easeOutQuad * targetProg));
+        }
+      }, stepTimeXp);
+
+      return () => {
+        clearInterval(xpInterval);
+        clearInterval(progInterval);
+      };
+    } else {
+      setAnimatedXp(0);
+      setAnimatedProgress(0);
+    }
+  }, [activeSidebarTab]);
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
@@ -2436,14 +2683,119 @@ export default function StudentDashboard() {
           )}
 
           {activeSidebarTab === 'learning' && (
-            <div className="w-full space-y-8 animate-fadeIn">
-              <div className="text-center space-y-2">
-                <h1 className="text-2xl font-black uppercase text-slate-900 dark:text-white font-heading">Your learning roadmap</h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">Click on the active lesson nodes to solve matching assessment questions.</p>
+            <div className="w-full space-y-8 relative overflow-hidden p-6 rounded-3xl bg-slate-50/50 dark:bg-[#020617]/50 border border-slate-200/60 dark:border-slate-800/40 backdrop-blur-xl transition-all duration-300">
+              
+              {/* Ambient Background Particles and Orbs */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="bg-emerald-500/10 dark:bg-emerald-500/5 w-64 h-64 rounded-full blur-3xl absolute -left-20 -top-20 pointer-events-none" />
+                <div className="bg-blue-500/10 dark:bg-blue-500/5 w-72 h-72 rounded-full blur-3xl absolute -right-20 -bottom-20 pointer-events-none" />
+                {!reducedMotion && (
+                  [...Array(12)].map((_, i) => (
+                    <motion.div
+                      key={`particle-${i}`}
+                      className="absolute w-1.5 h-1.5 rounded-full bg-emerald-500/20 dark:bg-emerald-400/20"
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                      }}
+                      animate={{
+                        y: [0, -40, 0],
+                        x: [0, Math.random() * 20 - 10, 0],
+                        scale: [1, 1.5, 1],
+                        opacity: [0.2, 0.6, 0.2],
+                      }}
+                      transition={{
+                        duration: 6 + Math.random() * 6,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+                  ))
+                )}
               </div>
 
-              {/* Category Tab Switcher */}
-              <div className="flex flex-wrap justify-center gap-2 mb-6 select-none">
+              {/* Hero Title & Subtitle with Blur-Fade-Up Reveal */}
+              <motion.div 
+                initial={reducedMotion ? {} : { opacity: 0, y: 15, filter: "blur(4px)" }}
+                animate={reducedMotion ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.6 }}
+                className="text-center space-y-2 relative z-10"
+              >
+                <h1 className="text-2xl font-black uppercase text-slate-900 dark:text-white font-heading">
+                  Your learning roadmap
+                </h1>
+                <p className="text-xs text-slate-500 dark:text-slate-405 max-w-md mx-auto">
+                  Click on the active lesson nodes to solve matching assessment questions.
+                </p>
+              </motion.div>
+
+              {/* Stats Panel Widget (Circular Progress Ring & XP Counter) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8 relative z-10">
+                {/* Progress Ring Card */}
+                <div className="bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-4 flex items-center gap-4 shadow-sm backdrop-blur-md">
+                  <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
+                    <svg className="w-full h-full transform -rotate-90">
+                      <circle
+                        cx="28"
+                        cy="28"
+                        r="22"
+                        className="stroke-slate-200 dark:stroke-slate-800"
+                        strokeWidth="4.5"
+                        fill="transparent"
+                      />
+                      <motion.circle
+                        cx="28"
+                        cy="28"
+                        r="22"
+                        className="stroke-emerald-500 dark:stroke-emerald-400"
+                        strokeWidth="4.5"
+                        fill="transparent"
+                        strokeDasharray={2 * Math.PI * 22}
+                        initial={{ strokeDashoffset: 2 * Math.PI * 22 }}
+                        animate={{ strokeDashoffset: (2 * Math.PI * 22) - ((2 * Math.PI * 22) * animatedProgress) / 100 }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <span className="absolute text-xs font-black text-slate-850 dark:text-white">
+                      {animatedProgress}%
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Roadmap Progress</span>
+                    <span className="text-sm font-black text-slate-800 dark:text-white mt-0.5 block">
+                      {completedNodeIds.length} of 9 Completed
+                    </span>
+                  </div>
+                </div>
+
+                {/* XP Counter Card */}
+                <div className="bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-4 flex items-center gap-4 shadow-sm backdrop-blur-md">
+                  <div className="w-11 h-11 rounded-xl bg-amber-500/10 dark:bg-amber-400/5 flex items-center justify-center shrink-0 border border-amber-500/20">
+                    <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Total Experience</span>
+                    <span className="text-base font-black text-slate-800 dark:text-white mt-0.5 block font-mono">
+                      {animatedXp.toLocaleString()} XP
+                    </span>
+                  </div>
+                </div>
+
+                {/* Streak Card */}
+                <div className="bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-4 flex items-center gap-4 shadow-sm backdrop-blur-md">
+                  <div className="w-11 h-11 rounded-xl bg-orange-500/10 dark:bg-orange-400/5 flex items-center justify-center shrink-0 border border-orange-500/20">
+                    <span className="text-xl">🔥</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Daily Streak</span>
+                    <span className="text-sm font-black text-slate-800 dark:text-white mt-0.5 block">{streak} Days Active</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Subject Filters Tab Switcher */}
+              <div className="flex flex-wrap justify-center gap-2 mb-6 select-none relative z-10">
                 {[
                   { id: 'all', label: 'All Subjects', icon: '🌐' },
                   { id: 'quant', label: 'Quantitative', icon: '📐' },
@@ -2451,109 +2803,45 @@ export default function StudentDashboard() {
                   { id: 'verbal', label: 'Verbal Ability', icon: '📚' },
                   { id: 'coding', label: 'Coding & CS', icon: '💻' }
                 ].map((tab) => (
-                  <button
+                  <motion.button
                     key={tab.id}
-                    onClick={() => setRoadmapFilter(tab.id as any)}
-                    className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-305 cursor-pointer flex items-center gap-1.5 border ${
+                    onClick={() => handleFilterChange(tab.id)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-1.5 border ${
                       roadmapFilter === tab.id
-                        ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-950 border-transparent shadow-md scale-105'
-                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205 border-slate-205 dark:border-slate-800'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-transparent shadow-md'
+                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-slate-200 dark:border-slate-800'
                     }`}
                   >
                     <span>{tab.icon}</span>
                     <span>{tab.label}</span>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
 
               {/* Gamified Winding Bezier Roadmap Path */}
               {(() => {
-                const getNodeCoords = (index: number) => {
-                  let x = 50;
-                  let y = 80;
-                  if (index < 3) {
-                    // Row 0: moving left to right
-                    x = index === 0 ? 10 : index === 1 ? 50 : 90;
-                    y = 80;
-                  } else if (index < 6) {
-                    // Row 1: moving right to left
-                    x = index === 3 ? 90 : index === 4 ? 50 : 10;
-                    y = 260;
+                const rawNodesList = DOMAIN_ROADMAPS[roadmapFilter] || DOMAIN_ROADMAPS.all;
+                const nodesList = rawNodesList.map((node: any) => {
+                  let status: 'completed' | 'active' | 'locked' = 'locked';
+                  if (completedNodeIds.includes(node.id)) {
+                    status = 'completed';
+                  } else if (node.id === activeNodeId) {
+                    status = 'active';
                   } else {
-                    // Row 2: moving left to right
-                    x = index === 6 ? 10 : index === 7 ? 50 : 90;
-                    y = 440;
+                    status = 'locked';
                   }
-                  return { x, y };
-                };
+                  return { ...node, status };
+                });
 
-                const DOMAIN_ROADMAPS: Record<string, any[]> = {
-                  all: [
-                    { id: 1, title: 'Percentages', desc: 'Core fractional relationships', status: 'completed', symbol: '%' },
-                    { id: 2, title: 'Ratios & Proportions', desc: 'Comparative scale models', status: 'completed', symbol: '1:2' },
-                    { id: 3, title: 'Profit & Loss', desc: 'Commerce margins & calculations', status: 'active', symbol: '₹' },
-                    { id: 4, title: 'Time & Work', desc: 'Rate equations & tasks efficiency', status: 'locked', symbol: '⏳' },
-                    { id: 5, title: 'Syllogisms', desc: 'Boolean Venn diagrams deductions', status: 'locked', symbol: 'V' },
-                    { id: 6, title: 'Blood Relations', desc: 'Structured family maps trees', status: 'locked', symbol: '👪' },
-                    { id: 7, title: 'Coding: Arrays', desc: 'Linear memory indexing logic', status: 'locked', symbol: '[]' },
-                    { id: 8, title: 'Coding: Recursion', desc: 'Call stacks and induction checks', status: 'locked', symbol: '()' },
-                    { id: 9, title: 'Mastery Milestone', desc: 'Complete Career Certification', status: 'locked', symbol: '🏆' }
-                  ],
-                  quant: [
-                    { id: 1, title: 'Percentages', desc: 'Core fractional relationships', status: 'completed', symbol: '%' },
-                    { id: 2, title: 'Ratios & Proportions', desc: 'Comparative scale models', status: 'completed', symbol: '1:2' },
-                    { id: 3, title: 'Profit & Loss', desc: 'Commerce margins & calculations', status: 'active', symbol: '₹' },
-                    { id: 4, title: 'Simple Interest', desc: 'Linear accumulation models', status: 'locked', symbol: 'P*R' },
-                    { id: 5, title: 'Compound Interest', desc: 'Exponential curves and compound periods', status: 'locked', symbol: 'A^t' },
-                    { id: 6, title: 'Time & Work', desc: 'Rate equations & tasks efficiency', status: 'locked', symbol: '⏳' },
-                    { id: 7, title: 'Time & Speed', desc: 'Relative velocity equations', status: 'locked', symbol: '🚗' },
-                    { id: 8, title: 'Geometry & Mensuration', desc: 'Shapes properties and formulas', status: 'locked', symbol: '📐' },
-                    { id: 9, title: 'Quant Mastery', desc: 'Aptitude Certification Complete', status: 'locked', symbol: '🏆' }
-                  ],
-                  logical: [
-                    { id: 1, title: 'Series & Analogy', desc: 'Visual progressions logic patterns', status: 'completed', symbol: '1,2' },
-                    { id: 2, title: 'Seating Arrangements', desc: 'Linear coordinates spacing constraints', status: 'completed', symbol: '🪑' },
-                    { id: 3, title: 'Syllogisms', desc: 'Boolean Venn diagrams deductions', status: 'active', symbol: 'V' },
-                    { id: 4, title: 'Blood Relations', desc: 'Structured family maps trees', status: 'locked', symbol: '👪' },
-                    { id: 5, title: 'Clocks & Calendars', desc: 'Periodic time mathematics checks', status: 'locked', symbol: '📅' },
-                    { id: 6, title: 'Coding-Decoding', desc: 'Cipher shifting mapping tables', status: 'locked', symbol: '🔑' },
-                    { id: 7, title: 'Data Sufficiency', desc: 'Logical evaluation prerequisites', status: 'locked', symbol: '📊' },
-                    { id: 8, title: 'Logical Deductions', desc: 'Analytical deduction steps conclusions', status: 'locked', symbol: 'Logic' },
-                    { id: 9, title: 'Logical Mastery', desc: 'Logical Certification Complete', status: 'locked', symbol: '🏆' }
-                  ],
-                  verbal: [
-                    { id: 1, title: 'Spotting Errors', desc: 'Grammar checking logic systems', status: 'completed', symbol: '✏️' },
-                    { id: 2, title: 'Sentence Improvement', desc: 'Syntax phrasing modifications', status: 'completed', symbol: 'ABC' },
-                    { id: 3, title: 'Prepositions', desc: 'Spatial connection structure relationships', status: 'active', symbol: 'Prep' },
-                    { id: 4, title: 'Reading Comprehension', desc: 'Context interpretation mapping paragraphs', status: 'locked', symbol: '📖' },
-                    { id: 5, title: 'Synonyms & Antonyms', desc: 'Contextual semantic vocabulary checks', status: 'locked', symbol: 'Syn' },
-                    { id: 6, title: 'One Word Substitution', desc: 'Noun definitions dictionary compact', status: 'locked', symbol: '1W' },
-                    { id: 7, title: 'Sentence Arrangement', desc: 'Logical paragraph reordering structures', status: 'locked', symbol: 'Sort' },
-                    { id: 8, title: 'Idioms & Phrases', desc: 'Metaphoric language vocabulary banks', status: 'locked', symbol: 'Phrase' },
-                    { id: 9, title: 'Verbal Mastery', desc: 'Verbal Certification Complete', status: 'locked', symbol: '🏆' }
-                  ],
-                  coding: [
-                    { id: 1, title: 'Variables & Loops', desc: 'Flow structures state iterations', status: 'completed', symbol: 'loop' },
-                    { id: 2, title: 'Functions & Scope', desc: 'Modular components calls stack', status: 'completed', symbol: 'fn' },
-                    { id: 3, title: 'Coding: Arrays', desc: 'Linear memory indexing logic', status: 'active', symbol: '[]' },
-                    { id: 4, title: 'Coding: Recursion', desc: 'Call stacks and induction checks', status: 'locked', symbol: '()' },
-                    { id: 5, title: 'Object Oriented Prog', desc: 'Abstraction encapsulation structures', status: 'locked', symbol: 'OOP' },
-                    { id: 6, title: 'Searching & Sorting', desc: 'Divide and conquer speed limits', status: 'locked', symbol: 'Bin' },
-                    { id: 7, title: 'Linked Lists & Queues', desc: 'Dynamic pointer chaining arrays', status: 'locked', symbol: '->' },
-                    { id: 8, title: 'Trees & Graphs', desc: 'Hierarchical node network traversals', status: 'locked', symbol: 'Tree' },
-                    { id: 9, title: 'Coding Mastery', desc: 'Technical Certification Complete', status: 'locked', symbol: '🏆' }
-                  ]
-                };
- 
-                const nodesList = DOMAIN_ROADMAPS[roadmapFilter] || DOMAIN_ROADMAPS.all;
- 
                 const illustrationsList = [
                   { y: 170, x: 25, icon: <Award className="w-5 h-5 text-emerald-500" />, title: "Apex Peak", desc: "Aptitude standards reached" },
                   { y: 170, x: 75, icon: <Sparkles className="w-5 h-5 text-amber-500" />, title: "Unlock Spark", desc: "Reveal hidden concepts" },
                   { y: 350, x: 25, icon: <Cpu className="w-5 h-5 text-indigo-500" />, title: "Logic Gate", desc: "Algorithms unlocked" },
                   { y: 350, x: 75, icon: <Target className="w-5 h-5 text-orange-500" />, title: "Precision Target", desc: "Aim for mastery goals" }
                 ];
- 
+
                 const rawSegmentPaths = [
                   "M 10,80 L 50,80",
                   "M 50,80 L 90,80",
@@ -2565,7 +2853,7 @@ export default function StudentDashboard() {
                   "M 50,440 L 90,440"
                 ];
 
-                const segments = rawSegmentPaths.map((pathStr, idx) => {
+                const segments = rawSegmentPaths.map((pathStr: string, idx: number) => {
                   const startNode = nodesList[idx];
                   const endNode = nodesList[idx + 1];
                   
@@ -2586,7 +2874,7 @@ export default function StudentDashboard() {
                 });
 
                 // Find active index to compute traveling path coordinates
-                const activeIndex = nodesList.findIndex(n => n.status === 'active');
+                const activeIndex = nodesList.findIndex((n: any) => n.status === 'active');
                 const completedCoords = [];
                 for (let i = 0; i <= (activeIndex !== -1 ? activeIndex : 0); i++) {
                   const { x, y } = getNodeCoords(i);
@@ -2606,7 +2894,7 @@ export default function StudentDashboard() {
                   >
                     
                     {/* SVG Curve Canvas */}
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 520" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 520" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2050/svg">
                       <defs>
                         <linearGradient id="completed-grad" x1="0" y1="0" x2="1" y2="1">
                           <stop offset="0%" stopColor="#10B981" />
@@ -2616,6 +2904,11 @@ export default function StudentDashboard() {
                           <stop offset="0%" stopColor="#10B981" />
                           <stop offset="100%" stopColor="#2563EB" />
                         </linearGradient>
+                        <linearGradient id="active-flow-grad" x1="0" y1="0" x2="100%" y2="0" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stopColor="#10B981" />
+                          <stop offset="50%" stopColor="#3B82F6" />
+                          <stop offset="100%" stopColor="#10B981" />
+                        </linearGradient>
                         <filter id="active-glow" x="-30%" y="-30%" width="160%" height="160%">
                           <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#3B82F6" floodOpacity="0.5" />
                         </filter>
@@ -2623,7 +2916,7 @@ export default function StudentDashboard() {
                           <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#10B981" floodOpacity="0.35" />
                         </filter>
                       </defs>
- 
+
                       {/* Decorative graphics: background stars & flags */}
                       <g opacity="0.25" className="text-emerald-500 dark:text-emerald-400">
                         <path d="M 78,130 L 81,133 L 86,133 L 82,136 L 83,141 L 78,138 L 73,141 L 74,136 L 70,133 L 75,133 Z" fill="currentColor" />
@@ -2633,7 +2926,7 @@ export default function StudentDashboard() {
                         <path d="M 30,150 L 33,153 L 38,153 L 34,157 L 35,162 L 30,159 L 25,162 L 26,157 L 22,153 L 27,153 Z" fill="currentColor" />
                         <path d="M 75,320 L 78,323 L 83,323 L 79,326 L 80,331 L 75,328 L 70,331 L 71,326 L 67,323 L 72,323 Z" fill="currentColor" />
                       </g>
- 
+
                       {/* 3D Road Side Extrusion (Thick Depth Edge) */}
                       {segments.map((seg, i) => (
                         <path
@@ -2646,7 +2939,7 @@ export default function StudentDashboard() {
                           transform="translate(0, 5)"
                         />
                       ))}
- 
+
                       {/* Colored Road Side Extrusion for Completed & Active tracks */}
                       {segments.map((seg, i) => {
                         if (seg.status === 'completed') {
@@ -2676,7 +2969,7 @@ export default function StudentDashboard() {
                         }
                         return null;
                       })}
- 
+
                       {/* Background Road Borders & Fill */}
                       {segments.map((seg, i) => (
                         <React.Fragment key={`bg-road-${i}`}>
@@ -2698,20 +2991,23 @@ export default function StudentDashboard() {
                           />
                         </React.Fragment>
                       ))}
- 
+
                       {/* Active / Completed Winding Road Colors */}
                       {segments.map((seg, i) => {
                         if (seg.status === 'completed') {
                           return (
                             <React.Fragment key={`fg-road-${i}`}>
                               {/* Green colored road segment */}
-                              <path
+                              <motion.path
                                 d={seg.d}
                                 fill="none"
                                 stroke="url(#completed-grad)"
                                 strokeWidth="8"
                                 strokeLinecap="round"
                                 filter="url(#completed-glow)"
+                                initial={{ pathLength: 0 }}
+                                animate={{ pathLength: 1 }}
+                                transition={{ duration: 1.5, ease: "easeOut" }}
                               />
                               {/* White dashed highway lane divider lines */}
                               <path
@@ -2723,19 +3019,36 @@ export default function StudentDashboard() {
                                 strokeDasharray="4 4"
                                 opacity="0.6"
                               />
+                              {/* Shimmer overlay */}
+                              {!reducedMotion && (
+                                <motion.path
+                                  d={seg.d}
+                                  fill="none"
+                                  stroke="#10B981"
+                                  strokeWidth="8"
+                                  strokeLinecap="round"
+                                  opacity="0.3"
+                                  initial={{ strokeDasharray: "15 30", strokeDashoffset: 0 }}
+                                  animate={{ strokeDashoffset: -45 }}
+                                  transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                                />
+                              )}
                             </React.Fragment>
                           );
                         } else if (seg.status === 'active-transition') {
                           return (
                             <React.Fragment key={`fg-road-${i}`}>
                               {/* Green to Blue gradient transition road segment */}
-                              <path
+                              <motion.path
                                 d={seg.d}
                                 fill="none"
                                 stroke="url(#active-grad)"
                                 strokeWidth="8"
                                 strokeLinecap="round"
                                 filter="url(#active-glow)"
+                                initial={{ pathLength: 0 }}
+                                animate={{ pathLength: 1 }}
+                                transition={{ duration: 1.5, ease: "easeOut" }}
                               />
                               {/* White dashed highway lane divider lines */}
                               <path
@@ -2747,6 +3060,19 @@ export default function StudentDashboard() {
                                 strokeDasharray="4 4"
                                 opacity="0.7"
                               />
+                              {/* Active flow overlay */}
+                              {!reducedMotion && (
+                                <motion.path
+                                  d={seg.d}
+                                  fill="none"
+                                  stroke="url(#active-flow-grad)"
+                                  strokeWidth="8"
+                                  strokeLinecap="round"
+                                  initial={{ strokeDasharray: "8 12", strokeDashoffset: 0 }}
+                                  animate={{ strokeDashoffset: -20 }}
+                                  transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
+                                />
+                              )}
                             </React.Fragment>
                           );
                         } else {
@@ -2763,52 +3089,75 @@ export default function StudentDashboard() {
                           );
                         }
                       })}
- 
+
                       {/* Animated Traveling Glow Orb along the completed path */}
-                      <circle r="6" fill="#60A5FA" className="filter drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">
-                        <animateMotion 
-                          dur="5s" 
-                          repeatCount="indefinite" 
-                          path={motionPath} 
-                        />
-                      </circle>
+                      {completedCoords.length > 1 && (
+                        <circle r="6" fill="#60A5FA" className="filter drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">
+                          <animateMotion 
+                            dur="5s" 
+                            repeatCount="indefinite" 
+                            path={motionPath} 
+                          />
+                        </circle>
+                      )}
                     </svg>
- 
+
                     {/* Side decorative Illustration cards in the empty columns */}
-                    {illustrationsList.map((ill, i) => (
-                      <div 
+                    {illustrationsList.map((ill: any, i: number) => (
+                      <motion.div 
                         key={i}
-                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-250 dark:border-slate-900/80 p-2.5 rounded-2xl shadow-md w-36 select-none transition-all duration-300 hover:scale-105 pointer-events-none"
+                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-205 dark:border-slate-800/80 p-2.5 rounded-2xl shadow-md w-38 select-none pointer-events-auto cursor-help"
                         style={{ 
                           left: `${ill.x}%`, 
                           top: `${ill.y}px`,
                           transform: 'translate3d(-50%, -50%, 15px)',
                           boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.3)'
                         }}
+                        initial={{ opacity: 0, y: ill.y + 20, scale: 0.9 }}
+                        animate={{ opacity: 1, y: ill.y, scale: 1 }}
+                        transition={{ delay: 0.4 + i * 0.15, duration: 0.6, type: "spring" }}
+                        whileHover={{ 
+                          scale: 1.08, 
+                          y: ill.y - 4,
+                          boxShadow: '0 15px 30px -5px rgba(0,0,0,0.2), 0 0 15px rgba(245,158,11,0.2)',
+                        }}
                       >
-                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center shrink-0 shadow-inner">
+                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center shrink-0 shadow-inner relative overflow-hidden group">
+                          <motion.div 
+                            className="absolute top-0 bottom-0 left-0 w-2 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
+                            animate={{
+                              left: ["-20%", "120%"]
+                            }}
+                            transition={{
+                              duration: 2.5,
+                              repeat: Infinity,
+                              repeatDelay: 3,
+                              ease: "easeInOut"
+                            }}
+                          />
                           {ill.icon}
                         </div>
                         <div className="min-w-0 text-left">
                           <span className="text-[9px] font-black text-slate-800 dark:text-white block uppercase tracking-wide leading-none">{ill.title}</span>
-                          <span className="text-[7.5px] text-slate-450 dark:text-slate-500 font-semibold block leading-tight mt-0.5 truncate">{ill.desc}</span>
+                          <span className="text-[7.5px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight mt-0.5 truncate">{ill.desc}</span>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
- 
+
                     {/* HTML Nodes overlay */}
-                    {nodesList.map((node, index) => {
+                    {nodesList.map((node: any, index: number) => {
                       const { x, y } = getNodeCoords(index);
                       const isCompleted = node.status === 'completed';
                       const isActive = node.status === 'active';
                       const isLocked = node.status === 'locked';
+                      const isJustUnlocked = justUnlockedNodeId === node.id;
 
                       const zElevation = isActive ? 35 : isCompleted ? 20 : 5;
 
                       return (
                         <div 
                           key={node.id} 
-                          className="absolute flex flex-col items-center z-10 transition-all duration-300 ease-out"
+                          className="absolute flex flex-col items-center z-10 group"
                           style={{ 
                             left: `${x}%`, 
                             top: `${y}px`,
@@ -2817,47 +3166,101 @@ export default function StudentDashboard() {
                           }}
                         >
                           
-                          {/* Active floating indicator badge */}
+                          {/* Pulsing Active glow */}
                           {isActive && (
-                            <div 
-                              className="absolute -top-10 bg-gradient-to-r from-blue-600 to-indigo-650 text-white text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-lg animate-bounce flex items-center gap-1 border border-blue-400/40 select-none z-20"
-                              style={{
-                                transform: 'translate3d(0, 0, 10px)',
+                            <motion.div
+                              className="absolute w-20 h-20 rounded-full bg-blue-500/30 dark:bg-blue-400/20 blur-md pointer-events-none"
+                              animate={reducedMotion ? {} : {
+                                scale: [0.9, 1.4, 0.9],
+                                opacity: [0.2, 0.7, 0.2]
+                              }}
+                              transition={{
+                                duration: 2.5,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                            />
+                          )}
+
+                          {/* Active floating indicator badge with rocket */}
+                          {isActive && (
+                            <motion.div
+                              className="absolute -top-12 z-20 pointer-events-none flex flex-col items-center"
+                              animate={reducedMotion ? {} : {
+                                y: [-4, 4, -4]
+                              }}
+                              transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: "easeInOut"
                               }}
                             >
-                              <Play className="w-2 h-2 fill-current" />
-                              <span>Active Unit</span>
-                            </div>
+                              <div className="bg-gradient-to-tr from-amber-500 to-orange-655 p-1.5 rounded-full shadow-lg border border-amber-300">
+                                <Rocket className="w-3.5 h-3.5 text-white" />
+                              </div>
+                              <div className="w-2 h-2 bg-orange-650 rotate-45 -mt-1 shadow-md border-r border-b border-amber-300/30" />
+                            </motion.div>
                           )}
- 
+
                           {/* Circular 3D Lesson Node */}
-                          <button
+                          <motion.button
+                            variants={shakeVariants}
+                            animate={
+                              shakeNodeId === node.id 
+                                ? "shake" 
+                                : isJustUnlocked 
+                                ? { scale: [0.8, 1.2, 1], rotate: [0, -5, 5, 0] } 
+                                : "idle"
+                            }
+                            onAnimationComplete={() => setShakeNodeId(null)}
                             onClick={() => {
-                              if (!isLocked) {
-                                setActiveSidebarTab('practice');
-                                setSelectedDomain('quant');
+                              if (isLocked) {
+                                setShakeNodeId(node.id);
+                              } else {
+                                setActiveChallengeNode(node);
                               }
                             }}
-                            disabled={isLocked}
+                            whileHover={!isLocked ? { 
+                              y: -6, 
+                              scale: 1.05, 
+                              boxShadow: "0px 10px 25px rgba(59, 130, 246, 0.3)" 
+                            } : {}}
+                            initial={isJustUnlocked ? { scale: 0.8 } : false}
+                            transition={{ duration: 0.8, ease: "easeInOut" }}
                             className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 select-none cursor-pointer ${
                               isCompleted 
-                                ? 'bg-gradient-to-tr from-emerald-555 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px] hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2' 
+                                ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px]' 
                                 : isActive 
-                                ? 'bg-gradient-to-tr from-blue-600 to-indigo-550 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:-translate-y-1 active:translate-y-1 active:border-b-4 animate-pulse-glow hover:brightness-110' 
+                                ? 'bg-gradient-to-tr from-blue-600 to-indigo-550 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:brightness-110' 
                                 : 'bg-slate-100 border-b-2 border-slate-350 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-650 cursor-not-allowed'
                             }`}
                           >
-                            {isCompleted ? (
-                              <Check className="w-7 h-7 stroke-[3.5]" />
-                            ) : node.symbol === '🏆' ? (
-                              <Trophy className={`w-5.5 h-5.5 ${isLocked ? 'text-slate-400 dark:text-slate-605' : 'text-amber-500'}`} />
-                            ) : isLocked ? (
-                              <Lock className="w-4.5 h-4.5" />
-                            ) : (
-                              <span className="text-base font-black font-mono">{node.symbol}</span>
-                            )}
-                          </button>
- 
+                            <AnimatePresence mode="wait">
+                              {isCompleted ? (
+                                <motion.div 
+                                  key="check" 
+                                  initial={{ scale: 0, rotate: -45 }} 
+                                  animate={{ scale: 1, rotate: 0 }} 
+                                  transition={{ type: "spring", stiffness: 300, damping: 12 }}
+                                >
+                                  <Check className="w-7 h-7 stroke-[3.5]" />
+                                </motion.div>
+                              ) : isLocked && !isJustUnlocked ? (
+                                <motion.div key="lock" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                  <Lock className="w-4.5 h-4.5" />
+                                </motion.div>
+                              ) : (
+                                <motion.div key="symbol" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 15 }}>
+                                  {node.symbol === '🏆' ? (
+                                    <Trophy className="w-5.5 h-5.5 text-amber-500" />
+                                  ) : (
+                                    <span className="text-base font-black font-mono">{node.symbol}</span>
+                                  )}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </motion.button>
+
                           {/* Node Label card popup on hover */}
                           <div 
                             className="absolute top-16 text-center bg-white/95 dark:bg-slate-900/90 p-2 rounded-xl border border-slate-250 dark:border-slate-800 shadow-md w-34 transition-all duration-300 backdrop-blur-md"
@@ -2867,12 +3270,36 @@ export default function StudentDashboard() {
                             }}
                           >
                             <span className="text-[9px] font-black text-slate-800 dark:text-white block truncate uppercase">{node.title}</span>
-                            <span className="text-[7.5px] text-slate-505 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
+                            <span className="text-[7.5px] text-slate-550 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
                             {isActive && (
                               <span className="text-[7.5px] text-blue-600 dark:text-blue-400 font-black block mt-0.5">75% Complete</span>
                             )}
                           </div>
- 
+
+                          {/* Locked node warning tooltip */}
+                          {isLocked && (
+                            <div className="absolute top-16 text-center bg-slate-950 text-white p-2 rounded-xl border border-slate-800 shadow-md w-36 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
+                              <span className="text-[9px] font-black block uppercase tracking-wide">Locked Unit</span>
+                              <span className="text-[7.5px] text-slate-400 font-semibold block leading-tight mt-0.5">Complete previous unit to unlock</span>
+                            </div>
+                          )}
+
+                          {/* Floating XP Burst overlay */}
+                          <AnimatePresence>
+                            {showXpBurst === node.id && (
+                              <motion.div
+                                key={`xp-burst-${node.id}`}
+                                className="absolute -top-16 text-emerald-500 font-heading font-black text-sm select-none pointer-events-none z-30 flex items-center gap-1 shadow-sm px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/50 rounded-lg border border-emerald-300/40"
+                                initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                                animate={{ opacity: 1, y: -30, scale: 1.25 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 1.2, ease: "easeOut" }}
+                              >
+                                <span>+150 XP</span>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
                         </div>
                       );
                     })}
@@ -4036,40 +4463,7 @@ export default function StudentDashboard() {
             </div>
           )}
 
-          {/* Footer */}
-          <footer className="mt-12 border-t border-slate-200 dark:border-slate-900/60 pt-6 flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider select-none shrink-0">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              {currentRole?.role === 'admin' ? (
-                <input
-                  type="text"
-                  value={footerBadgeText}
-                  onChange={(e) => {
-                    setFooterBadgeText(e.target.value);
-                    localStorage.setItem('aptitude_footer_badge_text', e.target.value);
-                  }}
-                  className="bg-transparent border-b border-dashed border-slate-405 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-705 dark:text-slate-300 w-64"
-                  title="Edit Footer Badge Text"
-                />
-              ) : (
-                <span>{footerBadgeText}</span>
-              )}
-            </div>
-            {currentRole?.role === 'admin' ? (
-              <input
-                type="text"
-                value={footerCopyright}
-                onChange={(e) => {
-                  setFooterCopyright(e.target.value);
-                  localStorage.setItem('aptitude_footer_copyright', e.target.value);
-                }}
-                className="bg-transparent border-b border-dashed border-slate-405 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-705 dark:text-slate-300 text-right w-80"
-                title="Edit Footer Copyright"
-              />
-            ) : (
-              <span>{footerCopyright}</span>
-            )}
-          </footer>
+
 
           {/* Real-time Badge Unlock Celebration Popup Modal */}
           {justUnlockedBadge && (
@@ -4301,6 +4695,173 @@ export default function StudentDashboard() {
               </div>
             );
           })()}
+
+          {/* Confetti Explosion Overlay */}
+          {showConfettiBurst && (
+            <div className="fixed inset-0 z-[100] pointer-events-none overflow-hidden">
+              {[...Array(50)].map((_, i) => {
+                const angle = (i / 50) * 2 * Math.PI;
+                const velocity = 100 + Math.random() * 200;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity - 150;
+                const colors = ['#F59E0B', '#10B981', '#3B82F6', '#EC4899', '#8B5CF6'];
+                return (
+                  <motion.div
+                    key={`confetti-${i}`}
+                    className="absolute w-2.5 h-2.5 rounded-sm"
+                    style={{
+                      left: "50%",
+                      top: "50%",
+                      backgroundColor: colors[i % colors.length],
+                    }}
+                    initial={{ scale: 0, x: 0, y: 0, rotate: 0 }}
+                    animate={{
+                      scale: [1, 0.8, 0],
+                      x: tx,
+                      y: [0, ty, ty + 400],
+                      rotate: [0, Math.random() * 720 - 360],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      ease: "easeOut",
+                    }}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* Mini-Lesson Challenge Modal */}
+          <AnimatePresence>
+            {activeChallengeNode && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0, y: 30 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.9, opacity: 0, y: 30 }}
+                  className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden"
+                >
+                  {/* Glow decoration */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+                  
+                  {/* Header */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">Mini-Lesson Challenge</span>
+                      <h4 className="text-lg font-black text-slate-900 dark:text-white uppercase mt-0.5">{activeChallengeNode.title}</h4>
+                    </div>
+                    <button
+                      onClick={() => setActiveChallengeNode(null)}
+                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Question details */}
+                  {(() => {
+                    const challenge = ROADMAP_CHALLENGES[activeChallengeNode.title];
+                    if (!challenge) {
+                      return (
+                        <div className="text-center py-6 text-sm text-slate-500">
+                          No mock challenge loaded for this node yet.
+                        </div>
+                      );
+                    }
+
+                    const selectedOption = challengeAnswers[activeChallengeNode.id];
+                    const isSubmitted = challengeSubmitted[activeChallengeNode.id];
+                    const isCorrect = isSubmitted && selectedOption !== undefined && parseInt(selectedOption) === challenge.correctIndex;
+
+                    return (
+                      <div className="space-y-4">
+                        <p className="text-sm font-semibold text-slate-850 dark:text-slate-200 leading-relaxed">
+                          {challenge.question}
+                        </p>
+
+                        <div className="space-y-2">
+                          {challenge.options.map((opt, oIdx) => {
+                            const isOptSelected = selectedOption === oIdx.toString();
+                            let btnStyle = "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50";
+                            
+                            if (isOptSelected) {
+                              if (isSubmitted) {
+                                if (oIdx === challenge.correctIndex) {
+                                  btnStyle = "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500 text-emerald-600 dark:text-emerald-400";
+                                } else {
+                                  btnStyle = "bg-rose-50 dark:bg-rose-950/30 border-rose-500 text-rose-600 dark:text-rose-400";
+                                }
+                              } else {
+                                btnStyle = "bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-600 dark:text-blue-400";
+                              }
+                            } else if (isSubmitted && oIdx === challenge.correctIndex) {
+                              btnStyle = "bg-emerald-50/50 dark:bg-emerald-950/10 border-emerald-500/50 text-emerald-605 dark:text-emerald-400";
+                            }
+
+                            return (
+                              <button
+                                key={oIdx}
+                                disabled={isSubmitted}
+                                onClick={() => {
+                                  setChallengeAnswers(prev => ({ ...prev, [activeChallengeNode.id]: oIdx.toString() }));
+                                }}
+                                className={`w-full p-3.5 rounded-2xl border text-xs font-bold text-left transition-all flex items-center justify-between ${btnStyle}`}
+                              >
+                                <span>{opt}</span>
+                                {isSubmitted && oIdx === challenge.correctIndex && (
+                                  <CheckCircle className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {isSubmitted && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`p-4 rounded-2xl text-xs ${isCorrect ? 'bg-emerald-50/60 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300' : 'bg-rose-50/60 dark:bg-rose-950/20 text-rose-800 dark:text-rose-300'}`}
+                          >
+                            <p className="font-black uppercase tracking-wider mb-1">
+                              {isCorrect ? "🎉 Correct! +150 XP" : "❌ Incorrect"}
+                            </p>
+                            <p className="leading-relaxed font-medium opacity-90">{challenge.solution}</p>
+                          </motion.div>
+                        )}
+
+                        <div className="pt-2 flex gap-3">
+                          {!isSubmitted ? (
+                            <button
+                              disabled={selectedOption === undefined}
+                              onClick={() => {
+                                setChallengeSubmitted(prev => ({ ...prev, [activeChallengeNode.id]: true }));
+                                const isAnsCorrect = selectedOption !== undefined && parseInt(selectedOption) === challenge.correctIndex;
+                                if (isAnsCorrect) {
+                                  handleChallengeSuccess(activeChallengeNode);
+                                }
+                              }}
+                              className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400 dark:disabled:text-slate-600 text-white font-black uppercase text-xs tracking-wider rounded-2xl transition-all shadow-lg hover:shadow-blue-500/20"
+                            >
+                              Submit Answer
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setActiveChallengeNode(null);
+                              }}
+                              className="flex-1 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 font-black uppercase text-xs tracking-wider rounded-2xl transition-all"
+                            >
+                              Close & Continue
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
 
           {/* Celebration graphics canvas overlay */}
           {celebrationActive && <CanvasCelebration confettiStyle={confettiStyle} />}
