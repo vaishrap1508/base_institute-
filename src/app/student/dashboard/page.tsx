@@ -57,6 +57,13 @@ import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 
+const getYouTubeId = (url: string): string | null => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
 const ROADMAP_CHALLENGES: Record<string, { question: string, options: string[], correctIndex: number, solution: string }> = {
   'Percentages': {
     question: "A laptop price drops from ₹40,000 to ₹34,000. What is the percentage decrease in the price?",
@@ -1172,6 +1179,11 @@ export default function StudentDashboard() {
   };
 
   const handlePlayToggle = () => {
+    const isYouTube = activeQuestion?.videoUrl && getYouTubeId(activeQuestion.videoUrl);
+    if (isYouTube) {
+      setIsVideoPlaying(!isVideoPlaying);
+      return;
+    }
     if (videoRef.current) {
       if (isVideoPlaying) {
         videoRef.current.pause();
@@ -3685,128 +3697,186 @@ export default function StudentDashboard() {
                             handlePlayToggle();
                           }}
                         >
-                          <video
-                            ref={videoRef}
-                            src="/live_count_bg.mp4"
-                            onTimeUpdate={handleVideoTimeUpdate}
-                            onLoadedMetadata={handleVideoLoadedMetadata}
-                            onEnded={() => {
-                              setIsVideoPlaying(false);
-                              setVideoProgress(100);
-                            }}
-                            className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
-                            muted
-                            playsInline
-                          />
-
-                          {/* Hover Overlay Controls */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 z-10">
-                            
-                            {/* Player Top Bar */}
-                            <div className="flex justify-between items-center w-full">
-                              <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
-                                {activeQuestion.videoTitle || 'Walkthrough Explanation'}
-                              </span>
-                            </div>
-
-                            {/* Player Bottom Bar / Controls */}
-                            <div className="space-y-2.5 w-full">
-                              
-                              {/* Progress Slider Track */}
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="100"
-                                  step="0.1"
-                                  value={videoProgress}
-                                  onChange={handleVideoSliderChange}
-                                  className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
-                                />
-                              </div>
-
-                              <div className="flex items-center justify-between w-full">
-                                <div className="flex items-center gap-3">
-                                  {/* Play/Pause Button */}
-                                  <button
-                                    onClick={handlePlayToggle}
-                                    className="p-1 rounded-md text-white hover:bg-white/10 transition-colors cursor-pointer"
-                                  >
-                                    {isVideoPlaying ? (
-                                      <span className="font-mono text-xs font-black select-none">PAUSE</span>
-                                    ) : (
-                                      <Play className="w-3.5 h-3.5 fill-current" />
-                                    )}
-                                  </button>
-
-                                  {/* Current Time / Duration display */}
-                                  <span className="font-mono text-[9px] text-white/70 select-none">
-                                    {formatTime(videoPlayTime)} / {formatTime(videoDurationSeconds)}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-2 relative">
-                                  {/* Speed Popover Menu */}
-                                  {isSpeedMenuOpen && (
-                                    <div 
-                                      className="absolute bottom-full right-0 mb-2 bg-[#111827]/95 backdrop-blur-md border border-slate-800 rounded-xl p-2 w-32 shadow-xl z-20 flex flex-col gap-0.5 text-left"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <div className="text-[7.5px] font-black uppercase text-slate-400 px-2 py-1 tracking-wider border-b border-slate-700/60 mb-1 select-none">
-                                        Playback Speed
-                                      </div>
-                                      {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((sp) => (
-                                        <button
-                                          key={sp}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handlePlaybackSpeedChange(sp);
-                                            setIsSpeedMenuOpen(false);
-                                          }}
-                                          className={`text-[9px] font-black font-mono w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer ${
-                                            playbackSpeed === sp ? 'text-blue-400 bg-blue-500/10' : 'text-white/80'
-                                          }`}
-                                        >
-                                          <span>{sp === 1 ? 'Normal' : `${sp}x`}</span>
-                                          {playbackSpeed === sp && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  )}
-
-                                  {/* Speed Selector Trigger Button */}
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setIsSpeedMenuOpen(!isSpeedMenuOpen);
-                                    }}
-                                    className="flex items-center gap-1 text-[8.5px] font-black font-mono px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
-                                  >
-                                    <span>Speed: {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}</span>
-                                    <SettingsIcon className={`w-3 h-3 transition-transform duration-300 ${isSpeedMenuOpen ? 'rotate-90 text-blue-400' : 'text-white/80'}`} />
-                                  </button>
-                                  
-                                  {/* Close/Toggle PiP manually for mini player */}
-                                  {isMiniPlayerActive && (
+                          {(() => {
+                            const ytId = getYouTubeId(activeQuestion.videoUrl);
+                            if (ytId) {
+                              if (isVideoPlaying) {
+                                return (
+                                  <div className="absolute inset-0 w-full h-full bg-black z-0">
+                                    <iframe
+                                      width="100%"
+                                      height="100%"
+                                      src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&controls=1`}
+                                      title={activeQuestion.videoTitle || "Video solution"}
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                      allowFullScreen
+                                      className="w-full h-full border-0"
+                                    ></iframe>
                                     <button
+                                      type="button"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        setIsMiniPlayerActive(false);
+                                        setIsVideoPlaying(false);
                                       }}
-                                      className="text-[9.5px] font-black text-white hover:text-blue-400 transition-colors bg-white/10 px-1.5 py-0.5 rounded cursor-pointer"
+                                      className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-black/60 hover:bg-black/85 text-white hover:text-rose-400 transition-colors shadow-md flex items-center justify-center cursor-pointer"
+                                      title="Close Player"
                                     >
-                                      EXPAND
+                                      <X className="w-4 h-4" />
                                     </button>
-                                  )}
-                                </div>
-                              </div>
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden z-0">
+                                    <img
+                                      src={`https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`}
+                                      alt="Video Walkthrough Thumbnail"
+                                      className="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-102"
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+                                      }}
+                                    />
+                                  </div>
+                                );
+                              }
+                            } else {
+                              return (
+                                <video
+                                  ref={videoRef}
+                                  src={activeQuestion.videoUrl}
+                                  onTimeUpdate={handleVideoTimeUpdate}
+                                  onLoadedMetadata={handleVideoLoadedMetadata}
+                                  onEnded={() => {
+                                    setIsVideoPlaying(false);
+                                    setVideoProgress(100);
+                                  }}
+                                  className="absolute inset-0 w-full h-full object-cover opacity-100 pointer-events-none"
+                                  playsInline
+                                />
+                              );
+                            }
+                          })()}
 
-                            </div>
-                          </div>
+                          {/* Hover Overlay Controls */}
+                          {(() => {
+                            const ytId = getYouTubeId(activeQuestion.videoUrl);
+                            if (ytId) {
+                              if (!isVideoPlaying) {
+                                return (
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 flex flex-col justify-between p-4 z-10 pointer-events-none">
+                                    <div className="flex justify-between items-center w-full">
+                                      <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
+                                        {activeQuestion.videoTitle || 'Walkthrough Explanation'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            } else {
+                              return (
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 z-10">
+                                  {/* Player Top Bar */}
+                                  <div className="flex justify-between items-center w-full">
+                                    <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
+                                      {activeQuestion.videoTitle || 'Walkthrough Explanation'}
+                                    </span>
+                                  </div>
+
+                                  {/* Player Bottom Bar / Controls */}
+                                  <div className="space-y-2.5 w-full">
+                                    {/* Progress Slider Track */}
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        step="0.1"
+                                        value={videoProgress}
+                                        onChange={handleVideoSliderChange}
+                                        className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    <div className="flex items-center justify-between w-full">
+                                      <div className="flex items-center gap-3">
+                                        <button
+                                          onClick={handlePlayToggle}
+                                          className="p-1 rounded-md text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                        >
+                                          {isVideoPlaying ? (
+                                            <span className="font-mono text-xs font-black select-none">PAUSE</span>
+                                          ) : (
+                                            <Play className="w-3.5 h-3.5 fill-current" />
+                                          )}
+                                        </button>
+
+                                        <span className="font-mono text-[9px] text-white/70 select-none">
+                                          {formatTime(videoPlayTime)} / {formatTime(videoDurationSeconds)}
+                                        </span>
+                                      </div>
+
+                                      <div className="flex items-center gap-2 relative">
+                                        {isSpeedMenuOpen && (
+                                          <div 
+                                            className="absolute bottom-full right-0 mb-2 bg-[#111827]/95 backdrop-blur-md border border-slate-800 rounded-xl p-2 w-32 shadow-xl z-20 flex flex-col gap-0.5 text-left"
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <div className="text-[7.5px] font-black uppercase text-slate-400 px-2 py-1 tracking-wider border-b border-slate-700/60 mb-1 select-none">
+                                              Playback Speed
+                                            </div>
+                                            {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((sp) => (
+                                              <button
+                                                key={sp}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handlePlaybackSpeedChange(sp);
+                                                  setIsSpeedMenuOpen(false);
+                                                }}
+                                                className={`text-[9px] font-black font-mono w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer ${
+                                                  playbackSpeed === sp ? 'text-blue-400 bg-blue-500/10' : 'text-white/80'
+                                                }`}
+                                              >
+                                                <span>{sp === 1 ? 'Normal' : `${sp}x`}</span>
+                                                {playbackSpeed === sp && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        )}
+
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsSpeedMenuOpen(!isSpeedMenuOpen);
+                                          }}
+                                          className="flex items-center gap-1 text-[8.5px] font-black font-mono px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
+                                        >
+                                          <span>Speed: {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}</span>
+                                          <SettingsIcon className={`w-3 h-3 transition-transform duration-300 ${isSpeedMenuOpen ? 'rotate-90 text-blue-400' : 'text-white/80'}`} />
+                                        </button>
+                                        
+                                        {isMiniPlayerActive && (
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setIsMiniPlayerActive(false);
+                                            }}
+                                            className="text-[9.5px] font-black text-white hover:text-blue-400 transition-colors bg-white/10 px-1.5 py-0.5 rounded cursor-pointer"
+                                          >
+                                            EXPAND
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+                          })()}
 
                           {/* Non-hover initial play state overlay */}
                           {!isVideoPlaying && !isMiniPlayerActive && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/45 pointer-events-none">
                               <span className="w-12 h-12 rounded-full bg-blue-600/90 flex items-center justify-center text-white shadow-xl animate-pulse pointer-events-auto cursor-pointer" onClick={(e) => {
                                 e.stopPropagation();
                                 handlePlayToggle();
@@ -3815,7 +3885,6 @@ export default function StudentDashboard() {
                               </span>
                             </div>
                           )}
-
                         </motion.div>
                         
                         <div className="flex justify-between items-center text-[10px] text-slate-500 font-bold px-1 select-none">
@@ -4107,136 +4176,194 @@ export default function StudentDashboard() {
                               handlePlayToggle();
                             }}
                           >
-                            <video
-                              ref={videoRef}
-                              src="/live_count_bg.mp4"
-                              onTimeUpdate={handleVideoTimeUpdate}
-                              onLoadedMetadata={handleVideoLoadedMetadata}
-                              onEnded={() => {
-                                setIsVideoPlaying(false);
-                                setVideoProgress(100);
-                              }}
-                              className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
-                              muted
-                              playsInline
-                            />
-
-                            {/* Hover Overlay Controls */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 z-10">
-                              
-                              {/* Player Top Bar */}
-                              <div className="flex justify-between items-center w-full">
-                                <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
-                                  {activeQuestion.videoTitle || 'Walkthrough Explanation'}
-                                </span>
-                              </div>
-
-                              {/* Player Bottom Bar / Controls */}
-                              <div className="space-y-2.5 w-full">
-                                
-                                {/* Progress Slider Track */}
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    step="0.1"
-                                    value={videoProgress}
-                                    onChange={handleVideoSliderChange}
-                                    className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
-                                  />
-                                </div>
-
-                                <div className="flex items-center justify-between w-full">
-                                  <div className="flex items-center gap-3">
-                                    {/* Play/Pause Button */}
+                          {(() => {
+                            const ytId = getYouTubeId(activeQuestion.videoUrl);
+                            if (ytId) {
+                              if (isVideoPlaying) {
+                                return (
+                                  <div className="absolute inset-0 w-full h-full bg-black z-0">
+                                    <iframe
+                                      width="100%"
+                                      height="100%"
+                                      src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&controls=1`}
+                                      title={activeQuestion.videoTitle || "Video solution"}
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                      allowFullScreen
+                                      className="w-full h-full border-0"
+                                    ></iframe>
                                     <button
-                                      onClick={handlePlayToggle}
-                                      className="p-1 rounded-md text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsVideoPlaying(false);
+                                      }}
+                                      className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-black/60 hover:bg-black/85 text-white hover:text-rose-400 transition-colors shadow-md flex items-center justify-center cursor-pointer"
+                                      title="Close Player"
                                     >
-                                      {isVideoPlaying ? (
-                                        <span className="font-mono text-xs font-black select-none">PAUSE</span>
-                                      ) : (
-                                        <Play className="w-3.5 h-3.5 fill-current" />
-                                      )}
+                                      <X className="w-4 h-4" />
                                     </button>
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden z-0">
+                                    <img
+                                      src={`https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`}
+                                      alt="Video Walkthrough Thumbnail"
+                                      className="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-102"
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+                                      }}
+                                    />
+                                  </div>
+                                );
+                              }
+                            } else {
+                              return (
+                                <video
+                                  ref={videoRef}
+                                  src={activeQuestion.videoUrl}
+                                  onTimeUpdate={handleVideoTimeUpdate}
+                                  onLoadedMetadata={handleVideoLoadedMetadata}
+                                  onEnded={() => {
+                                    setIsVideoPlaying(false);
+                                    setVideoProgress(100);
+                                  }}
+                                  className="absolute inset-0 w-full h-full object-cover opacity-100 pointer-events-none"
+                                  playsInline
+                                />
+                              );
+                            }
+                          })()}
 
-                                    {/* Current Time / Duration display */}
-                                    <span className="font-mono text-[9px] text-white/70 select-none">
-                                      {formatTime(videoPlayTime)} / {formatTime(videoDurationSeconds)}
+                          {/* Hover Overlay Controls */}
+                          {(() => {
+                            const ytId = getYouTubeId(activeQuestion.videoUrl);
+                            if (ytId) {
+                              if (!isVideoPlaying) {
+                                return (
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 flex flex-col justify-between p-4 z-10 pointer-events-none">
+                                    <div className="flex justify-between items-center w-full">
+                                      <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
+                                        {activeQuestion.videoTitle || 'Walkthrough Explanation'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            } else {
+                              return (
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 z-10">
+                                  {/* Player Top Bar */}
+                                  <div className="flex justify-between items-center w-full">
+                                    <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
+                                      {activeQuestion.videoTitle || 'Walkthrough Explanation'}
                                     </span>
                                   </div>
 
-                                  <div className="flex items-center gap-2 relative">
-                                    {/* Speed Popover Menu */}
-                                    {isSpeedMenuOpen && (
-                                      <div 
-                                        className="absolute bottom-full right-0 mb-2 bg-[#111827]/95 backdrop-blur-md border border-slate-800 rounded-xl p-2 w-32 shadow-xl z-20 flex flex-col gap-0.5 text-left"
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        <div className="text-[7.5px] font-black uppercase text-slate-400 px-2 py-1 tracking-wider border-b border-slate-700/60 mb-1 select-none">
-                                          Playback Speed
-                                        </div>
-                                        {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((sp) => (
+                                  {/* Player Bottom Bar / Controls */}
+                                  <div className="space-y-2.5 w-full">
+                                    {/* Progress Slider Track */}
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        step="0.1"
+                                        value={videoProgress}
+                                        onChange={handleVideoSliderChange}
+                                        className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
+                                      />
+                                    </div>
+
+                                    <div className="flex items-center justify-between w-full">
+                                      <div className="flex items-center gap-3">
+                                        <button
+                                          onClick={handlePlayToggle}
+                                          className="p-1 rounded-md text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                        >
+                                          {isVideoPlaying ? (
+                                            <span className="font-mono text-xs font-black select-none">PAUSE</span>
+                                          ) : (
+                                            <Play className="w-3.5 h-3.5 fill-current" />
+                                          )}
+                                        </button>
+
+                                        <span className="font-mono text-[9px] text-white/70 select-none">
+                                          {formatTime(videoPlayTime)} / {formatTime(videoDurationSeconds)}
+                                        </span>
+                                      </div>
+
+                                      <div className="flex items-center gap-2 relative">
+                                        {isSpeedMenuOpen && (
+                                          <div 
+                                            className="absolute bottom-full right-0 mb-2 bg-[#111827]/95 backdrop-blur-md border border-slate-800 rounded-xl p-2 w-32 shadow-xl z-20 flex flex-col gap-0.5 text-left"
+                                            onClick={(e) => e.stopPropagation()}
+                                          >
+                                            <div className="text-[7.5px] font-black uppercase text-slate-400 px-2 py-1 tracking-wider border-b border-slate-700/60 mb-1 select-none">
+                                              Playback Speed
+                                            </div>
+                                            {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((sp) => (
+                                              <button
+                                                key={sp}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handlePlaybackSpeedChange(sp);
+                                                  setIsSpeedMenuOpen(false);
+                                                }}
+                                                className={`text-[9px] font-black font-mono w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer ${
+                                                  playbackSpeed === sp ? 'text-blue-400 bg-blue-500/10' : 'text-white/80'
+                                                }`}
+                                              >
+                                                <span>{sp === 1 ? 'Normal' : `${sp}x`}</span>
+                                                {playbackSpeed === sp && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        )}
+
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsSpeedMenuOpen(!isSpeedMenuOpen);
+                                          }}
+                                          className="flex items-center gap-1 text-[8.5px] font-black font-mono px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
+                                        >
+                                          <span>Speed: {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}</span>
+                                          <SettingsIcon className={`w-3 h-3 transition-transform duration-300 ${isSpeedMenuOpen ? 'rotate-90 text-blue-400' : 'text-white/80'}`} />
+                                        </button>
+                                        
+                                        {isMiniPlayerActive && (
                                           <button
-                                            key={sp}
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              handlePlaybackSpeedChange(sp);
-                                              setIsSpeedMenuOpen(false);
+                                              setIsMiniPlayerActive(false);
                                             }}
-                                            className={`text-[9px] font-black font-mono w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer ${
-                                              playbackSpeed === sp ? 'text-blue-400 bg-blue-500/10' : 'text-white/80'
-                                            }`}
+                                            className="text-[9.5px] font-black text-white hover:text-blue-400 transition-colors bg-white/10 px-1.5 py-0.5 rounded cursor-pointer"
                                           >
-                                            <span>{sp === 1 ? 'Normal' : `${sp}x`}</span>
-                                            {playbackSpeed === sp && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                                            EXPAND
                                           </button>
-                                        ))}
+                                        )}
                                       </div>
-                                    )}
-
-                                    {/* Speed Selector Trigger Button */}
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsSpeedMenuOpen(!isSpeedMenuOpen);
-                                      }}
-                                      className="flex items-center gap-1 text-[8.5px] font-black font-mono px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
-                                    >
-                                      <span>Speed: {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}</span>
-                                      <SettingsIcon className={`w-3 h-3 transition-transform duration-300 ${isSpeedMenuOpen ? 'rotate-90 text-blue-400' : 'text-white/80'}`} />
-                                    </button>
-                                    
-                                    {/* Close/Toggle PiP manually for mini player */}
-                                    {isMiniPlayerActive && (
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setIsMiniPlayerActive(false);
-                                        }}
-                                        className="text-[9.5px] font-black text-white hover:text-blue-400 transition-colors bg-white/10 px-1.5 py-0.5 rounded cursor-pointer"
-                                      >
-                                        EXPAND
-                                      </button>
-                                    )}
+                                    </div>
                                   </div>
                                 </div>
+                              );
+                            }
+                          })()}
 
-                              </div>
+                          {/* Non-hover initial play state overlay */}
+                          {!isVideoPlaying && !isMiniPlayerActive && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/45 pointer-events-none">
+                              <span className="w-12 h-12 rounded-full bg-blue-600/90 flex items-center justify-center text-white shadow-xl animate-pulse pointer-events-auto cursor-pointer" onClick={(e) => {
+                                e.stopPropagation();
+                                handlePlayToggle();
+                              }}>
+                                <Play className="w-5 h-5 fill-current ml-0.5" />
+                              </span>
                             </div>
-
-                            {/* Non-hover initial play state overlay */}
-                            {!isVideoPlaying && !isMiniPlayerActive && (
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
-                                <span className="w-12 h-12 rounded-full bg-blue-600/90 flex items-center justify-center text-white shadow-xl animate-pulse pointer-events-auto cursor-pointer" onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePlayToggle();
-                                }}>
-                                  <Play className="w-5 h-5 fill-current ml-0.5" />
-                                </span>
-                              </div>
-                            )}
+                          )}
 
                           </motion.div>
                           
