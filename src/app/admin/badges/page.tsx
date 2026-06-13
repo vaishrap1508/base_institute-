@@ -302,24 +302,24 @@ export default function AdminBadgesPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-550 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-850 p-4 rounded-xl space-y-3.5 text-xs text-left">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">Clearance Status</span>
-                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-450 uppercase tracking-wide">DENIED</span>
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Attempted User</span>
-                    <span className="text-slate-800 dark:text-slate-105 font-bold">{currentRole.name}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-slate-800 dark:text-slate-100 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
                     <span className="text-slate-800 dark:text-rose-400 font-bold uppercase tracking-wider text-[11px] text-rose-600">{currentRole.role}</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/badges</span>
                   </div>
                 </div>
@@ -351,7 +351,7 @@ export default function AdminBadgesPage() {
               <div className="flex items-center gap-3 shrink-0">
                 <button
                   onClick={fetchBadgesAndStats}
-                  className="px-4 py-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-250 dark:border-slate-850 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:bg-slate-50"
+                  className="px-4 py-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:bg-slate-50"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                   <span>Refresh Stats</span>
@@ -372,12 +372,12 @@ export default function AdminBadgesPage() {
               </div>
 
               <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5">
-                <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-450">
+                <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Active Badges</span>
-                  <span className="text-2xl font-black text-emerald-600 dark:text-emerald-450 tracking-tight mt-1">
+                  <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight mt-1">
                     {badges.filter(b => b.is_active).length}
                   </span>
                 </div>
@@ -389,7 +389,7 @@ export default function AdminBadgesPage() {
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Total Unlocks</span>
-                  <span className="text-2xl font-black text-rose-600 dark:text-rose-450 tracking-tight mt-1">
+                  <span className="text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight mt-1">
                     {stats?.totalCompleted || 0}
                   </span>
                 </div>
@@ -423,7 +423,7 @@ export default function AdminBadgesPage() {
                       placeholder="Search badges..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-250 dark:border-slate-850 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-blue-600"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-blue-600"
                     />
                   </div>
 
@@ -432,7 +432,7 @@ export default function AdminBadgesPage() {
                     <select
                       value={categoryFilter}
                       onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="bg-slate-50 dark:bg-slate-950 border border-slate-250 dark:border-slate-850 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-600"
+                      className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-600"
                     >
                       <option value="all">All Stages</option>
                       <option value="Getting Started">Stage 1 (Getting Started)</option>
@@ -449,7 +449,7 @@ export default function AdminBadgesPage() {
                 ) : filteredBadges.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 text-center gap-2 select-none">
                     <Award className="w-10 h-10 text-slate-300 dark:text-slate-700" />
-                    <p className="text-sm font-bold text-slate-750 dark:text-slate-350">No badges found</p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No badges found</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -484,8 +484,8 @@ export default function AdminBadgesPage() {
                             disabled={updatingId === b.id}
                             className={`px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer ${
                               b.is_active 
-                                ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/25 dark:text-emerald-450 border border-emerald-500/10'
-                                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/25 dark:text-rose-450 border border-rose-500/10'
+                                ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/25 dark:text-emerald-400 border border-emerald-500/10'
+                                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/25 dark:text-rose-400 border border-rose-500/10'
                             }`}
                           >
                             {updatingId === b.id ? '...' : (b.is_active ? 'Active' : 'Disabled')}
@@ -493,7 +493,7 @@ export default function AdminBadgesPage() {
                           
                           <button
                             onClick={() => handleOpenEdit(b)}
-                            className="p-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-450 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-250 dark:border-slate-800 rounded-lg cursor-pointer"
+                            className="p-1.5 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg cursor-pointer"
                             title="Edit Badge Criteria"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -510,7 +510,7 @@ export default function AdminBadgesPage() {
                 
                 {/* Upload Assets Panel */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-                  <h3 className="text-xs font-black text-slate-850 dark:text-white uppercase tracking-widest flex items-center gap-2 select-none">
+                  <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2 select-none">
                     <UploadCloud className="w-4 h-4 text-blue-600" />
                     <span>Upload Badge Assets</span>
                   </h3>
@@ -520,7 +520,7 @@ export default function AdminBadgesPage() {
                   
                   {/* Fake Uploader */}
                   <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-950/40 transition-all text-center select-none">
-                    <UploadCloud className="w-8 h-8 text-slate-350 animate-bounce" />
+                    <UploadCloud className="w-8 h-8 text-slate-300 animate-bounce" />
                     <div>
                       <span className="text-[10.5px] font-bold text-slate-900 dark:text-white">Choose a PNG file</span>
                       <p className="text-[8px] text-slate-400 mt-0.5">Max size 2MB (Dimensions: 512x512)</p>
@@ -528,8 +528,8 @@ export default function AdminBadgesPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-[9px] font-extrabold text-slate-450 uppercase tracking-widest block">Target Folder Destination</label>
-                    <select className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl px-3 py-2 text-[10px] font-bold w-full focus:outline-none">
+                    <label className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block">Target Folder Destination</label>
+                    <select className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-[10px] font-bold w-full focus:outline-none">
                       <option value="stage1">/public/badges/stage1/</option>
                     </select>
                   </div>
@@ -537,7 +537,7 @@ export default function AdminBadgesPage() {
 
                 {/* Badge distribution chart representation */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4 select-none">
-                  <h3 className="text-xs font-black text-slate-850 dark:text-white uppercase tracking-widest flex items-center gap-2">
+                  <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2">
                     <Layers className="w-4 h-4 text-blue-600" />
                     <span>Completion Distribution</span>
                   </h3>
@@ -553,7 +553,7 @@ export default function AdminBadgesPage() {
                               <span className="text-slate-800 dark:text-slate-200 truncate uppercase max-w-[120px]">{dist.name}</span>
                               <span className="text-slate-400 font-mono">{dist.earnedCount} users</span>
                             </div>
-                            <div className="w-full h-1 bg-slate-55/70 dark:bg-slate-950 rounded-full overflow-hidden">
+                            <div className="w-full h-1 bg-slate-50/70 dark:bg-slate-950 rounded-full overflow-hidden">
                               <div 
                                 className="h-full bg-blue-600 rounded-full"
                                 style={{ width: `${Math.min(100, dist.earnedCount * 25)}%` }} // rough scaling
@@ -580,15 +580,15 @@ export default function AdminBadgesPage() {
                   onSubmit={handleSaveEdit}
                   className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] shadow-2xl p-6 space-y-5 animate-scaleIn text-left select-none"
                 >
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-850 pb-3">
-                    <h3 className="font-black text-xs text-slate-850 dark:text-white uppercase tracking-widest flex items-center gap-2">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <h3 className="font-black text-xs text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2">
                       <Sliders className="w-4 h-4 text-blue-600" />
                       <span>Edit Badge Criteria</span>
                     </h3>
                     <button 
                       type="button"
                       onClick={() => setSelectedBadge(null)}
-                      className="text-slate-400 hover:text-slate-650 text-xs font-bold p-1 hover:bg-slate-100 rounded cursor-pointer"
+                      className="text-slate-400 hover:text-slate-600 text-xs font-bold p-1 hover:bg-slate-100 rounded cursor-pointer"
                     >
                       Close
                     </button>
@@ -598,57 +598,57 @@ export default function AdminBadgesPage() {
                     
                     {/* Badge Name */}
                     <div className="space-y-1">
-                      <label className="text-[9px] font-extrabold text-slate-450 uppercase tracking-widest block">Badge Name</label>
+                      <label className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block">Badge Name</label>
                       <input 
                         type="text" 
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         required
-                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
                       />
                     </div>
 
                     {/* Description */}
                     <div className="space-y-1">
-                      <label className="text-[9px] font-extrabold text-slate-450 uppercase tracking-widest block">Description</label>
+                      <label className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block">Description</label>
                       <textarea 
                         value={editDesc}
                         onChange={(e) => setEditDesc(e.target.value)}
                         required
                         rows={2}
-                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
                       />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       {/* XP Reward */}
                       <div className="space-y-1">
-                        <label className="text-[9px] font-extrabold text-slate-450 uppercase tracking-widest block">XP Reward</label>
+                        <label className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block">XP Reward</label>
                         <input 
                           type="number" 
                           value={editXp}
                           onChange={(e) => setEditXp(Number(e.target.value))}
                           required
-                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
+                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
                         />
                       </div>
 
                       {/* Level */}
                       <div className="space-y-1">
-                        <label className="text-[9px] font-extrabold text-slate-450 uppercase tracking-widest block">Badge Level</label>
+                        <label className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block">Badge Level</label>
                         <input 
                           type="number" 
                           value={editLevel}
                           onChange={(e) => setEditLevel(Number(e.target.value))}
                           required
-                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
+                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
                         />
                       </div>
                     </div>
 
                     {/* Target Value */}
                     <div className="space-y-1">
-                      <label className="text-[9px] font-extrabold text-slate-450 uppercase tracking-widest block">
+                      <label className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block">
                         Unlock Target Value (Condition Type: <span className="font-mono text-blue-600">{selectedBadge.unlock_condition?.type}</span>)
                       </label>
                       <input 
@@ -656,7 +656,7 @@ export default function AdminBadgesPage() {
                         value={editTarget}
                         onChange={(e) => setEditTarget(Number(e.target.value))}
                         required
-                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-600"
                       />
                       <span className="text-[8.5px] font-bold text-slate-400 mt-1 block">
                         Sets the quantitative threshold (e.g. solved items, streak days, visited counts) needed to achieve this badge.

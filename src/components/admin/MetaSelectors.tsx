@@ -99,7 +99,7 @@ export default function MetaSelectors({
             onClick={() => onChangeDifficulty('HARD')}
             className={`py-2 px-3 text-xs font-semibold rounded-lg border text-center transition-all duration-150 ${
               difficulty === 'HARD'
-                ? 'bg-rose-50 border-rose-300 text-rose-700 font-bold shadow-sm shadow-rose-100 dark:bg-rose-950/40 dark:border-rose-800 dark:text-rose-450 dark:shadow-none'
+                ? 'bg-rose-50 border-rose-300 text-rose-700 font-bold shadow-sm shadow-rose-100 dark:bg-rose-950/40 dark:border-rose-800 dark:text-rose-400 dark:shadow-none'
                 : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800'
             }`}
           >
@@ -142,10 +142,10 @@ export default function MetaSelectors({
                 type="button"
                 key={company}
                 onClick={() => handleAddTagInternal(company)}
-                className="w-full flex items-center justify-between px-3.5 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-850 text-left font-medium"
+                className="w-full flex items-center justify-between px-3.5 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-left font-medium"
               >
                 <span>{company}</span>
-                <span className="text-[9px] text-slate-400 dark:text-slate-550 bg-slate-100 dark:bg-slate-950 px-1.5 py-0.5 rounded font-mono">
+                <span className="text-[9px] text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-950 px-1.5 py-0.5 rounded font-mono">
                   Database
                 </span>
               </button>
@@ -175,7 +175,7 @@ export default function MetaSelectors({
           {selectedTags.map((tag) => (
             <span
               key={tag}
-              className="flex items-center gap-1 px-2.5 py-1 bg-slate-100/90 dark:bg-slate-800 text-slate-600 dark:text-slate-350 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-200/80 dark:hover:bg-slate-700 border border-slate-200/50 dark:border-slate-700/50 rounded-full text-xs font-semibold tracking-tight transition-colors duration-100 cursor-default"
+              className="flex items-center gap-1 px-2.5 py-1 bg-slate-100/90 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-200/80 dark:hover:bg-slate-700 border border-slate-200/50 dark:border-slate-700/50 rounded-full text-xs font-semibold tracking-tight transition-colors duration-100 cursor-default"
             >
               {tag}
               <button

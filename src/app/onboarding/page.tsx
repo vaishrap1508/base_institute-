@@ -747,14 +747,14 @@ export default function OnboardingPage() {
                 ? 'bg-emerald-50/90 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-200 border-emerald-200/80 dark:border-emerald-900/50 backdrop-blur-md' 
                 : notification.type === 'error'
                 ? 'bg-rose-50/90 dark:bg-rose-950/90 text-rose-800 dark:text-rose-200 border-rose-200/80 dark:border-rose-900/50 backdrop-blur-md'
-                : 'bg-blue-50/90 dark:bg-blue-950/90 text-blue-800 dark:text-blue-205 border-blue-200/80 dark:border-blue-900/50 backdrop-blur-md'
+                : 'bg-blue-50/90 dark:bg-blue-950/90 text-blue-800 dark:text-blue-200 border-blue-200/80 dark:border-blue-900/50 backdrop-blur-md'
             }`}
           >
             <div className="p-1 rounded-lg bg-white/50 dark:bg-white/10 shrink-0">
               {notification.type === 'success' ? (
                 <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <Info className="w-4 h-4 text-blue-600 dark:text-blue-450" />
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               )}
             </div>
             <span className="text-xs font-semibold leading-normal">{notification.text}</span>
@@ -798,7 +798,7 @@ export default function OnboardingPage() {
               Tell us a little about yourself so we can tailor the experience to your goals.
             </p>
             <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/40 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/40 text-[10px] font-bold text-slate-500 dark:text-slate-400 backdrop-blur-sm shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-550 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-500 animate-pulse" />
               <span>Step {currentStep} of 6</span>
               <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
               <span>Estimated time: {
@@ -838,7 +838,7 @@ export default function OnboardingPage() {
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center border text-[10px] transition-all duration-300 relative ${
                         isCompleted 
-                          ? 'border-blue-650 bg-blue-600 text-white font-black shadow-sm'
+                          ? 'border-blue-600 bg-blue-600 text-white font-black shadow-sm'
                           : isActive 
                           ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold scale-110 shadow-[0_0_15px_rgba(37,99,235,0.25)]' 
                           : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-slate-400 dark:text-slate-500'
@@ -856,14 +856,14 @@ export default function OnboardingPage() {
                         isActive 
                           ? 'text-blue-600 dark:text-blue-400' 
                           : isCompleted 
-                          ? 'text-slate-700 dark:text-slate-350' 
-                          : 'text-slate-455 dark:text-slate-550'
+                          ? 'text-slate-700 dark:text-slate-300' 
+                          : 'text-slate-500 dark:text-slate-500'
                       }`}>
                         {s.label}
                       </span>
                     </button>
                     {index < stepsConfig.length - 1 && (
-                      <div className="h-[2px] flex-1 mx-2 relative bg-slate-200 dark:bg-slate-805 rounded-full overflow-hidden">
+                      <div className="h-[2px] flex-1 mx-2 relative bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div 
                           className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500 ease-out"
                           style={{ width: isCompleted ? '100%' : isActive ? '50%' : '0%' }}
@@ -937,7 +937,7 @@ export default function OnboardingPage() {
                           value={username}
                           onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                           style={{ textTransform: 'none' }}
-                          className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-805 rounded-xl py-3.5 pl-12 pr-12 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-mono placeholder-slate-400"
+                          className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3.5 pl-12 pr-12 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-mono placeholder-slate-400"
                         />
                         {username && (
                           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
@@ -975,7 +975,7 @@ export default function OnboardingPage() {
                         </div>
                       )}
                       
-                      <span className="text-[11px] text-slate-500 dark:text-slate-450 block leading-normal mt-1.5 font-medium">
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block leading-normal mt-1.5 font-medium">
                         This is how you will be identified in progress and performance tracking.
                       </span>
                     </div>
@@ -996,12 +996,12 @@ export default function OnboardingPage() {
                           onClick={() => setUserType('student')}
                           className={`p-5 rounded-2xl border-2 text-left cursor-pointer transition-all duration-300 flex flex-col gap-3 relative hover:-translate-y-0.5 ${
                             userType === 'student'
-                              ? 'border-blue-600 bg-blue-50/20 text-slate-905 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.06)]'
-                              : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900/60 dark:text-slate-300'
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.06)]'
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900/60 dark:text-slate-300'
                           }`}
                         >
                           <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base ${
-                            userType === 'student' ? 'bg-blue-105 dark:bg-blue-950/50 text-blue-600' : 'bg-slate-100 dark:bg-slate-900 text-slate-500'
+                            userType === 'student' ? 'bg-blue-100 dark:bg-blue-950/50 text-blue-600' : 'bg-slate-100 dark:bg-slate-900 text-slate-500'
                           }`}>
                             🎓
                           </div>
@@ -1027,12 +1027,12 @@ export default function OnboardingPage() {
                           }}
                           className={`p-5 rounded-2xl border-2 text-left cursor-pointer transition-all duration-300 flex flex-col gap-3 relative hover:-translate-y-0.5 ${
                             userType === 'other'
-                              ? 'border-blue-600 bg-blue-50/20 text-slate-905 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.06)]'
-                              : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900/60 dark:text-slate-300'
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.06)]'
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900/60 dark:text-slate-300'
                           }`}
                         >
                           <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base ${
-                            userType === 'other' ? 'bg-blue-105 dark:bg-blue-950/50 text-blue-600' : 'bg-slate-100 dark:bg-slate-900 text-slate-500'
+                            userType === 'other' ? 'bg-blue-100 dark:bg-blue-950/50 text-blue-600' : 'bg-slate-100 dark:bg-slate-900 text-slate-500'
                           }`}>
                             💼
                           </div>
@@ -1055,7 +1055,7 @@ export default function OnboardingPage() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         transition={{ duration: 0.35, ease: 'easeOut' }}
-                        className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6 border-t border-slate-100 dark:border-slate-805/40 pt-6"
+                        className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6 border-t border-slate-100 dark:border-slate-800/40 pt-6"
                       >
                         {/* State Selector */}
                         <div className="space-y-1.5 relative">
@@ -1087,7 +1087,7 @@ export default function OnboardingPage() {
                                 }, 200);
                               }}
                               onKeyDown={handleStateKeyDown}
-                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-650 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold"
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold"
                             />
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                             
@@ -1119,7 +1119,7 @@ export default function OnboardingPage() {
                                   </button>
                                 ))
                               ) : (
-                                <div className="px-4 py-3 text-xs font-semibold text-slate-405 dark:text-slate-500 text-center select-none">
+                                <div className="px-4 py-3 text-xs font-semibold text-slate-400 dark:text-slate-500 text-center select-none">
                                   No states found
                                 </div>
                               )}
@@ -1134,7 +1134,7 @@ export default function OnboardingPage() {
                             <select
                               value={graduationYear}
                               onChange={(e) => setGraduationYear(e.target.value)}
-                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-650 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
                             >
                               {['2024', '2025', '2026', '2027', '2028', '2029', '2030'].map((yr) => (
                                 <option key={yr} value={yr} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
@@ -1166,7 +1166,7 @@ export default function OnboardingPage() {
                               onBlur={() => {
                                 setTimeout(() => setCollegeDropdownOpen(false), 200);
                               }}
-                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-11 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-650 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-11 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                             {loadingColleges ? (
                               <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border border-blue-600 border-t-transparent rounded-full animate-spin pointer-events-none" />
@@ -1202,7 +1202,7 @@ export default function OnboardingPage() {
                             <select
                               value={degree}
                               onChange={(e) => setDegree(e.target.value)}
-                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-650 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
                             >
                               {Object.keys(DEGREE_BRANCH_DATA).map((deg) => (
                                 <option key={deg} value={deg} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
@@ -1221,7 +1221,7 @@ export default function OnboardingPage() {
                             <select
                               value={branch}
                               onChange={(e) => setBranch(e.target.value)}
-                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-650 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
                             >
                               {DEGREE_BRANCH_DATA[degree] && DEGREE_BRANCH_DATA[degree].map((br) => (
                                 <option key={br} value={br} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
@@ -1257,8 +1257,8 @@ export default function OnboardingPage() {
                             }}
                             className={`p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex items-start gap-4 relative hover:-translate-y-0.5 ${
                               isSelected 
-                                ? 'border-blue-600 bg-blue-50/20 text-slate-905 dark:bg-blue-950/10 dark:text-blue-450 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
-                                : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
+                                ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
+                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
                             }`}
                           >
                             <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'}`}>
@@ -1266,7 +1266,7 @@ export default function OnboardingPage() {
                             </div>
                             <div className="flex flex-col min-w-0 pr-5">
                               <span className="text-xs font-bold tracking-tight text-slate-900 dark:text-white">{g.label}</span>
-                              <span className="text-[11px] text-slate-500 dark:text-slate-450 leading-normal mt-1 font-medium">{g.desc}</span>
+                              <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal mt-1 font-medium">{g.desc}</span>
                             </div>
                             {isSelected && (
                               <div className="absolute top-4 right-4 w-4 h-4 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white animate-scaleUp shadow-xs">
@@ -1282,7 +1282,7 @@ export default function OnboardingPage() {
                       <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="space-y-1.5 max-w-xl mx-auto border-t border-slate-100 dark:border-slate-805/40 pt-4"
+                        className="space-y-1.5 max-w-xl mx-auto border-t border-slate-100 dark:border-slate-800/40 pt-4"
                       >
                         <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
                           Specify your custom goal (Optional)
@@ -1293,7 +1293,7 @@ export default function OnboardingPage() {
                           value={customGoal}
                           onChange={(e) => setCustomGoal(e.target.value)}
                           style={{ textTransform: 'none' }}
-                          className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-650 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold"
+                          className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold"
                         />
                       </motion.div>
                     )}
@@ -1314,8 +1314,8 @@ export default function OnboardingPage() {
                           style={{ textTransform: 'none' }}
                           className={`w-full p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex items-center justify-between font-bold text-xs ${
                             isSelected 
-                              ? 'border-blue-600 bg-blue-50/20 text-slate-905 dark:bg-blue-950/10 dark:text-blue-450 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
-                              : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
                           }`}
                         >
                           <div className="flex items-center gap-3.5">
@@ -1345,8 +1345,8 @@ export default function OnboardingPage() {
                           style={{ textTransform: 'none' }}
                           className={`w-full p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex items-center justify-between font-bold text-xs ${
                             isSelected 
-                              ? 'border-blue-600 bg-blue-50/20 text-slate-905 dark:bg-blue-950/10 dark:text-blue-455 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
-                              : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-500 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
                           }`}
                         >
                           <div className="flex items-center gap-3.5">
@@ -1382,8 +1382,8 @@ export default function OnboardingPage() {
                           style={{ textTransform: 'none' }}
                           className={`w-full p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex items-center justify-between font-bold text-xs ${
                             isSelected 
-                              ? 'border-blue-600 bg-blue-50/20 text-slate-905 dark:bg-blue-950/10 dark:text-blue-450 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
-                              : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
                           }`}
                         >
                           <div className="flex items-center gap-3.5">
@@ -1405,8 +1405,8 @@ export default function OnboardingPage() {
           {/* Stepper Buttons Panel (Card Footer) */}
           <div className="border-t border-slate-200/50 dark:border-slate-800/50 pt-5 flex flex-row items-center justify-between gap-4">
             {/* Left section: Secure shield */}
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-450 font-bold shrink-0">
-              <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-555 shrink-0" />
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold shrink-0">
+              <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-600 shrink-0" />
               <span className="text-[10px] uppercase tracking-wider hidden md:inline leading-none">
                 Data Fully Encrypted
               </span>
@@ -1439,7 +1439,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleBackStep}
                   disabled={loading}
-                  className="h-[52px] px-5 bg-transparent hover:bg-slate-100/50 dark:hover:bg-slate-805/30 disabled:opacity-30 text-slate-550 dark:text-slate-400 font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-800 transition-colors cursor-pointer select-none active:scale-95"
+                  className="h-[52px] px-5 bg-transparent hover:bg-slate-100/50 dark:hover:bg-slate-800/30 disabled:opacity-30 text-slate-500 dark:text-slate-400 font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-800 transition-colors cursor-pointer select-none active:scale-95"
                 >
                   Back
                 </button>
@@ -1451,8 +1451,8 @@ export default function OnboardingPage() {
                 style={{ textTransform: 'none' }}
                 className={`h-[52px] px-6 font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2.5 transition-all select-none active:scale-95 duration-200 ${
                   (isContinueDisabled() || loading)
-                    ? 'bg-slate-100 text-slate-400 dark:bg-slate-805/40 dark:text-slate-600 cursor-not-allowed shadow-none border border-slate-200/50 dark:border-slate-805/30'
-                    : 'bg-gradient-to-r from-blue-650 to-indigo-650 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-500/20 shadow-lg hover:shadow-xl hover:translate-y-[-1px] cursor-pointer'
+                    ? 'bg-slate-100 text-slate-400 dark:bg-slate-800/40 dark:text-slate-600 cursor-not-allowed shadow-none border border-slate-200/50 dark:border-slate-800/30'
+                    : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-500/20 shadow-lg hover:shadow-xl hover:translate-y-[-1px] cursor-pointer'
                 }`}
               >
                 <span>{loading ? 'Bootstrapping...' : (currentStep === 6 ? 'Complete Onboarding →' : 'Continue →')}</span>

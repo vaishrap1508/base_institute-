@@ -28,7 +28,7 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
           <span className="font-semibold text-slate-900 dark:text-white tracking-tight text-[15px] leading-tight">
             System Admin
           </span>
-          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-550 tracking-wider uppercase mt-0.5">
+          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase mt-0.5">
             Institutional Access
           </span>
         </div>

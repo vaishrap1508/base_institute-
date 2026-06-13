@@ -354,29 +354,29 @@ export default function QuestionDirectoryPage() {
               </div>
 
               {/* Details table */}
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-850 p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-850 pb-2">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
                   <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                     Clearance Token Status
                   </span>
-                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-455 uppercase tracking-wide">
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-500 uppercase tracking-wide">
                     DENIED
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Attempted User</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Clearance Role</span>
-                    <span className="text-slate-800 dark:text-slate-200 font-bold uppercase tracking-wider text-[11px] text-rose-600 dark:text-rose-450">
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold uppercase tracking-wider text-[11px] text-rose-600 dark:text-rose-400">
                       {currentRole.role}
                     </span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/directory</span>
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default function QuestionDirectoryPage() {
                       ? 'bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/20 dark:border-indigo-900/30 dark:text-indigo-400' 
                       : 'bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-950/20 dark:border-amber-900/30 dark:text-amber-400'
                   }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${dbSource === 'Supabase Cloud' ? 'bg-indigo-650 animate-pulse' : 'bg-amber-500'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${dbSource === 'Supabase Cloud' ? 'bg-indigo-600 animate-pulse' : 'bg-amber-500'}`} />
                     {dbSource}
                   </span>
                 </div>
@@ -470,7 +470,7 @@ export default function QuestionDirectoryPage() {
                   <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Active Published
                   </span>
-                  <span className="text-2xl font-black text-emerald-705 dark:text-emerald-400 tracking-tight mt-1">
+                  <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight mt-1">
                     {stats.published}
                   </span>
                 </div>
@@ -500,7 +500,7 @@ export default function QuestionDirectoryPage() {
                   <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Taxonomy Concepts
                   </span>
-                  <span className="text-2xl font-black text-purple-705 dark:text-purple-400 tracking-tight mt-1">
+                  <span className="text-2xl font-black text-purple-700 dark:text-purple-400 tracking-tight mt-1">
                     {stats.conceptsCount}
                   </span>
                 </div>

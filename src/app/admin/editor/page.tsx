@@ -811,7 +811,7 @@ export default function AdminContentCreator() {
   const activeDomainName = domains.find((d) => d.id === domainId)?.name || 'Quantitative Aptitude';
 
   return (
-    <div className="flex h-screen bg-slate-105 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
+    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
       {/* 1. Left Navigation Sidebar */}
       <Sidebar
         activeId="editor"
@@ -828,7 +828,7 @@ export default function AdminContentCreator() {
           <div className="absolute top-20 right-8 z-50 animate-slideIn">
             <div className={`px-4.5 py-3.5 rounded-xl border shadow-lg flex items-center gap-3 max-w-md ${
               notification.type === 'success'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/20 dark:border-emerald-900/30 dark:text-emerald-450'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/20 dark:border-emerald-900/30 dark:text-emerald-400'
                 : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/20 dark:border-blue-900/20 dark:text-blue-400'
             }`}>
               <CheckCircle2 className={`w-5 h-5 shrink-0 ${notification.type === 'success' ? 'text-emerald-600' : 'text-blue-600'}`} />
@@ -844,7 +844,7 @@ export default function AdminContentCreator() {
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
             <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               {/* Pulsing Lock Icon Container */}
-              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-450 shadow-inner relative">
+              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-400 shadow-inner relative">
                 <Lock className="w-7 h-7 animate-pulse" />
                 <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">
                   !
@@ -860,7 +860,7 @@ export default function AdminContentCreator() {
               </div>
 
               {/* Identity Token checklist */}
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-850 p-4 rounded-xl space-y-3.5 text-xs text-left">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-900 pb-2">
                   <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                     Assigned Clearance Token

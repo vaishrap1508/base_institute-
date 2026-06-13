@@ -144,13 +144,13 @@ function ResetPasswordContent() {
         
         <div className="space-y-1.5 text-center sm:text-left">
           <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Configure New Password</h3>
-          <p className="text-xs font-semibold text-slate-400 dark:text-slate-550 leading-normal">
+          <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 leading-normal">
             Enter a secure password to replace your previous credentials.
           </p>
         </div>
 
         {errorMsg && (
-          <div className="bg-rose-50 border border-rose-150 p-3 rounded-xl text-rose-700 text-xs font-semibold leading-relaxed animate-fadeIn flex items-center gap-2">
+          <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl text-rose-700 text-xs font-semibold leading-relaxed animate-fadeIn flex items-center gap-2">
             <span className="shrink-0">⚠️</span>
             <span>{errorMsg}</span>
           </div>
@@ -159,9 +159,9 @@ function ResetPasswordContent() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Password field */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-wide">New Password</label>
+            <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">New Password</label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 dark:text-slate-600" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
               <input 
                 type={showPassword ? 'text' : 'password'} 
                 placeholder="••••••••••••"
@@ -173,7 +173,7 @@ function ResetPasswordContent() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-305 cursor-pointer flex items-center justify-center p-0.5 rounded"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 cursor-pointer flex items-center justify-center p-0.5 rounded"
               >
                 {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </button>
@@ -182,7 +182,7 @@ function ResetPasswordContent() {
             {password && (
               <div className="space-y-1 mt-1.5 animate-fadeIn">
                 <div className="flex justify-between items-center text-[9px] font-bold">
-                  <span className="text-slate-400 dark:text-slate-550 uppercase tracking-wide">Security Strength:</span>
+                  <span className="text-slate-400 dark:text-slate-500 uppercase tracking-wide">Security Strength:</span>
                   <span className={
                     getPasswordStrength(password).score <= 2 ? 'text-rose-500' :
                     getPasswordStrength(password).score <= 4 ? 'text-amber-500' : 'text-emerald-500'
@@ -200,7 +200,7 @@ function ResetPasswordContent() {
             )}
 
             <div className="mt-2.5 space-y-2 bg-slate-50/50 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/80 rounded-xl p-3 animate-fadeIn">
-              <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-widest block mb-1">
+              <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1">
                 Password Requirements
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5">
@@ -222,7 +222,7 @@ function ResetPasswordContent() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l-6 6M9 9l6 6" strokeWidth="2" />
                       </svg>
                     )}
-                    <span className={rule.satisfied ? 'text-emerald-600 dark:text-emerald-450' : 'text-rose-555'}>
+                    <span className={rule.satisfied ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}>
                       {rule.label}
                     </span>
                   </div>
@@ -233,9 +233,9 @@ function ResetPasswordContent() {
 
           {/* Confirm Password field */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-555 uppercase tracking-wide">Confirm Password</label>
+            <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-600 uppercase tracking-wide">Confirm Password</label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 dark:text-slate-600" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
               <input 
                 type={showPassword ? 'text' : 'password'} 
                 placeholder="••••••••••••"
@@ -249,8 +249,8 @@ function ResetPasswordContent() {
             {confirmPassword && (
               <div className={`mt-2 p-3 rounded-xl border flex items-center gap-2.5 transition-all duration-300 animate-fadeIn ${
                 password === confirmPassword 
-                  ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-650 dark:text-emerald-400' 
-                  : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-500 dark:text-rose-450'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400' 
+                  : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-500 dark:text-rose-400'
               }`}>
                 {password === confirmPassword ? (
                   <>
@@ -270,7 +270,7 @@ function ResetPasswordContent() {
           <button
             type="submit"
             disabled={loading || !token || password !== confirmPassword}
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-250 dark:disabled:bg-slate-800 disabled:text-slate-400 text-white rounded-xl shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 cursor-pointer font-bold text-xs transition-all active:scale-98 mt-2"
+            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:text-slate-400 text-white rounded-xl shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 cursor-pointer font-bold text-xs transition-all active:scale-98 mt-2"
           >
             {loading ? (
               <>
@@ -286,7 +286,7 @@ function ResetPasswordContent() {
           </button>
         </form>
 
-        <div className="text-center text-xs font-semibold text-slate-505 pt-1 border-t border-slate-100 dark:border-slate-800">
+        <div className="text-center text-xs font-semibold text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-800">
           <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-bold hover:underline">
             Back to Sign In
           </Link>

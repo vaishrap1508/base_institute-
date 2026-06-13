@@ -552,7 +552,7 @@ const AptitudeCategoryIcon = ({ category }: { category: string }) => {
       );
     case 'placement':
       return (
-        <span className="w-4 h-4 bg-slate-855 rounded flex items-center justify-center p-0.5 shadow-md border border-slate-600 text-[8px]" title="Placement Focus">
+        <span className="w-4 h-4 bg-slate-900 rounded flex items-center justify-center p-0.5 shadow-md border border-slate-600 text-[8px]" title="Placement Focus">
           💼
         </span>
       );
@@ -1402,7 +1402,7 @@ export default function LandingPage() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(226,232,240,0.5)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,0.5)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
       <div className="flex items-center justify-between relative z-10">
         <span className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">Question Workspace</span>
-        <span className="text-[8px] font-bold text-indigo-750 bg-indigo-50 border border-indigo-200 dark:text-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-900/30 px-1.5 py-0.5 rounded transition-colors duration-300">Active Brainteaser</span>
+        <span className="text-[8px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 dark:text-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-900/30 px-1.5 py-0.5 rounded transition-colors duration-300">Active Brainteaser</span>
       </div>
 
       <div className="space-y-2 flex-1 flex flex-col justify-center relative z-10 text-left">
@@ -1424,7 +1424,7 @@ export default function LandingPage() {
                     ? isCorrect 
                       ? `bg-emerald-50 border-emerald-500 text-emerald-700 shadow-[0_0_12px_rgba(16,185,129,0.15)] dark:bg-emerald-950/60 dark:border-emerald-500 dark:text-emerald-400 dark:shadow-[0_0_12px_rgba(16,185,129,0.25)] ${workspaceSuccessPop ? 'animate-success-pop' : ''}`
                       : 'bg-rose-50 border-rose-500 text-rose-700 shadow-[0_0_12px_rgba(244,63,94,0.15)] dark:bg-rose-950/60 dark:border-rose-500 dark:text-rose-400 dark:shadow-[0_0_12px_rgba(244,63,94,0.2)]'
-                    : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-350 hover:text-slate-800 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-slate-200'
+                    : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-800 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 {num}
@@ -1446,7 +1446,7 @@ export default function LandingPage() {
 
       <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-100 dark:border-slate-900/60 transition-colors duration-300">
         <span>Accuracy: {selectedWorkspaceAns === 30 ? '100%' : '84%'} avg</span>
-        <span className="text-indigo-650 dark:text-indigo-400 font-mono">Topic: Sequences</span>
+        <span className="text-indigo-600 dark:text-indigo-400 font-mono">Topic: Sequences</span>
       </div>
     </div>
   );
@@ -1492,12 +1492,12 @@ export default function LandingPage() {
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black shadow-md transition-all duration-300 border ${
                   isActive 
                     ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.6)] scale-110'
-                    : 'bg-slate-50 border-slate-200 text-slate-450 hover:text-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 dark:hover:text-slate-200'
+                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 dark:hover:text-slate-200'
                 }`}>
                   0{num}
                 </div>
                 <span className={`text-[8px] font-bold tracking-tight transition-colors duration-300 ${
-                  isActive ? 'text-indigo-650 dark:text-indigo-400 font-black' : 'text-slate-500'
+                  isActive ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'text-slate-500'
                 }`}>
                   {labels[num - 1]}
                 </span>
@@ -1515,7 +1515,7 @@ export default function LandingPage() {
 
         <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-100 dark:border-slate-900/60 transition-colors duration-300">
           <span>Curriculum Map: Active</span>
-          <span className="text-purple-650 dark:text-purple-400 font-mono">Partnerships: 156+</span>
+          <span className="text-purple-600 dark:text-purple-400 font-mono">Partnerships: 156+</span>
         </div>
       </div>
     );
@@ -1586,10 +1586,10 @@ export default function LandingPage() {
         </div>
 
         <div className="space-y-2 flex-1 flex flex-col justify-center relative z-10">
-          <div className="flex justify-between items-center text-[10px] font-bold text-slate-800 dark:text-slate-350 transition-colors duration-300">
+          <div className="flex justify-between items-center text-[10px] font-bold text-slate-800 dark:text-slate-300 transition-colors duration-300">
             <span>Standard Mock Test</span>
             <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded border font-bold uppercase transition-all duration-300 ${
-              assessmentStatus === 'idle' ? 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900 dark:text-slate-450 dark:border-slate-800' :
+              assessmentStatus === 'idle' ? 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800' :
               assessmentStatus === 'running' ? 'bg-amber-50 text-amber-700 border-amber-200 animate-pulse dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/40' :
               'bg-emerald-50 text-emerald-700 border-emerald-200 font-black animate-text-glow dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/40'
              }`}>
@@ -1756,7 +1756,7 @@ export default function LandingPage() {
           {/* Theme Toggle Button (Icon-Only Circular Button) */}
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none"
             title="Toggle theme"
             suppressHydrationWarning
           >
@@ -1799,7 +1799,7 @@ export default function LandingPage() {
           </h1>
 
           {/* Paragraph explanation */}
-          <p className="text-sm md:text-base text-slate-650 dark:text-slate-400 max-w-xl leading-relaxed">
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
             {content.hero_paragraph}
           </p>
 
@@ -1815,7 +1815,7 @@ export default function LandingPage() {
             <button
               suppressHydrationWarning
               onClick={() => showNotice("Platform Staging sandbox environment is active. Standard compiler demo running on visual panel.", "info")}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 dark:bg-slate-900 dark:hover:bg-slate-850 dark:text-slate-300 dark:hover:text-white font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-800/80 transition-all duration-200 cursor-pointer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-800/80 transition-all duration-200 cursor-pointer"
             >
               <Play className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0 fill-current" />
               <span>{content.hero_btn_secondary}</span>
@@ -1900,7 +1900,7 @@ export default function LandingPage() {
                 <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Dynamic Equation input</span>
                 <span className="text-[8px] font-bold text-blue-600 bg-blue-50 dark:text-blue-500/80 dark:bg-blue-950/20 px-1.5 py-0.5 rounded">LaTeX Mode</span>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-200 dark:border-slate-900 font-mono text-[11px] text-blue-650 dark:text-blue-400 space-y-2 min-h-[92px]">
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-200 dark:border-slate-900 font-mono text-[11px] text-blue-600 dark:text-blue-400 space-y-2 min-h-[92px]">
                 {/* Row 1 */}
                 <div className={`flex gap-3 transition-all duration-300 ${solverPhase !== 'loading' ? 'opacity-100' : 'opacity-20'}`}>
                   <span className="text-slate-400 dark:text-slate-700 select-none w-3 text-right">1</span>
@@ -2004,7 +2004,7 @@ export default function LandingPage() {
                 <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider block">Company Tags</span>
               </div>
               <div className="space-y-1 border-l border-slate-100 dark:border-l border-slate-900">
-                <span className="text-[14px] font-black text-indigo-650 dark:text-indigo-400 tracking-tight block">
+                <span className="text-[14px] font-black text-indigo-600 dark:text-indigo-400 tracking-tight block">
                   {studentsCount}K
                 </span>
                 <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider block">Students</span>
@@ -2025,7 +2025,7 @@ export default function LandingPage() {
             >
               {badge1Content && (
                 <div 
-                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-880/90 shadow-md select-none transition-all duration-500 group-hover:border-blue-500/40 group-hover:shadow-[0_0_20px_rgba(37,99,235,0.2)] pointer-events-auto cursor-pointer ${
+                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-900/90 shadow-md select-none transition-all duration-500 group-hover:border-blue-500/40 group-hover:shadow-[0_0_20px_rgba(37,99,235,0.2)] pointer-events-auto cursor-pointer ${
                     badge1Fade ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'
                   }`}
                   style={{ transition: 'opacity 0.3s ease-out, transform 0.3s ease-out, filter 0.3s ease-out' }}
@@ -2047,7 +2047,7 @@ export default function LandingPage() {
             >
               {badge2Content && (
                 <div 
-                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-880/90 shadow-md select-none transition-all duration-500 group-hover:border-indigo-500/40 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] pointer-events-auto cursor-pointer ${
+                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-900/90 shadow-md select-none transition-all duration-500 group-hover:border-indigo-500/40 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] pointer-events-auto cursor-pointer ${
                     badge2Fade ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'
                   }`}
                   style={{ transition: 'opacity 0.3s ease-out, transform 0.3s ease-out, filter 0.3s ease-out' }}
@@ -2069,7 +2069,7 @@ export default function LandingPage() {
             >
               {badge3Content && (
                 <div 
-                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-880/90 shadow-md select-none transition-all duration-500 group-hover:border-emerald-500/40 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] pointer-events-auto cursor-pointer ${
+                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-900/90 shadow-md select-none transition-all duration-500 group-hover:border-emerald-500/40 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] pointer-events-auto cursor-pointer ${
                     badge3Fade ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'
                   }`}
                   style={{ transition: 'opacity 0.3s ease-out, transform 0.3s ease-out, filter 0.3s ease-out' }}
@@ -2091,7 +2091,7 @@ export default function LandingPage() {
             >
               {badge4Content && (
                 <div 
-                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-880/90 shadow-md select-none transition-all duration-500 group-hover:border-amber-500/40 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] pointer-events-auto cursor-pointer ${
+                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-900/90 shadow-md select-none transition-all duration-500 group-hover:border-amber-500/40 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] pointer-events-auto cursor-pointer ${
                     badge4Fade ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'
                   }`}
                   style={{ transition: 'opacity 0.3s ease-out, transform 0.3s ease-out, filter 0.3s ease-out' }}
@@ -2506,7 +2506,7 @@ export default function LandingPage() {
                       {/* Content Section (Left side in card flex) */}
                       <div className="flex-1 space-y-4 z-10 relative text-left">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 flex items-center justify-center shadow-md dark:shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:bg-slate-50 dark:group-hover:bg-slate-950 ${card.accentColor}`}>
+                          <div className={`w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-md dark:shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:bg-slate-50 dark:group-hover:bg-slate-950 ${card.accentColor}`}>
                             <CardIcon className={`w-5 h-5 ${
                               idx === 0 ? 'group-hover:animate-pulse-slow' :
                               idx === 1 ? 'group-hover:animate-bounce-subtle' :
@@ -2542,8 +2542,8 @@ export default function LandingPage() {
                           isExpanded ? 'max-h-[300px] opacity-100 mt-4' : 'max-h-0 opacity-0'
                         }`}>
                           <div className="bg-slate-100/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900/60 rounded-2xl p-4 space-y-3">
-                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-550 dark:text-slate-500 block">Syllabus Overview</span>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-650 dark:text-slate-350">
+                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-500 block">Syllabus Overview</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                               {card.syllabus.map((item, key) => (
                                 <div 
                                   key={key} 
@@ -2621,7 +2621,7 @@ export default function LandingPage() {
             </div>
 
             {/* Personal Quote Message Box */}
-            <div className="relative mt-2 p-5 rounded-2xl border border-slate-205 bg-slate-50/50 dark:border-slate-900 dark:bg-slate-900/30 backdrop-blur-md overflow-hidden">
+            <div className="relative mt-2 p-5 rounded-2xl border border-slate-200 bg-slate-50/50 dark:border-slate-900 dark:bg-slate-900/30 backdrop-blur-md overflow-hidden">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-500 to-indigo-500" />
               <Quote className="absolute right-4 top-4 w-12 h-12 text-slate-300 dark:text-slate-800/20 rotate-180 pointer-events-none" />
               <div className="text-xs sm:text-sm font-semibold italic text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
@@ -2629,7 +2629,7 @@ export default function LandingPage() {
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
-                <span className="text-[10px] font-black tracking-widest uppercase text-slate-550 dark:text-slate-500">Live Guidance Channel</span>
+                <span className="text-[10px] font-black tracking-widest uppercase text-slate-500 dark:text-slate-500">Live Guidance Channel</span>
               </div>
             </div>
 
@@ -2677,7 +2677,7 @@ export default function LandingPage() {
               {/* Badge 3 (Lower Middle-Left) */}
               {content.mentor_badge_3 && (
                 <div className="absolute top-[58%] left-[-15px] sm:left-[-35px] bg-white/90 dark:bg-slate-900/85 backdrop-blur-md border border-slate-200 dark:border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-3 hover:border-slate-300 dark:hover:border-slate-700/80 transition-all cursor-default z-20">
-                  <BookOpen className="w-3.5 h-3.5 text-indigo-650 dark:text-indigo-400 shrink-0" />
+                  <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                   <span className="text-[10px] font-extrabold text-slate-800 dark:text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_3}</span>
                 </div>
               )}
@@ -2760,7 +2760,7 @@ export default function LandingPage() {
                         <span className={`px-2 py-0.5 text-[9px] font-bold font-mono rounded-full border transition-all ${
                           isActive 
                             ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-950/40 dark:border-blue-900/30 dark:text-blue-400' 
-                            : 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-slate-950/80 dark:border-slate-900/60 dark:text-slate-500 dark:group-hover/cat:border-slate-800 dark:group-hover/cat:text-slate-350'
+                            : 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-slate-950/80 dark:border-slate-900/60 dark:text-slate-500 dark:group-hover/cat:border-slate-800 dark:group-hover/cat:text-slate-300'
                         }`}>
                           {categoryCount}
                         </span>
@@ -2784,16 +2784,15 @@ export default function LandingPage() {
                     <span className="text-[9px] text-slate-500 font-extrabold uppercase tracking-wide">1-on-1 Helpdesk</span>
                   </div>
                 </div>
-                <p className="text-[10px] text-slate-650 dark:text-slate-400 leading-relaxed font-semibold text-left">
+                <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-relaxed font-semibold text-left">
                   Can't find the answers you're looking for? Reach out to our placement support cell for customized guidance.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => showNotice("Support ticketing queue loading... Connect with an agent at support@aptitudearena.com", "info")}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase rounded-lg shadow-md cursor-pointer transition-all duration-200 active:scale-95 border border-transparent"
+                <a
+                  href="mailto:support@aptitudearena.com"
+                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase rounded-lg shadow-md cursor-pointer transition-all duration-200 active:scale-95 border border-transparent block text-center"
                 >
-                  Open Support Ticket
-                </button>
+                  Mail Us
+                </a>
               </div>
 
             </div>
@@ -2810,18 +2809,18 @@ export default function LandingPage() {
                     placeholder="Search questions across all categories..."
                     value={faqSearch}
                     onChange={(e) => setFaqSearch(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-900 hover:border-slate-300 dark:hover:border-slate-850 focus:border-blue-600 rounded-xl py-3.5 pl-11 pr-24 text-xs text-slate-800 dark:text-slate-200 focus:outline-none transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium"
+                    className="w-full bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-900 hover:border-slate-300 dark:hover:border-slate-800 focus:border-blue-600 rounded-xl py-3.5 pl-11 pr-24 text-xs text-slate-800 dark:text-slate-200 focus:outline-none transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium"
                   />
                   <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     {faqSearch && (
                       <button 
                         onClick={() => setFaqSearch('')}
-                        className="text-slate-500 hover:text-slate-700 dark:text-slate-450 dark:hover:text-slate-350 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                        className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
                       >
                         Clear
                       </button>
                     )}
-                    <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 text-[8px] font-mono font-bold text-slate-550 dark:text-slate-600 uppercase tracking-widest">
+                    <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 text-[8px] font-mono font-bold text-slate-500 dark:text-slate-600 uppercase tracking-widest">
                       {filteredFaqs.length} Result{filteredFaqs.length !== 1 ? 's' : ''}
                     </span>
                   </div>
@@ -2835,7 +2834,7 @@ export default function LandingPage() {
                       key={tag}
                       type="button"
                       onClick={() => setFaqSearch(tag)}
-                      className="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-slate-350 text-slate-600 hover:text-slate-900 dark:bg-slate-900 dark:border-slate-900 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all cursor-pointer text-[10px] font-semibold"
+                      className="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-900 dark:bg-slate-900 dark:border-slate-900 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all cursor-pointer text-[10px] font-semibold"
                     >
                       #{tag}
                     </button>
@@ -2856,7 +2855,7 @@ export default function LandingPage() {
                         className={`rounded-2xl border transition-all duration-500 overflow-hidden relative ${
                           isOpen 
                             ? 'bg-white dark:bg-slate-900/60 shadow-xl border-slate-200 dark:border-slate-900' 
-                            : 'bg-white/80 dark:bg-slate-900/20 border-slate-200 dark:border-slate-900/60 hover:border-slate-300 dark:hover:border-slate-850 hover:bg-white dark:hover:bg-slate-900/40'
+                            : 'bg-white/80 dark:bg-slate-900/20 border-slate-200 dark:border-slate-900/60 hover:border-slate-300 dark:hover:border-slate-800 hover:bg-white dark:hover:bg-slate-900/40'
                         }`}
                         style={{
                           borderColor: isOpen ? `${catDetails.color}35` : '',
@@ -2884,7 +2883,7 @@ export default function LandingPage() {
                                 #{faq.tag}
                               </span>
                             )}
-                            <div className={`p-1 rounded-md bg-slate-100 border border-slate-250 text-slate-500 dark:bg-slate-950/65 dark:border-slate-900 transition-all duration-300 ${
+                            <div className={`p-1 rounded-md bg-slate-100 border border-slate-200 text-slate-500 dark:bg-slate-950/65 dark:border-slate-900 transition-all duration-300 ${
                               isOpen ? 'rotate-180 border-slate-800' : 'group-hover/faq-btn:border-slate-300'
                             }`}
                             style={{
@@ -2903,8 +2902,8 @@ export default function LandingPage() {
                             opacity: isOpen ? 1 : 0
                           }}
                         >
-                          <div className="px-6 pb-5 text-xs text-slate-650 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-900/50 pt-4.5 font-medium space-y-4">
-                            <p className="whitespace-pre-line text-slate-700 dark:text-slate-350">{faq.answer}</p>
+                          <div className="px-6 pb-5 text-xs text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-900/50 pt-4.5 font-medium space-y-4">
+                            <p className="whitespace-pre-line text-slate-700 dark:text-slate-300">{faq.answer}</p>
                             
                             {/* Helpful vote component (Focus Point #3) */}
                             <div className="flex flex-wrap items-center justify-between gap-4 pt-3.5 border-t border-slate-100 dark:border-slate-900/50 select-none">
@@ -2924,7 +2923,7 @@ export default function LandingPage() {
                                     <button
                                       type="button"
                                       onClick={() => setHelpfulVotes(prev => ({ ...prev, [faq.id]: 'yes' }))}
-                                      className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 hover:border-slate-300 text-[10px] font-black text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-850 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                                      className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 hover:border-slate-300 text-[10px] font-black text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
                                     >
                                       <span>Yes</span>
                                       <span>👍</span>
@@ -2932,7 +2931,7 @@ export default function LandingPage() {
                                     <button
                                       type="button"
                                       onClick={() => setHelpfulVotes(prev => ({ ...prev, [faq.id]: 'no' }))}
-                                      className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 hover:border-slate-300 text-[10px] font-black text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-850 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                                      className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 hover:border-slate-300 text-[10px] font-black text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
                                     >
                                       <span>No</span>
                                       <span>👎</span>
@@ -2965,11 +2964,11 @@ export default function LandingPage() {
       {/* ==========================================
           CALL TO ACTION (CTA) SECTION
           ========================================== */}
-      <section className="relative w-full border-t border-slate-205 dark:border-slate-900 py-16 px-6 sm:px-12 bg-white dark:bg-slate-950/50">
+      <section className="relative w-full border-t border-slate-200 dark:border-slate-900 py-16 px-6 sm:px-12 bg-white dark:bg-slate-950/50">
         
         <div className="max-w-4xl mx-auto">
           
-          <div className="bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-slate-105/50 dark:from-blue-900/30 dark:via-indigo-950/20 dark:to-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 sm:p-12 text-center space-y-6 relative overflow-hidden shadow-2xl">
+          <div className="bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-slate-100/50 dark:from-blue-900/30 dark:via-indigo-950/20 dark:to-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 sm:p-12 text-center space-y-6 relative overflow-hidden shadow-2xl">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_50%)] pointer-events-none" />
             
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
@@ -3033,7 +3032,7 @@ export default function LandingPage() {
                 </div>
                 <button 
                   onClick={() => setIsEditorOpen(false)}
-                  className="p-1 rounded-md hover:bg-slate-850 text-slate-400 hover:text-slate-200 cursor-pointer"
+                  className="p-1 rounded-md hover:bg-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -3045,7 +3044,7 @@ export default function LandingPage() {
               </div>
 
               {/* Tabs selector */}
-              <div className="flex flex-wrap gap-1.5 border-b border-slate-850 pb-4 text-[10px] font-bold">
+              <div className="flex flex-wrap gap-1.5 border-b border-slate-800 pb-4 text-[10px] font-bold">
                 {(['global', 'hero', 'mentor', 'bento', 'curriculum', 'stats', 'faqs', 'cta', 'footer'] as const).map((tab) => (
                   <button
                     key={tab}
@@ -3232,7 +3231,7 @@ export default function LandingPage() {
                     />
                   </div>
                   <div className="space-y-3 pt-2">
-                    <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-850 pb-1">Floating Badge Names</span>
+                    <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1">Floating Badge Names</span>
                     <div className="grid grid-cols-2 gap-2 text-[10px]">
                       <div className="space-y-1">
                         <label className="text-slate-500 font-bold">Badge 1</label>
@@ -3301,7 +3300,7 @@ export default function LandingPage() {
                   <div className="space-y-4">
                     <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1.5">Row 1 Marquee Photos (Left-To-Right)</span>
                     {content.marquee_images_row1.map((img, idx) => (
-                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-850 space-y-2">
+                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
                         <div className="grid grid-cols-2 gap-2 text-[10px]">
                           <div className="space-y-1">
                             <label className="text-slate-500 font-bold">Category</label>
@@ -3351,7 +3350,7 @@ export default function LandingPage() {
                   <div className="space-y-4">
                     <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1.5">Row 2 Marquee Photos (Right-To-Left)</span>
                     {content.marquee_images_row2.map((img, idx) => (
-                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-850 space-y-2">
+                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
                         <div className="grid grid-cols-2 gap-2 text-[10px]">
                           <div className="space-y-1">
                             <label className="text-slate-500 font-bold">Category</label>
@@ -3427,7 +3426,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Card 1 Config */}
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <span className="text-[10px] font-extrabold text-blue-400 uppercase block border-b border-slate-900 pb-1.5">Card 1 (Mass Impact Grid cell)</span>
                     <div className="space-y-2">
                       <div className="space-y-1">
@@ -3466,7 +3465,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Card 2 Config */}
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <span className="text-[10px] font-extrabold text-indigo-400 uppercase block border-b border-slate-900 pb-1.5">Card 2 (Student Interactions Grid cell)</span>
                     <div className="space-y-2">
                       <div className="space-y-1">
@@ -3505,7 +3504,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Card 3 Config */}
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <span className="text-[10px] font-extrabold text-purple-400 uppercase block border-b border-slate-900 pb-1.5">Card 3 (Live Workshops Grid cell)</span>
                     <div className="space-y-2">
                       <div className="space-y-1">
@@ -3544,7 +3543,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Card 4 Config */}
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <span className="text-[10px] font-extrabold text-emerald-400 uppercase block border-b border-slate-900 pb-1.5">Card 4 (Mock Assessments Grid cell)</span>
                     <div className="space-y-2">
                       <div className="space-y-1">
@@ -3608,19 +3607,19 @@ export default function LandingPage() {
                     <div className="space-y-3.5 text-xs">
                       <span className="text-[10px] font-extrabold text-slate-400 uppercase block">Active Cache values</span>
                       <div className="grid grid-cols-2 gap-3.5 font-bold font-mono">
-                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-850">
+                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                           <span className="text-[9px] text-slate-500 block uppercase">Students (Raw + Offset)</span>
                           <span className="text-white mt-1 block">{stats.active_students}</span>
                         </div>
-                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-850">
+                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                           <span className="text-[9px] text-slate-500 block uppercase">Questions (Raw + Offset)</span>
                           <span className="text-white mt-1 block">{stats.question_pool}</span>
                         </div>
-                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-850">
+                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                           <span className="text-[9px] text-slate-500 block uppercase">Companies (Raw + Offset)</span>
                           <span className="text-white mt-1 block">{stats.company_tags}</span>
                         </div>
-                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-850">
+                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                           <span className="text-[9px] text-slate-500 block uppercase">Colleges (Raw + Offset)</span>
                           <span className="text-white mt-1 block">{stats.college_partnerships}</span>
                         </div>
@@ -3666,7 +3665,7 @@ export default function LandingPage() {
                         });
                         setOpenFaqId(newId);
                       }}
-                      className="px-2.5 py-1 bg-slate-950 hover:bg-slate-850 text-[10px] font-black text-blue-400 rounded border border-slate-800 flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1 bg-slate-950 hover:bg-slate-800 text-[10px] font-black text-blue-400 rounded border border-slate-800 flex items-center gap-1 cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>ADD ITEM</span>
@@ -3675,7 +3674,7 @@ export default function LandingPage() {
 
                   <div className="space-y-3">
                     {content.faq_items.map((item, index) => (
-                      <div key={item.id} className="bg-slate-950 p-3.5 rounded-xl border border-slate-850 space-y-3 relative">
+                      <div key={item.id} className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-3 relative">
                         <button
                           onClick={() => {
                             const list = content.faq_items.filter((f) => f.id !== item.id);
@@ -3769,7 +3768,7 @@ export default function LandingPage() {
             <div className="border-t border-slate-800 pt-4 flex gap-3">
               <button
                 onClick={() => setIsEditorOpen(false)}
-                className="flex-1 py-3 px-4 bg-slate-850 hover:bg-slate-800 text-slate-300 font-bold text-xs rounded-xl border border-slate-800 transition-colors cursor-pointer"
+                className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-800 text-slate-300 font-bold text-xs rounded-xl border border-slate-800 transition-colors cursor-pointer"
               >
                 Cancel
               </button>

@@ -130,7 +130,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden flex flex-col transition-colors duration-300">
       {/* Table Title Row */}
-      <div className="px-6 py-4 border-b border-slate-150 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-950/20">
+      <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-950/20">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
           <span className="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-tight">

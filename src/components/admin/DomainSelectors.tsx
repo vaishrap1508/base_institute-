@@ -83,7 +83,7 @@ export default function DomainSelectors({
         <select
           value={selectedDomainId}
           onChange={(e) => onChangeDomain(e.target.value)}
-          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {domains.map((domain) => (
             <option key={domain.id} value={domain.id} className="dark:bg-slate-900 dark:text-slate-100">
@@ -124,7 +124,7 @@ export default function DomainSelectors({
                   setIsAddingDomain(false);
                   setNewDomainName('');
                 }}
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-350 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -152,7 +152,7 @@ export default function DomainSelectors({
         <select
           value={selectedSubTopicId}
           onChange={(e) => onChangeSubTopic(e.target.value)}
-          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {subTopics.map((topic) => (
             <option key={topic.id} value={topic.id} className="dark:bg-slate-900 dark:text-slate-100">
@@ -194,7 +194,7 @@ export default function DomainSelectors({
                     setIsAddingSubTopic(false);
                     setNewSubTopicName('');
                   }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-350 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -223,7 +223,7 @@ export default function DomainSelectors({
         <select
           value={selectedConceptId}
           onChange={(e) => onChangeConcept(e.target.value)}
-          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {concepts.map((concept) => (
             <option key={concept.id} value={concept.id} className="dark:bg-slate-900 dark:text-slate-100">
@@ -265,7 +265,7 @@ export default function DomainSelectors({
                     setIsAddingConcept(false);
                     setNewConceptName('');
                   }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-350 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

@@ -51,30 +51,30 @@ export default function AnalyticsPage() {
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
             <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
-              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-455 shadow-inner relative">
+              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-500 shadow-inner relative">
                 <Cpu className="w-7 h-7 animate-pulse" />
                 <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-550 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-850 p-4 rounded-xl space-y-3.5 text-xs text-left">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Attempted User</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
                     <span className="text-slate-800 dark:text-slate-100 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
                     <span className="text-slate-800 dark:text-rose-400 font-bold uppercase tracking-wider text-[11px] text-rose-600">{currentRole.role}</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/analytics</span>
                   </div>
                 </div>
@@ -118,7 +118,7 @@ export default function AnalyticsPage() {
 
                   <div className="space-y-4">
                     {domainMetrics.map((domain) => (
-                      <div key={domain.code} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl space-y-3.5 hover:shadow-xs transition-shadow duration-150">
+                      <div key={domain.code} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl space-y-3.5 hover:shadow-xs transition-shadow duration-150">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className={`text-[10px] font-black text-white px-2 py-0.5 rounded bg-gradient-to-r ${domain.color} tracking-wider`}>
@@ -128,12 +128,12 @@ export default function AnalyticsPage() {
                           </div>
                           <div className="flex items-center gap-4 text-xs font-bold text-slate-700 dark:text-slate-300">
                             <div className="flex flex-col items-end">
-                              <span className="text-[10px] text-slate-400 dark:text-slate-550 font-bold uppercase tracking-wider">COMPLETED</span>
+                              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">COMPLETED</span>
                               <span>{domain.completion}</span>
                             </div>
                             <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
                             <div className="flex flex-col items-end">
-                              <span className="text-[10px] text-slate-400 dark:text-slate-550 font-bold uppercase tracking-wider">ACCURACY</span>
+                              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">ACCURACY</span>
                               <span className="text-blue-600 dark:text-blue-400">{domain.accuracy}</span>
                             </div>
                           </div>
@@ -160,7 +160,7 @@ export default function AnalyticsPage() {
                   <div className="space-y-4">
                     {companyStats.map((item) => (
                       <div key={item.company} className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-350">
+                        <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
                           <div className="flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                             <span>{item.company} Mock Sets</span>
@@ -168,10 +168,10 @@ export default function AnalyticsPage() {
                           <span className="text-slate-500 dark:text-slate-400 font-medium">{item.attempts} attempts</span>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className="flex-1 h-2 bg-slate-150 dark:bg-slate-850 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                             <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${item.accuracy}%` }} />
                           </div>
-                          <span className="text-[10px] font-black text-indigo-650 dark:text-indigo-400 w-8 text-right">{item.accuracy}%</span>
+                          <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 w-8 text-right">{item.accuracy}%</span>
                         </div>
                       </div>
                     ))}
@@ -179,8 +179,8 @@ export default function AnalyticsPage() {
                 </div>
 
                 <div className="p-3 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100/50 dark:border-indigo-900/30 rounded-xl flex items-start gap-2.5 mt-4">
-                  <TrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-450 shrink-0 mt-0.5" />
-                  <span className="text-[11px] text-indigo-900 dark:text-indigo-350 leading-normal font-semibold">
+                  <TrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                  <span className="text-[11px] text-indigo-900 dark:text-indigo-300 leading-normal font-semibold">
                     Average student placement accuracy increased by 4.2% since adding dynamic LaTeX previews in Sandbox v2.4.
                   </span>
                 </div>

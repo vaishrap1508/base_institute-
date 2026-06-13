@@ -162,11 +162,11 @@ export default function EmailManagementPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-550 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-850 p-4 rounded-xl space-y-3.5 text-xs text-left">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
@@ -204,14 +204,14 @@ export default function EmailManagementPage() {
             <div className="border-b border-slate-200/60 dark:border-slate-900 pb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Email Registry & Queue Control</h1>
-                <p className="text-xs font-semibold text-slate-505 dark:text-slate-400 mt-1">
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
                   Inspect delivery logs, audit verification tokens, configure queues, and retry failed transmissions.
                 </p>
               </div>
               <div className="flex items-center gap-3 shrink-0">
                 <button
                   onClick={fetchLogs}
-                  className="px-4 py-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-250 dark:border-slate-850 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:bg-slate-50"
+                  className="px-4 py-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:bg-slate-50"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                   <span>Refresh Logs</span>
@@ -254,7 +254,7 @@ export default function EmailManagementPage() {
               </div>
 
               <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5">
-                <div className="w-11 h-11 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-450">
+                <div className="w-11 h-11 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400">
                   <AlertCircle className="w-5 h-5 animate-pulse" />
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -286,7 +286,7 @@ export default function EmailManagementPage() {
                     placeholder="Search recipient / subject..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-250 dark:border-slate-850 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-blue-600"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2 pl-10 pr-4 text-xs focus:outline-none focus:border-blue-600"
                   />
                   <button type="submit" className="hidden">Submit</button>
                 </form>
@@ -296,7 +296,7 @@ export default function EmailManagementPage() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-slate-50 dark:bg-slate-950 border border-slate-250 dark:border-slate-850 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-600"
+                    className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-blue-600"
                   >
                     <option value="all">All Logs</option>
                     <option value="sent">Delivered</option>
@@ -316,7 +316,7 @@ export default function EmailManagementPage() {
                 <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
                   <Inbox className="w-10 h-10 text-slate-300 dark:text-slate-700" />
                   <div className="space-y-1">
-                    <p className="text-sm font-bold text-slate-700 dark:text-slate-350">No logs found</p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No logs found</p>
                     <p className="text-xs text-slate-400">There are no logs matching the current criteria.</p>
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export default function EmailManagementPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse text-left text-xs font-medium">
                     <thead>
-                      <tr className="border-b border-slate-200/80 dark:border-slate-850 text-slate-400 uppercase tracking-wider text-[10px] font-extrabold">
+                      <tr className="border-b border-slate-200/80 dark:border-slate-800 text-slate-400 uppercase tracking-wider text-[10px] font-extrabold">
                         <th className="pb-3 pl-3">Recipient</th>
                         <th className="pb-3">Subject</th>
                         <th className="pb-3">Status</th>
@@ -345,7 +345,7 @@ export default function EmailManagementPage() {
                           <td className="py-4">
                             <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide border ${
                               log.status === 'sent' 
-                                ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border-emerald-100 dark:border-emerald-900/30' 
+                                ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30' 
                                 : log.status === 'failed'
                                 ? 'bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-900/30'
                                 : 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/30'
@@ -366,7 +366,7 @@ export default function EmailManagementPage() {
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => setSelectedLog(log)}
-                                className="p-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-850 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg cursor-pointer"
+                                className="p-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg cursor-pointer"
                                 title="Inspect Error Details"
                               >
                                 <Eye className="w-3.5 h-3.5" />
@@ -400,7 +400,7 @@ export default function EmailManagementPage() {
               <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
                 <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 space-y-4 animate-scaleUp text-left">
                   <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <h3 className="font-black text-sm text-slate-850 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                    <h3 className="font-black text-sm text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
                       <Mail className="w-4 h-4 text-blue-600" />
                       <span>Log Details Inspection</span>
                     </h3>

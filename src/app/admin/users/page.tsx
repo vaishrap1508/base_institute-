@@ -64,30 +64,30 @@ export default function UsersPage() {
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
             <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
-              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-455 shadow-inner relative">
+              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-500 shadow-inner relative">
                 <Cpu className="w-7 h-7 animate-pulse" />
                 <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-550 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-850 p-4 rounded-xl space-y-3.5 text-xs text-left">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-555 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-555 font-semibold uppercase">Attempted User</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-600 font-semibold uppercase">Attempted User</span>
                     <span className="text-slate-800 dark:text-slate-100 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-555 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-600 font-semibold uppercase">Clearance Role</span>
                     <span className="text-slate-800 dark:text-rose-400 font-bold uppercase tracking-wider text-[11px] text-rose-600">{currentRole.role}</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-555 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-600 font-semibold uppercase">Attempted Access Route</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/users</span>
                   </div>
                 </div>
@@ -129,7 +129,7 @@ export default function UsersPage() {
                 <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/20 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Users className="w-4.5 h-4.5 text-slate-500 dark:text-slate-400" />
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-250 tracking-tight">Active Sandbox Accounts</span>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-tight">Active Sandbox Accounts</span>
                   </div>
                 </div>
 
@@ -150,7 +150,7 @@ export default function UsersPage() {
                             <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-800 shadow-xs" />
                             <div className="flex flex-col">
                               <span className="font-bold text-slate-900 dark:text-white leading-tight">{user.name}</span>
-                              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wide mt-0.5">{user.clearance}</span>
+                              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mt-0.5">{user.clearance}</span>
                             </div>
                           </td>
                           <td className="px-6 py-4.5 font-mono text-slate-500 dark:text-slate-400">{user.email}</td>
@@ -168,7 +168,7 @@ export default function UsersPage() {
                                 <span>Active</span>
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-rose-500 dark:text-rose-450 font-bold">
+                              <span className="inline-flex items-center gap-1 text-rose-500 dark:text-rose-400 font-bold">
                                 <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
                                 <span>Suspended</span>
                               </span>
@@ -190,20 +190,20 @@ export default function UsersPage() {
                   </div>
 
                   <div className="space-y-4 text-xs">
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl space-y-2">
+                    <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
                       <div className="flex items-center justify-between font-bold text-slate-800 dark:text-slate-200">
                         <span className="text-blue-600 dark:text-blue-400">ADMIN CLEARANCE</span>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-550">FULL ACCESS</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">FULL ACCESS</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                         Admin tokens carry full clearance to read/write questions, publish database entries, reset latency profiles, check schema rules, and review raw JSON exports.
                       </p>
                     </div>
 
-                    <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl space-y-2">
+                    <div className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
                       <div className="flex items-center justify-between font-bold text-slate-800 dark:text-slate-200">
                         <span className="text-slate-700 dark:text-slate-300">EDITOR CLEARANCE</span>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-550">LIMITED ACCESS</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">LIMITED ACCESS</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                         Editor tokens grant isolated clearance to access the Dynamic Content Studio to compose mathematical items and validate options. Restricted from global directory search and setup panels.
@@ -214,8 +214,8 @@ export default function UsersPage() {
 
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
                   <KeyRound className="w-5 h-5 text-amber-500 shrink-0" />
-                  <div className="flex flex-col text-[11px] text-slate-400 dark:text-slate-550 leading-relaxed">
-                    <span className="font-bold text-slate-600 dark:text-slate-350">Clearance Cryptography Enabled</span>
+                  <div className="flex flex-col text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed">
+                    <span className="font-bold text-slate-600 dark:text-slate-300">Clearance Cryptography Enabled</span>
                     <span>Tokens automatically roll every 24 hours.</span>
                   </div>
                 </div>

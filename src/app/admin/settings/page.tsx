@@ -471,23 +471,23 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
                 <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-850 p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-855 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">Clearance Status</span>
-                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-450 uppercase tracking-wide">DENIED</span>
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-900 pb-2">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Attempted User</span>
-                    <span className="text-slate-800 dark:text-slate-205 font-bold">{currentRole.name}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-550 font-semibold uppercase">Clearance Role</span>
-                    <span className="text-slate-800 dark:text-slate-205 font-bold uppercase tracking-wider text-[11px] text-rose-600 dark:text-rose-450">{currentRole.role}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold uppercase tracking-wider text-[11px] text-rose-600 dark:text-rose-400">{currentRole.role}</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-555 font-semibold uppercase">Attempted Access Route</span>
-                    <span className="text-slate-800 dark:text-slate-205 font-bold font-mono text-[11px]">/admin/settings</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-600 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/settings</span>
                   </div>
                 </div>
               </div>
@@ -517,47 +517,47 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Configuration Items */}
               <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs p-6 space-y-6">
-                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-850 pb-4">
-                  <Settings className="w-5 h-5 text-blue-600 dark:text-blue-450" />
+                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
+                  <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight">Compiler Switches</h3>
                 </div>
 
-                <div className="space-y-5 text-xs font-semibold text-slate-755 dark:text-slate-300">
+                <div className="space-y-5 text-xs font-semibold text-slate-800 dark:text-slate-300">
                   {/* Item 1 */}
-                  <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl">
                     <div className="flex flex-col gap-1">
-                      <span className="text-slate-850 dark:text-slate-200 font-bold">Staging Sandbox Telemetry</span>
+                      <span className="text-slate-800 dark:text-slate-200 font-bold">Staging Sandbox Telemetry</span>
                       <span className="text-slate-400 dark:text-slate-500 font-medium leading-relaxed max-w-md">
                         Enabling telemetry streams mock logs and events to the audit console in real time.
                       </span>
                     </div>
-                    <button onClick={() => setSandboxMode(!sandboxMode)} className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-355 cursor-pointer">
+                    <button onClick={() => setSandboxMode(!sandboxMode)} className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-400 cursor-pointer">
                       {sandboxMode ? <ToggleRight className="w-10 h-10" /> : <ToggleLeft className="w-10 h-10 text-slate-400 dark:text-slate-600" />}
                     </button>
                   </div>
 
                   {/* Item 2 */}
-                  <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl">
                     <div className="flex flex-col gap-1">
-                      <span className="text-slate-855 dark:text-slate-200 font-bold">KaTeX Mathematical Render Pipeline</span>
+                      <span className="text-slate-900 dark:text-slate-200 font-bold">KaTeX Mathematical Render Pipeline</span>
                       <span className="text-slate-400 dark:text-slate-500 font-medium leading-relaxed max-w-md">
                         Compiles double dollar signs ($$) into elegant centered equations inside the preview canvas.
                       </span>
                     </div>
-                    <button onClick={() => setLatexRenderer(!latexRenderer)} className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-355 cursor-pointer">
+                    <button onClick={() => setLatexRenderer(!latexRenderer)} className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-400 cursor-pointer">
                       {latexRenderer ? <ToggleRight className="w-10 h-10" /> : <ToggleLeft className="w-10 h-10 text-slate-400 dark:text-slate-600" />}
                     </button>
                   </div>
 
                   {/* Item 3 */}
-                  <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl">
                     <div className="flex flex-col gap-1">
-                      <span className="text-slate-855 dark:text-slate-200 font-bold">Default Option Shuffling</span>
+                      <span className="text-slate-900 dark:text-slate-200 font-bold">Default Option Shuffling</span>
                       <span className="text-slate-400 dark:text-slate-500 font-medium leading-relaxed max-w-md">
                         Automatically enables choice option shuffling on newly instantiated questions inside the studio.
                       </span>
                     </div>
-                    <button onClick={() => setShuffleDefault(!shuffleDefault)} className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-355 cursor-pointer">
+                    <button onClick={() => setShuffleDefault(!shuffleDefault)} className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-400 cursor-pointer">
                       {shuffleDefault ? <ToggleRight className="w-10 h-10" /> : <ToggleLeft className="w-10 h-10 text-slate-400 dark:text-slate-600" />}
                     </button>
                   </div>
@@ -567,7 +567,7 @@ export default function SettingsPage() {
               {/* Maintenance Tools */}
               <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs p-6 space-y-6 flex flex-col justify-between">
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-850 pb-4">
+                  <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
                     <Database className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
                     <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight">Database Utilities</h3>
                   </div>
@@ -576,7 +576,7 @@ export default function SettingsPage() {
                     {/* Seed Button */}
                     <button
                       onClick={handleSeedQuestions}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100/80 dark:hover:bg-blue-900/30 border border-blue-250 dark:border-blue-900/40 text-blue-700 dark:text-blue-400 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100/80 dark:hover:bg-blue-900/30 border border-blue-200 dark:border-blue-900/40 text-blue-700 dark:text-blue-400 rounded-xl text-xs font-bold transition-all cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Seed Mock Question</span>
@@ -585,7 +585,7 @@ export default function SettingsPage() {
                     {/* Reset Button */}
                     <button
                       onClick={handleResetCatalog}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100/80 dark:hover:bg-rose-900/30 border border-rose-250 dark:border-rose-900/40 text-rose-700 dark:text-rose-400 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100/80 dark:hover:bg-rose-900/30 border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-400 rounded-xl text-xs font-bold transition-all cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>Reset Catalog to Defaults</span>
@@ -595,7 +595,7 @@ export default function SettingsPage() {
                     <button
                       onClick={handleSyncToSupabase}
                       disabled={isSyncing}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-50 dark:bg-indigo-950/20 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 border border-indigo-250 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-400 rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-50 dark:bg-indigo-950/20 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-400 rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
                       <span>{isSyncing ? 'Syncing to Supabase...' : 'Sync Catalog to Supabase'}</span>
@@ -603,40 +603,40 @@ export default function SettingsPage() {
                   </div>
 
                   {syncStatus && (
-                    <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl space-y-3 animate-scaleUp">
+                    <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-3 animate-scaleUp">
                       <div className="flex items-center justify-between text-xs font-bold">
                         <span className="text-slate-700 dark:text-slate-300">Sync Status</span>
-                        <span className={syncStatus.inProgress ? "text-indigo-650 animate-pulse" : "text-emerald-600"}>
+                        <span className={syncStatus.inProgress ? "text-indigo-600 animate-pulse" : "text-emerald-600"}>
                           {syncStatus.inProgress ? 'In Progress...' : 'Completed'}
                         </span>
                       </div>
                       
                       {/* Progress Bar */}
-                      <div className="w-full bg-slate-200 dark:bg-slate-850 h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                         <div 
-                          className="bg-indigo-650 h-full transition-all duration-350" 
+                          className="bg-indigo-600 h-full transition-all duration-350" 
                           style={{ width: `${syncStatus.total > 0 ? (syncStatus.completed / syncStatus.total) * 100 : 0}%` }}
                         />
                       </div>
 
                       {/* Stats */}
                       <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-bold">
-                        <div className="bg-white dark:bg-slate-900 p-2 border border-slate-100 dark:border-slate-850 rounded-lg">
+                        <div className="bg-white dark:bg-slate-900 p-2 border border-slate-100 dark:border-slate-800 rounded-lg">
                           <div className="text-slate-400">Total</div>
                           <div className="text-sm text-slate-800 dark:text-slate-200">{syncStatus.total}</div>
                         </div>
                         <div className="bg-emerald-50 dark:bg-emerald-950/20 p-2 border border-emerald-100 dark:border-emerald-900/30 rounded-lg">
                           <div className="text-emerald-600 dark:text-emerald-400">Success</div>
-                          <div className="text-sm text-slate-808 dark:text-slate-200">{syncStatus.completed}</div>
+                          <div className="text-sm text-slate-800 dark:text-slate-200">{syncStatus.completed}</div>
                         </div>
                         <div className="bg-rose-50 dark:bg-rose-950/20 p-2 border border-rose-100 dark:border-rose-900/30 rounded-lg">
                           <div className="text-rose-600 dark:text-rose-400">Failed</div>
-                          <div className="text-sm text-slate-808 dark:text-slate-200">{syncStatus.failed}</div>
+                          <div className="text-sm text-slate-800 dark:text-slate-200">{syncStatus.failed}</div>
                         </div>
                       </div>
 
                       {syncStatus.errors.length > 0 && (
-                        <div className="max-h-24 overflow-y-auto text-[10px] text-rose-605 dark:text-rose-400 space-y-1 bg-rose-50/50 dark:bg-rose-950/10 p-2 rounded-lg border border-rose-100/50 dark:border-rose-900/35 font-mono">
+                        <div className="max-h-24 overflow-y-auto text-[10px] text-rose-600 dark:text-rose-400 space-y-1 bg-rose-50/50 dark:bg-rose-950/10 p-2 rounded-lg border border-rose-100/50 dark:border-rose-900/35 font-mono">
                           {syncStatus.errors.map((err, idx) => (
                             <div key={idx}>• {err}</div>
                           ))}
@@ -646,7 +646,7 @@ export default function SettingsPage() {
                   )}
                 </div>
 
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl flex items-center gap-3 mt-4 text-xs font-semibold text-slate-500 dark:text-slate-455">
+                <div className="p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center gap-3 mt-4 text-xs font-semibold text-slate-500 dark:text-slate-500">
                   <Shield className="w-5 h-5 text-emerald-500 shrink-0" />
                   <div className="flex flex-col">
                     <span className="text-slate-800 dark:text-slate-200 font-bold">Secure Core v2.4</span>
@@ -659,11 +659,11 @@ export default function SettingsPage() {
 
             {/* NEW SECTION: Onboarding Flow Customizer */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs p-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-slate-850 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
                 <div className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-blue-600 dark:text-blue-450" />
+                  <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   <div>
-                    <h3 className="text-sm font-bold text-slate-805 dark:text-slate-205 tracking-tight">Onboarding Journey Customizer</h3>
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight">Onboarding Journey Customizer</h3>
                     <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Manage onboarding steps, options, goals, and state filters in real time.</p>
                   </div>
                 </div>
@@ -676,7 +676,7 @@ export default function SettingsPage() {
                   <span>{savingOnboarding ? 'Saving Settings...' : 'Save Onboarding Settings'}</span>
                 </button>
               </div>              {/* Tabs */}
-              <div className="flex flex-wrap gap-2 border-b border-slate-100 dark:border-slate-850 pb-3 text-xs font-bold text-slate-500 dark:text-slate-400">
+              <div className="flex flex-wrap gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 text-xs font-bold text-slate-500 dark:text-slate-400">
                 <button
                   onClick={() => setActiveTab('goals')}
                   className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'goals' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/60' : 'hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200'}`}
@@ -732,9 +732,9 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                         {goalOptions.map((goal, idx) => (
-                          <div key={goal.id || idx} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl flex items-start justify-between gap-3 text-xs">
+                          <div key={goal.id || idx} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl flex items-start justify-between gap-3 text-xs">
                             <div className="flex flex-col gap-1 min-w-0">
-                              <span className="text-slate-850 dark:text-slate-400 font-extrabold uppercase tracking-wider text-[10px]">{goal.id}</span>
+                              <span className="text-slate-800 dark:text-slate-400 font-extrabold uppercase tracking-wider text-[10px]">{goal.id}</span>
                               <span className="text-slate-900 dark:text-slate-200 font-bold">{goal.label}</span>
                               <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed pr-2">{goal.desc}</p>
                             </div>
@@ -749,8 +749,8 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add Goal Form */}
-                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl p-4 space-y-3.5">
-                        <span className="text-[11px] font-black text-slate-450 dark:text-slate-400 uppercase tracking-wider">Add Custom Onboarding Goal</span>
+                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl p-4 space-y-3.5">
+                        <span className="text-[11px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-wider">Add Custom Onboarding Goal</span>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           <input
                             type="text"
@@ -796,7 +796,7 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar p-1">
                         {indianStates.map((st, idx) => (
-                          <div key={st || idx} className="px-3.5 py-2 bg-indigo-50/50 dark:bg-indigo-950/30 hover:bg-indigo-55 dark:hover:bg-indigo-950/50 border border-indigo-200/60 dark:border-indigo-800 text-indigo-900 dark:text-indigo-300 rounded-xl text-xs font-bold flex items-center gap-2 animate-scaleUp">
+                          <div key={st || idx} className="px-3.5 py-2 bg-indigo-50/50 dark:bg-indigo-950/30 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 border border-indigo-200/60 dark:border-indigo-800 text-indigo-900 dark:text-indigo-300 rounded-xl text-xs font-bold flex items-center gap-2 animate-scaleUp">
                             <span>{st}</span>
                             <button
                               onClick={() => setIndianStates(prev => prev.filter((_, i) => i !== idx))}
@@ -809,9 +809,9 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add State Form */}
-                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
                         <div className="flex-1 space-y-1.5">
-                          <label className="text-[11px] font-black text-slate-455 dark:text-slate-400 uppercase tracking-wider">Add Indian State / Union Territory</label>
+                          <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">Add Indian State / Union Territory</label>
                           <input
                             type="text"
                             placeholder="e.g. Telangana"
@@ -841,14 +841,14 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                         {timelineOptions.map((time, idx) => (
-                          <div key={time || idx} className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800 dark:text-slate-200">
+                          <div key={time || idx} className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800 dark:text-slate-200">
                             <div className="flex items-center gap-2">
-                              <Calendar className="w-4.5 h-4.5 text-slate-450 dark:text-slate-500" />
+                              <Calendar className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500" />
                               <span>{time}</span>
                             </div>
                             <button
                               onClick={() => setTimelineOptions(prev => prev.filter((_, i) => i !== idx))}
-                              className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-55 dark:hover:bg-rose-950/40 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
+                              className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -857,9 +857,9 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add Timeline Form */}
-                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
                         <div className="flex-1 space-y-1.5">
-                          <label className="text-[11px] font-black text-slate-455 dark:text-slate-400 uppercase tracking-wider">Add Timeline Metric Option</label>
+                          <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">Add Timeline Metric Option</label>
                           <input
                             type="text"
                             placeholder="e.g. Within 2 Weeks"
@@ -889,14 +889,14 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                         {commitmentOptions.map((commit, idx) => (
-                          <div key={commit || idx} className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800 dark:text-slate-200">
+                          <div key={commit || idx} className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800 dark:text-slate-200">
                             <div className="flex items-center gap-2">
-                              <Clock className="w-4.5 h-4.5 text-slate-450 dark:text-slate-500" />
+                              <Clock className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500" />
                               <span>{commit}</span>
                             </div>
                             <button
                               onClick={() => setCommitmentOptions(prev => prev.filter((_, i) => i !== idx))}
-                              className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-55 dark:hover:bg-rose-950/40 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
+                              className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -905,9 +905,9 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add Commitment Form */}
-                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
                         <div className="flex-1 space-y-1.5">
-                          <label className="text-[11px] font-black text-slate-455 dark:text-slate-400 uppercase tracking-wider">Add Weekly Commitment Option</label>
+                          <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">Add Weekly Commitment Option</label>
                           <input
                             type="text"
                             placeholder="e.g. 20+ Hours per Week"
@@ -937,14 +937,14 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                         {preferenceOptions.map((pref, idx) => (
-                          <div key={pref || idx} className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800 dark:text-slate-200">
+                          <div key={pref || idx} className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-800 dark:text-slate-200">
                             <div className="flex items-center gap-2">
-                              <BookOpen className="w-4.5 h-4.5 text-slate-450 dark:text-slate-500" />
+                              <BookOpen className="w-4.5 h-4.5 text-slate-400 dark:text-slate-500" />
                               <span>{pref}</span>
                             </div>
                             <button
                               onClick={() => setPreferenceOptions(prev => prev.filter((_, i) => i !== idx))}
-                              className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-55 dark:hover:bg-rose-950/40 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
+                              className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/40 p-1 rounded-lg transition-all shrink-0 cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -953,9 +953,9 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add Preference Form */}
-                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
+                      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row gap-3 items-end">
                         <div className="flex-1 space-y-1.5">
-                          <label className="text-[11px] font-black text-slate-455 dark:text-slate-400 uppercase tracking-wider">Add Pedagogical Learning Preference</label>
+                          <label className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">Add Pedagogical Learning Preference</label>
                           <input
                             type="text"
                             placeholder="e.g. Concept-oriented Interactive Lectures"

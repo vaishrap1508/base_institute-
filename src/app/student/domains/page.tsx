@@ -359,7 +359,7 @@ export default function DomainsScreen() {
         
         {/* Sidebar Header Brand */}
         <div className="p-6 border-b border-slate-100 dark:border-slate-900/60 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-650 flex items-center justify-center text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)]">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)]">
             <Layers className="w-5 h-5" />
           </div>
           <div className="flex flex-col select-none">
@@ -461,7 +461,7 @@ export default function DomainsScreen() {
             title="User Profile Menu"
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all cursor-pointer relative ${profileDropdownOpen ? 'ring-2 ring-blue-500 bg-slate-50 dark:bg-slate-900' : ''}`}
           >
-            <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden relative border border-slate-205 dark:border-slate-800">
+            <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden relative border border-slate-200 dark:border-slate-800">
               {profile.avatar && profile.avatar !== 'initial' ? (
                 <img 
                   src={profile.avatar} 
@@ -491,7 +491,7 @@ export default function DomainsScreen() {
             <div className="absolute left-4 bottom-16 w-64 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
               {/* Profile details header */}
               <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-slate-105 dark:bg-slate-805 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
                   {profile.avatar && profile.avatar !== 'initial' ? (
                     <img 
                       src={profile.avatar} 
@@ -506,14 +506,14 @@ export default function DomainsScreen() {
                   <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
                     {profile.username || 'Vaishnavi Raparthy'}
                   </span>
-                  <span className="text-[10px] text-slate-405 dark:text-slate-505 font-semibold truncate leading-normal">
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
                     {userEmail}
                   </span>
                 </div>
               </div>
 
               {/* Menu Options */}
-              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-350">
+              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
                 
                 {/* My Profile option */}
                 <button
@@ -523,7 +523,7 @@ export default function DomainsScreen() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <User className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <User className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
                   <span className="flex-1">My Profile</span>
                 </button>
 
@@ -535,12 +535,12 @@ export default function DomainsScreen() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
                   <span className="flex-1">Account</span>
                 </button>
 
                 {/* Buganizer (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-505 opacity-60 select-none font-bold">
+                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
                   <div className="flex items-center gap-3">
                     <Bug className="w-4 h-4 shrink-0" />
                     <span>Buganizer</span>
@@ -549,7 +549,7 @@ export default function DomainsScreen() {
                 </div>
 
                 {/* Sessions (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-555 opacity-60 select-none font-bold">
+                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-600 opacity-60 select-none font-bold">
                   <div className="flex items-center gap-3">
                     <List className="w-4 h-4 shrink-0" />
                     <span>Sessions</span>
@@ -565,7 +565,7 @@ export default function DomainsScreen() {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
-                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
                   <span className="flex-1">Troubleshooting</span>
                 </button>
 
@@ -578,7 +578,7 @@ export default function DomainsScreen() {
                   className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
                   <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
                     <span>New Features</span>
                   </div>
                   <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
@@ -593,12 +593,12 @@ export default function DomainsScreen() {
                 >
                   {theme === 'dark' ? (
                     <>
-                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
                       <span className="flex-1">Light Mode</span>
                     </>
                   ) : (
                     <>
-                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
                       <span className="flex-1">Dark Mode</span>
                     </>
                   )}
@@ -613,7 +613,7 @@ export default function DomainsScreen() {
                   className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
                 >
                   <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-555 shrink-0" />
+                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
                     <span>Notification</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
@@ -628,10 +628,10 @@ export default function DomainsScreen() {
                     handleLogout();
                     setProfileDropdownOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-605 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
                 >
                   <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
-                  <span className="flex-1 font-extrabold text-rose-605 dark:text-rose-450">Logout</span>
+                  <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
                 </button>
 
               </div>
@@ -680,22 +680,22 @@ export default function DomainsScreen() {
               className="group flex items-center justify-between gap-6 bg-white border border-slate-200/80 dark:bg-slate-900/10 dark:border-slate-900/50 px-6 py-3 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.01)] hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:scale-[1.01] text-left cursor-pointer w-full md:w-[52%] lg:w-[55%] shrink-0"
             >
               <div className="space-y-1">
-                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-550 uppercase tracking-widest block leading-none">continue last topic</span>
+                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">continue last topic</span>
                 <span className="text-xs font-black text-slate-800 dark:text-slate-200 block leading-none">Percentages (Quantitative)</span>
               </div>
-              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100/30 dark:bg-blue-950/40 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-450 transition-colors group-hover:bg-blue-600 group-hover:text-white shadow-[0_2px_6px_rgba(37,99,235,0.05)]">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100/30 dark:bg-blue-950/40 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-colors group-hover:bg-blue-600 group-hover:text-white shadow-[0_2px_6px_rgba(37,99,235,0.05)]">
                 <Play className="w-4 h-4 fill-current ml-0.5" />
               </div>
             </button>
 
             {/* Daily Streak Badge */}
-            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-150 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-5 py-3 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] self-end md:self-auto">
+            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-5 py-3 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] self-end md:self-auto">
               <div className="relative flex h-2.5 w-2.5 items-center justify-center">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
               </div>
               <span className="text-[10.5px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5 leading-none">
-                <Flame className="w-4 h-4 fill-indigo-550 text-indigo-550 dark:fill-indigo-400 dark:text-indigo-400" /> {streak} Day Streak
+                <Flame className="w-4 h-4 fill-indigo-550 text-indigo-500 dark:fill-indigo-400 dark:text-indigo-400" /> {streak} Day Streak
               </span>
             </div>
 
@@ -759,12 +759,12 @@ export default function DomainsScreen() {
                     <div className="flex gap-4">
                       <div className="space-y-1">
                         <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none transition-colors duration-300">solved</span>
-                        <span className="text-xs font-mono font-extrabold text-slate-700 dark:text-slate-350 block leading-none transition-colors duration-300">{d.solved} problems</span>
+                        <span className="text-xs font-mono font-extrabold text-slate-700 dark:text-slate-300 block leading-none transition-colors duration-300">{d.solved} problems</span>
                       </div>
-                      <div className="h-6 w-px bg-slate-105 dark:bg-slate-900" />
+                      <div className="h-6 w-px bg-slate-100 dark:bg-slate-900" />
                       <div className="space-y-1">
                         <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none transition-colors duration-300">left</span>
-                        <span className="text-xs font-mono font-extrabold text-slate-700 dark:text-slate-350 block leading-none transition-colors duration-300">{d.topicsLeft} topics</span>
+                        <span className="text-xs font-mono font-extrabold text-slate-700 dark:text-slate-300 block leading-none transition-colors duration-300">{d.topicsLeft} topics</span>
                       </div>
                     </div>
 
@@ -783,7 +783,7 @@ export default function DomainsScreen() {
               ))
             ) : (
               <div className="col-span-1 md:col-span-2 text-center py-16 bg-white dark:bg-slate-900/10 border border-dashed border-slate-200 dark:border-slate-900 rounded-3xl p-8 space-y-3 transition-colors duration-300">
-                <Target className="w-10 h-10 text-slate-350 dark:text-slate-600 mx-auto animate-pulse" />
+                <Target className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto animate-pulse" />
                 <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">No Matching Domains Found</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">We couldn't find any learning domains matching "{searchQuery}". Try editing your search query.</p>
               </div>

@@ -203,7 +203,7 @@ export default function LivePreview({
       case 'EASY':
         return 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-900/30';
       case 'HARD':
-        return 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-450 border-rose-200/50 dark:border-rose-900/30';
+        return 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/50 dark:border-rose-900/30';
       case 'MEDIUM':
       default:
         return 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/50 dark:border-amber-900/30';
@@ -267,7 +267,7 @@ export default function LivePreview({
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-extrabold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-450 border border-blue-100 dark:border-blue-900/40 px-2 py-0.5 rounded tracking-wide uppercase">
+                  <span className="text-[10px] font-extrabold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 px-2 py-0.5 rounded tracking-wide uppercase">
                     {domainName}
                   </span>
                   <span className={`text-[10px] font-extrabold border px-2 py-0.5 rounded tracking-wide uppercase ${getDifficultyBadge()}`}>
@@ -280,7 +280,7 @@ export default function LivePreview({
                     {companyTags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[9px] font-black bg-slate-105 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800 text-slate-650 dark:text-slate-400 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded tracking-wide font-sans transition-colors"
+                        className="text-[9px] font-black bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded tracking-wide font-sans transition-colors"
                       >
                         {tag}
                       </span>
@@ -303,7 +303,7 @@ export default function LivePreview({
             </div>
 
             {/* Question Stem Prompt (Rendered beautifully with ReactMarkdown + Katex support) */}
-            <div className="text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed font-normal antialiased prose max-w-none prose-slate dark:prose-invert prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-code:text-slate-700 dark:prose-code:text-slate-300 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-50 dark:prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-100 dark:prose-pre:border-slate-850 break-all">
+            <div className="text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed font-normal antialiased prose max-w-none prose-slate dark:prose-invert prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-code:text-slate-700 dark:prose-code:text-slate-300 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-50 dark:prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-100 dark:prose-pre:border-slate-800 break-all">
               {questionStem ? (
                 <div className="prose max-w-none prose-slate dark:prose-invert break-all">
                   <SafeHtmlWithMath html={markdownToHtml(questionStem)} />
@@ -380,7 +380,7 @@ export default function LivePreview({
           {videoUrl && (
             <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm p-5 flex flex-col gap-3">
               <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Video className="w-3.5 h-3.5 text-slate-400 dark:text-slate-550" /> Video Walkthrough
+                <Video className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" /> Video Walkthrough
               </span>
 
               {/* Mock Video Container */}

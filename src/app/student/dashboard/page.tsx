@@ -44,7 +44,13 @@ import {
   BookMarked,
   Bug,
   List,
-  Rocket
+  Rocket,
+  MessageSquare,
+  Lightbulb,
+  FileText,
+  Send,
+  Video,
+  Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
@@ -661,9 +667,9 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       style={{ transformStyle: 'preserve-3d', transition: 'transform 0.1s ease-out' }}
-      className={`border rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-sm min-h-[280px] cursor-pointer hover:border-slate-350 dark:hover:border-slate-750 transition-all duration-300 ${isUnlocked
+      className={`border rounded-2xl p-5 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-sm min-h-[280px] cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-300 ${isUnlocked
           ? `${style.border} ${style.bg} ${style.glow}`
-          : 'border-slate-200 bg-slate-50/30 dark:border-slate-850/60 dark:bg-slate-900/40 opacity-70 hover:opacity-100'
+          : 'border-slate-200 bg-slate-50/30 dark:border-slate-800/60 dark:bg-slate-900/40 opacity-70 hover:opacity-100'
         }`}
     >
       {/* Lock Icon in Top-Right when Locked */}
@@ -708,7 +714,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
 
       <div className="mt-4 pt-2 border-t border-slate-200/40 dark:border-slate-800/40 w-full">
         {isUnlocked ? (
-          <span className="text-emerald-600 dark:text-emerald-450 flex items-center justify-center gap-1 text-[9px] font-extrabold uppercase tracking-widest">
+          <span className="text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-1 text-[9px] font-extrabold uppercase tracking-widest">
             <Check className="w-3 h-3 stroke-[3]" /> Unlocked
           </span>
         ) : (
@@ -723,7 +729,7 @@ const BadgeCard = ({ badge, isUnlocked, onClick }: { badge: any, isUnlocked: boo
                 style={{ width: `${(progress.current / progress.target) * 100}%` }}
               />
             </div>
-            <div className="text-[8px] font-black uppercase text-slate-400 dark:text-slate-550 tracking-widest text-center pt-0.5">
+            <div className="text-[8px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest text-center pt-0.5">
               {progress.label}
             </div>
           </div>
@@ -1035,6 +1041,156 @@ export default function StudentDashboard() {
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
+
+  // Concept-Hub Practice Arena Redesign States
+  const [selectedCollection, setSelectedCollection] = useState<string>('all');
+  const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
+  const [activeLearningTab, setActiveLearningTab] = useState<'explanation' | 'notes' | 'tips' | 'discussion' | 'related'>('explanation');
+  const [isMiniPlayerActive, setIsMiniPlayerActive] = useState<boolean>(false);
+  const [videoPlayTime, setVideoPlayTime] = useState<number>(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
+  const [isSpeedMenuOpen, setIsSpeedMenuOpen] = useState<boolean>(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(false);
+  const [videoDurationSeconds, setVideoDurationSeconds] = useState<number>(600); 
+  const [videoProgress, setVideoProgress] = useState<number>(0); 
+  const [practiceTimeSpent, setPracticeTimeSpent] = useState<number>(142);
+  const [newCommentText, setNewCommentText] = useState<string>('');
+  const [activeQuestionComments, setActiveQuestionComments] = useState<Record<string, Array<{ id: string; user: string; avatar: string; comment: string; time: string }>>>({
+    'Q-8029-X': [
+      { id: 'c1', user: 'Ananya Sharma', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', comment: 'Loved Saleem Sir’s explanation on the selling price formula. The shortcut saved me 2 minutes!', time: '2h ago' },
+      { id: 'c2', user: 'Rohit Verma', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', comment: 'Are percentages like these common in TCS NQT rounds?', time: '1d ago' },
+      { id: 'c3', user: 'Sriram Neppalli', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', comment: 'Remember: standard formula CP = (100 * profit) / profit% is great, but the 100x variable method is safer for complex adjustments.', time: '3d ago' }
+    ]
+  });
+
+  const scrollablePanelRef = useRef<HTMLDivElement>(null);
+  const mainVideoRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Sync activeQuestion comments dynamic lookup
+  const currentComments = useMemo(() => {
+    if (!activeQuestion) return [];
+    return activeQuestionComments[activeQuestion.id] || [
+      { id: 'fc1', user: 'Admin Instructor', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', comment: 'Be sure to post any clarifications here. Standard response turnaround is within 4 hours.', time: 'Just now' }
+    ];
+  }, [activeQuestion, activeQuestionComments]);
+
+
+
+  // Increment practice time spent
+  useEffect(() => {
+    if (activeSidebarTab !== 'practice') return;
+    const interval = setInterval(() => {
+      setPracticeTimeSpent(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [activeSidebarTab]);
+
+  // Sticky video player scroll checker
+  useEffect(() => {
+    if (activeSidebarTab !== 'practice' || !activeQuestion) {
+      setIsMiniPlayerActive(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsMiniPlayerActive(!entry.isIntersecting);
+      },
+      {
+        threshold: 0,
+        root: scrollablePanelRef.current,
+      }
+    );
+
+    const currentVideoRef = mainVideoRef.current;
+    if (currentVideoRef) {
+      observer.observe(currentVideoRef);
+    }
+
+    return () => {
+      if (currentVideoRef) {
+        observer.unobserve(currentVideoRef);
+      }
+    };
+  }, [activeSidebarTab, activeQuestion]);
+
+  const handleAddComment = () => {
+    if (!newCommentText.trim() || !activeQuestion) return;
+    const qId = activeQuestion.id;
+    const newComment = {
+      id: `c-${Date.now()}`,
+      user: profile.username || 'You (Student)',
+      avatar: profile.avatar === 'initial' || !profile.avatar ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' : profile.avatar,
+      comment: newCommentText,
+      time: 'Just now'
+    };
+    setActiveQuestionComments(prev => ({
+      ...prev,
+      [qId]: [...(prev[qId] || []), newComment]
+    }));
+    setNewCommentText('');
+  };
+
+  const handleTimestampClick = (seconds: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = seconds;
+      videoRef.current.play().catch(err => console.warn(err));
+      setIsVideoPlaying(true);
+    }
+  };
+
+  const handleVideoTimeUpdate = () => {
+    if (videoRef.current) {
+      const current = videoRef.current.currentTime;
+      const duration = videoRef.current.duration || 1;
+      setVideoPlayTime(current);
+      setVideoProgress((current / duration) * 100);
+    }
+  };
+
+  const handleVideoLoadedMetadata = () => {
+    if (videoRef.current) {
+      setVideoDurationSeconds(videoRef.current.duration);
+    }
+  };
+
+  const handleVideoSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newProgress = parseFloat(e.target.value);
+    setVideoProgress(newProgress);
+    if (videoRef.current) {
+      const duration = videoRef.current.duration || 1;
+      videoRef.current.currentTime = (newProgress / 100) * duration;
+    }
+  };
+
+  const handlePlaybackSpeedChange = (speed: number) => {
+    setPlaybackSpeed(speed);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+    }
+  };
+
+  const handlePlayToggle = () => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.pause();
+      } else {
+        if (videoRef.current.ended) {
+          videoRef.current.currentTime = 0;
+        }
+        videoRef.current.play().catch(err => console.warn(err));
+      }
+      setIsVideoPlaying(!isVideoPlaying);
+    }
+  };
+
+  const formatTime = (timeInSeconds: number) => {
+    const mins = Math.floor(timeInSeconds / 60);
+    const secs = Math.floor(timeInSeconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
 
   // Gamified Roadmap and animation states
   const [completedNodeIds, setCompletedNodeIds] = useState<number[]>([1, 2]);
@@ -1892,6 +2048,18 @@ export default function StudentDashboard() {
     });
   }, [questions, searchQuery, selectedDomain, selectedDifficulty]);
 
+  // Update activeQuestion on filter/collection select
+  useEffect(() => {
+    if (filteredQuestions.length > 0) {
+      const exists = filteredQuestions.some(q => q.id === activeQuestion?.id);
+      if (!exists) {
+        setActiveQuestion(filteredQuestions[0]);
+      }
+    } else {
+      setActiveQuestion(null);
+    }
+  }, [selectedCollection, selectedDomain, selectedDifficulty, searchQuery, filteredQuestions]);
+
   // Filtered Opportunities (for Career Hub view and dashboard preview)
   const filteredOpportunities = useMemo(() => {
     if (selectedOpportunityType === 'All') return opportunities;
@@ -2046,118 +2214,66 @@ export default function StudentDashboard() {
         </div>
 
         {/* Sidebar Tabs */}
-        <nav className="flex-1 flex flex-col gap-3 items-center w-full overflow-y-auto scrollbar-none">
-
-          {/* Dashboard Tab */}
-          <button
-            onClick={() => setActiveSidebarTab('dashboard')}
-            title="Dashboard"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'dashboard'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-              }`}
-          >
-            <Compass className="w-5 h-5" />
-          </button>
-
-          {/* Domains Tab */}
-          <button
-            onClick={() => router.push('/student/domains')}
-            title="Domains"
-            className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900 transition-all cursor-pointer"
-          >
-            <Layers className="w-5 h-5" />
-          </button>
-
-          {/* Learning Tab */}
-          <button
-            onClick={() => setActiveSidebarTab('learning')}
-            title="Learning Roadmap"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'learning'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-              }`}
-          >
-            <BookOpen className="w-5 h-5" />
-          </button>
-
-          {/* Practice Arena Tab */}
-          <button
-            onClick={() => setActiveSidebarTab('practice')}
-            title="Practice Arena"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'practice'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-              }`}
-          >
-            <BookOpenCheck className="w-5 h-5" />
-          </button>
-
-          {/* Mock Tests Tab */}
-          <button
-            onClick={() => setActiveSidebarTab('mockTests')}
-            title="Mock Tests"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'mockTests'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-              }`}
-          >
-            <Award className="w-5 h-5" />
-          </button>
-
-          {/* Career Hub Tab */}
-          <button
-            onClick={() => {
-              setActiveSidebarTab('careerHub');
-              setSelectedOpportunityType('All');
-            }}
-            title="Career Hub"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'careerHub'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-              }`}
-          >
-            <Briefcase className="w-5 h-5" />
-          </button>
-
-          {/* Leaderboards Tab */}
-          <button
-            onClick={() => setActiveSidebarTab('leaderboards')}
-            title="Leaderboard Rankings"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'leaderboards'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-              }`}
-          >
-            <Trophy className="w-5 h-5" />
-          </button>
-
-          {/* Achievements Tab */}
-          <button
-            onClick={() => setActiveSidebarTab('badges')}
-            title="Badges & Achievements"
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeSidebarTab === 'badges'
-                ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-900 shadow-md scale-105'
-                : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-200 dark:hover:bg-slate-900'
-              }`}
-          >
-            <Sparkles className="w-5 h-5" />
-          </button>
+        <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
+          {[
+            { id: 'dashboard', label: 'Dashboard', icon: Compass, action: 'tab' },
+            { id: 'domains', label: 'Domains', icon: Layers, action: 'nav', route: '/student/domains' },
+            { id: 'learning', label: 'Learning Roadmap', icon: BookOpen, action: 'tab' },
+            { id: 'practice', label: 'Practice Arena', icon: BookOpenCheck, action: 'tab' },
+            { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
+            { id: 'careerHub', label: 'Career Hub', icon: Briefcase, action: 'tab', subAction: () => setSelectedOpportunityType('All') },
+            { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
+            { id: 'badges', label: 'Badges & Achievements', icon: Sparkles, action: 'tab' }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeSidebarTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  if (tab.action === 'nav' && tab.route) {
+                    router.push(tab.route);
+                  } else {
+                    setActiveSidebarTab(tab.id as any);
+                    if (tab.subAction) tab.subAction();
+                  }
+                }}
+                title={tab.label}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer relative group/sidebar-btn ${
+                  isActive
+                    ? 'text-white dark:text-slate-900 shadow-md scale-105 z-10 font-bold'
+                    : 'text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 hover:scale-105 z-10'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeSidebarGlow"
+                    className="absolute inset-0 bg-[#111827] dark:bg-white rounded-full z-0 shadow-[0_0_15px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                    transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                  />
+                )}
+                {!isActive && (
+                  <div className="absolute inset-0 rounded-full bg-slate-100/0 dark:bg-slate-900/0 group-hover/sidebar-btn:bg-slate-100 dark:group-hover/sidebar-btn:bg-slate-900 transition-colors duration-200 z-0" />
+                )}
+                <Icon className="w-5 h-5 relative z-10 transition-transform duration-200 group-hover/sidebar-btn:scale-110" />
+              </button>
+            );
+          })}
 
           {/* Admin Tools Section */}
           {currentRole?.role === 'admin' && (
-            <div className="pt-2 border-t border-slate-150 dark:border-slate-900 w-full flex flex-col gap-2 items-center">
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-900 w-full flex flex-col gap-3 items-center">
               <button
                 onClick={() => router.push('/admin/editor')}
                 title="Content Creator (Admin)"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-55 dark:hover:bg-blue-900/30 transition-all cursor-pointer"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:scale-105 transition-all cursor-pointer"
               >
                 <SettingsIcon className="w-4.5 h-4.5" />
               </button>
               <button
                 onClick={() => router.push('/admin/dashboard')}
                 title="Admin Dashboard"
-                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all cursor-pointer"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:scale-105 transition-all cursor-pointer"
               >
                 <Layers className="w-4.5 h-4.5" />
               </button>
@@ -2213,7 +2329,7 @@ export default function StudentDashboard() {
               </div>
 
               {/* Menu Options */}
-              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-350">
+              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
 
                 {/* My Profile option */}
                 <button
@@ -2382,12 +2498,12 @@ export default function StudentDashboard() {
                 placeholder="Search something..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2 w-60 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                className="pl-9 pr-4 py-2 w-60 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
               />
             </div>
 
             {/* Preview/Edit Switcher */}
-            <div className="flex bg-slate-100 dark:bg-slate-900 p-0.5 rounded-full border border-slate-200 dark:border-slate-850 shadow-inner mr-2">
+            <div className="flex bg-slate-100 dark:bg-slate-900 p-0.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner mr-2">
               <button
                 type="button"
                 onClick={() => {
@@ -2401,7 +2517,7 @@ export default function StudentDashboard() {
                   setCurrentRole(studentRole);
                 }}
                 className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role !== 'admin'
-                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-450 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
+                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
                     : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                   }`}
               >
@@ -2421,8 +2537,8 @@ export default function StudentDashboard() {
                   router.push('/admin/editor');
                 }}
                 className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role === 'admin'
-                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-450 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-550 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                   }`}
               >
                 Edit / Admin
@@ -2433,7 +2549,7 @@ export default function StudentDashboard() {
         </header>
 
         {/* Scrollable Panel Area */}
-        <div className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
+        <div ref={scrollablePanelRef} className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
           }`}>
 
 
@@ -2445,7 +2561,7 @@ export default function StudentDashboard() {
 
               {/* Admin Banner Alert */}
               {currentRole?.role === 'admin' && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-blue-55/80 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40 text-blue-800 dark:text-blue-400 animate-fadeIn shadow-xs select-none">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-blue-50/80 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40 text-blue-800 dark:text-blue-400 animate-fadeIn shadow-xs select-none">
                   <div className="flex items-center gap-3">
                     <span className="p-2 rounded-lg bg-blue-600 text-white shadow-xs">
                       <SettingsIcon className="w-4 h-4 animate-pulse" />
@@ -2603,7 +2719,7 @@ export default function StudentDashboard() {
                           <span className="bg-amber-100 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
                             Active Track Unit
                           </span>
-                          <span className="text-slate-450 dark:text-slate-500 text-[10px] font-semibold">QUANT APTITUDE</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold">QUANT APTITUDE</span>
                         </div>
                         <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase leading-snug">
                           Percentages → Profit & Loss
@@ -2732,7 +2848,7 @@ export default function StudentDashboard() {
                                     <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                       {badge.name}
                                     </h4>
-                                    <p className="text-[9.5px] text-slate-450 mt-0.5 line-clamp-1">{badge.description}</p>
+                                    <p className="text-[9.5px] text-slate-400 mt-0.5 line-clamp-1">{badge.description}</p>
                                   </div>
                                 </div>
 
@@ -2858,7 +2974,7 @@ export default function StudentDashboard() {
                 <h1 className="text-2xl font-black uppercase text-slate-900 dark:text-white font-heading">
                   Your learning roadmap
                 </h1>
-                <p className="text-xs text-slate-500 dark:text-slate-405 max-w-md mx-auto">
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                   Click on the active lesson nodes to solve matching assessment questions.
                 </p>
               </motion.div>
@@ -2891,7 +3007,7 @@ export default function StudentDashboard() {
                         strokeLinecap="round"
                       />
                     </svg>
-                    <span className="absolute text-xs font-black text-slate-850 dark:text-white">
+                    <span className="absolute text-xs font-black text-slate-800 dark:text-white">
                       {animatedProgress}%
                     </span>
                   </div>
@@ -2942,7 +3058,7 @@ export default function StudentDashboard() {
                     onClick={() => setRoadmapFilter(tab.id as any)}
                     className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-305 cursor-pointer flex items-center gap-1.5 border ${roadmapFilter === tab.id
                         ? 'bg-[#111827] dark:bg-white text-white dark:text-slate-950 border-transparent shadow-md scale-105'
-                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205 border-slate-205 dark:border-slate-800'
+                        : 'bg-white/60 dark:bg-slate-900/40 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border-slate-200 dark:border-slate-800'
                       }`}
                   >
                     <span>{tab.icon}</span>
@@ -3237,7 +3353,7 @@ export default function StudentDashboard() {
                     {illustrationsList.map((ill: any, i: number) => (
                       <motion.div
                         key={i}
-                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-250 dark:border-slate-900/80 p-2.5 rounded-2xl shadow-md w-36 select-none transition-all duration-300 hover:scale-105 pointer-events-none"
+                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-200 dark:border-slate-900/80 p-2.5 rounded-2xl shadow-md w-36 select-none transition-all duration-300 hover:scale-105 pointer-events-none"
                         style={{
                           left: `${ill.x}%`,
                           top: `${ill.y}px`,
@@ -3326,10 +3442,10 @@ export default function StudentDashboard() {
                                 ease: "easeInOut"
                               }}
                             >
-                              <div className="bg-gradient-to-tr from-amber-500 to-orange-655 p-1.5 rounded-full shadow-lg border border-amber-300">
+                              <div className="bg-gradient-to-tr from-amber-500 to-orange-700 p-1.5 rounded-full shadow-lg border border-amber-300">
                                 <Rocket className="w-3.5 h-3.5 text-white" />
                               </div>
-                              <div className="w-2 h-2 bg-orange-650 rotate-45 -mt-1 shadow-md border-r border-b border-amber-300/30" />
+                              <div className="w-2 h-2 bg-orange-600 rotate-45 -mt-1 shadow-md border-r border-b border-amber-300/30" />
                             </motion.div>
                           )}
 
@@ -3359,16 +3475,16 @@ export default function StudentDashboard() {
                             initial={isJustUnlocked ? { scale: 0.8 } : false}
                             transition={{ duration: 0.8, ease: "easeInOut" }}
                             className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 select-none cursor-pointer ${isCompleted
-                                ? 'bg-gradient-to-tr from-emerald-555 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px] hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2'
+                                ? 'bg-gradient-to-tr from-emerald-600 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px] hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2'
                                 : isActive
-                                  ? 'bg-gradient-to-tr from-blue-600 to-indigo-550 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:brightness-110'
-                                  : 'bg-slate-100 border-b-2 border-slate-350 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-650 cursor-not-allowed'
+                                  ? 'bg-gradient-to-tr from-blue-600 to-indigo-500 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:brightness-110'
+                                  : 'bg-slate-100 border-b-2 border-slate-300 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-600 cursor-not-allowed'
                               }`}
                           >
                             {isCompleted ? (
                               <Check className="w-7 h-7 stroke-[3.5]" />
                             ) : node.symbol === '🏆' ? (
-                              <Trophy className={`w-5.5 h-5.5 ${isLocked ? 'text-slate-400 dark:text-slate-605' : 'text-amber-500'}`} />
+                              <Trophy className={`w-5.5 h-5.5 ${isLocked ? 'text-slate-400 dark:text-slate-600' : 'text-amber-500'}`} />
                             ) : isLocked ? (
                               <Lock className="w-4.5 h-4.5" />
                             ) : (
@@ -3385,7 +3501,7 @@ export default function StudentDashboard() {
                             }}
                           >
                             <span className="text-[9px] font-black text-slate-800 dark:text-white block truncate uppercase">{node.title}</span>
-                            <span className="text-[7.5px] text-slate-505 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
+                            <span className="text-[7.5px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
                             {isActive && (
                               <span className="text-[7.5px] text-blue-600 dark:text-blue-400 font-black block mt-0.5">75% Complete</span>
                             )}
@@ -3422,229 +3538,1190 @@ export default function StudentDashboard() {
                   </div>
                 );
               })()}
-            </div>
-          )}
+
+                {/* 3. Horizontal Question Selector Track */}
+                <div className="space-y-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block text-left">Set Navigation Track</span>
+                  {isLoading ? (
+                    <div className="w-full bg-white dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900 rounded-2xl py-8 flex flex-col items-center justify-center">
+                      <div className="w-6 h-6 rounded-full border border-blue-600 border-t-transparent animate-spin mb-2" />
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Loading set track...</span>
+                    </div>
+                  ) : filteredQuestions.length === 0 ? (
+                    <div className="w-full bg-white dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900 rounded-2xl py-8 flex flex-col items-center justify-center text-center">
+                      <Info className="w-6 h-6 text-slate-400 mb-1" />
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">No questions in this filter set</span>
+                    </div>
+                  ) : (
+                    <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+                      {filteredQuestions.map((q, idx) => {
+                        const isSolved = submittedAnswers[q.id];
+                        const isCurrent = activeQuestion?.id === q.id;
+                        const isCorrect = isSolved && selectedAnswers[q.id] === q.options.find(o => o.isCorrect)?.id;
+                        return (
+                          <button
+                            key={q.id}
+                            onClick={() => {
+                              setActiveQuestion(q);
+                              setIsVideoPlaying(false);
+                              setVideoProgress(0);
+                              setVideoPlayTime(0);
+                            }}
+                            className={`flex-shrink-0 w-44 p-4 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden cursor-pointer ${
+                              isCurrent
+                                ? 'bg-blue-950/30 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/20'
+                                : isSolved
+                                  ? isCorrect
+                                    ? 'bg-emerald-950/10 border-emerald-900 hover:border-emerald-700'
+                                    : 'bg-rose-950/10 border-rose-900 hover:border-rose-700'
+                                  : 'bg-slate-900/30 border-slate-900 hover:border-slate-700'
+                            }`}
+                          >
+                            <div className="flex justify-between items-center">
+                              <span className="font-mono text-[9px] font-black text-slate-500">#{q.id}</span>
+                              {isSolved ? (
+                                isCorrect ? (
+                                  <span className="w-4 h-4 rounded-full bg-emerald-600 flex items-center justify-center text-white text-[8px] font-black">✓</span>
+                                ) : (
+                                  <span className="w-4 h-4 rounded-full bg-rose-600 flex items-center justify-center text-white text-[8px] font-black">✗</span>
+                                )
+                              ) : (
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                              )}
+                            </div>
+                            <h5 className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300 mt-2 truncate">Lesson Unit {idx + 1}</h5>
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                              <span className="text-[7.5px] font-black uppercase bg-slate-100 dark:bg-slate-900/80 px-1.5 py-0.2 rounded leading-normal text-slate-500">
+                                {q.difficulty}
+                              </span>
+                              <span className="text-[7.5px] font-semibold text-slate-500">
+                                {q.domainId === 'quant' ? 'Quant' : q.domainId === 'logical' ? 'Logic' : 'Verbal'}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. Main Active Learning Module Card */}
+                {activeQuestion && (
+                  <div className="bg-white border border-slate-200 dark:bg-slate-950/40 dark:border-slate-900 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm relative transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.15)] overflow-hidden">
+                    
+                    {/* Visual shine gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/2 to-transparent pointer-events-none" />
+
+                    {/* Question Header & Tags */}
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-4 flex-wrap gap-3 relative z-10">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[9px] font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full tracking-wider uppercase">
+                          {activeQuestion.domainId === 'quant' ? 'QUANTITATIVE' : activeQuestion.domainId === 'logical' ? 'LOGICAL' : 'VERBAL'}
+                        </span>
+                        <span className={`text-[9px] font-black px-2.5 py-1 rounded-full border tracking-wide uppercase ${
+                          activeQuestion.difficulty === 'EASY'
+                            ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-emerald-400'
+                            : activeQuestion.difficulty === 'HARD'
+                              ? 'bg-rose-500/10 border-rose-500/25 text-rose-700 dark:text-rose-400'
+                              : 'bg-amber-500/10 border-amber-500/25 text-amber-700 dark:text-amber-400'
+                        }`}>
+                          {activeQuestion.difficulty}
+                        </span>
+                        <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded-md">
+                          #{activeQuestion.id}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="flex flex-col text-right">
+                          <span className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Instructor Walk-through</span>
+                          <span className="text-[10px] font-black text-slate-700 dark:text-slate-300">Ravi Kumar</span>
+                        </div>
+                        <button
+                          onClick={() => toggleBookmark(activeQuestion.id)}
+                          className={`p-2 rounded-xl border transition-colors cursor-pointer hover:scale-105 ${
+                            bookmarks.includes(activeQuestion.id)
+                              ? 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/20 dark:border-amber-900 dark:text-amber-500'
+                              : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <Bookmark className="w-4 h-4 stroke-[2.5]" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Question Title & Stem */}
+                    <div className="space-y-4 text-left relative z-10">
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-black text-slate-800 dark:text-white leading-snug tracking-tight font-heading">
+                        {activeQuestion.questionStem.split('###')[0].trim()}
+                      </h2>
+                    </div>
+
+                    {/* Immersive Custom Video Player Section */}
+                    {activeQuestion.videoUrl && (
+                      <div className="space-y-3 relative z-10">
+                        
+                        {/* Placeholder for Sticky video player gap */}
+                        {isMiniPlayerActive && (
+                          <div className="w-full aspect-video bg-slate-950/30 border border-dashed border-slate-900 rounded-2xl flex flex-col items-center justify-center text-[10px] uppercase font-black tracking-widest text-slate-500 select-none">
+                            <Video className="w-5 h-5 mb-2.5 animate-pulse text-blue-500" />
+                            <span>Playing in Sticky Picture-in-Picture mode</span>
+                          </div>
+                        )}
+
+                        {/* actual animated player tag */}
+                        <motion.div
+                          ref={mainVideoRef}
+                          layout="position"
+                          className={isMiniPlayerActive
+                            ? "fixed bottom-6 right-6 w-80 aspect-video shadow-2xl z-50 rounded-2xl border border-blue-500/40 bg-slate-950 overflow-hidden flex flex-col group/pip cursor-pointer"
+                            : "w-full aspect-video bg-black rounded-2xl overflow-hidden group relative border border-slate-200 dark:border-slate-900 shadow-md flex flex-col justify-end cursor-pointer"
+                          }
+                          onClick={(e) => {
+                            const target = e.target as HTMLElement;
+                            if (target.closest('button') || target.closest('input') || target.closest('a')) {
+                              return;
+                            }
+                            handlePlayToggle();
+                          }}
+                        >
+                          <video
+                            ref={videoRef}
+                            src="/live_count_bg.mp4"
+                            onTimeUpdate={handleVideoTimeUpdate}
+                            onLoadedMetadata={handleVideoLoadedMetadata}
+                            onEnded={() => {
+                              setIsVideoPlaying(false);
+                              setVideoProgress(100);
+                            }}
+                            className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
+                            muted
+                            playsInline
+                          />
+
+                          {/* Hover Overlay Controls */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 z-10">
+                            
+                            {/* Player Top Bar */}
+                            <div className="flex justify-between items-center w-full">
+                              <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
+                                {activeQuestion.videoTitle || 'Walkthrough Explanation'}
+                              </span>
+                            </div>
+
+                            {/* Player Bottom Bar / Controls */}
+                            <div className="space-y-2.5 w-full">
+                              
+                              {/* Progress Slider Track */}
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  step="0.1"
+                                  value={videoProgress}
+                                  onChange={handleVideoSliderChange}
+                                  className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
+                                />
+                              </div>
+
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-3">
+                                  {/* Play/Pause Button */}
+                                  <button
+                                    onClick={handlePlayToggle}
+                                    className="p-1 rounded-md text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                  >
+                                    {isVideoPlaying ? (
+                                      <span className="font-mono text-xs font-black select-none">PAUSE</span>
+                                    ) : (
+                                      <Play className="w-3.5 h-3.5 fill-current" />
+                                    )}
+                                  </button>
+
+                                  {/* Current Time / Duration display */}
+                                  <span className="font-mono text-[9px] text-white/70 select-none">
+                                    {formatTime(videoPlayTime)} / {formatTime(videoDurationSeconds)}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-2 relative">
+                                  {/* Speed Popover Menu */}
+                                  {isSpeedMenuOpen && (
+                                    <div 
+                                      className="absolute bottom-full right-0 mb-2 bg-[#111827]/95 backdrop-blur-md border border-slate-800 rounded-xl p-2 w-32 shadow-xl z-20 flex flex-col gap-0.5 text-left"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <div className="text-[7.5px] font-black uppercase text-slate-400 px-2 py-1 tracking-wider border-b border-slate-700/60 mb-1 select-none">
+                                        Playback Speed
+                                      </div>
+                                      {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((sp) => (
+                                        <button
+                                          key={sp}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handlePlaybackSpeedChange(sp);
+                                            setIsSpeedMenuOpen(false);
+                                          }}
+                                          className={`text-[9px] font-black font-mono w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer ${
+                                            playbackSpeed === sp ? 'text-blue-400 bg-blue-500/10' : 'text-white/80'
+                                          }`}
+                                        >
+                                          <span>{sp === 1 ? 'Normal' : `${sp}x`}</span>
+                                          {playbackSpeed === sp && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {/* Speed Selector Trigger Button */}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setIsSpeedMenuOpen(!isSpeedMenuOpen);
+                                    }}
+                                    className="flex items-center gap-1 text-[8.5px] font-black font-mono px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
+                                  >
+                                    <span>Speed: {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}</span>
+                                    <SettingsIcon className={`w-3 h-3 transition-transform duration-300 ${isSpeedMenuOpen ? 'rotate-90 text-blue-400' : 'text-white/80'}`} />
+                                  </button>
+                                  
+                                  {/* Close/Toggle PiP manually for mini player */}
+                                  {isMiniPlayerActive && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsMiniPlayerActive(false);
+                                      }}
+                                      className="text-[9.5px] font-black text-white hover:text-blue-400 transition-colors bg-white/10 px-1.5 py-0.5 rounded cursor-pointer"
+                                    >
+                                      EXPAND
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+
+                          {/* Non-hover initial play state overlay */}
+                          {!isVideoPlaying && !isMiniPlayerActive && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
+                              <span className="w-12 h-12 rounded-full bg-blue-600/90 flex items-center justify-center text-white shadow-xl animate-pulse pointer-events-auto cursor-pointer" onClick={(e) => {
+                                e.stopPropagation();
+                                handlePlayToggle();
+                              }}>
+                                <Play className="w-5 h-5 fill-current ml-0.5" />
+                              </span>
+                            </div>
+                          )}
+
+                        </motion.div>
+                        
+                        <div className="flex justify-between items-center text-[10px] text-slate-500 font-bold px-1 select-none">
+                          <span>Video Lesson explanation by Ravi Kumar</span>
+                          <span>Duration: {activeQuestion.videoDuration || '10 mins'}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* AI Generated Quick Summary insights */}
+                    <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 text-left relative overflow-hidden group shadow-xs">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-xl rounded-full" />
+                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs">
+                        <Cpu className="w-4 h-4" />
+                        <span className="uppercase tracking-wider font-black text-[10px]">AI Generated Lesson Summary</span>
+                      </div>
+                      <ul className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-[11px] text-slate-600 dark:text-slate-300 font-semibold list-disc list-inside leading-relaxed">
+                        <li>
+                          {activeQuestion.domainId === 'quant' 
+                            ? 'Algebraic variable modeling is safer than manual trial logic.' 
+                            : activeQuestion.domainId === 'logical'
+                              ? 'Circular constraints usually have two branching solutions.'
+                              : 'Synonyms like Prolific imply output capacity (Productive).'}
+                        </li>
+                        <li>Important Placement question category for TCS and Amazon rounds.</li>
+                        <li>Option A is mathematically consistent under standard parameters.</li>
+                        <li>Mastery percentage average for this unit is 84% speed index.</li>
+                      </ul>
+                    </div>
+
+                    {/* Selectable Options */}
+                    <div className="space-y-4 pt-2">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block text-left">Interactive Learning Choices</span>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {activeQuestion.options.map((opt) => {
+                          const isOptionSelected = selectedAnswers[activeQuestion.id] === opt.id;
+                          const isSubmitted = submittedAnswers[activeQuestion.id];
+                          const showCorrectness = isSubmitted && opt.isCorrect;
+                          const showIncorrectness = isSubmitted && isOptionSelected && !opt.isCorrect;
+
+                          return (
+                            <button
+                              key={opt.id}
+                              onClick={() => !isSubmitted && handleAnswerSelect(activeQuestion.id, opt.id)}
+                              disabled={isSubmitted}
+                              className={`p-4 rounded-2xl border text-left flex items-start justify-between gap-3 text-xs transition-all duration-300 relative overflow-hidden group cursor-pointer ${
+                                showCorrectness
+                                  ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                                  : showIncorrectness
+                                    ? 'border-rose-500 bg-rose-50 dark:border-rose-600 dark:bg-rose-950/20 text-rose-800 dark:text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] animate-shake'
+                                    : isOptionSelected
+                                      ? 'border-blue-500 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-950/30 text-slate-800 dark:text-white'
+                                      : 'border-slate-200 bg-slate-50/50 hover:border-blue-500/40 hover:shadow-[0_0_10px_rgba(59,130,246,0.1)] hover:bg-slate-50 dark:border-slate-900 dark:bg-slate-950/40 dark:hover:border-slate-800 dark:hover:bg-slate-900/30 text-slate-700 dark:text-slate-300'
+                              }`}
+                            >
+                              <div className="flex items-start gap-3 min-w-0">
+                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-[10.5px] shrink-0 border transition-colors duration-300 ${
+                                  showCorrectness
+                                    ? 'border-emerald-300 bg-emerald-100 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-900/35 dark:text-emerald-400'
+                                    : showIncorrectness
+                                      ? 'border-rose-300 bg-rose-100 text-rose-800 dark:border-rose-800/40 dark:bg-rose-900/35 dark:text-rose-400'
+                                      : isOptionSelected
+                                        ? 'border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-800/40 dark:bg-blue-900/35 dark:text-blue-400'
+                                        : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
+                                }`}>
+                                  {opt.id.toUpperCase()}
+                                </span>
+                                <span className="font-semibold">{opt.text}</span>
+                              </div>
+                              {isSubmitted && opt.isCorrect && (
+                                <CheckCircle className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
+                              )}
+                              {isSubmitted && isOptionSelected && !opt.isCorrect && (
+                                <X className="w-4.5 h-4.5 text-rose-500 shrink-0" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            )}
 
           {/* ====================================================================
-              3. TAB: PRACTICE ARENA (Interactive Feed)
+              3. TAB: PRACTICE ARENA (Curated Hub redesign layout)
               ==================================================================== */}
           {activeSidebarTab === 'practice' && (
-            <div className="space-y-6 pt-2 animate-fadeIn w-full">
+            <div className="w-full space-y-8 animate-fadeIn text-slate-800 dark:text-slate-200">
+              
+              {/* Three-Column Workspace layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Center Column - Main Workspace (8 cols) */}
+                <div className="lg:col-span-8 space-y-8">
+                  
+                  {/* 1. Curated Practice Collections (Netflix style) */}
+                  <div className="bg-white/40 dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 shadow-xs text-left relative overflow-hidden">
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading mb-4">Curated Practice Arenas</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      {[
+                        { id: 'all', title: 'All Practice Sets', domain: 'All', icon: '🌐', gradient: 'from-blue-600/15 to-indigo-600/15 dark:from-blue-950/40 dark:to-indigo-950/40 border-blue-500/20 dark:border-blue-900/40 text-blue-600 dark:text-blue-400', count: questions.length },
+                        { id: 'quant', title: 'Quantitative Arena', domain: 'quant', icon: '📐', gradient: 'from-amber-600/15 to-orange-600/15 dark:from-amber-950/40 dark:to-orange-950/40 border-amber-500/20 dark:border-amber-900/40 text-amber-600 dark:text-amber-400', count: questions.filter(q => q.domainId === 'quant').length },
+                        { id: 'logical', title: 'Logical Sequences', domain: 'logical', icon: '🧩', gradient: 'from-pink-600/15 to-rose-600/15 dark:from-pink-950/40 dark:to-rose-950/40 border-pink-500/20 dark:border-pink-900/40 text-pink-600 dark:text-pink-400', count: questions.filter(q => q.domainId === 'logical').length },
+                        { id: 'verbal', title: 'Verbal Mastery', domain: 'verbal', icon: '📚', gradient: 'from-emerald-600/15 to-teal-600/15 dark:from-emerald-950/40 dark:to-teal-950/40 border-emerald-500/20 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400', count: questions.filter(q => q.domainId === 'verbal').length }
+                      ].map((col) => {
+                        const isSelected = selectedCollection === col.id;
+                        return (
+                          <button
+                            key={col.id}
+                            onClick={() => {
+                              setSelectedCollection(col.id);
+                              setSelectedDomain(col.domain);
+                            }}
+                            className={`p-4 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden group/collection-btn cursor-pointer flex flex-col justify-between h-28 ${
+                              isSelected
+                                ? 'bg-slate-50 border-blue-500 dark:bg-slate-900 dark:border-blue-500 shadow-md shadow-blue-500/10 scale-102 font-bold'
+                                : 'bg-white hover:bg-slate-50 dark:bg-slate-950/30 border-slate-200 dark:border-slate-900 hover:border-slate-800 dark:hover:bg-slate-900/30'
+                            }`}
+                          >
+                            <div className="flex justify-between items-center w-full">
+                              <span className="text-xl">{col.icon}</span>
+                              <span className="text-[9px] font-black font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-900 px-1.5 py-0.5 rounded uppercase">
+                                {col.count} Sets
+                              </span>
+                            </div>
+                            <div className="mt-2 text-left">
+                              <h4 className="text-[11px] font-black uppercase text-slate-800 dark:text-white leading-tight">
+                                {col.title}
+                              </h4>
+                              <span className="text-[8px] font-semibold text-slate-400 dark:text-slate-500 block mt-1">
+                                {col.id === 'all' ? 'Unified course track' : `Concepts in ${col.id}`}
+                              </span>
+                            </div>
+                            {isSelected && (
+                              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-              {/* Section Title & Filter Tabs */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-900 pb-5 transition-colors duration-300">
-                <div>
-                  <h3 className="text-lg font-black text-slate-800 dark:text-white tracking-tight uppercase font-sans flex items-center gap-2">
-                    <BookOpenCheck className="w-5 h-5 text-blue-600" />
-                    <span>Practice Arena Feed</span>
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Real-time Aptitude and Verbal solving sheets updated by editors.</p>
-                </div>
-
-                {/* Search Bar */}
-                <div className="relative w-full md:w-64">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
-                  <input
-                    type="text"
-                    placeholder="Search question stems..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl py-2 pl-9 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Filters Row */}
-              <div className="flex flex-wrap items-center gap-3">
-                {/* Domain Switcher */}
-                <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900 shadow-2xs transition-colors duration-300">
-                  {['All', 'quant', 'logical', 'verbal'].map((domain) => (
-                    <button
-                      key={domain}
-                      onClick={() => setSelectedDomain(domain)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${selectedDomain === domain
-                          ? 'bg-blue-600 text-white shadow-sm'
-                          : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                    >
-                      {domain === 'All' ? 'All Domains' : domain === 'quant' ? 'Quantitative' : domain === 'logical' ? 'Logical' : 'Verbal'}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Difficulty pills */}
-                <div className="flex items-center gap-2 bg-slate-50/60 p-1 rounded-xl border border-slate-200 dark:bg-slate-900/60 dark:border-slate-900 transition-colors duration-300">
-                  {['All', 'EASY', 'MEDIUM', 'HARD'].map((diff) => (
-                    <button
-                      key={diff}
-                      onClick={() => setSelectedDifficulty(diff)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer ${selectedDifficulty === diff
-                          ? 'bg-slate-200 text-slate-850 dark:bg-slate-800 dark:text-slate-100 shadow-xs'
-                          : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                    >
-                      {diff}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Scalable Practice Question Feed */}
-              {isLoading ? (
-                <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl py-14 flex flex-col items-center justify-center text-center transition-colors duration-300">
-                  <div className="w-10 h-10 rounded-full border border-blue-600 border-t-transparent animate-spin mb-3" />
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Compiling question catalog...</span>
-                </div>
-              ) : filteredQuestions.length === 0 ? (
-                <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl py-14 flex flex-col items-center justify-center text-center p-6 transition-colors duration-300">
-                  <Info className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-2.5" />
-                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">No matching questions cataloged</span>
-                  <span className="text-[10px] text-slate-500 mt-1 leading-normal">Try clearing domain or difficulty selections.</span>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  {filteredQuestions.map((q) => {
-                    const isBookmarked = bookmarks.includes(q.id);
-                    const isSubmitted = submittedAnswers[q.id];
-                    const selectedOption = selectedAnswers[q.id];
-                    const showSolution = revealedSolutions[q.id];
-
-                    const domainLabel = q.domainId === 'quant' ? 'QUANT' : q.domainId === 'logical' ? 'LOGICAL' : 'VERBAL';
-
-                    return (
-                      <div
-                        key={q.id}
-                        className="bg-white border border-slate-200 dark:bg-slate-950/40 dark:border-slate-900 rounded-2xl p-6 space-y-4 hover:border-slate-350 dark:hover:border-slate-800 transition-all duration-150 shadow-xs relative overflow-hidden"
-                      >
-                        {/* Top banner tag info */}
-                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-3 flex-wrap gap-2 transition-colors duration-300">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-black bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/35 px-2 py-0.5 rounded tracking-wide uppercase transition-colors duration-300">
-                              {domainLabel}
-                            </span>
-                            <span className={`text-[9px] font-black px-2 py-0.5 rounded border transition-colors duration-300 ${q.difficulty === 'EASY'
-                                ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:border-emerald-900/30 dark:text-emerald-450'
-                                : q.difficulty === 'HARD'
-                                  ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-400'
-                                  : 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900/30 dark:text-amber-400'
-                              }`}>
-                              {q.difficulty}
-                            </span>
-                            <span className="font-mono text-[9.5px] text-slate-500 font-bold uppercase tracking-wider">#{q.id}</span>
-                          </div>
-
-                          {/* Interactive actions */}
-                          <div className="flex items-center gap-2">
+                  {/* 2. Set Navigation Track */}
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block text-left">Set Navigation Track</span>
+                    {isLoading ? (
+                      <div className="w-full bg-white dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900 rounded-2xl py-8 flex flex-col items-center justify-center">
+                        <div className="w-6 h-6 rounded-full border border-blue-600 border-t-transparent animate-spin mb-2" />
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Loading set track...</span>
+                      </div>
+                    ) : filteredQuestions.length === 0 ? (
+                      <div className="w-full bg-white dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900 rounded-2xl py-8 flex flex-col items-center justify-center text-center">
+                        <Info className="w-6 h-6 text-slate-400 mb-1" />
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">No questions in this filter set</span>
+                      </div>
+                    ) : (
+                      <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+                        {filteredQuestions.map((q, idx) => {
+                          const isSolved = submittedAnswers[q.id];
+                          const isCurrent = activeQuestion?.id === q.id;
+                          const isCorrect = isSolved && selectedAnswers[q.id] === q.options.find(o => o.isCorrect)?.id;
+                          return (
                             <button
-                              onClick={() => toggleBookmark(q.id)}
-                              className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${isBookmarked
-                                  ? 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-500'
-                                  : 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-400 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800 dark:text-slate-450'
-                                }`}
+                              key={q.id}
+                              onClick={() => {
+                                setActiveQuestion(q);
+                                setIsVideoPlaying(false);
+                                setVideoProgress(0);
+                                setVideoPlayTime(0);
+                              }}
+                              className={`flex-shrink-0 w-44 p-4 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden cursor-pointer ${
+                                isCurrent
+                                  ? 'bg-blue-100/30 border-blue-500 dark:bg-blue-950/30 shadow-[0_0_15px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/20'
+                                  : isSolved
+                                    ? isCorrect
+                                      ? 'bg-emerald-100/10 border-emerald-900 dark:bg-emerald-950/10 hover:border-emerald-700'
+                                      : 'bg-rose-100/10 border-rose-900 dark:bg-rose-950/10 hover:border-rose-700'
+                                    : 'bg-slate-50 border-slate-200 hover:border-slate-400 dark:bg-slate-900/30 dark:border-slate-900 dark:hover:border-slate-700'
+                              }`}
                             >
-                              <Bookmark className="w-3.5 h-3.5 stroke-[2.5]" />
+                              <div className="flex justify-between items-center">
+                                <span className="font-mono text-[9px] text-slate-400">#{q.id}</span>
+                                {isSolved ? (
+                                  isCorrect ? (
+                                    <span className="w-4 h-4 rounded-full bg-emerald-600 flex items-center justify-center text-white text-[8px] font-black">✓</span>
+                                  ) : (
+                                    <span className="w-4 h-4 rounded-full bg-rose-600 flex items-center justify-center text-white text-[8px] font-black">✗</span>
+                                  )
+                                ) : (
+                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                                )}
+                              </div>
+                              <h5 className="text-[11px] font-black uppercase tracking-tight text-slate-800 dark:text-slate-300 mt-2 truncate">Lesson Unit {idx + 1}</h5>
+                              <div className="flex items-center gap-1.5 mt-1.5">
+                                <span className="text-[7.5px] font-black uppercase bg-slate-100 dark:bg-slate-900 px-1.5 py-0.2 rounded leading-normal text-slate-500">
+                                  {q.difficulty}
+                                </span>
+                                <span className="text-[7.5px] font-semibold text-slate-500">
+                                  {q.domainId === 'quant' ? 'Quant' : q.domainId === 'logical' ? 'Logic' : 'Verbal'}
+                                </span>
+                              </div>
                             </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. Active Learning Card */}
+                  {activeQuestion && (
+                    <div className="bg-white border border-slate-200 dark:bg-slate-950/40 dark:border-slate-900 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm relative transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.15)] overflow-hidden">
+                      
+                      {/* Visual shine gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/2 to-transparent pointer-events-none" />
+
+                      {/* Question Header & Tags */}
+                      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-4 flex-wrap gap-3 relative z-10">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[9px] font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full tracking-wider uppercase">
+                            {activeQuestion.domainId === 'quant' ? 'QUANTITATIVE' : activeQuestion.domainId === 'logical' ? 'LOGICAL' : 'VERBAL'}
+                          </span>
+                          <span className={`text-[9px] font-black px-2.5 py-1 rounded-full border tracking-wide uppercase ${
+                            activeQuestion.difficulty === 'EASY'
+                              ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-emerald-400'
+                              : activeQuestion.difficulty === 'HARD'
+                                ? 'bg-rose-500/10 border-rose-500/25 text-rose-700 dark:text-rose-400'
+                                : 'bg-amber-500/10 border-amber-500/25 text-amber-700 dark:text-amber-400'
+                          }`}>
+                            {activeQuestion.difficulty}
+                          </span>
+                          <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded-md">
+                            #{activeQuestion.id}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="flex flex-col text-right">
+                            <span className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Instructor Walk-through</span>
+                            <span className="text-[10px] font-black text-slate-700 dark:text-slate-300">Ravi Kumar</span>
+                          </div>
+                          <button
+                            onClick={() => toggleBookmark(activeQuestion.id)}
+                            className={`p-2 rounded-xl border transition-colors cursor-pointer hover:scale-105 ${
+                              bookmarks.includes(activeQuestion.id)
+                                ? 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/20 dark:border-amber-900 dark:text-amber-500'
+                                : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800'
+                            }`}
+                          >
+                            <Bookmark className="w-4 h-4 stroke-[2.5]" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Question Title & Stem */}
+                      <div className="space-y-4 text-left relative z-10">
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-black text-slate-800 dark:text-white leading-snug tracking-tight font-heading">
+                          {activeQuestion.questionStem.split('###')[0].trim()}
+                        </h2>
+                      </div>
+
+                      {/* Immersive Custom Video Player Section */}
+                      {activeQuestion.videoUrl && (
+                        <div className="space-y-3 relative z-10">
+                          
+                          {/* Placeholder for Sticky video player gap */}
+                          {isMiniPlayerActive && (
+                            <div className="w-full aspect-video bg-slate-950/30 border border-dashed border-slate-900 rounded-2xl flex flex-col items-center justify-center text-[10px] uppercase font-black tracking-widest text-slate-500 select-none">
+                              <Video className="w-5 h-5 mb-2.5 animate-pulse text-blue-500" />
+                              <span>Playing in Sticky Picture-in-Picture mode</span>
+                            </div>
+                          )}
+
+                          {/* actual animated player tag */}
+                          <motion.div
+                            ref={mainVideoRef}
+                            layout="position"
+                            className={isMiniPlayerActive
+                              ? "fixed bottom-6 right-6 w-80 aspect-video shadow-2xl z-50 rounded-2xl border border-blue-500/40 bg-slate-950 overflow-hidden flex flex-col group/pip cursor-pointer"
+                              : "w-full aspect-video bg-black rounded-2xl overflow-hidden group relative border border-slate-200 dark:border-slate-900 shadow-md flex flex-col justify-end cursor-pointer"
+                            }
+                            onClick={(e) => {
+                              const target = e.target as HTMLElement;
+                              if (target.closest('button') || target.closest('input') || target.closest('a')) {
+                                return;
+                              }
+                              handlePlayToggle();
+                            }}
+                          >
+                            <video
+                              ref={videoRef}
+                              src="/live_count_bg.mp4"
+                              onTimeUpdate={handleVideoTimeUpdate}
+                              onLoadedMetadata={handleVideoLoadedMetadata}
+                              onEnded={() => {
+                                setIsVideoPlaying(false);
+                                setVideoProgress(100);
+                              }}
+                              className="absolute inset-0 w-full h-full object-cover opacity-60 pointer-events-none"
+                              muted
+                              playsInline
+                            />
+
+                            {/* Hover Overlay Controls */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 z-10">
+                              
+                              {/* Player Top Bar */}
+                              <div className="flex justify-between items-center w-full">
+                                <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
+                                  {activeQuestion.videoTitle || 'Walkthrough Explanation'}
+                                </span>
+                              </div>
+
+                              {/* Player Bottom Bar / Controls */}
+                              <div className="space-y-2.5 w-full">
+                                
+                                {/* Progress Slider Track */}
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    value={videoProgress}
+                                    onChange={handleVideoSliderChange}
+                                    className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
+                                  />
+                                </div>
+
+                                <div className="flex items-center justify-between w-full">
+                                  <div className="flex items-center gap-3">
+                                    {/* Play/Pause Button */}
+                                    <button
+                                      onClick={handlePlayToggle}
+                                      className="p-1 rounded-md text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                    >
+                                      {isVideoPlaying ? (
+                                        <span className="font-mono text-xs font-black select-none">PAUSE</span>
+                                      ) : (
+                                        <Play className="w-3.5 h-3.5 fill-current" />
+                                      )}
+                                    </button>
+
+                                    {/* Current Time / Duration display */}
+                                    <span className="font-mono text-[9px] text-white/70 select-none">
+                                      {formatTime(videoPlayTime)} / {formatTime(videoDurationSeconds)}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center gap-2 relative">
+                                    {/* Speed Popover Menu */}
+                                    {isSpeedMenuOpen && (
+                                      <div 
+                                        className="absolute bottom-full right-0 mb-2 bg-[#111827]/95 backdrop-blur-md border border-slate-800 rounded-xl p-2 w-32 shadow-xl z-20 flex flex-col gap-0.5 text-left"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <div className="text-[7.5px] font-black uppercase text-slate-400 px-2 py-1 tracking-wider border-b border-slate-700/60 mb-1 select-none">
+                                          Playback Speed
+                                        </div>
+                                        {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((sp) => (
+                                          <button
+                                            key={sp}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handlePlaybackSpeedChange(sp);
+                                              setIsSpeedMenuOpen(false);
+                                            }}
+                                            className={`text-[9px] font-black font-mono w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer ${
+                                              playbackSpeed === sp ? 'text-blue-400 bg-blue-500/10' : 'text-white/80'
+                                            }`}
+                                          >
+                                            <span>{sp === 1 ? 'Normal' : `${sp}x`}</span>
+                                            {playbackSpeed === sp && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {/* Speed Selector Trigger Button */}
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsSpeedMenuOpen(!isSpeedMenuOpen);
+                                      }}
+                                      className="flex items-center gap-1 text-[8.5px] font-black font-mono px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
+                                    >
+                                      <span>Speed: {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}</span>
+                                      <SettingsIcon className={`w-3 h-3 transition-transform duration-300 ${isSpeedMenuOpen ? 'rotate-90 text-blue-400' : 'text-white/80'}`} />
+                                    </button>
+                                    
+                                    {/* Close/Toggle PiP manually for mini player */}
+                                    {isMiniPlayerActive && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setIsMiniPlayerActive(false);
+                                        }}
+                                        className="text-[9.5px] font-black text-white hover:text-blue-400 transition-colors bg-white/10 px-1.5 py-0.5 rounded cursor-pointer"
+                                      >
+                                        EXPAND
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+
+                              </div>
+                            </div>
+
+                            {/* Non-hover initial play state overlay */}
+                            {!isVideoPlaying && !isMiniPlayerActive && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
+                                <span className="w-12 h-12 rounded-full bg-blue-600/90 flex items-center justify-center text-white shadow-xl animate-pulse pointer-events-auto cursor-pointer" onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePlayToggle();
+                                }}>
+                                  <Play className="w-5 h-5 fill-current ml-0.5" />
+                                </span>
+                              </div>
+                            )}
+
+                          </motion.div>
+                          
+                          <div className="flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-500 font-bold px-1 select-none">
+                            <span>Video Lesson explanation by Ravi Kumar</span>
+                            <span>Duration: {activeQuestion.videoDuration || '10 mins'}</span>
                           </div>
                         </div>
+                      )}
 
-                        {/* Question Stem Text Area */}
-                        <div className="space-y-3 leading-relaxed">
-                          <div className="text-[12.5px] font-bold text-slate-850 dark:text-slate-100 whitespace-pre-wrap leading-normal font-sans transition-colors duration-300">
-                            {q.questionStem}
-                          </div>
+                      {/* AI Generated Quick Summary insights */}
+                      <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 dark:bg-blue-950/10 dark:border-blue-900/30 text-left relative overflow-hidden group shadow-xs">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-xl rounded-full" />
+                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs">
+                          <Cpu className="w-4 h-4" />
+                          <span className="uppercase tracking-wider font-black text-[10px]">AI Generated Lesson Summary</span>
                         </div>
+                        <ul className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-[11px] text-slate-700 dark:text-slate-300 font-semibold list-disc list-inside leading-relaxed">
+                          <li>
+                            {activeQuestion.domainId === 'quant' 
+                              ? 'Algebraic variable modeling is safer than manual trial logic.' 
+                              : activeQuestion.domainId === 'logical'
+                                ? 'Circular constraints usually have two branching solutions.'
+                                : 'Synonyms like Prolific imply output capacity (Productive).'}
+                          </li>
+                          <li>Important Placement question category for TCS and Amazon rounds.</li>
+                          <li>Option A is mathematically consistent under standard parameters.</li>
+                          <li>Mastery percentage average for this unit is 84% speed index.</li>
+                        </ul>
+                      </div>
 
-                        {/* Selectable Options List */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                          {q.options.map((opt) => {
-                            const isOptionSelected = selectedOption === opt.id;
+                      {/* Selectable Options */}
+                      <div className="space-y-4 pt-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block text-left">Interactive Learning Choices</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {activeQuestion.options.map((opt) => {
+                            const isOptionSelected = selectedAnswers[activeQuestion.id] === opt.id;
+                            const isSubmitted = submittedAnswers[activeQuestion.id];
                             const showCorrectness = isSubmitted && opt.isCorrect;
                             const showIncorrectness = isSubmitted && isOptionSelected && !opt.isCorrect;
 
                             return (
                               <button
                                 key={opt.id}
-                                onClick={() => !isSubmitted && handleAnswerSelect(q.id, opt.id)}
+                                onClick={() => !isSubmitted && handleAnswerSelect(activeQuestion.id, opt.id)}
                                 disabled={isSubmitted}
-                                className={`p-3 rounded-xl border text-left flex items-start justify-between gap-3 text-[11.5px] transition-all duration-150 ${showCorrectness
-                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-2xs dark:border-emerald-500 dark:bg-emerald-950/20 dark:text-emerald-300'
+                                className={`p-4 rounded-2xl border text-left flex items-start justify-between gap-3 text-xs transition-all duration-300 relative overflow-hidden group cursor-pointer ${
+                                  showCorrectness
+                                    ? 'border-emerald-500 bg-emerald-50/50 dark:border-emerald-600 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
                                     : showIncorrectness
-                                      ? 'border-rose-500 bg-rose-50 text-rose-800 shadow-2xs dark:border-rose-500 dark:bg-rose-950/20 dark:text-rose-300'
+                                      ? 'border-rose-500 bg-rose-50/50 dark:border-rose-600 dark:bg-rose-950/20 text-rose-800 dark:text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] animate-shake'
                                       : isOptionSelected
-                                        ? 'border-blue-600 bg-blue-50/30 text-slate-900 dark:border-blue-600 dark:bg-blue-950/30 dark:text-white'
-                                        : 'border-slate-200 bg-slate-50/55 hover:border-slate-350 hover:bg-slate-50 text-slate-700 dark:border-slate-900 dark:bg-slate-950/20 dark:hover:border-slate-800 dark:hover:bg-slate-900/30 dark:text-slate-300 disabled:opacity-60 disabled:hover:border-slate-900'
-                                  }`}
+                                        ? 'border-blue-500 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-950/30 text-slate-800 dark:text-white font-bold shadow-sm'
+                                        : 'border-slate-200 bg-white hover:border-blue-500/40 hover:shadow-[0_0_10px_rgba(59,130,246,0.1)] dark:border-slate-900 dark:bg-slate-950/40 dark:hover:border-slate-800 dark:hover:bg-slate-900/30 text-slate-700 dark:text-slate-300'
+                                }`}
                               >
-                                <div className="flex items-start gap-2.5 min-w-0">
-                                  <span className={`w-5 h-5 rounded-md flex items-center justify-center font-mono font-black text-[10px] shrink-0 border transition-colors duration-300 ${showCorrectness
-                                      ? 'border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-800/40 dark:bg-emerald-900/35 dark:text-emerald-450'
+                                <div className="flex items-start gap-3 min-w-0">
+                                  <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-[10.5px] shrink-0 border transition-colors duration-300 ${
+                                    showCorrectness
+                                      ? 'border-emerald-300 bg-emerald-100 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-900/35 dark:text-emerald-500'
                                       : showIncorrectness
-                                        ? 'border-rose-200 bg-rose-100 text-rose-700 dark:border-rose-800/40 dark:bg-rose-900/35 dark:text-rose-400'
-                                        : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
-                                    }`}>
-                                    {opt.id}
+                                        ? 'border-rose-300 bg-rose-100 text-rose-800 dark:border-rose-800/40 dark:bg-rose-900/35 dark:text-rose-500'
+                                        : isOptionSelected
+                                          ? 'border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-800/40 dark:bg-blue-900/35 dark:text-blue-400'
+                                          : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
+                                  }`}>
+                                    {opt.id.toUpperCase()}
                                   </span>
-                                  <span className="font-semibold leading-normal break-words mt-0.5">{opt.text}</span>
+                                  <span className="font-semibold">{opt.text}</span>
                                 </div>
-
-                                {/* Correctness indicators */}
-                                <div className="shrink-0 flex items-center">
-                                  {showCorrectness && (
-                                    <div className="w-4.5 h-4.5 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-inner">
-                                      <Check className="w-3 h-3 stroke-[3]" />
-                                    </div>
-                                  )}
-                                  {showIncorrectness && (
-                                    <div className="w-4.5 h-4.5 rounded-full bg-rose-600 flex items-center justify-center text-white shadow-inner">
-                                      <X className="w-3 h-3 stroke-[3]" />
-                                    </div>
-                                  )}
-                                </div>
+                                {isSubmitted && opt.isCorrect && (
+                                  <CheckCircle className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
+                                )}
+                                {isSubmitted && isOptionSelected && !opt.isCorrect && (
+                                  <X className="w-4.5 h-4.5 text-rose-500 shrink-0" />
+                                )}
                               </button>
                             );
                           })}
                         </div>
+                      </div>
 
-                        {/* Interactive Explanation & Video solver toggler */}
-                        {isSubmitted && (
-                          <div className="border-t border-slate-100 dark:border-slate-900/80 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 transition-colors duration-300">
+                      {/* Interactive Learning Tabs Switcher */}
+                      <div className="flex border-b border-slate-200 dark:border-slate-900 select-none pb-0.5 pt-4 overflow-x-auto gap-2">
+                        {[
+                          { id: 'explanation', label: 'Explanation' },
+                          { id: 'notes', label: 'Video Transcript' },
+                          { id: 'tips', label: 'Mentor Tips & Cheats' },
+                          { id: 'discussion', label: `Discussion (${currentComments.length})` },
+                          { id: 'related', label: 'Related Questions' }
+                        ].map((tab) => {
+                          const isActive = activeLearningTab === tab.id;
+                          return (
                             <button
-                              onClick={() => toggleSolution(q.id)}
-                              className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 transition-colors cursor-pointer select-none"
+                              key={tab.id}
+                              onClick={() => setActiveLearningTab(tab.id as any)}
+                              className={`px-4 py-2 text-xs font-black uppercase tracking-wider transition-all duration-205 relative cursor-pointer whitespace-nowrap ${
+                                isActive
+                                  ? 'text-blue-600 dark:text-blue-400 font-extrabold'
+                                  : 'text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300'
+                              }`}
                             >
-                              <span>{showSolution ? 'Hide' : 'Show'} Step-by-Step Explanation</span>
-                              {showSolution ? <ChevronDown className="w-4 h-4 shrink-0" /> : <ChevronRight className="w-4 h-4 shrink-0" />}
+                              {tab.label}
+                              {isActive && (
+                                <motion.div
+                                  layoutId="activeLearningTabGlowPractice"
+                                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"
+                                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                                />
+                              )}
                             </button>
+                          );
+                        })}
+                      </div>
 
-                            {q.videoUrl && (
-                              <a
-                                href={q.videoUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-[10px] font-black uppercase text-slate-450 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-450 flex items-center gap-1 transition-colors select-none"
+                      {/* Tab Content Panels */}
+                      <div className="pt-2">
+                        {activeLearningTab === 'explanation' && (
+                          <div className="bg-slate-50/50 border border-slate-200 dark:bg-slate-900/40 dark:border-slate-900 p-5 rounded-2xl text-left space-y-3 font-medium text-xs leading-relaxed transition-all duration-300 animate-fadeIn">
+                            <span className="text-[9px] font-black text-slate-500 dark:text-slate-500 uppercase tracking-widest block border-b border-slate-100 dark:border-slate-800 pb-1.5 mb-2 select-none">LaTeX Mathematical Solver Output</span>
+                            <div className="text-slate-700 dark:text-slate-300 space-y-2.5">
+                              {activeQuestion.hintText ? (
+                                <p className="font-semibold whitespace-pre-line font-mono text-[11px] leading-relaxed">
+                                  {activeQuestion.hintText.replace(/\\frac/g, '').replace(/\\text/g, '').replace(/[\{\}]/g, ' ')}
+                                </p>
+                              ) : (
+                                <p className="italic text-slate-400">Step-by-step formula derivation is currently loading...</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {activeLearningTab === 'notes' && (
+                          <div className="space-y-3.5 text-left animate-fadeIn">
+                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block select-none">Interactive Transcript Notes</span>
+                            <div className="grid grid-cols-1 gap-2.5">
+                              {(activeQuestion.domainId === 'quant' ? [
+                                { time: '0:00', sec: 0, text: 'Read the question stem and extract key variable constants' },
+                                { time: '1:30', sec: 90, text: 'Model the Cost Price as 100x variable multiplier' },
+                                { time: '3:15', sec: 195, text: 'Setup Profit equation relationships & margin margins' },
+                                { time: '5:45', sec: 345, text: 'Solve the linear variables for variable value x' },
+                                { time: '7:40', sec: 460, text: 'Alternative quick short-cut review for campus test timing' }
+                              ] : activeQuestion.domainId === 'logical' ? [
+                                { time: '0:00', sec: 0, text: 'Deconstruct arrangement parameters and absolute rules' },
+                                { time: '2:15', sec: 135, text: 'Establish circular reference points coordinates' },
+                                { time: '4:40', sec: 280, text: 'Map remaining candidates using relative directions checks' },
+                                { time: '6:50', sec: 410, text: 'Re-evaluating options correctness against initial logic board' }
+                              ] : [
+                                { time: '0:00', sec: 0, text: 'Identify the structural core of grammatical corrections' },
+                                { time: '1:20', sec: 80, text: 'Applying subject-verb modifiers rules' },
+                                { time: '3:45', sec: 225, text: 'Eliminating syntactical filler clauses' },
+                                { time: '5:30', sec: 330, text: 'Final semantic check of context definitions mapping' }
+                              ]).map((note, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => {
+                                    if (videoRef.current) {
+                                      videoRef.current.currentTime = note.sec;
+                                      setVideoPlayTime(note.sec);
+                                      setIsVideoPlaying(true);
+                                      videoRef.current.play();
+                                    }
+                                  }}
+                                  className="w-full p-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/30 dark:hover:bg-slate-900/60 border border-slate-100 dark:border-slate-900/60 rounded-xl flex items-start gap-4 transition-all duration-200 text-left cursor-pointer group"
+                                >
+                                  <span className="bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-400 font-mono text-[10px] font-black px-2 py-0.5 rounded group-hover:scale-105 transition-transform shrink-0">
+                                    {note.time}
+                                  </span>
+                                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {note.text}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {activeLearningTab === 'tips' && (
+                          <div className="space-y-4 text-left animate-fadeIn">
+                            <div className="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/15 dark:bg-amber-950/10 dark:border-amber-900/40 relative overflow-hidden">
+                              <h4 className="text-xs font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider flex items-center gap-1.5">
+                                <Lightbulb className="w-4 h-4 animate-bounce" /> Mentor Cheat Sheet
+                              </h4>
+                              <div className="mt-3.5 space-y-3">
+                                {activeQuestion.domainId === 'quant' ? (
+                                  <>
+                                    <div className="flex items-start gap-3 border-b border-amber-500/10 pb-2.5">
+                                      <span className="font-mono text-[10px] font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded shrink-0">FORMULA</span>
+                                      <p className="text-xs font-bold text-slate-800 dark:text-slate-400 font-mono">
+                                        CP = Selling Price × 100 / (100 + Profit%)
+                                      </p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                      <span className="font-mono text-[10px] font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded shrink-0">SHORTCUT</span>
+                                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-400 leading-normal">
+                                        Assume Base CP = 100x. When markup is 20%, MP = 120x. If discount is 10%, SP = 108x. Hence Profit = 8%. Saves equations modeling time.
+                                      </p>
+                                    </div>
+                                  </>
+                                ) : activeQuestion.domainId === 'logical' ? (
+                                  <>
+                                    <div className="flex items-start gap-3 border-b border-amber-500/10 pb-2.5">
+                                      <span className="font-mono text-[10px] font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded shrink-0">STRATEGY</span>
+                                      <p className="text-xs font-bold text-slate-800 dark:text-slate-300">
+                                        Identify absolute placements (e.g. "A is sitting third to the right of B") first before checking branching conditions.
+                                      </p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                      <span className="font-mono text-[10px] font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded shrink-0">TIP</span>
+                                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-400 leading-normal">
+                                        For circular arrangements with even candidates, opposite positions align symmetrically. Mark diagonals early.
+                                      </p>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="flex items-start gap-3 border-b border-amber-500/10 pb-2.5">
+                                      <span className="font-mono text-[10px] font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded shrink-0">RULE</span>
+                                      <p className="text-xs font-bold text-slate-800 dark:text-slate-300">
+                                        Subject-Verb separation: Ignore prepositional modifier blocks between subject and verb (e.g., "The box [of pencils] is red").
+                                      </p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                      <span className="font-mono text-[10px] font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded shrink-0">TRAP</span>
+                                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-400 leading-normal">
+                                        Double negatives: "Hardly" and "Scarcely" already contain negative implications; pairing with "not" is syntactically invalid.
+                                      </p>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeLearningTab === 'discussion' && (
+                          <div className="space-y-5 text-left animate-fadeIn">
+                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block select-none">Community Board</span>
+                            
+                            {/* Comments List */}
+                            <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
+                              {currentComments.map((comment) => (
+                                <div key={comment.id} className="flex items-start gap-3.5 bg-slate-50/50 dark:bg-slate-900/20 p-3 rounded-xl border border-slate-100 dark:border-slate-900/50">
+                                  <img src={comment.avatar} alt={comment.user} className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-800" />
+                                  <div className="leading-tight">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs font-black text-slate-800 dark:text-white uppercase">{comment.user}</span>
+                                      <span className="text-[9px] font-bold text-slate-400 font-mono">{comment.time}</span>
+                                    </div>
+                                    <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-1.5 leading-relaxed">{comment.comment}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* New comment input */}
+                            <div className="flex gap-3 pt-2">
+                              <input
+                                type="text"
+                                placeholder="Ask a clarification or post advice..."
+                                value={newCommentText}
+                                onChange={(e) => setNewCommentText(e.target.value)}
+                                className="flex-1 px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 placeholder-slate-400"
+                              />
+                              <button
+                                onClick={() => {
+                                  if (newCommentText.trim() === '') return;
+                                  const newC = {
+                                    id: `c_${Date.now()}`,
+                                    user: profile.username || 'You',
+                                    avatar: profile.avatar && profile.avatar !== 'initial' ? profile.avatar : 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack',
+                                    comment: newCommentText,
+                                    time: 'Just now'
+                                  };
+                                  setActiveQuestionComments(prev => {
+                                    const currentQList = prev[activeQuestion.id] || [];
+                                    return {
+                                      ...prev,
+                                      [activeQuestion.id]: [newC, ...currentQList]
+                                    };
+                                  });
+                                  setNewCommentText('');
+                                }}
+                                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
                               >
-                                <Play className="w-3 h-3 text-slate-400 shrink-0" />
-                                <span>Watch video solution</span>
-                                <ExternalLink className="w-2.5 h-2.5 shrink-0" />
-                              </a>
+                                <span>Send</span>
+                                <Send className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {activeLearningTab === 'related' && (
+                          <div className="space-y-4 text-left animate-fadeIn">
+                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block select-none">Linked Learning Sets</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                              {questions.filter(q => q.domainId === activeQuestion.domainId && q.id !== activeQuestion.id).slice(0, 4).map((q) => (
+                                <button
+                                  key={q.id}
+                                  onClick={() => {
+                                    setActiveQuestion(q);
+                                    setIsVideoPlaying(false);
+                                    setVideoProgress(0);
+                                    setVideoPlayTime(0);
+                                  }}
+                                  className="p-4 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/30 dark:hover:bg-slate-900/60 border border-slate-100 dark:border-slate-900/80 rounded-2xl flex flex-col justify-between text-left transition-all duration-205 group cursor-pointer"
+                                >
+                                  <div className="flex justify-between items-center w-full">
+                                    <span className="font-mono text-[9px] text-slate-400 font-bold">#{q.id}</span>
+                                    <span className="text-[8px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md text-slate-500">
+                                      {q.difficulty}
+                                    </span>
+                                  </div>
+                                  <h5 className="text-[11px] font-black text-slate-800 dark:text-slate-200 mt-2 line-clamp-1 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+                                    {q.questionStem.split('###')[0].trim()}
+                                  </h5>
+                                  <span className="text-[9px] text-blue-500 dark:text-blue-400 font-extrabold mt-2 block group-hover:translate-x-0.5 transition-transform">
+                                    Start Walk-through →
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Column - Insights Panel (4 cols) */}
+                <div className="lg:col-span-4 space-y-8">
+                  
+                  {/* 1. Live Practice Stopwatch & Stats */}
+                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-900/60 mb-4 select-none">
+                      <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Practice Analytics</h3>
+                      <span className="text-[9px] font-black uppercase text-blue-500 tracking-wider">Real-time stats</span>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Live stopwatch block */}
+                      <div className="p-4 rounded-2xl bg-emerald-500/5 dark:bg-emerald-950/10 border border-emerald-500/10 dark:border-emerald-900/30 flex items-center justify-between">
+                        <div className="text-left">
+                          <span className="text-[8.5px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block font-mono">Live Study Time</span>
+                          <span className="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400 mt-1 block">
+                            {Math.floor(practiceTimeSpent / 60)}m {practiceTimeSpent % 60}s
+                          </span>
+                        </div>
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                      </div>
+
+                      {/* Accuracy & Avg speed stats */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-slate-50/50 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-100 dark:border-slate-900/60">
+                          <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Solve Accuracy</span>
+                          <span className="text-sm font-mono font-black text-slate-800 dark:text-white block mt-1">84.5%</span>
+                        </div>
+                        <div className="bg-slate-50/50 dark:bg-slate-950/20 p-3 rounded-xl border border-slate-100 dark:border-slate-900/60">
+                          <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Avg Solve Speed</span>
+                          <span className="text-sm font-mono font-black text-slate-800 dark:text-white block mt-1">42 Secs</span>
+                        </div>
+                      </div>
+
+                      {/* Progress slider bar: daily goals */}
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                          <span>Daily Practice Goal</span>
+                          <span>8 / 10 Complete</span>
+                        </div>
+                        <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                          <div className="bg-blue-500 h-full rounded-full" style={{ width: '80%' }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Concept Mastery Card */}
+                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading pb-3 border-b border-slate-200 dark:border-slate-900/60 mb-4">Concept Mastery</h3>
+                    <div className="space-y-3.5">
+                      {[
+                        { name: 'Percentages & Margins', val: 94, color: 'bg-emerald-500' },
+                        { name: 'Ratios & Proportions', val: 82, color: 'bg-blue-500' },
+                        { name: 'Profit & Loss Systems', val: 78, color: 'bg-indigo-500' },
+                        { name: 'Syllogisms & Logic Venns', val: 65, color: 'bg-amber-500' },
+                        { name: 'CS Coding Arrays & Stack', val: 45, color: 'bg-pink-500' }
+                      ].map((item, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-bold text-slate-500">
+                            <span className="truncate max-w-[75%]">{item.name}</span>
+                            <span className="font-mono">{item.val}%</span>
+                          </div>
+                          <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div className={`${item.color} h-full rounded-full`} style={{ width: `${item.val}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 3. Placement Leaderboard */}
+                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading pb-3 border-b border-slate-100 dark:border-slate-900/60 mb-4">Placement Leaderboard</h3>
+                    <div className="space-y-3">
+                      {[
+                        { rank: 1, name: 'Aniketh Rao', score: '1,450 XP', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack' },
+                        { rank: 2, name: 'Megha Shetty', score: '1,320 XP', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Zoe' },
+                        { rank: 3, name: 'Sriram Reddy', score: '1,280 XP', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Leo' },
+                        { rank: 14, name: 'Vaishnavi Raparthy (You)', score: '950 XP', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Charlie', isSelf: true }
+                      ].map((student, idx) => (
+                        <div key={idx} className={`flex items-center justify-between p-2 rounded-xl ${student.isSelf ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-transparent'}`}>
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className={`font-mono text-xs font-black w-4 text-center ${student.rank === 1 ? 'text-amber-500' : student.rank === 2 ? 'text-slate-400' : student.rank === 3 ? 'text-amber-700' : 'text-slate-500'}`}>
+                              #{student.rank}
+                            </span>
+                            <img src={student.avatar} alt={student.name} className="w-6.5 h-6.5 rounded-full border border-slate-200 dark:border-slate-800" />
+                            <span className={`text-[11px] truncate font-bold ${student.isSelf ? 'text-blue-600 dark:text-blue-400 font-black' : 'text-slate-700 dark:text-slate-300'}`}>
+                              {student.name}
+                            </span>
+                          </div>
+                          <span className="font-mono text-[10px] font-black text-slate-500 shrink-0">{student.score}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. Mentor insights box */}
+                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left relative overflow-hidden">
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading pb-3 border-b border-slate-100 dark:border-slate-900/60 mb-4">Mentor Insights</h3>
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap gap-2 select-none">
+                        <span className="text-[8px] font-black bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900 px-2 py-0.5 rounded font-mono uppercase">TCS NQT Target</span>
+                        <span className="text-[8px] font-black bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900 px-2 py-0.5 rounded font-mono uppercase">Amazon Target</span>
+                        <span className="text-[8px] font-black bg-purple-100 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-900 px-2 py-0.5 rounded font-mono uppercase">Goldman Sachs</span>
+                      </div>
+                      <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 leading-normal">
+                        Percentages and Profit/Loss margins represent 35% of all quantitative questions in the TCS NQT qualifier round, and constitute 4 interview puzzles in the Amazon technical screening round.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 5. Compact vertical roadmap */}
+                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading pb-3 border-b border-slate-100 dark:border-slate-900/60 mb-4">Arena Learning Path</h3>
+                    <div className="relative pl-6 border-l border-slate-200 dark:border-slate-800 space-y-5 py-2">
+                      {[
+                        { title: 'Level 1: Percentages', status: 'completed' },
+                        { title: 'Level 2: Ratios & Proportions', status: 'completed' },
+                        { title: 'Level 3: Profit & Loss', status: 'active' },
+                        { title: 'Level 4: Time & Work', status: 'locked' },
+                        { title: 'Level 5: Syllogisms', status: 'locked' }
+                      ].map((step, idx) => (
+                        <div key={idx} className="relative">
+                          {/* Left node dot */}
+                          <div className={`absolute -left-9 top-0.5 w-6 h-6 rounded-full flex items-center justify-center border-2 shadow-xs ${
+                            step.status === 'completed'
+                              ? 'bg-emerald-500 border-emerald-600 text-white'
+                              : step.status === 'active'
+                                ? 'bg-blue-600 border-blue-700 text-white animate-pulse'
+                                : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400'
+                          }`}>
+                            {step.status === 'completed' ? (
+                              <Check className="w-3.5 h-3.5 stroke-[3.5]" />
+                            ) : (
+                              <span className="text-[9px] font-bold font-mono">{idx + 1}</span>
                             )}
                           </div>
-                        )}
-
-                        {/* Solved Explanation drawer */}
-                        {isSubmitted && showSolution && q.hintText && (
-                          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4.5 text-xs text-slate-650 dark:bg-slate-900/40 dark:border-slate-900 dark:text-slate-400 leading-normal whitespace-pre-wrap font-medium animate-fadeIn transition-colors duration-300">
-                            <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block border-b border-slate-200 dark:border-slate-900 pb-1.5 mb-2 select-none">LaTeX Mathematical Solver Output</span>
-                            {q.hintText.replace(/\\frac/g, '').replace(/\\text/g, '').replace(/[\{\}]/g, ' ')}
+                          
+                          <div className="leading-tight text-left pl-1">
+                            <h4 className={`text-xs font-black uppercase tracking-tight ${step.status === 'active' ? 'text-blue-600 dark:text-blue-400 font-bold' : step.status === 'completed' ? 'text-slate-800 dark:text-white font-bold' : 'text-slate-400'}`}>
+                              {step.title}
+                            </h4>
+                            <span className="text-[9.5px] text-slate-400 dark:text-slate-500 font-semibold block mt-0.5">
+                              {step.status === 'completed' ? 'Set Completed • 150 XP' : step.status === 'active' ? 'Solve sets to certify' : 'Locked Unit'}
+                            </span>
                           </div>
-                        )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-                      </div>
-                    );
-                  })}
                 </div>
-              )}
 
+              </div>
             </div>
           )}
 
@@ -3700,7 +4777,7 @@ export default function StudentDashboard() {
                         <button
                           disabled={test.status === 'Completed'}
                           className={`py-2 px-5 font-bold text-xs rounded-xl shadow-xs cursor-pointer select-none transition-all ${test.status === 'Completed'
-                              ? 'bg-slate-100 text-slate-450 border border-slate-200 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-950 cursor-not-allowed shadow-none'
+                              ? 'bg-slate-100 text-slate-400 border border-slate-200 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-950 cursor-not-allowed shadow-none'
                               : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/10'
                             }`}
                         >
@@ -3748,17 +4825,17 @@ export default function StudentDashboard() {
               {/* Feed Grid */}
               {oppsLoading || announcementsLoading ? (
                 <div className="py-14 flex flex-col items-center justify-center text-center">
-                  <div className="w-8 h-8 rounded-full border border-blue-650 border-t-transparent animate-spin mb-3" />
+                  <div className="w-8 h-8 rounded-full border border-blue-600 border-t-transparent animate-spin mb-3" />
                   <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Compiling opportunities files...</span>
                 </div>
               ) : selectedOpportunityType === 'Placement Updates' ? (
                 // Display Placement Updates Announcements
                 <div className="space-y-4">
                   {announcements.map((a) => (
-                    <div key={a.id} className="bg-white border border-slate-200 dark:bg-slate-900/15 dark:border-slate-900 p-5 rounded-2xl space-y-2.5 hover:border-slate-350 transition-colors">
+                    <div key={a.id} className="bg-white border border-slate-200 dark:bg-slate-900/15 dark:border-slate-900 p-5 rounded-2xl space-y-2.5 hover:border-slate-300 transition-colors">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-2">
-                          <span className="text-[9px] font-black text-indigo-650 bg-indigo-50 border border-indigo-200 dark:text-indigo-400 dark:bg-indigo-950/20 dark:border-indigo-900/30 px-2 py-0.5 rounded-lg uppercase">
+                          <span className="text-[9px] font-black text-indigo-600 bg-indigo-50 border border-indigo-200 dark:text-indigo-400 dark:bg-indigo-950/20 dark:border-indigo-900/30 px-2 py-0.5 rounded-lg uppercase">
                             {a.type}
                           </span>
                           {a.priority === 'High' && (
@@ -3770,7 +4847,7 @@ export default function StudentDashboard() {
                         <span className="text-[9.5px] text-slate-500 font-semibold">{a.publisher} · {a.date || 'June 4'}</span>
                       </div>
                       <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase leading-snug">{a.title}</h4>
-                      <p className="text-xs text-slate-650 dark:text-slate-400 leading-relaxed font-medium">{a.content}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">{a.content}</p>
                     </div>
                   ))}
                 </div>
@@ -3778,7 +4855,7 @@ export default function StudentDashboard() {
                 <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl py-14 flex flex-col items-center justify-center text-center p-6">
                   <Info className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-2.5" />
                   <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">No Active Opportunities in this Category</span>
-                  <p className="text-[10px] text-slate-450 mt-1 leading-normal">Check back later for active portal drives.</p>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-normal">Check back later for active portal drives.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -3786,7 +4863,7 @@ export default function StudentDashboard() {
                     const isExpanded = expandedOpportunityId === o.id;
                     const statusColor =
                       o.status === 'Open' ? 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/25' :
-                        o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-55/65 border-amber-200 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
+                        o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-50/65 border-amber-200 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
                           o.status === 'New' ? 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-900/25' :
                             'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/20 dark:border-rose-900/25';
 
@@ -3799,7 +4876,7 @@ export default function StudentDashboard() {
                     return (
                       <div
                         key={o.id}
-                        className="bg-white border border-slate-200 hover:border-slate-350 dark:bg-slate-900/10 dark:border-slate-900 dark:hover:border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all duration-200"
+                        className="bg-white border border-slate-200 hover:border-slate-300 dark:bg-slate-900/10 dark:border-slate-900 dark:hover:border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all duration-200"
                       >
                         <div className="space-y-3.5">
                           <div className="flex items-center justify-between gap-1 flex-wrap">
@@ -3826,12 +4903,12 @@ export default function StudentDashboard() {
                             {o.days_remaining > 0 ? (
                               <span className="text-amber-600 dark:text-amber-400 font-bold font-mono">{o.days_remaining} Days Left</span>
                             ) : (
-                              <span className="text-slate-450 dark:text-slate-550 font-bold uppercase font-mono">Closed</span>
+                              <span className="text-slate-400 dark:text-slate-500 font-bold uppercase font-mono">Closed</span>
                             )}
                           </div>
 
                           {isExpanded && o.details && (
-                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed border border-slate-200 dark:border-slate-850 animate-fadeIn font-medium">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed border border-slate-200 dark:border-slate-800 animate-fadeIn font-medium">
                               {o.details}
                             </div>
                           )}
@@ -3839,7 +4916,7 @@ export default function StudentDashboard() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => setExpandedOpportunityId(isExpanded ? null : o.id)}
-                              className="flex-1 py-2 px-3 bg-white hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded-lg border border-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 dark:text-slate-300 dark:border-slate-850 transition-colors cursor-pointer text-center"
+                              className="flex-1 py-2 px-3 bg-white hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded-lg border border-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-800 transition-colors cursor-pointer text-center"
                             >
                               {isExpanded ? 'Hide' : 'Details'}
                             </button>
@@ -3906,12 +4983,12 @@ export default function StudentDashboard() {
                     key={idx}
                     className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${item.self
                         ? 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-900/10 dark:border-blue-950 dark:text-blue-400 shadow-sm'
-                        : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 dark:bg-slate-950/20 dark:border-slate-900/60 dark:hover:bg-slate-900/40 dark:text-slate-350'
+                        : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 dark:bg-slate-950/20 dark:border-slate-900/60 dark:hover:bg-slate-900/40 dark:text-slate-300'
                       }`}
                   >
                     <div className="flex items-center gap-4">
                       <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-xs ${item.rank === 1 ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' :
-                          item.rank === 2 ? 'bg-slate-200 text-slate-700 dark:bg-slate-400/20 dark:text-slate-450' :
+                          item.rank === 2 ? 'bg-slate-200 text-slate-700 dark:bg-slate-400/20 dark:text-slate-400' :
                             item.rank === 3 ? 'bg-amber-50 text-amber-900 dark:bg-amber-700/20 dark:text-amber-700' :
                               'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'
                         }`}>
@@ -3943,7 +5020,7 @@ export default function StudentDashboard() {
               </div>
 
               {saveSuccess && (
-                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-450 rounded-2xl p-4 flex items-center gap-3 animate-fadeIn">
+                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 text-emerald-800 dark:text-emerald-400 rounded-2xl p-4 flex items-center gap-3 animate-fadeIn">
                   <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
                   <span className="text-xs font-bold">Profile onboarding configurations saved successfully!</span>
                 </div>
@@ -4060,7 +5137,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* Choose Profile Photo */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-850 space-y-3">
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                   <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">
                     Choose Profile Photo / Avatar
                   </label>
@@ -4069,7 +5146,7 @@ export default function StudentDashboard() {
                     <button
                       type="button"
                       onClick={() => setProfile({ ...profile, avatar: 'initial' })}
-                      className={`relative w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-650 text-white flex items-center justify-center font-black text-sm uppercase shadow-sm transition-all duration-200 hover:scale-105 cursor-pointer border-2 ${(!profile.avatar || profile.avatar === 'initial')
+                      className={`relative w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-sm uppercase shadow-sm transition-all duration-200 hover:scale-105 cursor-pointer border-2 ${(!profile.avatar || profile.avatar === 'initial')
                           ? 'border-blue-600 ring-2 ring-blue-400 dark:ring-blue-700/50 scale-105'
                           : 'border-transparent opacity-60 hover:opacity-100'
                         }`}
@@ -4183,7 +5260,7 @@ export default function StudentDashboard() {
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800/80 pb-5">
                   <div className="text-left">
                     <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight uppercase">Getting Started Badges</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-450 mt-0.5 font-semibold">Standalone starter achievements for onboarding and consistency.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-semibold">Standalone starter achievements for onboarding and consistency.</p>
                   </div>
                 </div>
 
@@ -4244,7 +5321,7 @@ export default function StudentDashboard() {
                     <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-950/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-900" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5 text-left">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Dynamic 3D Hover Tilt</span>
-                        <p className="text-[10px] text-slate-450 leading-relaxed max-w-[220px]">Enable smooth interactive mouse-coordinate perspective card rotation.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed max-w-[220px]">Enable smooth interactive mouse-coordinate perspective card rotation.</p>
                       </div>
                       <button
                         onClick={() => {
@@ -4254,7 +5331,7 @@ export default function StudentDashboard() {
                         }}
                         className={`py-1.5 px-4 rounded-xl text-xs font-extrabold uppercase transition-all duration-300 cursor-pointer ${tiltEnabled
                             ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md'
-                            : 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-400'
+                            : 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-400'
                           }`}
                       >
                         {tiltEnabled ? 'Enabled' : 'Disabled'}
@@ -4265,7 +5342,7 @@ export default function StudentDashboard() {
                     <div className="space-y-2.5 text-left" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Confetti Celebration Blast</span>
-                        <p className="text-[10px] text-slate-450 leading-relaxed">Choose canvas animation style to launch upon achieving a badge milestone.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">Choose canvas animation style to launch upon achieving a badge milestone.</p>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2">
@@ -4304,7 +5381,7 @@ export default function StudentDashboard() {
                     <div className="space-y-2.5 text-left" style={{ transform: 'translateZ(10px)' }}>
                       <div className="space-y-0.5">
                         <span className="text-xs font-bold text-slate-900 dark:text-white">Daily XP Milestone Goal</span>
-                        <p className="text-[10px] text-slate-450 leading-relaxed">Determine your daily target value. Updates dashboard trackers dynamically.</p>
+                        <p className="text-[10px] text-slate-400 leading-relaxed">Determine your daily target value. Updates dashboard trackers dynamically.</p>
                       </div>
 
                       <div className="grid grid-cols-4 gap-2">
@@ -4341,7 +5418,7 @@ export default function StudentDashboard() {
 
                       <button
                         onClick={toggleTheme}
-                        className="py-2 px-4 bg-slate-200 hover:bg-slate-300 dark:bg-slate-900 dark:hover:bg-slate-850 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer"
+                        className="py-2 px-4 bg-slate-200 hover:bg-slate-300 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer"
                       >
                         {theme === 'light' ? (
                           <>
@@ -4473,16 +5550,16 @@ export default function StudentDashboard() {
                             <span className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${getAccentClass(accentColor, 'bg')}`} />
                             <span className="text-[9px] font-black uppercase text-slate-300 font-mono tracking-wider">Dashboard</span>
                           </div>
-                          <span className="text-[8px] font-bold text-slate-550">v2.4</span>
+                          <span className="text-[8px] font-bold text-slate-500">v2.4</span>
                         </div>
 
                         <div className="space-y-2.5">
-                          <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-850/80">
+                          <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
                             <div className="text-[8px] text-slate-500 uppercase tracking-widest font-extrabold">Student XP Goal</div>
                             <div className="text-xs font-black text-white mt-0.5 font-mono">{dailyXpGoal} XP</div>
                           </div>
 
-                          <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-850">
+                          <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-800">
                             <div className="text-[7.5px] text-slate-400 font-semibold uppercase">Tilt Response</div>
                             <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-md ${tiltEnabled ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-500'
                               }`}>
@@ -4490,7 +5567,7 @@ export default function StudentDashboard() {
                             </span>
                           </div>
 
-                          <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-850">
+                          <div className="bg-slate-950 p-2 rounded-xl flex items-center justify-between border border-slate-800">
                             <div className="text-[7.5px] text-slate-400 font-semibold uppercase">Confetti Style</div>
                             <span className="text-[7px] font-black uppercase text-blue-400">
                               {confettiStyle}
@@ -4557,40 +5634,7 @@ export default function StudentDashboard() {
             </div>
           )}
 
-          {/* Footer */}
-          <footer className="mt-12 border-t border-slate-200 dark:border-slate-900/60 pt-6 flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider select-none shrink-0">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              {currentRole?.role === 'admin' ? (
-                <input
-                  type="text"
-                  value={footerBadgeText}
-                  onChange={(e) => {
-                    setFooterBadgeText(e.target.value);
-                    localStorage.setItem('aptitude_footer_badge_text', e.target.value);
-                  }}
-                  className="bg-transparent border-b border-dashed border-slate-405 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-705 dark:text-slate-300 w-64"
-                  title="Edit Footer Badge Text"
-                />
-              ) : (
-                <span>{footerBadgeText}</span>
-              )}
-            </div>
-            {currentRole?.role === 'admin' ? (
-              <input
-                type="text"
-                value={footerCopyright}
-                onChange={(e) => {
-                  setFooterCopyright(e.target.value);
-                  localStorage.setItem('aptitude_footer_copyright', e.target.value);
-                }}
-                className="bg-transparent border-b border-dashed border-slate-405 dark:border-slate-700 focus:border-blue-500 focus:outline-none px-1 text-[10px] font-bold uppercase tracking-wider text-slate-705 dark:text-slate-300 text-right w-80"
-                title="Edit Footer Copyright"
-              />
-            ) : (
-              <span>{footerCopyright}</span>
-            )}
-          </footer>
+
 
           {/* Real-time Badge Unlock Celebration Popup Modal */}
           {justUnlockedBadge && (
@@ -4640,7 +5684,7 @@ export default function StudentDashboard() {
 
                   <button
                     onClick={() => setJustUnlockedBadge(null)}
-                    className="text-[10px] font-extrabold uppercase text-slate-400 hover:text-slate-600 dark:hover:text-slate-350 transition-colors py-2 block cursor-pointer"
+                    className="text-[10px] font-extrabold uppercase text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-2 block cursor-pointer"
                   >
                     Dismiss
                   </button>
@@ -4657,11 +5701,11 @@ export default function StudentDashboard() {
 
             const getLevelInfo = (lvl: number) => {
               switch (lvl) {
-                case 1: return { name: 'Bronze Standard', color: 'text-emerald-450 border-emerald-500/20 bg-emerald-500/5' };
-                case 2: return { name: 'Silver Standard', color: 'text-blue-450 border-blue-500/20 bg-blue-500/5' };
+                case 1: return { name: 'Bronze Standard', color: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5' };
+                case 2: return { name: 'Silver Standard', color: 'text-blue-400 border-blue-500/20 bg-blue-500/5' };
                 case 3: return { name: 'Gold Standard', color: 'text-purple-400 border-purple-500/20 bg-purple-500/5' };
-                case 4: return { name: 'Platinum Elite', color: 'text-amber-450 border-amber-500/20 bg-amber-500/5' };
-                case 5: return { name: 'Titanium Master', color: 'text-indigo-450 border-indigo-500/20 bg-indigo-500/5' };
+                case 4: return { name: 'Platinum Elite', color: 'text-amber-400 border-amber-500/20 bg-amber-500/5' };
+                case 5: return { name: 'Titanium Master', color: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/5' };
                 default: return { name: 'Standard Badge', color: 'text-slate-400 border-slate-700 bg-slate-800/50' };
               }
             };
@@ -4677,7 +5721,7 @@ export default function StudentDashboard() {
                 <div className="absolute top-[12%] left-[8%] text-amber-500 animate-bounce text-xl pointer-events-none select-none opacity-40">✨</div>
                 <div className="absolute top-[20%] right-[12%] text-blue-400 animate-pulse text-2xl pointer-events-none select-none opacity-30">⭐</div>
                 <div className="absolute bottom-[15%] left-[10%] text-purple-400 animate-pulse text-xl pointer-events-none select-none opacity-40">🔥</div>
-                <div className="absolute bottom-[25%] right-[8%] text-emerald-450 animate-bounce text-xl pointer-events-none select-none opacity-30">💡</div>
+                <div className="absolute bottom-[25%] right-[8%] text-emerald-400 animate-bounce text-xl pointer-events-none select-none opacity-30">💡</div>
                 <div className="absolute top-[60%] left-[5%] text-indigo-400 animate-pulse text-lg pointer-events-none select-none opacity-30">✨</div>
                 <div className="absolute top-[8%] right-[45%] text-pink-400 animate-bounce text-lg pointer-events-none select-none opacity-20">⭐</div>
 
@@ -4720,7 +5764,7 @@ export default function StudentDashboard() {
 
                       {/* How to Earn */}
                       <div className="space-y-3 pt-6 border-t border-slate-800/80">
-                        <h4 className="text-[11px] font-black text-slate-350 uppercase tracking-widest flex items-center gap-2">
+                        <h4 className="text-[11px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-2">
                           <Award className="w-4 h-4 text-amber-500" />
                           How it is earned
                         </h4>
@@ -4752,7 +5796,7 @@ export default function StudentDashboard() {
                     <div className="max-w-xl md:mx-auto w-full mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row gap-4">
                       <button
                         onClick={() => setSelectedBadge(null)}
-                        className="flex-1 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all active:scale-95 cursor-pointer"
+                        className="flex-1 bg-slate-800 hover:bg-slate-800 border border-slate-700 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all active:scale-95 cursor-pointer"
                       >
                         Close Details
                       </button>
@@ -4795,7 +5839,7 @@ export default function StudentDashboard() {
                         />
                       ) : (
                         <div className={`w-36 h-36 rounded-full flex items-center justify-center text-6xl border shadow-inner relative ${isSelectedUnlocked
-                            ? 'bg-slate-850 border-slate-750 text-white'
+                            ? 'bg-slate-800 border-slate-700 text-white'
                             : 'bg-slate-800/40 border-slate-800 text-slate-600'
                           }`}>
                           <span className="z-10">{getCategoryEmoji(selectedBadge.category)}</span>
@@ -4899,7 +5943,7 @@ export default function StudentDashboard() {
 
                     return (
                       <div className="space-y-4">
-                        <p className="text-sm font-semibold text-slate-850 dark:text-slate-200 leading-relaxed">
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
                           {challenge.question}
                         </p>
 
@@ -4919,7 +5963,7 @@ export default function StudentDashboard() {
                                 btnStyle = "bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-600 dark:text-blue-400";
                               }
                             } else if (isSubmitted && oIdx === challenge.correctIndex) {
-                              btnStyle = "bg-emerald-50/50 dark:bg-emerald-950/10 border-emerald-500/50 text-emerald-605 dark:text-emerald-400";
+                              btnStyle = "bg-emerald-50/50 dark:bg-emerald-950/10 border-emerald-500/50 text-emerald-600 dark:text-emerald-400";
                             }
 
                             return (

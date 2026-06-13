@@ -79,7 +79,7 @@ export default function FilterDropdowns({
               setSelectedSubTopic('All');
               setSelectedConcept('All');
             }}
-            className="w-full text-xs font-bold text-slate-700 dark:text-slate-350 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-900"
+            className="w-full text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-900"
           >
             <option value="All" className="dark:bg-slate-950">All Domains</option>
             {DOMAINS_DATA.map((d) => (
@@ -98,7 +98,7 @@ export default function FilterDropdowns({
               setSelectedConcept('All');
             }}
             disabled={selectedDomain === 'All'}
-            className="w-full text-xs font-bold text-slate-700 dark:text-slate-350 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:enabled:bg-slate-100/50 dark:hover:enabled:bg-slate-900"
+            className="w-full text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:enabled:bg-slate-100/50 dark:hover:enabled:bg-slate-900"
           >
             <option value="All" className="dark:bg-slate-950">All Sub-topics</option>
             {activeSubTopics.map((s) => (
@@ -114,7 +114,7 @@ export default function FilterDropdowns({
             value={selectedConcept}
             onChange={(e) => setSelectedConcept(e.target.value)}
             disabled={selectedSubTopic === 'All'}
-            className="w-full text-xs font-bold text-slate-700 dark:text-slate-350 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:enabled:bg-slate-100/50 dark:hover:enabled:bg-slate-900"
+            className="w-full text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:enabled:bg-slate-100/50 dark:hover:enabled:bg-slate-900"
           >
             <option value="All" className="dark:bg-slate-950">All Concepts</option>
             {activeConcepts.map((c) => (
@@ -129,7 +129,7 @@ export default function FilterDropdowns({
           <select
             value={selectedDifficulty}
             onChange={(e) => setSelectedDifficulty(e.target.value)}
-            className="w-full text-xs font-bold text-slate-700 dark:text-slate-350 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-900"
+            className="w-full text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-900"
           >
             <option value="All" className="dark:bg-slate-950">All Levels</option>
             <option value="EASY" className="dark:bg-slate-950">EASY</option>
@@ -144,7 +144,7 @@ export default function FilterDropdowns({
           <select
             value={selectedCompany}
             onChange={(e) => setSelectedCompany(e.target.value)}
-            className="w-full text-xs font-bold text-slate-700 dark:text-slate-350 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-900"
+            className="w-full text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-900"
           >
             <option value="All" className="dark:bg-slate-950">All Companies</option>
             {COMPANY_POOL.map((company) => (
@@ -159,7 +159,7 @@ export default function FilterDropdowns({
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full text-xs font-bold text-slate-700 dark:text-slate-350 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-900"
+            className="w-full text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-900"
           >
             <option value="All" className="dark:bg-slate-950">All Statuses</option>
             <option value="Published" className="dark:bg-slate-950">Published</option>
@@ -171,7 +171,7 @@ export default function FilterDropdowns({
         {/* Action Button: Reset Filters */}
         <button
           onClick={onResetFilters}
-          className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 h-[38px] cursor-pointer shrink-0"
+          className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 h-[38px] cursor-pointer shrink-0"
         >
           <FilterX className="w-3.5 h-3.5" />
           <span>Reset Filters</span>

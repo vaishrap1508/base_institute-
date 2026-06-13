@@ -80,9 +80,9 @@ export default function DashboardPage() {
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
                 <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-850 p-4 rounded-xl space-y-3.5 text-xs text-left">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
@@ -151,7 +151,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Active Student Sessions</span>
-                  <span className="text-2xl font-black text-amber-750 dark:text-amber-400 tracking-tight mt-1">1,482</span>
+                  <span className="text-2xl font-black text-amber-700 dark:text-amber-400 tracking-tight mt-1">1,482</span>
                 </div>
               </div>
 
@@ -161,7 +161,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">System Latency</span>
-                  <span className="text-2xl font-black text-purple-750 dark:text-purple-450 tracking-tight mt-1">14ms</span>
+                  <span className="text-2xl font-black text-purple-700 dark:text-purple-400 tracking-tight mt-1">14ms</span>
                 </div>
               </div>
             </div>
@@ -292,7 +292,7 @@ export default function DashboardPage() {
 
                 <a
                   href="/admin/directory"
-                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-105 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold transition-all mt-4 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold transition-all mt-4 cursor-pointer"
                 >
                   <span>Go to Question Directory</span>
                   <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
