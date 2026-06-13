@@ -131,7 +131,7 @@ export default function ResponseMatrix({
                   rows={2}
                   className={`w-full px-3 py-1.5 bg-white dark:bg-slate-900 border rounded-lg text-sm transition-all focus:outline-none resize-none overflow-y-auto break-words leading-relaxed ${
                     isCorrect
-                      ? 'border-blue-200 dark:border-blue-900/40 text-blue-900 dark:text-blue-100 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                      ? 'border-blue-200 dark:border-blue-900/40 text-blue-900 dark:text-blue-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
                       : 'border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
                   }`}
                 />

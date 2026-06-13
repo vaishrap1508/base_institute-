@@ -1018,7 +1018,7 @@ export default function AdminContentCreator() {
                 <Database className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-100">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-200">
                   Transaction Registry
                 </span>
                 <span className="text-lg font-black tracking-tight">Question Published Successfully</span>

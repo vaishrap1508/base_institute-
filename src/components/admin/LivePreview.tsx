@@ -344,7 +344,7 @@ export default function LivePreview({
                       !isOptionFilled
                         ? 'opacity-40 cursor-not-allowed bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800'
                         : isSelected
-                        ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 dark:border-blue-600 text-blue-900 dark:text-blue-100 shadow-sm shadow-blue-50 dark:shadow-none'
+                        ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 dark:border-blue-600 text-blue-900 dark:text-blue-300 shadow-sm shadow-blue-50 dark:shadow-none'
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50/30 dark:hover:bg-slate-800/30'
                     }`}
                   >
