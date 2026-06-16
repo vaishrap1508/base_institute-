@@ -12,6 +12,7 @@ import {
   Cpu, 
   ShieldCheck, 
   ArrowRight, 
+  ArrowLeft,
   Sparkles, 
   ChevronRight,
   User,
@@ -776,10 +777,6 @@ function LoginContent() {
 
         {/* Center Mission Statements */}
         <div className="space-y-6 z-10 my-auto">
-          <div className="inline-flex items-center gap-2 bg-blue-950/40 border border-blue-900/40 px-3 py-1 rounded-full text-[9px] font-black text-blue-400 tracking-wider uppercase">
-            <Sparkles className="w-3 h-3 text-blue-400" />
-            <span>Staging release v2.4</span>
-          </div>
           <h2 className="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight uppercase">
             Master your <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Aptitude</span> with editorial precision.
           </h2>
@@ -801,7 +798,6 @@ function LoginContent() {
           </div>
           <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
             <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-            <span>Secure</span>
           </div>
         </div>
 
@@ -813,22 +809,17 @@ function LoginContent() {
       <div className="lg:col-span-7 flex flex-col justify-center items-center p-6 sm:p-12 min-h-screen relative">
         
         {/* Back link to Home */}
+        {/* Back link to Home */}
         <Link 
           href="/" 
-          className="absolute top-6 left-6 sm:left-12 flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
+          className="absolute top-6 left-6 sm:left-12 flex items-center gap-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
-          <span>← Back to home</span>
+          <ArrowLeft className="w-5 h-5" />
         </Link>
 
-        {/* Theme Toggle and Staging clearance indicator for user */}
-        <div className="absolute top-6 right-6 sm:right-12 flex items-center gap-3">
+        {/* Theme Toggle in the topmost right corner */}
+        <div className="absolute top-4 right-4 flex items-center">
           <ThemeToggle />
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              Staging Sandbox Secure
-            </span>
-          </div>
         </div>
 
         {/* The Card Form container */}
@@ -897,7 +888,9 @@ function LoginContent() {
 
               {/* Email field */}
               <div className="space-y-1.5 animate-fadeIn">
-                <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Email Address</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Email Address</label>
+                </div>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                   <input 
@@ -1023,7 +1016,9 @@ function LoginContent() {
               {/* Dynamic Sign-up Fields */}
               {isRegister && (
                 <div className="space-y-1.5 animate-fadeIn">
-                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Full Name</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Full Name</label>
+                  </div>
                   <div className="relative">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                     <input 
@@ -1040,7 +1035,9 @@ function LoginContent() {
 
               {/* Email field */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Email Address</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Email Address</label>
+                </div>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                   <input 
@@ -1155,7 +1152,9 @@ function LoginContent() {
               {/* Confirm Password field (Only during Registration) */}
               {isRegister && (
                 <div className="space-y-1.5 animate-fadeIn">
-                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-600 uppercase tracking-wide">Confirm Password</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-600 uppercase tracking-wide">Confirm Password</label>
+                  </div>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                     <input 
@@ -1227,7 +1226,7 @@ function LoginContent() {
 
           {/* Mode Switcher */}
           {!isForgotPassword && (
-            <div className="text-center text-xs font-semibold text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <div className="text-center text-xs font-semibold text-slate-500 dark:text-slate-400 pt-2.5">
               {isRegister ? (
                 <span>
                   Already have an account?{' '}

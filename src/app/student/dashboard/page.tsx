@@ -14,6 +14,8 @@ import {
   ChevronRight,
   ChevronDown,
   Play,
+  Pause,
+  RotateCcw,
   Cpu,
   Award,
   Bookmark,
@@ -1222,18 +1224,11 @@ export default function StudentDashboard() {
   const [showConfettiBurst, setShowConfettiBurst] = useState<boolean>(false);
 
   const getNodeCoords = (index: number) => {
+    // 800px vertical S-curve for the perfect isometric Mario-Kart track look
+    const y = 100 + (index * 80);
     let x = 50;
-    let y = 80;
-    if (index < 3) {
-      x = index === 0 ? 10 : index === 1 ? 50 : 90;
-      y = 80;
-    } else if (index < 6) {
-      x = index === 3 ? 90 : index === 4 ? 50 : 10;
-      y = 260;
-    } else {
-      x = index === 6 ? 10 : index === 7 ? 50 : 90;
-      y = 440;
-    }
+    if (index % 4 === 1) x = 75;
+    if (index % 4 === 3) x = 25;
     return { x, y };
   };
 
@@ -1345,8 +1340,46 @@ export default function StudentDashboard() {
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<string[]>([]);
   const [justUnlockedBadge, setJustUnlockedBadge] = useState<any | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<any | null>(null);
-  const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(9); // Defaults to June 9, 2026 (Today)
+  const [currentYear, setCurrentYear] = useState<number>(2026);
+  const [currentMonth, setCurrentMonth] = useState<number>(5); // 0-indexed, 5 is June
+  const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(9);
+  const [todayDay, setTodayDay] = useState<number | null>(null);
   const [earnedBadgesHistory, setEarnedBadgesHistory] = useState<any[]>([]);
+
+  // Update calendar to actual current date on mount to handle hydration safely
+  useEffect(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const day = today.getDate();
+    setCurrentYear(year);
+    setCurrentMonth(month);
+    setTodayDay(day);
+    setSelectedCalendarDay(day);
+  }, []);
+
+  // Days in month calculation
+  const daysInMonth = useMemo(() => {
+    return new Date(currentYear, currentMonth + 1, 0).getDate();
+  }, [currentYear, currentMonth]);
+
+  // First day of week calculation (mapped to Mon-Sun)
+  const paddingDays = useMemo(() => {
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    // Sunday in JS is 0, we want it to be index 6. Monday is 1 -> 0, Tuesday is 2 -> 1, etc.
+    return firstDay === 0 ? 6 : firstDay - 1;
+  }, [currentYear, currentMonth]);
+
+  const monthYearName = useMemo(() => {
+    const d = new Date(currentYear, currentMonth, 1);
+    const month = d.toLocaleDateString('en-US', { month: 'long' });
+    return `${month} ${currentYear}`;
+  }, [currentYear, currentMonth]);
+
+  const selectedMonthName = useMemo(() => {
+    const d = new Date(currentYear, currentMonth, 1);
+    return d.toLocaleDateString('en-US', { month: 'long' });
+  }, [currentYear, currentMonth]);
 
   // Compute active study days dynamically from history
   const streakDaysFromHistory = useMemo(() => {
@@ -1354,20 +1387,19 @@ export default function StudentDashboard() {
     earnedBadgesHistory.forEach(item => {
       if (!item.earned_at) return;
       const d = new Date(item.earned_at);
-      // June 2026 (year 2026, month 5)
-      if (d.getFullYear() === 2026 && d.getMonth() === 5) {
+      if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
         days.add(d.getDate());
       }
     });
     return Array.from(days);
-  }, [earnedBadgesHistory]);
+  }, [earnedBadgesHistory, currentYear, currentMonth]);
 
   // Compute badges earned on selected calendar day with multipliers for duplicate earnings
   const badgesEarnedOnSelectedDay: Array<{ badge: any; count: number }> = useMemo(() => {
     const dayHistory = earnedBadgesHistory.filter(item => {
       if (!item.earned_at) return false;
       const d = new Date(item.earned_at);
-      return d.getFullYear() === 2026 && d.getMonth() === 5 && d.getDate() === selectedCalendarDay;
+      return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === selectedCalendarDay;
     });
 
     const badgeCounts: Record<string, number> = {};
@@ -1382,7 +1414,7 @@ export default function StudentDashboard() {
         count
       };
     }).filter((item): item is { badge: any; count: number } => item.badge !== undefined);
-  }, [earnedBadgesHistory, selectedCalendarDay, badges]);
+  }, [earnedBadgesHistory, selectedCalendarDay, badges, currentYear, currentMonth]);
 
   // Custom Settings States
   const [dailyXpGoal, setDailyXpGoal] = useState<number>(100);
@@ -2293,179 +2325,7 @@ export default function StudentDashboard() {
           )}
         </nav>
 
-        {/* User profile popup menu trigger */}
-        <div className="p-4 w-full flex flex-col items-center shrink-0 relative" ref={profileDropdownRef}>
-          <button
-            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            title="User Profile Menu"
-            className={`w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative overflow-hidden ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
-          >
-            {profile.avatar && profile.avatar !== 'initial' ? (
-              <img
-                src={profile.avatar}
-                alt="User Avatar"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <User className="w-5 h-5" />
-            )}
 
-            {/* Red dot notification badge */}
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
-          </button>
-
-          {/* User profile dropdown overlay */}
-          {profileDropdownOpen && (
-            <div className="absolute left-[84px] bottom-0 w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
-              {/* Profile details header */}
-              <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
-                  {profile.avatar && profile.avatar !== 'initial' ? (
-                    <img
-                      src={profile.avatar}
-                      alt="User Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                </div>
-                <div className="flex flex-col min-w-0 text-left">
-                  <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
-                    {profile.username || 'Vaishnavi Raparthy'}
-                  </span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
-                    {currentRole?.email || 'shellysros1922@gmail.com'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Menu Options */}
-              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
-
-                {/* My Profile option */}
-                <button
-                  onClick={() => {
-                    setActiveSidebarTab('profile');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <span className="flex-1">My Profile</span>
-                </button>
-
-                {/* Account option */}
-                <button
-                  onClick={() => {
-                    setActiveSidebarTab('settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <span className="flex-1">Account</span>
-                </button>
-
-                {/* Buganizer (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <Bug className="w-4 h-4 shrink-0" />
-                    <span>Buganizer</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Sessions (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <List className="w-4 h-4 shrink-0" />
-                    <span>Sessions</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Troubleshooting option */}
-                <button
-                  onClick={() => {
-                    alert('Troubleshooting utility loaded. Sandbox is operating securely.');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <span className="flex-1">Troubleshooting</span>
-                </button>
-
-                {/* New Features option */}
-                <button
-                  onClick={() => {
-                    setActiveSidebarTab('badges');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                    <span>New Features</span>
-                  </div>
-                  <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
-                </button>
-
-                {/* Theme Toggle option */}
-                <button
-                  onClick={() => {
-                    toggleTheme();
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  {theme === 'dark' ? (
-                    <>
-                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span className="flex-1">Light Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span className="flex-1">Dark Mode</span>
-                    </>
-                  )}
-                </button>
-
-                {/* Notification option */}
-                <button
-                  onClick={() => {
-                    setActiveSidebarTab('settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                    <span>Notification</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
-                </button>
-
-                {/* Divider */}
-                <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
-
-                {/* Logout option */}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
-                >
-                  <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
-                  <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
-                </button>
-
-              </div>
-            </div>
-          )}
-        </div>
       </aside>
 
       {/* 2. Main Workspace Frame */}
@@ -2555,6 +2415,180 @@ export default function StudentDashboard() {
               >
                 Edit / Admin
               </button>
+            </div>
+
+            {/* User profile popup menu trigger */}
+            <div className="relative flex items-center shrink-0 ml-2" ref={profileDropdownRef}>
+              <button
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                title="User Profile Menu"
+                className={`w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative overflow-hidden ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
+              >
+                {profile.avatar && profile.avatar !== 'initial' ? (
+                  <img
+                    src={profile.avatar}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-5 h-5" />
+                )}
+
+                {/* Red dot notification badge */}
+                <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
+              </button>
+
+              {/* User profile dropdown overlay */}
+              {profileDropdownOpen && (
+                <div className="absolute right-0 top-[120%] w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
+                  {/* Profile details header */}
+                  <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                      {profile.avatar && profile.avatar !== 'initial' ? (
+                        <img
+                          src={profile.avatar}
+                          alt="User Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="flex flex-col min-w-0 text-left">
+                      <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
+                        {profile.username || 'Vaishnavi Raparthy'}
+                      </span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
+                        {currentRole?.email || 'shellysros1922@gmail.com'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Menu Options */}
+                  <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+
+                    {/* My Profile option */}
+                    <button
+                      onClick={() => {
+                        setActiveSidebarTab('profile');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span className="flex-1">My Profile</span>
+                    </button>
+
+                    {/* Account option */}
+                    <button
+                      onClick={() => {
+                        setActiveSidebarTab('settings');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span className="flex-1">Account</span>
+                    </button>
+
+                    {/* Buganizer (locked option) */}
+                    <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
+                      <div className="flex items-center gap-3">
+                        <Bug className="w-4 h-4 shrink-0" />
+                        <span>Buganizer</span>
+                      </div>
+                      <Lock className="w-3.5 h-3.5" />
+                    </div>
+
+                    {/* Sessions (locked option) */}
+                    <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
+                      <div className="flex items-center gap-3">
+                        <List className="w-4 h-4 shrink-0" />
+                        <span>Sessions</span>
+                      </div>
+                      <Lock className="w-3.5 h-3.5" />
+                    </div>
+
+                    {/* Troubleshooting option */}
+                    <button
+                      onClick={() => {
+                        alert('Troubleshooting utility loaded. Sandbox is operating securely.');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span className="flex-1">Troubleshooting</span>
+                    </button>
+
+                    {/* New Features option */}
+                    <button
+                      onClick={() => {
+                        setActiveSidebarTab('badges');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                        <span>New Features</span>
+                      </div>
+                      <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
+                    </button>
+
+                    {/* Theme Toggle option */}
+                    <button
+                      onClick={() => {
+                        toggleTheme();
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      {theme === 'dark' ? (
+                        <>
+                          <Sun className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                          <span className="flex-1">Light Mode</span>
+                        </>
+                      ) : (
+                        <>
+                          <Moon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                          <span className="flex-1">Dark Mode</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Notification option */}
+                    <button
+                      onClick={() => {
+                        setActiveSidebarTab('settings');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Bell className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                        <span>Notification</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
+                    </button>
+
+                    {/* Divider */}
+                    <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
+
+                    {/* Logout option */}
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                    >
+                      <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
+                      <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
+                    </button>
+
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>
@@ -2774,7 +2808,7 @@ export default function StudentDashboard() {
                   <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
                     <div className="flex items-center justify-between mb-4 pb-1 border-b border-slate-100 dark:border-slate-900/60">
                       <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Lesson schedule</h3>
-                      <span className="text-xs font-bold text-slate-500">June 2026</span>
+                      <span className="text-xs font-bold text-slate-500">{monthYearName}</span>
                     </div>
 
                     {/* Monthly calendar Grid */}
@@ -2789,15 +2823,19 @@ export default function StudentDashboard() {
                         <span>Sun</span>
                       </div>
 
-                      {/* Dates grid for June 2026. Starts on Monday, 30 days */}
+                      {/* Dates grid for current month/year */}
                       <div className="grid grid-cols-7 gap-y-2.5 gap-x-1 text-center text-xs font-bold text-slate-700 dark:text-slate-400">
-                        {/* Day 1 to 30 */}
-                        {[...Array(30)].map((_, i) => {
+                        {/* Padding days */}
+                        {[...Array(paddingDays)].map((_, i) => (
+                          <div key={`pad-${i}`} className="w-7 h-7" />
+                        ))}
+                        {/* Actual days */}
+                        {[...Array(daysInMonth)].map((_, i) => {
                           const dateNum = i + 1;
 
                           // Streak/active study dates from dynamic history
                           const isStreakDay = streakDaysFromHistory.includes(dateNum);
-                          const isToday = dateNum === 9; // Today is June 9, 2026
+                          const isToday = dateNum === todayDay;
                           const isSelected = selectedCalendarDay === dateNum;
 
                           let dateStyles = "w-7 h-7 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
@@ -2833,7 +2871,7 @@ export default function StudentDashboard() {
                       {/* Badges Earned Section */}
                       <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-900/60">
                         <div className="flex justify-between items-center text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
-                          <span>Badges Earned • June {selectedCalendarDay}</span>
+                          <span>Badges Earned • {selectedMonthName} {selectedCalendarDay}</span>
                           <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-black uppercase">
                             {badgesEarnedOnSelectedDay.reduce((acc: number, item: any) => acc + item.count, 0)} Badges
                           </span>
@@ -2910,28 +2948,49 @@ export default function StudentDashboard() {
                       </span>
                     </div>
 
-                    <div className="flex gap-2 relative z-10 pt-2 border-t border-[#092B1D]/80">
+                    <div className="flex justify-center gap-4 relative z-10 pt-3 border-t border-[#092B1D]/80">
 
-                      {/* Toggle play/pause button */}
+                      {/* Play Button */}
                       <button
-                        onClick={() => setTimeTrackerIsRunning(!timeTrackerIsRunning)}
-                        className={`flex-1 py-1.8 font-bold text-[10px] uppercase rounded-xl transition-all cursor-pointer text-center ${timeTrackerIsRunning
-                            ? "bg-amber-600 hover:bg-amber-500 text-white"
+                        onClick={() => setTimeTrackerIsRunning(true)}
+                        disabled={timeTrackerIsRunning}
+                        title="Start Study"
+                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
+                          timeTrackerIsRunning
+                            ? "bg-[#061E14] text-emerald-800/40 border border-[#082419] cursor-not-allowed"
                             : "bg-emerald-600 hover:bg-emerald-500 text-white"
-                          }`}
+                        }`}
+                        type="button"
                       >
-                        {timeTrackerIsRunning ? "Pause Session" : "Start Study"}
+                        <Play className="w-4 h-4 fill-current" />
                       </button>
 
-                      {/* Reset button */}
+                      {/* Pause Button */}
+                      <button
+                        onClick={() => setTimeTrackerIsRunning(false)}
+                        disabled={!timeTrackerIsRunning}
+                        title="Pause Session"
+                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
+                          !timeTrackerIsRunning
+                            ? "bg-[#061E14] text-emerald-800/40 border border-[#082419] cursor-not-allowed"
+                            : "bg-amber-600 hover:bg-amber-500 text-white"
+                        }`}
+                        type="button"
+                      >
+                        <Pause className="w-4 h-4" />
+                      </button>
+
+                      {/* Reset Button */}
                       <button
                         onClick={() => {
                           setTimeTrackerIsRunning(false);
                           setTimeTrackerSeconds(0);
                         }}
-                        className="py-1.8 px-3 bg-[#092B1D] hover:bg-[#061E14] text-[#A7F3D0] font-bold text-[10px] uppercase rounded-xl border border-[#082419] transition-colors cursor-pointer text-center"
+                        title="Reset Session"
+                        className="w-9 h-9 rounded-full bg-[#092B1D] hover:bg-[#061E14] text-[#A7F3D0] border border-[#082419] flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
+                        type="button"
                       >
-                        Reset
+                        <RotateCcw className="w-4 h-4" />
                       </button>
 
                     </div>
@@ -2945,7 +3004,7 @@ export default function StudentDashboard() {
           )}
 
           {activeSidebarTab === 'learning' && (
-            <div className="w-full space-y-8 relative overflow-hidden p-6 rounded-3xl bg-slate-50/50 dark:bg-[#020617]/50 border border-slate-200/60 dark:border-slate-800/40 backdrop-blur-xl transition-all duration-300">
+            <div className="w-full relative py-12 px-4 sm:px-8 rounded-[2.5rem] bg-[#0A0F1C] border border-[#1E293B] shadow-2xl transition-all duration-300">
 
               {/* Ambient Background Particles and Orbs */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -3094,23 +3153,25 @@ export default function StudentDashboard() {
                   return { ...node, status };
                 });
 
-                const illustrationsList = [
-                  { y: 170, x: 25, icon: <Award className="w-5 h-5 text-emerald-500" />, title: "Apex Peak", desc: "Aptitude standards reached" },
-                  { y: 170, x: 75, icon: <Sparkles className="w-5 h-5 text-amber-500" />, title: "Unlock Spark", desc: "Reveal hidden concepts" },
-                  { y: 350, x: 25, icon: <Cpu className="w-5 h-5 text-indigo-500" />, title: "Logic Gate", desc: "Algorithms unlocked" },
-                  { y: 350, x: 75, icon: <Target className="w-5 h-5 text-orange-500" />, title: "Precision Target", desc: "Aim for mastery goals" }
-                ];
 
-                const rawSegmentPaths = [
-                  "M 10,80 L 50,80",
-                  "M 50,80 L 90,80",
-                  "M 90,80 C 99,80 99,260 90,260",
-                  "M 90,260 L 50,260",
-                  "M 50,260 L 10,260",
-                  "M 10,260 C 1,260 1,440 10,440",
-                  "M 10,440 L 50,440",
-                  "M 50,440 L 90,440"
-                ];
+
+                const rawSegmentPaths = [];
+                for (let i = 0; i < nodesList.length - 1; i++) {
+                  const start = getNodeCoords(i);
+                  const end = getNodeCoords(i + 1);
+
+                  // Scale x by 10 for the 1000px SVG coordinate space
+                  const sx = start.x * 10;
+                  const ex = end.x * 10;
+
+                  // Calculate control points for a smooth top-to-bottom S-curve
+                  const cp1x = sx;
+                  const cp1y = start.y + 40;
+                  const cp2x = ex;
+                  const cp2y = end.y - 40;
+
+                  rawSegmentPaths.push(`M ${sx},${start.y} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${ex},${end.y}`);
+                }
 
                 const segments = rawSegmentPaths.map((pathStr: string, idx: number) => {
                   const startNode = nodesList[idx];
@@ -3132,28 +3193,24 @@ export default function StudentDashboard() {
                   return { d: pathStr, status };
                 });
 
-                // Find active index to compute traveling path coordinates
+                // Construct motion path for the orb by joining the exact Bezier segments
                 const activeIndex = nodesList.findIndex((n: any) => n.status === 'active');
-                const completedCoords = [];
-                for (let i = 0; i <= (activeIndex !== -1 ? activeIndex : 0); i++) {
-                  const { x, y } = getNodeCoords(i);
-                  completedCoords.push(`${x},${y}`);
-                }
-                const motionPath = completedCoords.length > 1
-                  ? `M ${completedCoords.join(' L ')}`
-                  : `M 10,80 L 10,80`;
+                const pathEndIndex = activeIndex !== -1 ? activeIndex : 0;
+                const completedSegments = rawSegmentPaths.slice(0, pathEndIndex);
+                
+                const startCoords = getNodeCoords(0);
+                const startX = startCoords.x * 10;
+                const motionPath = completedSegments.length > 0
+                  ? completedSegments.join(' ')
+                  : `M ${startX},${startCoords.y} L ${startX},${startCoords.y}`;
 
                 return (
                   <div
-                    className="relative w-full h-[520px] select-none my-6 transition-all duration-500 ease-out"
-                    style={{
-                      transform: 'perspective(1200px) rotateX(12deg)',
-                      transformStyle: 'preserve-3d',
-                    }}
+                    className="relative w-full max-w-4xl mx-auto h-[800px] select-none mt-8 mb-24 transition-all duration-500 ease-out"
                   >
 
                     {/* SVG Curve Canvas */}
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 520" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2050/svg">
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" viewBox="0 0 1000 800" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
                         <linearGradient id="completed-grad" x1="0" y1="0" x2="1" y2="1">
                           <stop offset="0%" stopColor="#10B981" />
@@ -3176,181 +3233,120 @@ export default function StudentDashboard() {
                         </filter>
                       </defs>
 
-                      {/* Decorative graphics: background stars & flags */}
-                      <g opacity="0.25" className="text-emerald-500 dark:text-emerald-400">
-                        <path d="M 78,130 L 81,133 L 86,133 L 82,136 L 83,141 L 78,138 L 73,141 L 74,136 L 70,133 L 75,133 Z" fill="currentColor" />
-                        <path d="M 25,360 L 28,363 L 33,363 L 29,366 L 30,371 L 25,368 L 20,371 L 21,366 L 17,363 L 22,363 Z" fill="currentColor" />
-                      </g>
-                      <g opacity="0.3" className="text-blue-500 dark:text-blue-400 animate-pulse">
-                        <path d="M 30,150 L 33,153 L 38,153 L 34,157 L 35,162 L 30,159 L 25,162 L 26,157 L 22,153 L 27,153 Z" fill="currentColor" />
-                        <path d="M 75,320 L 78,323 L 83,323 L 79,326 L 80,331 L 75,328 L 70,331 L 71,326 L 67,323 L 72,323 Z" fill="currentColor" />
-                      </g>
+
 
                       {/* 3D Road Side Extrusion (Thick Depth Edge) */}
                       {segments.map((seg, i) => (
                         <path
                           key={`extrusion-${i}`}
                           d={seg.d}
-                          fill="none"
-                          className="stroke-slate-300/40 dark:stroke-[#020617]"
-                          strokeWidth="16"
+                          strokeWidth="28"
                           strokeLinecap="round"
-                          transform="translate(0, 5)"
+                          className="stroke-[#0B1221]/80 translate-y-4"
                         />
                       ))}
 
-                      {/* Colored Road Side Extrusion for Completed & Active tracks */}
-                      {segments.map((seg, i) => {
-                        if (seg.status === 'completed') {
-                          return (
-                            <path
-                              key={`ext-completed-${i}`}
-                              d={seg.d}
-                              fill="none"
-                              stroke="#047857"
-                              strokeWidth="12"
-                              strokeLinecap="round"
-                              transform="translate(0, 4)"
-                            />
-                          );
-                        } else if (seg.status === 'active-transition') {
-                          return (
-                            <path
-                              key={`ext-active-${i}`}
-                              d={seg.d}
-                              fill="none"
-                              stroke="#1D4ED8"
-                              strokeWidth="12"
-                              strokeLinecap="round"
-                              transform="translate(0, 4)"
-                            />
-                          );
-                        }
-                        return null;
-                      })}
-
-                      {/* Background Road Borders & Fill */}
+                      {/* Main Base Shadow below the road */}
                       {segments.map((seg, i) => (
-                        <React.Fragment key={`bg-road-${i}`}>
-                          {/* Outer dark grey/slate road border line */}
-                          <path
-                            d={seg.d}
-                            fill="none"
-                            className="stroke-slate-200/50 dark:stroke-slate-900"
-                            strokeWidth="14"
-                            strokeLinecap="round"
-                          />
-                          {/* Inner road background fill */}
-                          <path
-                            d={seg.d}
-                            fill="none"
-                            className="stroke-slate-100 dark:stroke-[#030712]/90"
-                            strokeWidth="10"
-                            strokeLinecap="round"
-                          />
-                        </React.Fragment>
+                        <path
+                          key={`shadow-${i}`}
+                          d={seg.d}
+                          strokeWidth="34"
+                          strokeLinecap="round"
+                          className="stroke-black/50 blur-sm translate-y-6"
+                        />
                       ))}
 
-                      {/* Active / Completed Winding Road Colors */}
+                      {/* Base Inactive Track - Always visible */}
+                      {segments.map((seg, i) => (
+                        <path
+                          key={`base-path-${i}`}
+                          d={seg.d}
+                          fill="none"
+                          stroke="#1E293B"
+                          strokeWidth="28"
+                          strokeLinecap="round"
+                        />
+                      ))}
+
+                      {/* Main Surface Path - Animated Drawing Overlay */}
                       {segments.map((seg, i) => {
-                        if (seg.status === 'completed') {
-                          return (
-                            <React.Fragment key={`fg-road-${i}`}>
-                              {/* Green colored road segment */}
-                              <motion.path
-                                d={seg.d}
-                                fill="none"
-                                stroke="url(#completed-grad)"
-                                strokeWidth="8"
-                                strokeLinecap="round"
-                                filter="url(#completed-glow)"
-                                initial={{ pathLength: 0 }}
-                                animate={{ pathLength: 1 }}
-                                transition={{ duration: 1.5, ease: "easeOut" }}
-                              />
-                              {/* White dashed highway lane divider lines */}
-                              <path
-                                d={seg.d}
-                                fill="none"
-                                stroke="#FFFFFF"
-                                strokeWidth="1.2"
-                                strokeLinecap="round"
-                                strokeDasharray="4 4"
-                                opacity="0.6"
-                              />
-                              {/* Shimmer overlay */}
-                              {!reducedMotion && (
-                                <motion.path
-                                  d={seg.d}
-                                  fill="none"
-                                  stroke="#10B981"
-                                  strokeWidth="8"
-                                  strokeLinecap="round"
-                                  opacity="0.3"
-                                  initial={{ strokeDasharray: "15 30", strokeDashoffset: 0 }}
-                                  animate={{ strokeDashoffset: -45 }}
-                                  transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-                                />
-                              )}
-                            </React.Fragment>
-                          );
-                        } else if (seg.status === 'active-transition') {
-                          return (
-                            <React.Fragment key={`fg-road-${i}`}>
-                              {/* Green to Blue gradient transition road segment */}
-                              <motion.path
-                                d={seg.d}
-                                fill="none"
-                                stroke="url(#active-grad)"
-                                strokeWidth="8"
-                                strokeLinecap="round"
-                                filter="url(#active-glow)"
-                                initial={{ pathLength: 0 }}
-                                animate={{ pathLength: 1 }}
-                                transition={{ duration: 1.5, ease: "easeOut" }}
-                              />
-                              {/* White dashed highway lane divider lines */}
-                              <path
-                                d={seg.d}
-                                fill="none"
-                                stroke="#FFFFFF"
-                                strokeWidth="1.2"
-                                strokeLinecap="round"
-                                strokeDasharray="4 4"
-                                opacity="0.7"
-                              />
-                              {/* Active flow overlay */}
-                              {!reducedMotion && (
-                                <motion.path
-                                  d={seg.d}
-                                  fill="none"
-                                  stroke="url(#active-flow-grad)"
-                                  strokeWidth="8"
-                                  strokeLinecap="round"
-                                  initial={{ strokeDasharray: "8 12", strokeDashoffset: 0 }}
-                                  animate={{ strokeDashoffset: -20 }}
-                                  transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
-                                />
-                              )}
-                            </React.Fragment>
-                          );
-                        } else {
+                        if (seg.status === 'locked') return null;
+
+                        let strokeColor = "url(#completed-grad)";
+                        let filter = "url(#completed-glow)";
+
+                        if (seg.status === 'active-transition') {
+                          strokeColor = "url(#active-flow-grad)";
+                          filter = "url(#active-glow)";
+                        }
+
+                        return (
+                          <motion.path
+                            key={`path-${i}`}
+                            d={seg.d}
+                            fill="none"
+                            stroke={strokeColor}
+                            strokeWidth="28"
+                            strokeLinecap="round"
+                            filter={filter}
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: 1 }}
+                            transition={{ duration: 0.8, delay: i * 0.8, ease: "easeInOut" }}
+                          />
+                        );
+                      })}
+
+                      {/* SVG Animations */}
+                      <style>{`
+                        @keyframes flowDash {
+                          to { stroke-dashoffset: -20; }
+                        }
+                        .animate-dash-flow {
+                          animation: flowDash 1s linear infinite;
+                        }
+                      `}</style>
+
+                      {/* White Dashed Center Line (Mario-Kart style) */}
+                      {segments.map((seg, i) => {
+                        const isLocked = seg.status === 'locked';
+                        
+                        if (isLocked) {
                           return (
                             <path
-                              key={`fg-road-${i}`}
+                              key={`dash-${i}`}
                               d={seg.d}
                               fill="none"
-                              className="stroke-slate-200 dark:stroke-slate-800"
-                              strokeWidth="4"
+                              stroke="white"
+                              strokeWidth="2.5"
                               strokeLinecap="round"
-                              strokeDasharray="8 6"
+                              strokeDasharray="8 12"
+                              className="opacity-20"
                             />
                           );
                         }
+
+                        return (
+                          <motion.path
+                            key={`dash-${i}`}
+                            d={seg.d}
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeDasharray="8 12"
+                            className="animate-dash-flow"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.8 }}
+                            transition={{ duration: 0.5, delay: (i * 0.8) + 0.2 }}
+                          />
+                        );
                       })}
 
+
+
                       {/* Animated Traveling Glow Orb along the completed path */}
-                      {completedCoords.length > 1 && (
+                      {completedSegments.length > 0 && (
                         <circle r="6" fill="#60A5FA" className="filter drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">
                           <animateMotion
                             dur="5s"
@@ -3361,47 +3357,7 @@ export default function StudentDashboard() {
                       )}
                     </svg>
 
-                    {/* Side decorative Illustration cards in the empty columns */}
-                    {illustrationsList.map((ill: any, i: number) => (
-                      <motion.div
-                        key={i}
-                        className="absolute flex items-center gap-2.5 bg-white/80 dark:bg-slate-950/75 border border-slate-200 dark:border-slate-900/80 p-2.5 rounded-2xl shadow-md w-36 select-none transition-all duration-300 hover:scale-105 pointer-events-none"
-                        style={{
-                          left: `${ill.x}%`,
-                          top: `${ill.y}px`,
-                          transform: 'translate3d(-50%, -50%, 15px)',
-                          boxShadow: '0 10px 20px -5px rgba(0, 0, 0, 0.3)'
-                        }}
-                        initial={{ opacity: 0, y: ill.y + 20, scale: 0.9 }}
-                        animate={{ opacity: 1, y: ill.y, scale: 1 }}
-                        transition={{ delay: 0.4 + i * 0.15, duration: 0.6, type: "spring" }}
-                        whileHover={{
-                          scale: 1.08,
-                          y: ill.y - 4,
-                          boxShadow: '0 15px 30px -5px rgba(0,0,0,0.2), 0 0 15px rgba(245,158,11,0.2)',
-                        }}
-                      >
-                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center shrink-0 shadow-inner relative overflow-hidden group">
-                          <motion.div
-                            className="absolute top-0 bottom-0 left-0 w-2 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
-                            animate={{
-                              left: ["-20%", "120%"]
-                            }}
-                            transition={{
-                              duration: 2.5,
-                              repeat: Infinity,
-                              repeatDelay: 3,
-                              ease: "easeInOut"
-                            }}
-                          />
-                          {ill.icon}
-                        </div>
-                        <div className="min-w-0 text-left">
-                          <span className="text-[9px] font-black text-slate-800 dark:text-white block uppercase tracking-wide leading-none">{ill.title}</span>
-                          <span className="text-[7.5px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight mt-0.5 truncate">{ill.desc}</span>
-                        </div>
-                      </motion.div>
-                    ))}
+
 
                     {/* HTML Nodes overlay */}
                     {nodesList.map((node: any, index: number) => {
@@ -3420,8 +3376,8 @@ export default function StudentDashboard() {
                           style={{
                             left: `${x}%`,
                             top: `${y}px`,
-                            transform: `translate3d(-50%, -50%, ${zElevation}px)`,
-                            transformStyle: 'preserve-3d',
+                            transform: `translate(-50%, -50%)`,
+                            zIndex: zElevation,
                           }}
                         >
 
@@ -3504,16 +3460,10 @@ export default function StudentDashboard() {
                             )}
                           </motion.button>
 
-                          {/* Node Label card popup on hover */}
-                          <div
-                            className="absolute top-16 text-center bg-white/95 dark:bg-slate-900/90 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-md w-34 transition-all duration-300 backdrop-blur-md"
-                            style={{
-                              transform: 'translate3d(0, 0, 15px)',
-                              boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.25)'
-                            }}
-                          >
-                            <span className="text-[9px] font-black text-slate-800 dark:text-white block truncate uppercase">{node.title}</span>
-                            <span className="text-[7.5px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight mt-0.5">{node.desc}</span>
+                          {/* Minimalist Dark Info Card matching Screenshot */}
+                          <div className={`mt-3 flex flex-col items-center bg-[#0B1221] px-4 py-2.5 rounded-xl border border-[#1E293B] shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all text-center min-w-[140px] max-w-[160px] pointer-events-none ${isActive ? 'ring-2 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : ''}`}>
+                            <span className="text-[10px] font-black text-white block uppercase tracking-wider leading-none mb-1">{node.title}</span>
+                            <span className="text-[8px] text-slate-400 font-semibold block leading-tight">{node.desc}</span>
                             {isActive && (
                               <span className="text-[7.5px] text-blue-600 dark:text-blue-400 font-black block mt-0.5">75% Complete</span>
                             )}
@@ -3551,425 +3501,8 @@ export default function StudentDashboard() {
                 );
               })()}
 
-                {/* 3. Horizontal Question Selector Track */}
-                <div className="space-y-3">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block text-left">Set Navigation Track</span>
-                  {isLoading ? (
-                    <div className="w-full bg-white dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900 rounded-2xl py-8 flex flex-col items-center justify-center">
-                      <div className="w-6 h-6 rounded-full border border-blue-600 border-t-transparent animate-spin mb-2" />
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Loading set track...</span>
-                    </div>
-                  ) : filteredQuestions.length === 0 ? (
-                    <div className="w-full bg-white dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900 rounded-2xl py-8 flex flex-col items-center justify-center text-center">
-                      <Info className="w-6 h-6 text-slate-400 mb-1" />
-                      <span className="text-[10px] font-bold text-slate-500 uppercase">No questions in this filter set</span>
-                    </div>
-                  ) : (
-                    <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
-                      {filteredQuestions.map((q, idx) => {
-                        const isSolved = submittedAnswers[q.id];
-                        const isCurrent = activeQuestion?.id === q.id;
-                        const isCorrect = isSolved && selectedAnswers[q.id] === q.options.find(o => o.isCorrect)?.id;
-                        return (
-                          <button
-                            key={q.id}
-                            onClick={() => {
-                              setActiveQuestion(q);
-                              setIsVideoPlaying(false);
-                              setVideoProgress(0);
-                              setVideoPlayTime(0);
-                            }}
-                            className={`flex-shrink-0 w-44 p-4 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden cursor-pointer ${
-                              isCurrent
-                                ? 'bg-blue-950/30 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/20'
-                                : isSolved
-                                  ? isCorrect
-                                    ? 'bg-emerald-950/10 border-emerald-900 hover:border-emerald-700'
-                                    : 'bg-rose-950/10 border-rose-900 hover:border-rose-700'
-                                  : 'bg-slate-900/30 border-slate-900 hover:border-slate-700'
-                            }`}
-                          >
-                            <div className="flex justify-between items-center">
-                              <span className="font-mono text-[9px] font-black text-slate-500">#{q.id}</span>
-                              {isSolved ? (
-                                isCorrect ? (
-                                  <span className="w-4 h-4 rounded-full bg-emerald-600 flex items-center justify-center text-white text-[8px] font-black">✓</span>
-                                ) : (
-                                  <span className="w-4 h-4 rounded-full bg-rose-600 flex items-center justify-center text-white text-[8px] font-black">✗</span>
-                                )
-                              ) : (
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                              )}
-                            </div>
-                            <h5 className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300 mt-2 truncate">Lesson Unit {idx + 1}</h5>
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                              <span className="text-[7.5px] font-black uppercase bg-slate-100 dark:bg-slate-900/80 px-1.5 py-0.2 rounded leading-normal text-slate-500">
-                                {q.difficulty}
-                              </span>
-                              <span className="text-[7.5px] font-semibold text-slate-500">
-                                {q.domainId === 'quant' ? 'Quant' : q.domainId === 'logical' ? 'Logic' : 'Verbal'}
-                              </span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* 4. Main Active Learning Module Card */}
-                {activeQuestion && (
-                  <div className="bg-white border border-slate-200 dark:bg-slate-950/40 dark:border-slate-900 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm relative transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.15)] overflow-hidden">
-                    
-                    {/* Visual shine gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/2 to-transparent pointer-events-none" />
-
-                    {/* Question Header & Tags */}
-                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-4 flex-wrap gap-3 relative z-10">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[9px] font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full tracking-wider uppercase">
-                          {activeQuestion.domainId === 'quant' ? 'QUANTITATIVE' : activeQuestion.domainId === 'logical' ? 'LOGICAL' : 'VERBAL'}
-                        </span>
-                        <span className={`text-[9px] font-black px-2.5 py-1 rounded-full border tracking-wide uppercase ${
-                          activeQuestion.difficulty === 'EASY'
-                            ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-emerald-400'
-                            : activeQuestion.difficulty === 'HARD'
-                              ? 'bg-rose-500/10 border-rose-500/25 text-rose-700 dark:text-rose-400'
-                              : 'bg-amber-500/10 border-amber-500/25 text-amber-700 dark:text-amber-400'
-                        }`}>
-                          {activeQuestion.difficulty}
-                        </span>
-                        <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded-md">
-                          #{activeQuestion.id}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <div className="flex flex-col text-right">
-                          <span className="text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Instructor Walk-through</span>
-                          <span className="text-[10px] font-black text-slate-700 dark:text-slate-300">Ravi Kumar</span>
-                        </div>
-                        <button
-                          onClick={() => toggleBookmark(activeQuestion.id)}
-                          className={`p-2 rounded-xl border transition-colors cursor-pointer hover:scale-105 ${
-                            bookmarks.includes(activeQuestion.id)
-                              ? 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/20 dark:border-amber-900 dark:text-amber-500'
-                              : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800'
-                          }`}
-                        >
-                          <Bookmark className="w-4 h-4 stroke-[2.5]" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Question Title & Stem */}
-                    <div className="space-y-4 text-left relative z-10">
-                      <h2 className="text-lg sm:text-xl md:text-2xl font-black text-slate-800 dark:text-white leading-snug tracking-tight font-heading">
-                        {activeQuestion.questionStem.split('###')[0].trim()}
-                      </h2>
-                    </div>
-
-                    {/* Immersive Custom Video Player Section */}
-                    {activeQuestion.videoUrl && (
-                      <div className="space-y-3 relative z-10">
-                        
-                        {/* Placeholder for Sticky video player gap */}
-                        {isMiniPlayerActive && (
-                          <div className="w-full aspect-video bg-slate-950/30 border border-dashed border-slate-900 rounded-2xl flex flex-col items-center justify-center text-[10px] uppercase font-black tracking-widest text-slate-500 select-none">
-                            <Video className="w-5 h-5 mb-2.5 animate-pulse text-blue-500" />
-                            <span>Playing in Sticky Picture-in-Picture mode</span>
-                          </div>
-                        )}
-
-                        {/* actual animated player tag */}
-                        <motion.div
-                          ref={mainVideoRef}
-                          layout="position"
-                          className={isMiniPlayerActive
-                            ? "fixed bottom-6 right-6 w-80 aspect-video shadow-2xl z-50 rounded-2xl border border-blue-500/40 bg-slate-950 overflow-hidden flex flex-col group/pip cursor-pointer"
-                            : "w-full aspect-video bg-black rounded-2xl overflow-hidden group relative border border-slate-200 dark:border-slate-900 shadow-md flex flex-col justify-end cursor-pointer"
-                          }
-                          onClick={(e) => {
-                            const target = e.target as HTMLElement;
-                            if (target.closest('button') || target.closest('input') || target.closest('a')) {
-                              return;
-                            }
-                            handlePlayToggle();
-                          }}
-                        >
-                          {(() => {
-                            const ytId = getYouTubeId(activeQuestion.videoUrl);
-                            if (ytId) {
-                              if (isVideoPlaying) {
-                                return (
-                                  <div className="absolute inset-0 w-full h-full bg-black z-0">
-                                    <iframe
-                                      width="100%"
-                                      height="100%"
-                                      src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&controls=1`}
-                                      title={activeQuestion.videoTitle || "Video solution"}
-                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                      allowFullScreen
-                                      className="w-full h-full border-0"
-                                    ></iframe>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setIsVideoPlaying(false);
-                                      }}
-                                      className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-black/60 hover:bg-black/85 text-white hover:text-rose-400 transition-colors shadow-md flex items-center justify-center cursor-pointer"
-                                      title="Close Player"
-                                    >
-                                      <X className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                );
-                              } else {
-                                return (
-                                  <div className="absolute inset-0 w-full h-full bg-slate-950 overflow-hidden z-0">
-                                    <img
-                                      src={`https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`}
-                                      alt="Video Walkthrough Thumbnail"
-                                      className="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-102"
-                                      onError={(e) => {
-                                        (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-                                      }}
-                                    />
-                                  </div>
-                                );
-                              }
-                            } else {
-                              return (
-                                <video
-                                  ref={videoRef}
-                                  src={activeQuestion.videoUrl}
-                                  onTimeUpdate={handleVideoTimeUpdate}
-                                  onLoadedMetadata={handleVideoLoadedMetadata}
-                                  onEnded={() => {
-                                    setIsVideoPlaying(false);
-                                    setVideoProgress(100);
-                                  }}
-                                  className="absolute inset-0 w-full h-full object-cover opacity-100 pointer-events-none"
-                                  playsInline
-                                />
-                              );
-                            }
-                          })()}
-
-                          {/* Hover Overlay Controls */}
-                          {(() => {
-                            const ytId = getYouTubeId(activeQuestion.videoUrl);
-                            if (ytId) {
-                              if (!isVideoPlaying) {
-                                return (
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 flex flex-col justify-between p-4 z-10 pointer-events-none">
-                                    <div className="flex justify-between items-center w-full">
-                                      <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
-                                        {activeQuestion.videoTitle || 'Walkthrough Explanation'}
-                                      </span>
-                                    </div>
-                                  </div>
-                                );
-                              }
-                              return null;
-                            } else {
-                              return (
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/30 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4 z-10">
-                                  {/* Player Top Bar */}
-                                  <div className="flex justify-between items-center w-full">
-                                    <span className="text-[9.5px] font-black text-white/80 uppercase tracking-wider drop-shadow-sm font-mono truncate max-w-[70%]">
-                                      {activeQuestion.videoTitle || 'Walkthrough Explanation'}
-                                    </span>
-                                  </div>
-
-                                  {/* Player Bottom Bar / Controls */}
-                                  <div className="space-y-2.5 w-full">
-                                    {/* Progress Slider Track */}
-                                    <div className="flex items-center gap-2">
-                                      <input
-                                        type="range"
-                                        min="0"
-                                        max="100"
-                                        step="0.1"
-                                        value={videoProgress}
-                                        onChange={handleVideoSliderChange}
-                                        className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
-                                      />
-                                    </div>
-
-                                    <div className="flex items-center justify-between w-full">
-                                      <div className="flex items-center gap-3">
-                                        <button
-                                          onClick={handlePlayToggle}
-                                          className="p-1 rounded-md text-white hover:bg-white/10 transition-colors cursor-pointer"
-                                        >
-                                          {isVideoPlaying ? (
-                                            <span className="font-mono text-xs font-black select-none">PAUSE</span>
-                                          ) : (
-                                            <Play className="w-3.5 h-3.5 fill-current" />
-                                          )}
-                                        </button>
-
-                                        <span className="font-mono text-[9px] text-white/70 select-none">
-                                          {formatTime(videoPlayTime)} / {formatTime(videoDurationSeconds)}
-                                        </span>
-                                      </div>
-
-                                      <div className="flex items-center gap-2 relative">
-                                        {isSpeedMenuOpen && (
-                                          <div 
-                                            className="absolute bottom-full right-0 mb-2 bg-[#111827]/95 backdrop-blur-md border border-slate-800 rounded-xl p-2 w-32 shadow-xl z-20 flex flex-col gap-0.5 text-left"
-                                            onClick={(e) => e.stopPropagation()}
-                                          >
-                                            <div className="text-[7.5px] font-black uppercase text-slate-400 px-2 py-1 tracking-wider border-b border-slate-700/60 mb-1 select-none">
-                                              Playback Speed
-                                            </div>
-                                            {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((sp) => (
-                                              <button
-                                                key={sp}
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  handlePlaybackSpeedChange(sp);
-                                                  setIsSpeedMenuOpen(false);
-                                                }}
-                                                className={`text-[9px] font-black font-mono w-full text-left px-2 py-1.5 rounded hover:bg-white/10 transition-colors flex items-center justify-between cursor-pointer ${
-                                                  playbackSpeed === sp ? 'text-blue-400 bg-blue-500/10' : 'text-white/80'
-                                                }`}
-                                              >
-                                                <span>{sp === 1 ? 'Normal' : `${sp}x`}</span>
-                                                {playbackSpeed === sp && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
-                                              </button>
-                                            ))}
-                                          </div>
-                                        )}
-
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setIsSpeedMenuOpen(!isSpeedMenuOpen);
-                                          }}
-                                          className="flex items-center gap-1 text-[8.5px] font-black font-mono px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
-                                        >
-                                          <span>Speed: {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}</span>
-                                          <SettingsIcon className={`w-3 h-3 transition-transform duration-300 ${isSpeedMenuOpen ? 'rotate-90 text-blue-400' : 'text-white/80'}`} />
-                                        </button>
-                                        
-                                        {isMiniPlayerActive && (
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              setIsMiniPlayerActive(false);
-                                            }}
-                                            className="text-[9.5px] font-black text-white hover:text-blue-400 transition-colors bg-white/10 px-1.5 py-0.5 rounded cursor-pointer"
-                                          >
-                                            EXPAND
-                                          </button>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            }
-                          })()}
-
-                          {/* Non-hover initial play state overlay */}
-                          {!isVideoPlaying && !isMiniPlayerActive && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/45 pointer-events-none">
-                              <span className="w-12 h-12 rounded-full bg-blue-600/90 flex items-center justify-center text-white shadow-xl animate-pulse pointer-events-auto cursor-pointer" onClick={(e) => {
-                                e.stopPropagation();
-                                handlePlayToggle();
-                              }}>
-                                <Play className="w-5 h-5 fill-current ml-0.5" />
-                              </span>
-                            </div>
-                          )}
-                        </motion.div>
-                        
-                        <div className="flex justify-between items-center text-[10px] text-slate-500 font-bold px-1 select-none">
-                          <span>Video Lesson explanation by Ravi Kumar</span>
-                          <span>Duration: {activeQuestion.videoDuration || '10 mins'}</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* AI Generated Quick Summary insights */}
-                    <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 text-left relative overflow-hidden group shadow-xs">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-xl rounded-full" />
-                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs">
-                        <Cpu className="w-4 h-4" />
-                        <span className="uppercase tracking-wider font-black text-[10px]">AI Generated Lesson Summary</span>
-                      </div>
-                      <ul className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-[11px] text-slate-600 dark:text-slate-300 font-semibold list-disc list-inside leading-relaxed">
-                        <li>
-                          {activeQuestion.domainId === 'quant' 
-                            ? 'Algebraic variable modeling is safer than manual trial logic.' 
-                            : activeQuestion.domainId === 'logical'
-                              ? 'Circular constraints usually have two branching solutions.'
-                              : 'Synonyms like Prolific imply output capacity (Productive).'}
-                        </li>
-                        <li>Important Placement question category for TCS and Amazon rounds.</li>
-                        <li>Option A is mathematically consistent under standard parameters.</li>
-                        <li>Mastery percentage average for this unit is 84% speed index.</li>
-                      </ul>
-                    </div>
-
-                    {/* Selectable Options */}
-                    <div className="space-y-4 pt-2">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block text-left">Interactive Learning Choices</span>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {activeQuestion.options.map((opt) => {
-                          const isOptionSelected = selectedAnswers[activeQuestion.id] === opt.id;
-                          const isSubmitted = submittedAnswers[activeQuestion.id];
-                          const showCorrectness = isSubmitted && opt.isCorrect;
-                          const showIncorrectness = isSubmitted && isOptionSelected && !opt.isCorrect;
-
-                          return (
-                            <button
-                              key={opt.id}
-                              onClick={() => !isSubmitted && handleAnswerSelect(activeQuestion.id, opt.id)}
-                              disabled={isSubmitted}
-                              className={`p-4 rounded-2xl border text-left flex items-start justify-between gap-3 text-xs transition-all duration-300 relative overflow-hidden group cursor-pointer ${
-                                showCorrectness
-                                  ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                                  : showIncorrectness
-                                    ? 'border-rose-500 bg-rose-50 dark:border-rose-600 dark:bg-rose-950/20 text-rose-800 dark:text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] animate-shake'
-                                    : isOptionSelected
-                                      ? 'border-blue-500 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-950/30 text-slate-800 dark:text-white'
-                                      : 'border-slate-200 bg-slate-50/50 hover:border-blue-500/40 hover:shadow-[0_0_10px_rgba(59,130,246,0.1)] hover:bg-slate-50 dark:border-slate-900 dark:bg-slate-950/40 dark:hover:border-slate-800 dark:hover:bg-slate-900/30 text-slate-700 dark:text-slate-300'
-                              }`}
-                            >
-                              <div className="flex items-start gap-3 min-w-0">
-                                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-[10.5px] shrink-0 border transition-colors duration-300 ${
-                                  showCorrectness
-                                    ? 'border-emerald-300 bg-emerald-100 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-900/35 dark:text-emerald-400'
-                                    : showIncorrectness
-                                      ? 'border-rose-300 bg-rose-100 text-rose-800 dark:border-rose-800/40 dark:bg-rose-900/35 dark:text-rose-400'
-                                      : isOptionSelected
-                                        ? 'border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-800/40 dark:bg-blue-900/35 dark:text-blue-400'
-                                        : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
-                                }`}>
-                                  {opt.id.toUpperCase()}
-                                </span>
-                                <span className="font-semibold">{opt.text}</span>
-                              </div>
-                              {isSubmitted && opt.isCorrect && (
-                                <CheckCircle className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
-                              )}
-                              {isSubmitted && isOptionSelected && !opt.isCorrect && (
-                                <X className="w-4.5 h-4.5 text-rose-500 shrink-0" />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            )}
+            </div>
+          )}
 
           {/* ====================================================================
               3. TAB: PRACTICE ARENA (Curated Hub redesign layout)
@@ -5404,7 +4937,6 @@ export default function StudentDashboard() {
                           setSelectedBadge(badge);
                           if (isUnlocked) {
                             playPreviewChime();
-                            triggerCelebration();
                           }
                         }}
                       />

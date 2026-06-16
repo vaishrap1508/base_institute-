@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
+import { motion } from 'framer-motion';
 
 // Simple, animated circular progress ring component
 const ProgressRing = ({ progress, size = 96, strokeWidth = 9, color = '#3B82F6' }: { progress: number; size?: number; strokeWidth?: number; color?: string }) => {
@@ -103,6 +104,7 @@ export default function DomainsScreen() {
   const [streak, setStreak] = useState(14);
   const [searchQuery, setSearchQuery] = useState('');
   const [userEmail, setUserEmail] = useState('shellysros1922@gmail.com');
+  const [currentRole, setCurrentRole] = useState<any>(null);
 
   // Dark/Light Theme Switcher State
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -135,6 +137,7 @@ export default function DomainsScreen() {
     if (roleStored) {
       try {
         const roleData = JSON.parse(roleStored);
+        setCurrentRole(roleData);
         if (roleData.email) setUserEmail(roleData.email);
       } catch (_) {}
     }
@@ -354,290 +357,77 @@ export default function DomainsScreen() {
       <div className="absolute top-0 right-0 w-[550px] h-[550px] rounded-full bg-blue-500/3 dark:bg-blue-500/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full bg-purple-500/3 dark:bg-purple-500/5 blur-[140px] pointer-events-none" />
 
-      {/* 1. Left Navigation Sidebar */}
-      <aside className="w-64 bg-white dark:bg-slate-950/80 border-r border-slate-200 dark:border-slate-900 flex flex-col h-screen shrink-0 z-20 relative shadow-[2px_0_15px_rgba(0,0,0,0.01)] backdrop-blur-xl transition-colors duration-300">
-        
-        {/* Sidebar Header Brand */}
-        <div className="p-6 border-b border-slate-100 dark:border-slate-900/60 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)]">
-            <Layers className="w-5 h-5" />
-          </div>
-          <div className="flex flex-col select-none">
-            <span className="font-black text-slate-900 dark:text-white tracking-tight text-sm leading-none transition-colors duration-300">
-              KINETIC HUB
-            </span>
-            <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 tracking-widest uppercase mt-1 transition-colors duration-300">
-              Command Center
-            </span>
-          </div>
+      {/* 1. Left Navigation Sidebar (Reference 2 style) */}
+      <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
+        {/* Top Logo Button */}
+        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title="Kinetic Hub" onClick={() => router.push('/student/dashboard')}>
+          <Layers className="w-5 h-5" />
         </div>
 
-        {/* Sidebar Tab Lists */}
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
-          
-          {/* Dashboard */}
-          <button 
-            onClick={() => router.push('/student/dashboard?tab=dashboard')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <Compass className="w-4.5 h-4.5" />
-            <span>Dashboard</span>
-          </button>
-          
-          {/* Domains (Active tab) */}
-          <button 
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-extrabold transition-all bg-blue-50 text-blue-600 border border-blue-100/60 dark:bg-blue-600/10 dark:text-blue-400 dark:border-blue-500/20 shadow-xs cursor-default"
-          >
-            <Layers className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400" />
-            <span>Domains</span>
-          </button>
-          
-          {/* Learning */}
-          <button 
-            onClick={() => router.push('/student/dashboard?tab=learning')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <BookOpen className="w-4.5 h-4.5" />
-            <span>Learning</span>
-          </button>
+        {/* Sidebar Tabs */}
+        <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
+          {[
+            { id: 'dashboard', label: 'Dashboard', icon: Compass, route: '/student/dashboard?tab=dashboard' },
+            { id: 'domains', label: 'Domains', icon: Layers, route: '/student/domains' },
+            { id: 'learning', label: 'Learning Roadmap', route: '/student/dashboard?tab=learning', icon: BookOpen },
+            { id: 'practice', label: 'Practice Arena', route: '/student/dashboard?tab=practice', icon: BookOpenCheck },
+            { id: 'mockTests', label: 'Mock Tests', route: '/student/dashboard?tab=mockTests', icon: Award },
+            { id: 'careerHub', label: 'Career Hub', route: '/student/dashboard?tab=careerHub', icon: Briefcase },
+            { id: 'leaderboards', label: 'Leaderboard Rankings', route: '/student/dashboard?tab=leaderboards', icon: Trophy },
+            { id: 'badges', label: 'Badges & Achievements', route: '/student/dashboard?tab=badges', icon: Sparkles }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = tab.id === 'domains';
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  router.push(tab.route);
+                }}
+                title={tab.label}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer relative group/sidebar-btn ${
+                  isActive
+                    ? 'text-white dark:text-slate-900 shadow-md scale-105 z-10 font-bold'
+                    : 'text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 hover:scale-105 z-10'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeSidebarGlow"
+                    className="absolute inset-0 bg-[#111827] dark:bg-white rounded-full z-0 shadow-[0_0_15px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                    transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                  />
+                )}
+                {!isActive && (
+                  <div className="absolute inset-0 rounded-full bg-slate-100/0 dark:bg-slate-900/0 group-hover/sidebar-btn:bg-slate-100 dark:group-hover/sidebar-btn:bg-slate-900 transition-colors duration-200 z-0" />
+                )}
+                <Icon className="w-5 h-5 relative z-10 transition-transform duration-200 group-hover/sidebar-btn:scale-110" />
+              </button>
+            );
+          })}
 
-          {/* Practice Arena */}
-          <button 
-            onClick={() => router.push('/student/dashboard?tab=practice')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <BookOpenCheck className="w-4.5 h-4.5" />
-            <span>Practice Arena</span>
-          </button>
-
-          {/* Mock Tests */}
-          <button 
-            onClick={() => router.push('/student/dashboard?tab=mockTests')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <Award className="w-4.5 h-4.5" />
-            <span>Mock Tests</span>
-          </button>
-
-          {/* Career Hub */}
-          <button 
-            onClick={() => router.push('/student/dashboard?tab=careerHub')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <Briefcase className="w-4.5 h-4.5" />
-            <span>Career Hub</span>
-          </button>
-
-          {/* Leaderboards */}
-          <button 
-            onClick={() => router.push('/student/dashboard?tab=leaderboards')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <Trophy className="w-4.5 h-4.5" />
-            <span>Leaderboards</span>
-          </button>
-
-
-
-          {/* Sidebar Stats block */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-900 mt-4 space-y-2 select-none">
-            <div className="px-4 py-2 bg-slate-50 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-900 flex items-center justify-between text-[11px] font-bold">
-              <span className="text-slate-400 dark:text-slate-500">Solved Count</span>
-              <span className="text-blue-600 dark:text-blue-400 font-mono font-extrabold">{solvedCount} items</span>
-            </div>
-            <div className="px-4 py-2 bg-slate-50 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-900 flex items-center justify-between text-[11px] font-bold">
-              <span className="text-slate-400 dark:text-slate-500">Active Streak</span>
-              <span className="text-orange-600 dark:text-orange-400 font-mono font-extrabold flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" /> {streak} Days
-              </span>
-            </div>
-          </div>
-        </nav>
-
-        {/* User profile popup menu trigger */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-900/60 w-full flex flex-col items-center shrink-0 relative animate-fadeIn" ref={profileDropdownRef}>
-          <button
-            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            title="User Profile Menu"
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all cursor-pointer relative ${profileDropdownOpen ? 'ring-2 ring-blue-500 bg-slate-50 dark:bg-slate-900' : ''}`}
-          >
-            <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden relative border border-slate-200 dark:border-slate-800">
-              {profile.avatar && profile.avatar !== 'initial' ? (
-                <img 
-                  src={profile.avatar} 
-                  alt="User Avatar" 
-                  className="w-full h-full object-cover" 
-                />
-              ) : (
-                <User className="w-4.5 h-4.5" />
-              )}
-            </div>
-            
-            <div className="flex flex-col min-w-0 text-left flex-1">
-              <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
-                {profile.username || 'Vaishnavi Raparthy'}
-              </span>
-              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
-                {userEmail}
-              </span>
-            </div>
-
-            {/* Red dot notification badge */}
-            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
-          </button>
-
-          {/* User profile dropdown overlay */}
-          {profileDropdownOpen && (
-            <div className="absolute left-4 bottom-16 w-64 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
-              {/* Profile details header */}
-              <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
-                  {profile.avatar && profile.avatar !== 'initial' ? (
-                    <img 
-                      src={profile.avatar} 
-                      alt="User Avatar" 
-                      className="w-full h-full object-cover" 
-                    />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                </div>
-                <div className="flex flex-col min-w-0 text-left">
-                  <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
-                    {profile.username || 'Vaishnavi Raparthy'}
-                  </span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
-                    {userEmail}
-                  </span>
-                </div>
-              </div>
-
-              {/* Menu Options */}
-              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
-                
-                {/* My Profile option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=profile');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <User className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                  <span className="flex-1">My Profile</span>
-                </button>
-
-                {/* Account option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                  <span className="flex-1">Account</span>
-                </button>
-
-                {/* Buganizer (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <Bug className="w-4 h-4 shrink-0" />
-                    <span>Buganizer</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Sessions (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-600 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <List className="w-4 h-4 shrink-0" />
-                    <span>Sessions</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Troubleshooting option */}
-                <button
-                  onClick={() => {
-                    alert('Troubleshooting utility loaded. Sandbox is operating securely.');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                  <span className="flex-1">Troubleshooting</span>
-                </button>
-
-                {/* New Features option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=badges');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                    <span>New Features</span>
-                  </div>
-                  <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
-                </button>
-
-                {/* Theme Toggle option */}
-                <button
-                  onClick={() => {
-                    toggleTheme();
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  {theme === 'dark' ? (
-                    <>
-                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                      <span className="flex-1">Light Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                      <span className="flex-1">Dark Mode</span>
-                    </>
-                  )}
-                </button>
-
-                {/* Notification option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                    <span>Notification</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
-                </button>
-
-                {/* Divider */}
-                <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
-
-                {/* Logout option */}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
-                >
-                  <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
-                  <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
-                </button>
-
-              </div>
+          {/* Admin Tools Section */}
+          {currentRole?.role === 'admin' && (
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-900 w-full flex flex-col gap-3 items-center">
+              <button
+                onClick={() => router.push('/admin/editor')}
+                title="Content Creator (Admin)"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:scale-105 transition-all cursor-pointer"
+              >
+                <SettingsIcon className="w-4.5 h-4.5" />
+              </button>
+              <button
+                onClick={() => router.push('/admin/dashboard')}
+                title="Admin Dashboard"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:scale-105 transition-all cursor-pointer"
+              >
+                <Layers className="w-4.5 h-4.5" />
+              </button>
             </div>
           )}
-        </div>
+        </nav>
+
+
       </aside>
 
       {/* 2. Main content area panel */}
@@ -656,18 +446,195 @@ export default function DomainsScreen() {
               </p>
             </div>
             
-            {/* Search Box */}
-            <div className="relative w-64 sm:w-80 select-none">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-              </span>
-              <input 
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search learning domains..."
-                className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
-              />
+            <div className="flex items-center gap-4">
+              {/* Search Box */}
+              <div className="relative w-64 sm:w-80 select-none">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                </span>
+                <input 
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search learning domains..."
+                  className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
+                />
+              </div>
+
+              {/* User profile popup menu trigger */}
+              <div className="relative flex items-center shrink-0" ref={profileDropdownRef}>
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  title="User Profile Menu"
+                  className={`w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative overflow-hidden ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
+                >
+                  {profile.avatar && profile.avatar !== 'initial' ? (
+                    <img
+                      src={profile.avatar}
+                      alt="User Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
+
+                  {/* Red dot notification badge */}
+                  <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
+                </button>
+
+                {/* User profile dropdown overlay */}
+                {profileDropdownOpen && (
+                  <div className="absolute right-0 top-[120%] w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
+                    {/* Profile details header */}
+                    <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                        {profile.avatar && profile.avatar !== 'initial' ? (
+                          <img
+                            src={profile.avatar}
+                            alt="User Avatar"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0 text-left">
+                        <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
+                          {profile.username || 'Vaishnavi Raparthy'}
+                        </span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
+                          {userEmail || 'shellysros1922@gmail.com'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Menu Options */}
+                    <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+
+                      {/* My Profile option */}
+                      <button
+                        onClick={() => {
+                          router.push('/student/dashboard?tab=profile');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                        <span className="flex-1">My Profile</span>
+                      </button>
+
+                      {/* Account option */}
+                      <button
+                        onClick={() => {
+                          router.push('/student/dashboard?tab=settings');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                        <span className="flex-1">Account</span>
+                      </button>
+
+                      {/* Buganizer (locked option) */}
+                      <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
+                        <div className="flex items-center gap-3">
+                          <Bug className="w-4 h-4 shrink-0" />
+                          <span>Buganizer</span>
+                        </div>
+                        <Lock className="w-3.5 h-3.5" />
+                      </div>
+
+                      {/* Sessions (locked option) */}
+                      <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-600 opacity-60 select-none font-bold">
+                        <div className="flex items-center gap-3">
+                          <List className="w-4 h-4 shrink-0" />
+                          <span>Sessions</span>
+                        </div>
+                        <Lock className="w-3.5 h-3.5" />
+                      </div>
+
+                      {/* Troubleshooting option */}
+                      <button
+                        onClick={() => {
+                          alert('Troubleshooting utility loaded. Sandbox is operating securely.');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                        <span className="flex-1">Troubleshooting</span>
+                      </button>
+
+                      {/* New Features option */}
+                      <button
+                        onClick={() => {
+                          router.push('/student/dashboard?tab=badges');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                          <span>New Features</span>
+                        </div>
+                        <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
+                      </button>
+
+                      {/* Theme Toggle option */}
+                      <button
+                        onClick={() => {
+                          toggleTheme();
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        {theme === 'dark' ? (
+                          <>
+                            <Sun className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                            <span className="flex-1">Light Mode</span>
+                          </>
+                        ) : (
+                          <>
+                            <Moon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                            <span className="flex-1">Dark Mode</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* Notification option */}
+                      <button
+                        onClick={() => {
+                          router.push('/student/dashboard?tab=settings');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Bell className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                          <span>Notification</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
+                      </button>
+
+                      {/* Divider */}
+                      <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
+
+                      {/* Logout option */}
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                      >
+                        <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
+                        <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
+                      </button>
+
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -677,7 +644,7 @@ export default function DomainsScreen() {
             {/* Continue Last Learning Shortcut */}
             <button
               onClick={() => router.push('/student/dashboard?tab=learning')}
-              className="group flex items-center justify-between gap-6 bg-white border border-slate-200/80 dark:bg-slate-900/10 dark:border-slate-900/50 px-6 py-3 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.01)] hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:scale-[1.01] text-left cursor-pointer w-full md:w-[52%] lg:w-[55%] shrink-0"
+              className="group flex items-center justify-between gap-6 bg-white border-[3px] border-slate-300/80 dark:bg-slate-900/10 dark:border-slate-700/80 px-6 py-3 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.01)] hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:scale-[1.01] text-left cursor-pointer w-full md:w-[52%] lg:w-[55%] shrink-0"
             >
               <div className="space-y-1">
                 <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">continue last topic</span>
@@ -689,13 +656,10 @@ export default function DomainsScreen() {
             </button>
 
             {/* Daily Streak Badge */}
-            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-5 py-3 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] self-end md:self-auto">
-              <div className="relative flex h-2.5 w-2.5 items-center justify-center">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-              </div>
-              <span className="text-[10.5px] font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5 leading-none">
-                <Flame className="w-4 h-4 fill-indigo-550 text-indigo-500 dark:fill-indigo-400 dark:text-indigo-400" /> {streak} Day Streak
+            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] self-end md:self-auto">
+              <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
+                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
+                {streak}
               </span>
             </div>
 
@@ -717,24 +681,21 @@ export default function DomainsScreen() {
                     const slug = slugMap[d.id] || d.id;
                     router.push(`/domain/${slug}`);
                   }}
-                  className={`group bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[24px] p-6 md:p-8 flex flex-col justify-between gap-6 transition-all duration-300 ease-out cursor-pointer hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.015)] ${d.bgGlow}`}
+                  className={`group bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[24px] p-6 flex flex-col gap-6 transition-all duration-300 ease-out cursor-pointer hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.015)] ${d.bgGlow}`}
                 >
                   
-                  {/* Top content slot: Icon + Titles */}
+                  {/* Top content slot: Titles */}
                   <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-3">
+                    <div className="flex-1 pr-2">
                       
-                      {/* Domain Icon illustration */}
-                      <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 dark:bg-slate-950/45 dark:border-slate-900/80 flex items-center justify-center shadow-inner overflow-hidden select-none transition-colors duration-300">
-                        {d.icon}
-                      </div>
-
-                      {/* Header details */}
-                      <div className="space-y-1">
-                        <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight leading-tight uppercase font-heading transition-colors duration-300">
-                          {d.title}
-                        </h2>
-                        <p className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none transition-colors duration-300">
+                      {/* Large Header */}
+                      <h2 className="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight leading-none uppercase font-heading transition-colors duration-300">
+                        {d.title}
+                      </h2>
+                      
+                      {/* Description Area (Filling the blank space) */}
+                      <div className="mt-4">
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed uppercase tracking-wider">
                           {d.subtitle}
                         </p>
                       </div>
@@ -742,15 +703,10 @@ export default function DomainsScreen() {
                     </div>
 
                     {/* Progress Circle Graphic */}
-                    <div className="shrink-0 flex items-center justify-center bg-slate-50/50 border border-slate-100 dark:bg-slate-950/45 dark:border-slate-900/60 p-2 rounded-2xl transition-colors duration-300">
+                    <div className="shrink-0 flex items-center justify-center transition-colors duration-300 opacity-80 mix-blend-luminosity">
                       <ProgressRing progress={d.progress} color={d.accent} />
                     </div>
                   </div>
-
-                  {/* Middle Description text */}
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed transition-colors duration-300">
-                    {d.description}
-                  </p>
 
                   {/* Bottom slot: Stats metrics + Button */}
                   <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-900/80 pt-4 mt-1 select-none transition-colors duration-300">

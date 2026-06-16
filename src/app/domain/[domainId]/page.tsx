@@ -37,6 +37,7 @@ import {
   Moon
 } from 'lucide-react';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
+import { motion } from 'framer-motion';
 import {
   getDomainById,
   getDomainProgress,
@@ -96,6 +97,7 @@ export default function DomainDetailPage() {
   // Dark/Light Theme Switcher State
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [themeMounted, setThemeMounted] = useState(false);
+  const [currentRole, setCurrentRole] = useState<any>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -151,6 +153,7 @@ export default function DomainDetailPage() {
     if (roleStored) {
       try {
         const roleData = JSON.parse(roleStored);
+        setCurrentRole(roleData);
         if (roleData.email) setUserEmail(roleData.email);
       } catch (_) {}
     }
@@ -245,282 +248,77 @@ export default function DomainDetailPage() {
       <div className="absolute top-0 right-0 w-[550px] h-[550px] rounded-full bg-blue-500/3 dark:bg-blue-500/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full bg-purple-500/3 dark:bg-purple-500/5 blur-[140px] pointer-events-none" />
 
-      {/* 1. Left Navigation Sidebar */}
-      <aside className="w-64 bg-white dark:bg-slate-950/80 border-r border-slate-200 dark:border-slate-900 flex flex-col h-screen shrink-0 z-20 relative shadow-[2px_0_15px_rgba(0,0,0,0.01)] backdrop-blur-xl transition-colors duration-300">
-        {/* Brand Header */}
-        <div className="p-6 border-b border-slate-100 dark:border-slate-900/60 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_4px_12px_rgba(59,130,246,0.25)]">
-            <Layers className="w-5 h-5" />
-          </div>
-          <div className="flex flex-col select-none">
-            <span className="font-black text-slate-900 dark:text-white tracking-tight text-sm leading-none transition-colors duration-300">
-              KINETIC HUB
-            </span>
-            <span className="text-[9px] font-bold text-blue-600 dark:text-blue-400 tracking-widest uppercase mt-1 transition-colors duration-300">
-              Command Center
-            </span>
-          </div>
+      {/* 1. Left Navigation Sidebar (Reference 2 style) */}
+      <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
+        {/* Top Logo Button */}
+        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title="Kinetic Hub" onClick={() => router.push('/student/dashboard')}>
+          <Layers className="w-5 h-5" />
         </div>
 
-        {/* Sidebar Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
-          <button
-            onClick={() => router.push('/student/dashboard?tab=dashboard')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <Compass className="w-4.5 h-4.5" />
-            <span>Dashboard</span>
-          </button>
+        {/* Sidebar Tabs */}
+        <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
+          {[
+            { id: 'dashboard', label: 'Dashboard', icon: Compass, route: '/student/dashboard?tab=dashboard' },
+            { id: 'domains', label: 'Domains', icon: Layers, route: '/student/domains' },
+            { id: 'learning', label: 'Learning Roadmap', route: '/student/dashboard?tab=learning', icon: BookOpen },
+            { id: 'practice', label: 'Practice Arena', route: '/student/dashboard?tab=practice', icon: BookOpenCheck },
+            { id: 'mockTests', label: 'Mock Tests', route: '/student/dashboard?tab=mockTests', icon: Award },
+            { id: 'careerHub', label: 'Career Hub', route: '/student/dashboard?tab=careerHub', icon: Briefcase },
+            { id: 'leaderboards', label: 'Leaderboard Rankings', route: '/student/dashboard?tab=leaderboards', icon: Trophy },
+            { id: 'badges', label: 'Badges & Achievements', route: '/student/dashboard?tab=badges', icon: Sparkles }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = tab.id === 'domains';
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  router.push(tab.route);
+                }}
+                title={tab.label}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer relative group/sidebar-btn ${
+                  isActive
+                    ? 'text-white dark:text-slate-950 shadow-md scale-105 z-10 font-bold'
+                    : 'text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 hover:scale-105 z-10'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeSidebarGlow"
+                    className="absolute inset-0 bg-[#111827] dark:bg-white rounded-full z-0 shadow-[0_0_15px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                    transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                  />
+                )}
+                {!isActive && (
+                  <div className="absolute inset-0 rounded-full bg-slate-100/0 dark:bg-slate-900/0 group-hover/sidebar-btn:bg-slate-100 dark:group-hover/sidebar-btn:bg-slate-900 transition-colors duration-200 z-0" />
+                )}
+                <Icon className="w-5 h-5 relative z-10 transition-transform duration-200 group-hover/sidebar-btn:scale-110" />
+              </button>
+            );
+          })}
 
-          <button
-            onClick={() => router.push('/student/domains')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-extrabold transition-all bg-blue-50 text-blue-600 border border-blue-100/60 dark:bg-blue-600/10 dark:text-blue-400 dark:border-blue-500/20 shadow-xs cursor-pointer"
-          >
-            <Layers className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400" />
-            <span>Domains</span>
-          </button>
-
-          <button
-            onClick={() => router.push('/student/dashboard?tab=learning')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <BookOpen className="w-4.5 h-4.5" />
-            <span>Learning</span>
-          </button>
-
-          <button
-            onClick={() => router.push('/student/dashboard?tab=practice')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <BookOpenCheck className="w-4.5 h-4.5" />
-            <span>Practice Arena</span>
-          </button>
-
-          <button
-            onClick={() => router.push('/student/dashboard?tab=mockTests')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <Award className="w-4.5 h-4.5" />
-            <span>Mock Tests</span>
-          </button>
-
-          <button
-            onClick={() => router.push('/student/dashboard?tab=careerHub')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <Briefcase className="w-4.5 h-4.5" />
-            <span>Career Hub</span>
-          </button>
-
-          <button
-            onClick={() => router.push('/student/dashboard?tab=leaderboards')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 cursor-pointer"
-          >
-            <Trophy className="w-4.5 h-4.5" />
-            <span>Leaderboards</span>
-          </button>
-
-
-
-          {/* Quick Metrics in Sidebar */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-900 mt-4 space-y-2 select-none">
-            <div className="px-4 py-2 bg-slate-50 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-900 flex items-center justify-between text-[11px] font-bold">
-              <span className="text-slate-400 dark:text-slate-500">Solved Count</span>
-              <span className="text-blue-600 dark:text-blue-400 font-mono font-extrabold">{solvedGlobal} items</span>
-            </div>
-            <div className="px-4 py-2 bg-slate-50 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-900 flex items-center justify-between text-[11px] font-bold">
-              <span className="text-slate-400 dark:text-slate-500">Active Streak</span>
-              <span className="text-orange-600 dark:text-orange-400 font-mono font-extrabold flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" /> {streak} Days
-              </span>
-            </div>
-          </div>
-        </nav>
-
-        {/* User profile popup menu trigger */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-900/60 w-full flex flex-col items-center shrink-0 relative animate-fadeIn" ref={profileDropdownRef}>
-          <button
-            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            title="User Profile Menu"
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all cursor-pointer relative ${profileDropdownOpen ? 'ring-2 ring-blue-500 bg-slate-50 dark:bg-slate-900' : ''}`}
-          >
-            <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden relative border border-slate-200 dark:border-slate-800">
-              {profile.avatar && profile.avatar !== 'initial' ? (
-                <img 
-                  src={profile.avatar} 
-                  alt="User Avatar" 
-                  className="w-full h-full object-cover" 
-                />
-              ) : (
-                <User className="w-4.5 h-4.5" />
-              )}
-            </div>
-            
-            <div className="flex flex-col min-w-0 text-left flex-1">
-              <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
-                {profile.username || 'Vaishnavi Raparthy'}
-              </span>
-              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
-                {userEmail}
-              </span>
-            </div>
-
-            {/* Red dot notification badge */}
-            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
-          </button>
-
-          {/* User profile dropdown overlay */}
-          {profileDropdownOpen && (
-            <div className="absolute left-4 bottom-16 w-64 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
-              {/* Profile details header */}
-              <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
-                  {profile.avatar && profile.avatar !== 'initial' ? (
-                    <img 
-                      src={profile.avatar} 
-                      alt="User Avatar" 
-                      className="w-full h-full object-cover" 
-                    />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                </div>
-                <div className="flex flex-col min-w-0 text-left">
-                  <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
-                    {profile.username || 'Vaishnavi Raparthy'}
-                  </span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-600 font-semibold truncate leading-normal">
-                    {userEmail}
-                  </span>
-                </div>
-              </div>
-
-              {/* Menu Options */}
-              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
-                
-                {/* My Profile option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=profile');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <User className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                  <span className="flex-1">My Profile</span>
-                </button>
-
-                {/* Account option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                  <span className="flex-1">Account</span>
-                </button>
-
-                {/* Buganizer (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <Bug className="w-4 h-4 shrink-0" />
-                    <span>Buganizer</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Sessions (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-600 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <List className="w-4 h-4 shrink-0" />
-                    <span>Sessions</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Troubleshooting option */}
-                <button
-                  onClick={() => {
-                    alert('Troubleshooting utility loaded. Sandbox is operating securely.');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                  <span className="flex-1">Troubleshooting</span>
-                </button>
-
-                {/* New Features option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=badges');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                    <span>New Features</span>
-                  </div>
-                  <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
-                </button>
-
-                {/* Theme Toggle option */}
-                <button
-                  onClick={() => {
-                    toggleTheme(); // Theme Toggle inside details tab checks theme logic directly
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  {theme === 'dark' ? (
-                    <>
-                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                      <span className="flex-1">Light Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                      <span className="flex-1">Dark Mode</span>
-                    </>
-                  )}
-                </button>
-
-                {/* Notification option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                    <span>Notification</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
-                </button>
-
-                {/* Divider */}
-                <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
-
-                {/* Logout option */}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
-                >
-                  <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
-                  <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
-                </button>
-
-              </div>
+          {/* Admin Tools Section */}
+          {currentRole?.role === 'admin' && (
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-900 w-full flex flex-col gap-3 items-center">
+              <button
+                onClick={() => router.push('/admin/editor')}
+                title="Content Creator (Admin)"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:scale-105 transition-all cursor-pointer"
+              >
+                <SettingsIcon className="w-4.5 h-4.5" />
+              </button>
+              <button
+                onClick={() => router.push('/admin/dashboard')}
+                title="Admin Dashboard"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:scale-105 transition-all cursor-pointer"
+              >
+                <Layers className="w-4.5 h-4.5" />
+              </button>
             </div>
           )}
-        </div>
+        </nav>
+
+
       </aside>
 
       {/* 2. Main Content View */}
@@ -536,6 +334,180 @@ export default function DomainDetailPage() {
               <span>Back to Domains</span>
             </button>
 
+            {/* User profile popup menu trigger */}
+            <div className="relative flex items-center shrink-0" ref={profileDropdownRef}>
+              <button
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                title="User Profile Menu"
+                className={`w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative overflow-hidden ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
+              >
+                {profile.avatar && profile.avatar !== 'initial' ? (
+                  <img
+                    src={profile.avatar}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-5 h-5" />
+                )}
+
+                {/* Red dot notification badge */}
+                <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
+              </button>
+
+              {/* User profile dropdown overlay */}
+              {profileDropdownOpen && (
+                <div className="absolute right-0 top-[120%] w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
+                  {/* Profile details header */}
+                  <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                      {profile.avatar && profile.avatar !== 'initial' ? (
+                        <img
+                          src={profile.avatar}
+                          alt="User Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="flex flex-col min-w-0 text-left">
+                      <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
+                        {profile.username || 'Vaishnavi Raparthy'}
+                      </span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
+                        {userEmail || 'shellysros1922@gmail.com'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Menu Options */}
+                  <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+
+                    {/* My Profile option */}
+                    <button
+                      onClick={() => {
+                        router.push('/student/dashboard?tab=profile');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span className="flex-1">My Profile</span>
+                    </button>
+
+                    {/* Account option */}
+                    <button
+                      onClick={() => {
+                        router.push('/student/dashboard?tab=settings');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                      <span className="flex-1">Account</span>
+                    </button>
+
+                    {/* Buganizer (locked option) */}
+                    <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
+                      <div className="flex items-center gap-3">
+                        <Bug className="w-4 h-4 shrink-0" />
+                        <span>Buganizer</span>
+                      </div>
+                      <Lock className="w-3.5 h-3.5" />
+                    </div>
+
+                    {/* Sessions (locked option) */}
+                    <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-600 opacity-60 select-none font-bold">
+                      <div className="flex items-center gap-3">
+                        <List className="w-4 h-4 shrink-0" />
+                        <span>Sessions</span>
+                      </div>
+                      <Lock className="w-3.5 h-3.5" />
+                    </div>
+
+                    {/* Troubleshooting option */}
+                    <button
+                      onClick={() => {
+                        alert('Troubleshooting utility loaded. Sandbox is operating securely.');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                      <span className="flex-1">Troubleshooting</span>
+                    </button>
+
+                    {/* New Features option */}
+                    <button
+                      onClick={() => {
+                        router.push('/student/dashboard?tab=badges');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                        <span>New Features</span>
+                      </div>
+                      <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
+                    </button>
+
+                    {/* Theme Toggle option */}
+                    <button
+                      onClick={() => {
+                        toggleTheme();
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      {theme === 'dark' ? (
+                        <>
+                          <Sun className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                          <span className="flex-1">Light Mode</span>
+                        </>
+                      ) : (
+                        <>
+                          <Moon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                          <span className="flex-1">Dark Mode</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Notification option */}
+                    <button
+                      onClick={() => {
+                        router.push('/student/dashboard?tab=settings');
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Bell className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
+                        <span>Notification</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
+                    </button>
+
+                    {/* Divider */}
+                    <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
+
+                    {/* Logout option */}
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setProfileDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                    >
+                      <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
+                      <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
+                    </button>
+
+                  </div>
+                </div>
+              )}
+            </div>
 
           </div>
 
