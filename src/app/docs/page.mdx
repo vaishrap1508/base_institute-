@@ -4,7 +4,6 @@ import { Callout } from 'nextra/components'
 <div className="relative overflow-hidden rounded-[24px] border border-slate-200/60 dark:border-slate-800/80 bg-linear-to-br from-blue-50/50 to-indigo-50/20 dark:from-slate-950/80 dark:to-slate-900/30 p-8 md:p-12 mb-10 shadow-xs mt-4">
   <div className="absolute top-0 right-0 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
   <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-  
   <div className="relative z-10 max-w-2xl flex flex-col gap-4">
     <div className="inline-flex items-center gap-1.5 bg-blue-100/60 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20 text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full self-start">
       Engineering Knowledge Base
@@ -12,21 +11,17 @@ import { Callout } from 'nextra/components'
     <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white my-0 leading-tight">
       Kinetic Developer Hub
     </h1>
-    <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed my-0">
+    <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed my-0">
       Access the official engineering specifications, API reference blocks, Supabase schema designs, and continuous deployment checklists for the Kinetic Hub.
-    </p>
-
+    </div>
     <div className="flex flex-wrap items-center gap-4 mt-6">
-      <div 
-        className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 shadow-xs hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 max-w-xs w-full"
-      >
+      <div className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 shadow-xs hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 max-w-xs w-full">
         <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
         <span className="text-xs text-slate-400 dark:text-slate-500">Search documentation...</span>
         <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 px-1.5 font-mono text-[9px] font-medium text-slate-400 dark:text-slate-500">
           <span className="text-xs">⌘</span>K
         </kbd>
       </div>
-
       <a href="./docs/getting-started" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold text-xs px-6 py-3.5 rounded-xl shadow-xs transition-all hover:translate-y-[-1px] no-underline">
         Start Reading
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
