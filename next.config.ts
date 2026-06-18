@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       'next-mdx-import-source-file': './src/mdx-components.tsx',
     },
   },
+  devIndicators: false,
 };
 
 export default withNextra(nextConfig);
