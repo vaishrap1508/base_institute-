@@ -1,6 +1,5 @@
 import { Callout } from 'nextra/components'
 
-{/* Premium Hero Banner Section */}
 <div className="relative overflow-hidden rounded-[24px] border border-slate-200/60 dark:border-slate-800/80 bg-linear-to-br from-blue-50/50 to-indigo-50/20 dark:from-slate-950/80 dark:to-slate-900/30 p-8 md:p-12 mb-10 shadow-xs mt-4">
   <div className="absolute top-0 right-0 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
   <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -32,14 +31,12 @@ import { Callout } from 'nextra/components'
 
 ---
 
-{/* Developer Portal Overview */}
 ## Overview
 
 Kinetic is an advanced, gamified learning platform tailored for student education and cohort management. The application features an adaptive learning dashboard, structured curriculum domains, visual questions engines, real-time feedback systems, and editorial pipelines for content creation and review.
 
 ---
 
-{/* Statistics Section */}
 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 mt-6">
   <div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-1 text-center md:text-left shadow-2xs">
     <span className="text-3xl font-black text-blue-600 dark:text-blue-400">62</span>
@@ -55,7 +52,7 @@ Kinetic is an advanced, gamified learning platform tailored for student educatio
   </div>
   <div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-5 flex items-center justify-between gap-1 shadow-2xs">
     <div className="flex flex-col text-center md:text-left">
-      <span className="text-base font-bold text-slate-800 dark:text-slate-100 leading-tight">Ready</span>
+      <span className="text-base font-bold text-slate-850 dark:text-slate-100 leading-tight">Ready</span>
       <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1 justify-center md:justify-start">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block" /> Production
       </span>
@@ -68,13 +65,11 @@ Kinetic is an advanced, gamified learning platform tailored for student educatio
 
 ---
 
-{/* Developer Resources Grid */}
 ## Documentation Sections
 
 Explore the key resource domains of the platform:
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-  {/* 1. Quick Start */}
   <a href="./docs/getting-started" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
     <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -85,11 +80,10 @@ Explore the key resource domains of the platform:
     <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
       Quick Start
     </h3>
-    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+    <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
       Step-by-step instructions to configure variables, set up database tables, and run development servers locally.
-    </p>
+    </div>
   </a>
-  {/* 2. Architecture */}
   <a href="./docs/architecture" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
     <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -100,11 +94,10 @@ Explore the key resource domains of the platform:
     <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
       Architecture Specs
     </h3>
-    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+    <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
       Deep dive into layering models, Google OAuth sequence diagrams, and learning flow blueprints.
-    </p>
+    </div>
   </a>
-  {/* 3. Product Documentation */}
   <a href="./docs/student-platform" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
     <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -115,11 +108,10 @@ Explore the key resource domains of the platform:
     <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
       Product Documentation
     </h3>
-    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+    <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
       Curriculum directory, interactive practice arena, discussion forums, and gamified streak boards.
-    </p>
+    </div>
   </a>
-  {/* 4. API Reference */}
   <a href="./docs/api" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
     <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -130,13 +122,12 @@ Explore the key resource domains of the platform:
     <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
       API Reference
     </h3>
-    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+    <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
       Auth, questions directories, domain tracking, and telemetry event logging REST payload models.
-    </p>
+    </div>
   </a>
-  {/* 5. Database */}
   <a href="./docs/database" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
+    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
     </div>
     <div className="w-10 h-10 rounded-xl bg-cyan-100/60 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
@@ -145,11 +136,10 @@ Explore the key resource domains of the platform:
     <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
       Database
     </h3>
-    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+    <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
       Entity-Relationship models, Row-Level Security policy layers, table schemas, and SQL migration records.
-    </p>
+    </div>
   </a>
-  {/* 6. Deployment */}
   <a href="./docs/deployment" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
     <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -160,11 +150,10 @@ Explore the key resource domains of the platform:
     <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
       Deployment
     </h3>
-    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+    <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
       Pipeline validation checks, Vercel deployments, build hooks configs, and environment checklist criteria.
-    </p>
+    </div>
   </a>
-  {/* 7. Troubleshooting */}
   <a href="./docs/troubleshooting" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
     <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
@@ -175,15 +164,28 @@ Explore the key resource domains of the platform:
     <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
       Troubleshooting
     </h3>
-    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+    <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
       Diagnosing and resolving compiling build checks, database limits, and middleware callback warnings.
-    </p>
+    </div>
+  </a>
+  <a href="./docs/content-creator" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
+    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+    </div>
+    <div className="w-10 h-10 rounded-xl bg-teal-100/60 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+    </div>
+    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+      Content Creator Guide
+    </h3>
+    <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
+      Learn how to structure metadata, map curriculum domains, and verify math equations.
+    </div>
   </a>
 </div>
 
 ---
 
-{/* Most Visited Documents Section */}
 <div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-6 mt-10 shadow-xs">
   <h3 className="text-base font-extrabold text-slate-800 dark:text-white m-0 flex items-center gap-2">
     <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
