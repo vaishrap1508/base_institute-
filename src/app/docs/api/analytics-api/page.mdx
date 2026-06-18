@@ -1,0 +1,208 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Analytics API
+
+This page provides technical specifications for user activity tracking, lesson interactions, and administrative analytics reporting endpoints.
+
+---
+
+## Overview
+
+The Analytics API subsystem ingestion pipeline processes events such as page views, video progress, practice session starts, and lesson durations. Administrative analytics aggregation endpoints compile these records to construct usage maps, track active sessions, signup statistics, and progress diagnostics.
+
+## Purpose
+
+The Analytics API enables tracking user progression and platform engagement. Telemetry data feeds the adaptive review engine and leaderboard algorithms while furnishing administrators with insights into module usage, peak activity times, and badge progression rates.
+
+## Architecture / Flow
+
+Event ingestions run through an asynchronous background logging pipeline, using queuing buffers to guarantee that client navigation is never blocked. Telemetry data maps directly to DB triggers, updating active streaks and daily statistics asynchronously.
+
+---
+
+## Endpoints
+
+### 1. Log Student Activity Event
+Records user interactions like page navigation, practice starts, and lesson durations.
+
+- **Endpoint**: `/api/student/activity`
+- **Method**: `POST`
+- **Authentication Requirements**: Valid JWT Token (Student/Editor/Admin)
+- **Rate Limit**: 120 requests per user per minute.
+- **Request Body**:
+  - `event_type` (string, required): Type of the interaction (e.g., `view_page`, `start_video`, `complete_question`).
+  - `page_url` (string, required): Relative path of the page (e.g., `/student/dashboard`).
+  - `duration_seconds` (number, required): Seconds elapsed during the activity block.
+
+#### Example Request & Response
+```json
+// POST /api/student/activity
+{
+  "event_type": "view_page",
+  "page_url": "/student/dashboard",
+  "duration_seconds": 45
+}
+```
+
+```json
+// Response 200 OK
+{
+  "success": true,
+  "status": "logged",
+  "daily_active_user": true
+}
+```
+
+#### Code Snippets
+<Tabs items={['cURL', 'JavaScript', 'TypeScript']}>
+  <Tabs.Tab>
+    ```bash
+    curl -X POST http://localhost:3000/api/student/activity \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your_jwt_token>" \
+      -d '{"event_type": "view_page", "page_url": "/student/dashboard", "duration_seconds": 45}'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript
+    fetch('/api/student/activity', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        event_type: 'view_page',
+        page_url: '/student/dashboard',
+        duration_seconds: 45
+      })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data));
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript
+    interface ActivityPayload {
+      event_type: string;
+      page_url: string;
+      duration_seconds: number;
+    }
+
+    interface ActivityResponse {
+      success: boolean;
+      status: string;
+      daily_active_user: boolean;
+    }
+
+    async function logActivity(payload: ActivityPayload, token: string): Promise<ActivityResponse> {
+      const response = await fetch('/api/student/activity', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      return response.json();
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+### 2. Get Administrative Analytics Overview
+Retrieves aggregated engagement and progress metrics for the admin badges dashboards.
+
+- **Endpoint**: `/api/admin/badges/stats`
+- **Method**: `GET`
+- **Authentication Requirements**: Valid JWT with ADMIN role status.
+- **Rate Limit**: 30 requests per minute per admin.
+
+#### Example Request & Response
+```http
+GET /api/admin/badges/stats HTTP/1.1
+Host: localhost:3000
+Authorization: Bearer <admin_jwt_token>
+```
+
+```json
+// Response 200 OK
+{
+  "daily_signups": 12,
+  "active_sessions": 142,
+  "test_completions": 48
+}
+```
+
+#### Code Snippets
+<Tabs items={['cURL', 'JavaScript', 'TypeScript']}>
+  <Tabs.Tab>
+    ```bash
+    curl -X GET http://localhost:3000/api/admin/badges/stats \
+      -H "Authorization: Bearer <admin_jwt_token>"
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript
+    fetch('/api/admin/badges/stats', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + adminToken
+      }
+    })
+    .then(res => res.json())
+    .then(data => console.log(data));
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript
+    interface AdminStatsResponse {
+      daily_signups: number;
+      active_sessions: number;
+      test_completions: number;
+    }
+
+    async function getAdminStats(adminToken: string): Promise<AdminStatsResponse> {
+      const response = await fetch('/api/admin/badges/stats', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`
+        }
+      });
+      return response.json();
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+## Key Components
+
+- `/api/student/activity/route.ts`: Ingestion endpoint handler verifying JWT identity and writing to user activity history logs.
+- `/api/admin/badges/stats/route.ts`: Aggregator handler running grouping queries to return operational dashboards indices.
+
+---
+
+## Database Impact
+
+- **Table `student_activity_logs`**: Appends telemetry records containing session timestamps and event payloads.
+- **Table `user_streaks`**: Triggers increment user streaks if user activity spans distinct consecutive calendar days.
+
+---
+
+## Best Practices
+
+<Callout type="info">
+  **Batching**: Batch client activity logs to send updates in 30-second heartbeats rather than firing requests on every minor user action, reducing database load.
+</Callout>
+
+---
+
+## Related Documents
+
+Related Reading:
+- **[System Overview](../../architecture/system-overview)**: Architecture context and telemetry stream handling.
+- **[Database Schema](../../database/schema-overview)**: Data models for user activities and daily engagement tracking.

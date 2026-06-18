@@ -1355,12 +1355,156 @@ select:-webkit-autofill:focus {
 .dark textarea:-webkit-autofill:hover,
 .dark textarea:-webkit-autofill:focus,
 .dark select:-webkit-autofill,
-.dark select:-webkit-autofill:hover,
 .dark select:-webkit-autofill:focus {
   -webkit-text-fill-color: #f8fafc !important;
   -webkit-box-shadow: 0 0 0px 1000px #020617 inset !important;
   box-shadow: 0 0 0px 1000px #020617 inset !important;
   border-color: #1e293b !important;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ==========================================================================
+   DEVELOPER PORTAL & NEXTRA DOCUMENTATION PORTAL STYLING OVERRIDES
+   ========================================================================== */
+
+/* Typography & Layout Spacing */
+article {
+  font-family: var(--font-body) !important;
+  color: var(--clr-text-2) !important;
+  line-height: 1.75 !important;
+  font-size: 0.9375rem !important;
+}
+
+article h1 {
+  font-family: var(--font-heading) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  color: var(--clr-text) !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.2 !important;
+}
+
+article h2 {
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--clr-text) !important;
+  margin-top: 2rem !important;
+  margin-bottom: 0.85rem !important;
+  line-height: 1.3 !important;
+  border-bottom: 1px solid var(--clr-border) !important;
+  padding-bottom: 0.35rem !important;
+}
+
+article h3 {
+  font-family: var(--font-heading) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  color: var(--clr-text) !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 0.75rem !important;
+  line-height: 1.4 !important;
+}
+
+article p {
+  margin-bottom: 1.25rem !important;
+}
+
+/* Callouts Styling */
+.nx-callout, .nextra-callout {
+  border-radius: 12px !important;
+  border-left-width: 4px !important;
+  padding: 1.15rem 1.4rem !important;
+  margin: 1.75rem 0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03) !important;
+  font-size: 0.9rem !important;
+}
+
+/* responsive premium tables */
+article table {
+  display: block !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  border-collapse: collapse !important;
+  margin: 2rem 0 !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--clr-border) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+article th {
+  background-color: var(--clr-bg) !important;
+  color: var(--clr-text) !important;
+  font-weight: 700 !important;
+  font-size: 0.825rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 0.85rem 1.15rem !important;
+  border-bottom: 2px solid var(--clr-border) !important;
+  text-align: left !important;
+}
+
+.dark article th {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+article td {
+  padding: 0.85rem 1.15rem !important;
+  border-bottom: 1px solid var(--clr-border) !important;
+  font-size: 0.875rem !important;
+  color: var(--clr-text-2) !important;
+}
+
+article tr:last-child td {
+  border-bottom: none !important;
+}
+
+article tr:hover td {
+  background-color: rgba(37, 99, 235, 0.02) !important;
+}
+.dark article tr:hover td {
+  background-color: rgba(96, 165, 250, 0.02) !important;
+}
+
+/* Mermaid Diagrams Padding and Spacing */
+.mermaid {
+  background: var(--clr-surface) !important;
+  border: 1px solid var(--clr-border) !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+  margin: 2rem 0 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04) !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* Premium Sidebar Active States styling */
+.nextra-sidebar-container a {
+  transition: all 0.15s ease !important;
+}
+
+.nextra-sidebar-container a:hover {
+  color: var(--clr-primary) !important;
+}
+
+.nextra-sidebar-container a.active {
+  color: var(--clr-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* Code Blocks polish styling */
+article pre {
+  border-radius: 12px !important;
+  border: 1px solid var(--clr-border) !important;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05) !important;
+  margin: 1.75rem 0 !important;
+  padding: 1.25rem !important;
+}
+
+article pre code {
+  font-family: var(--font-code) !important;
+  font-size: 0.85rem !important;
+  line-height: 1.6 !important;
 }
 

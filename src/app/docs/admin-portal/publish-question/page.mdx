@@ -1,0 +1,54 @@
+import { Callout } from 'nextra/components'
+
+# Publish Question
+
+The interface to submit drafted questions for review, check validation rules, and track publication status.
+
+---
+
+
+## Overview
+
+This page provides an overview and technical specifications for the Publish Question subsystem within the Kinetic Platform.
+
+## Purpose
+The Publish Question workflow manages the lifecycle of a question. It validates content completeness (verifying options, formulas, and answers) and forwards approved items to the master directory.
+
+## Features
+- **Validation Checklist Panel**: Scans questions for spelling errors, formatting issues, and correct answer flags.
+- **Workflow State Monitor**: Displays the current status of submissions (e.g. `Draft`, `In Review`, `Approved`, `Published`).
+- **Publication Scheduling Calendar**: Allows creators to schedule when approved questions go live.
+
+## Data Sources
+- **Questions Table**: Updates state attributes (`status`) and publish dates (`published_at`).
+- **Profiles Table**: Records the creator ID associated with the publication.
+
+## User Actions
+- **Request Review**: Triggers validation checks and moves the question to `in_review` status.
+- **Cancel Submission**: Retracts the request, returning the question to `draft` status.
+
+## Notes
+> [!NOTE]
+> Questions can be published immediately or scheduled to release with a specific database migration script or platform update.
+
+---
+
+## Architecture
+
+This component is integrated into the Next.js and Supabase tier, responding dynamically to API endpoints and schema constraints.
+
+---
+
+## Best Practices
+
+<Callout type="info">
+  **Best Practice**: Ensure that properties and state interfaces remain synchronized with type definitions across the workspace.
+</Callout>
+
+---
+
+## Related Links
+
+Related Reading:
+- **[System Overview](../../architecture/system-overview)**: Multi-tier architectural blueprints.
+- **[Getting Started](../../getting-started)**: Setup guide for local developers.

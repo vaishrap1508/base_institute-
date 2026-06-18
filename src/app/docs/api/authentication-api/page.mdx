@@ -1,0 +1,284 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Authentication API
+
+This page provides specifications for the user registration, email verification, session authentication, and account credentials recovery endpoints.
+
+---
+
+## Overview
+
+The Authentication API manages user identity records, password verification, social sign-ins, and session tokens. Next.js App Router API route handlers route operations directly to Supabase Auth servers, issuing secure HTTP-only cookies on successful logins.
+
+## Purpose
+
+The authentication routes establish identity contexts for client requests. Encapsulating registration verification prevents spam and ensures that all user records correspond to validated academic emails.
+
+## Architecture / Flow
+
+Authentication routes run through Edge routing filters that check cookie states. Credentials sign-ups dispatch email verification actions, while Google OAuth redirects flow through token exchange routes.
+
+---
+
+## Endpoints
+
+### 1. User Registration
+Creates a pending credentials record and dispatches a verification token email.
+
+- **Endpoint**: `/api/auth/register`
+- **Method**: `POST`
+- **Authentication Requirements**: None (Public)
+- **Rate Limit**: 5 registrations per IP per hour.
+- **Request Body**:
+  - `email` (string, required): Valid academic email address.
+  - `password` (string, required): Alphanumeric password (min 8 characters).
+  - `full_name` (string, required): Full name.
+
+#### Example Request & Response
+```json
+// POST /api/auth/register
+{
+  "email": "student@university.edu",
+  "password": "SecurePassword123!",
+  "full_name": "Sriram Neppalli"
+}
+```
+
+```json
+// Response 201 Created
+{
+  "success": true,
+  "message": "Verification email sent. Please confirm your account.",
+  "user_id": "usr_992831"
+}
+```
+
+#### Code Snippets
+<Tabs items={['cURL', 'JavaScript', 'TypeScript']}>
+  <Tabs.Tab>
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/register \
+      -H "Content-Type: application/json" \
+      -d '{"email":"student@university.edu", "password":"SecurePassword123!", "full_name":"Sriram Neppalli"}'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript
+    fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'student@university.edu',
+        password: 'SecurePassword123!',
+        full_name: 'Sriram Neppalli'
+      })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data));
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript
+    interface RegisterResponse {
+      success: boolean;
+      message: string;
+      user_id: string;
+    }
+
+    async function registerUser(): Promise<RegisterResponse> {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'student@university.edu',
+          password: 'SecurePassword123!',
+          full_name: 'Sriram Neppalli'
+        })
+      });
+      return response.json();
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+### 2. Verify Email
+Verifies a registration hash and issues session authorization tokens.
+
+- **Endpoint**: `/api/auth/verify`
+- **Method**: `POST`
+- **Authentication Requirements**: None (Public)
+- **Rate Limit**: 10 attempts per minute.
+- **Request Body**:
+  - `token` (string, required): Hash validation string.
+
+#### Example Request & Response
+```json
+// POST /api/auth/verify
+{
+  "token": "verification_token_hash_value"
+}
+```
+
+```json
+// Response 200 OK
+{
+  "success": true,
+  "session": {
+    "access_token": "jwt_session_token_value",
+    "expires_in": 3600
+  }
+}
+```
+
+#### Code Snippets
+<Tabs items={['cURL', 'JavaScript', 'TypeScript']}>
+  <Tabs.Tab>
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/verify \
+      -H "Content-Type: application/json" \
+      -d '{"token":"verification_token_hash_value"}'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript
+    fetch('/api/auth/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: 'verification_token_hash_value' })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data));
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript
+    interface VerifyResponse {
+      success: boolean;
+      session: {
+        access_token: string;
+        expires_in: number;
+      }
+    }
+
+    async function verifyToken(token: string): Promise<VerifyResponse> {
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      return response.json();
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+### 3. Account Login
+Authenticates user credentials and establishes secure session cookies.
+
+- **Endpoint**: `/api/auth/login`
+- **Method**: `POST`
+- **Authentication Requirements**: None (Public)
+- **Rate Limit**: 10 login queries per IP per minute.
+- **Request Body**:
+  - `email` (string, required): Registered user email.
+  - `password` (string, required): User password.
+
+#### Example Request & Response
+```json
+// POST /api/auth/login
+{
+  "email": "student@university.edu",
+  "password": "SecurePassword123!"
+}
+```
+
+```json
+// Response 200 OK
+{
+  "success": true,
+  "role": "STUDENT",
+  "onboarding_completed": true
+}
+```
+
+#### Code Snippets
+<Tabs items={['cURL', 'JavaScript', 'TypeScript']}>
+  <Tabs.Tab>
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/login \
+      -H "Content-Type: application/json" \
+      -d '{"email":"student@university.edu", "password":"SecurePassword123!"}'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'student@university.edu',
+        password: 'SecurePassword123!'
+      })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data));
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript
+    interface LoginResponse {
+      success: boolean;
+      role: 'STUDENT' | 'EDITOR' | 'ADMIN';
+      onboarding_completed: boolean;
+    }
+
+    async function loginUser(): Promise<LoginResponse> {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'student@university.edu',
+          password: 'SecurePassword123!'
+        })
+      });
+      return response.json();
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+## Key Components
+
+- `/api/auth/register/route.ts`: Implements signups with Supabase parameters.
+- `/api/auth/verify/route.ts`: Manages credentials validation and session cookie updates.
+- `/api/auth/login/route.ts`: Validates passwords and maps user role flags.
+
+---
+
+## Database Impact
+
+- **Table `auth.users`**: Inserts credential records.
+- **Table `profiles`**: Trigger inserts profile columns mapping role clearances.
+
+---
+
+## Best Practices
+
+<Callout type="warning">
+  **Rate Limits**: All login and registration paths must enforce client IP rate-limiting to prevent distributed brute-force dictionary attacks.
+</Callout>
+
+---
+
+## Related Documents
+
+Related Reading:
+- **[Authentication Architecture](../../architecture/authentication)**: Middleware route protections and details on JWT check cascades.
+- **[Database specifications](../../database)**: Schema descriptions for the `profiles` table.
+

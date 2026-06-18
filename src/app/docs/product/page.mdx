@@ -1,0 +1,119 @@
+import { Cards, Tabs, Callout } from 'nextra/components'
+
+{/* Hero Banner Header */}
+<div className="relative overflow-hidden rounded-[20px] border border-slate-200/50 dark:border-slate-800 bg-linear-to-br from-slate-50 to-indigo-50/30 dark:from-slate-950 dark:to-slate-900/40 p-8 mb-8 mt-2">
+  <div className="absolute top-0 right-0 w-60 h-60 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+  <div className="relative z-10 flex flex-col gap-3">
+    <div className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+      Product Guides
+    </div>
+    <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white my-0 leading-tight">
+      Product Overview
+    </h1>
+    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed my-0 max-w-xl">
+      Understand end-to-end user pathways: from account registration and email confirmation to Google credentials exchange and the onboarding questionnaire.
+    </p>
+  </div>
+</div>
+
+---
+
+## Overview
+
+Welcome to the Product Specifications section. This page outlines the core user authentication flows, registration steps, third-party social provider configurations, and the onboarding wizard questionnaire that sets up a student's learning target.
+
+## Purpose
+
+The main purpose of our authentication and onboarding modules is to create a seamless, friction-free entry point for students while securing their profiles databases rows. This ensures accurate cohort statistics, personalized recommendation setups, and secure identity tracking.
+
+## Architecture
+
+Our authentication flow combines local password registers with social identity provider tokens:
+
+<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 my-6">
+  <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-center">
+    <span className="text-xl font-black text-slate-800 dark:text-slate-200">2 Screens</span>
+    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mt-1">Auth Panels</span>
+  </div>
+  <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-center">
+    <span className="text-xl font-black text-slate-800 dark:text-slate-200">Google OAuth</span>
+    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mt-1">Social Provider</span>
+  </div>
+  <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-center">
+    <span className="text-xl font-black text-slate-800 dark:text-slate-200">4 Steps</span>
+    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mt-1">Onboarding Flow</span>
+  </div>
+  <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-center">
+    <span className="text-xl font-black text-slate-800 dark:text-slate-200">Yes</span>
+    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mt-1">Sandbox Mode</span>
+  </div>
+</div>
+
+## Data Flow
+
+The flow chart below maps the sequential student onboarding path:
+
+```mermaid
+graph TD
+  A[Sign Up / OAuth Login] --> B[Email Callback Check]
+  B --> C[Establish Session Cookie]
+  C --> D[Load Onboarding Questionnaire]
+  D --> E[Collect Interests & Domain targets]
+  E --> F[Save to Profiles Table]
+  F --> G[Redirect to Student Dashboard]
+```
+
+## Components
+
+Select a product guide to explore:
+
+<Cards>
+  <Cards.Card icon="🔐" title="Authentication Overview" href="./authentication" />
+  <Cards.Card icon="✉️" title="Email & Password Auth" href="./authentication/email-auth" />
+  <Cards.Card icon="🌐" title="Google OAuth Provider" href="./authentication/google-auth" />
+  <Cards.Card icon="📋" title="Onboarding Wizard Questionnaire" href="./authentication/onboarding-flow" />
+</Cards>
+
+## Implementation Notes
+
+Our authentication schemes utilize Supabase GoTrue servers:
+
+<Tabs items={['Email Authentication', 'Google OAuth Flow']}>
+  
+  <Tabs.Tab>
+    ### Email & Password Authentication Workflow
+    
+    1. **Registration**: The student inputs an email, full name, and password on the signup panel.
+    2. **Verification Trigger**: Supabase Auth sends an email containing a secure token.
+    3. **Session Verification**: When clicked, redirects the user to `/auth/callback` to establish secure session cookies.
+    
+    <Callout type="info">
+      Local sandbox modes bypass verification, immediately redirecting developers to `/onboarding`.
+    </Callout>
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+    ### Google OAuth Integration
+    
+    1. **Credentials Redirection**: The student selects "Sign in with Google" on the login screen.
+    2. **Redirect to Google**: Next.js redirects credentials matching flows to the Google Accounts validation page.
+    3. **Identity Registration**: On success, logs user data, updates matching database profiles, and directs the student to dashboard layouts.
+  </Tabs.Tab>
+
+</Tabs>
+
+## Best Practices
+
+<Callout type="warning">
+  **Warning**: Do not expose tokens in URL path parameters. The `/auth/callback` endpoint must consume query tokens server-side and issue HTTP-only cookies.
+</Callout>
+
+<Callout type="info">
+  **Note**: Ensure local development runs `.env.local` configured with the correct client client secret keys for Google OAuth services.
+</Callout>
+
+## Related Links
+
+Related Reading:
+- **[System Overview](../architecture/system-overview)**: Multi-tier architectural blueprints.
+- **[Getting Started](../getting-started)**: Setup guide for local developers.

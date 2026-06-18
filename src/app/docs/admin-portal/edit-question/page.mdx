@@ -1,0 +1,54 @@
+import { Callout } from 'nextra/components'
+
+# Edit Question
+
+The interface for modifying existing questions, addressing feedback, and editing content details.
+
+---
+
+
+## Overview
+
+This page provides an overview and technical specifications for the Edit Question subsystem within the Kinetic Platform.
+
+## Purpose
+The Edit Question workspace allows creators to refine existing questions. Creators address review feedback from administrators, correct formatting issues, or adjust answer options.
+
+## Features
+- **Revision History Ledger**: Displays a change log of edits, authors, and notes.
+- **Admin Feedback Banner**: Highlights review comments and rejection reasons directly at the top of the workspace.
+- **Lock Indicators**: Shows if a question is locked because it is currently linked to an active mock exam.
+
+## Data Sources
+- **Questions Table**: Reads existing questions and writes updates.
+- **Comments Table**: Fetches administrator comments related to revision requests.
+
+## User Actions
+- **Commit Edits**: Saves updates and resets the review status, sending the question back to the admin review queue.
+- **Compare Revisions**: Compares the original version with current edits.
+
+## Notes
+> [!WARNING]
+> Editing a published question temporarily retracts it from active practice sets to prevent students from seeing mid-update content.
+
+---
+
+## Architecture
+
+This component is integrated into the Next.js and Supabase tier, responding dynamically to API endpoints and schema constraints.
+
+---
+
+## Best Practices
+
+<Callout type="info">
+  **Best Practice**: Ensure that properties and state interfaces remain synchronized with type definitions across the workspace.
+</Callout>
+
+---
+
+## Related Links
+
+Related Reading:
+- **[System Overview](../../architecture/system-overview)**: Multi-tier architectural blueprints.
+- **[Getting Started](../../getting-started)**: Setup guide for local developers.

@@ -1,0 +1,106 @@
+import { Cards, Callout } from 'nextra/components'
+
+{/* Hero Header Banner */}
+<div className="relative overflow-hidden rounded-[20px] border border-slate-200/50 dark:border-slate-800 bg-linear-to-br from-slate-50 to-blue-50/30 dark:from-slate-950 dark:to-slate-900/40 p-8 mb-8 mt-2">
+  <div className="absolute top-0 right-0 w-60 h-60 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+  <div className="relative z-10 flex flex-col gap-3">
+    <div className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
+      Components Registry
+    </div>
+    <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white my-0 leading-tight">
+      Components Registry
+    </h1>
+    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed my-0 max-w-xl">
+      Technical directories of React elements, TypeScript props interfaces, component state properties, and layout containers.
+    </p>
+  </div>
+</div>
+
+---
+
+## Overview
+
+Welcome to the Components Registry section. This directory compiles the modular React UI components, layout templates, onboarding wizards, and visual editor widgets that build the client application of the Kinetic Platform.
+
+## Purpose
+
+The main purpose of our component architecture is to promote reuse, visual consistency, and type safety across student and administrator platforms. Decoupling visual primitives like `BentoCard` from page routing logic allows rapid front-end experimentation.
+
+## Architecture
+
+Our visual library utilizes React 19, tailwindcss 4, Framer Motion animations, and Lucide react icons:
+
+<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 my-6">
+  <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-center">
+    <span className="text-xl font-black text-slate-800 dark:text-slate-200">2 Core</span>
+    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mt-1">Shared primitives</span>
+  </div>
+  <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-center">
+    <span className="text-xl font-black text-slate-800 dark:text-slate-200">WYSIWYG</span>
+    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mt-1">Markdown editor</span>
+  </div>
+  <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-center">
+    <span className="text-xl font-black text-slate-800 dark:text-slate-200">KaTeX Math</span>
+    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mt-1">Pre-render Preview</span>
+  </div>
+  <div className="p-4 rounded-xl border border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-950/20 text-center">
+    <span className="text-xl font-black text-slate-800 dark:text-slate-200">14+ Views</span>
+    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mt-1">Route panels</span>
+  </div>
+</div>
+
+## Data Flow
+
+The layout tree below maps the inheritance and nesting paths of client views:
+
+```mermaid
+graph TD
+  Shell[App Root Page] --> Theme[ThemeToggle Client]
+  Shell --> Layout[Dashboard SPA Shell]
+  Layout --> Nav[Sidebar Navigation]
+  Layout --> Table[Questions Table Directory]
+  Table --> Card[BentoCard Spotlights]
+```
+
+## Components
+
+Select a component area to explore:
+
+<Cards>
+  <Cards.Card icon="🧱" title="Core Components" href="./core">
+    Shared container details: `BentoCard` spotlights tilting styles, and `ThemeToggle` controllers.
+  </Cards.Card>
+  <Cards.Card icon="👤" title="Student Screens" href="./student">
+    Authentication panels, onboarding forms, student dashboard SPA, and domain dashboards.
+  </Cards.Card>
+  <Cards.Card icon="⚙️" title="Admin Layout" href="./admin-layout">
+    Admin sidebars, role switcher headers, and directory table components.
+  </Cards.Card>
+  <Cards.Card icon="📝" title="Admin Editor" href="./admin-editor">
+    Visual editors, LivePreview device simulators, selectors, and option matrices.
+  </Cards.Card>
+  <Cards.Card icon="💻" title="Admin Screens" href="./admin-screens">
+    Metrics trackers, settings consoles, user logs, and gamification badge editors.
+  </Cards.Card>
+</Cards>
+
+## Implementation Notes
+
+All UI controls are declared inside the `src/components` tree. Primitives are written using Tailwind classes, with custom animations declared inside Framer Motion wrappers. Math formatting is rendered client-side using the `katex` package.
+
+## Best Practices
+
+<Callout type="warning">
+  **Important**: Keep client components lean. Add `"use client"` directive only to files that utilize React hooks or event listeners.
+</Callout>
+
+<Callout type="info">
+  **Props Standard**: All shared React components must enforce strict TypeScript interfaces. Check typings before integrating them inside layouts.
+</Callout>
+
+## Related Links
+
+Related Reading:
+- **[Student Platform Overview](../student-platform)**: Screen metrics logic and progress parameters.
+- **[Admin Portal Overview](../admin-portal)**: Question workflow tables configurations.
+- **[Database tables guides](../database)**: Schema layout matching tables inputs.

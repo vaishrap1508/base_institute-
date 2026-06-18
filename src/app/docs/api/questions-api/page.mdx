@@ -1,0 +1,285 @@
+import { Callout, Tabs } from 'nextra/components'
+
+# Questions API
+
+This page provides specifications for the question retrieval, answer submissions grading, and questions bookmarks endpoints.
+
+---
+
+## Overview
+
+The Questions API manages active student interactions with the question bank. It serves adaptive practice items based on user progress and evaluates option choices server-side, routing solved states to streaks triggers.
+
+## Purpose
+
+The questions endpoints decouple pedagogical data schemas from user interface elements. Server-side verification of answers prevents client-side answer cheating.
+
+## Architecture / Flow
+
+Question fetching routes execute database queries returning options matrices without correct keys, while submit routes calculate XP levels and record solve stats.
+
+---
+
+## Endpoints
+
+### 1. Get Next Practice Question
+Fetches the next question, adapting difficulty based on the student's recent performance.
+
+- **Endpoint**: `/api/student/questions/next`
+- **Method**: `GET`
+- **Authentication Requirements**: Valid Student Session Cookie
+- **Rate Limit**: 60 requests per minute.
+- **Query Parameters**:
+  - `domain_id` (string, required): Target learning domain UUID.
+
+#### Example Request & Response
+```bash
+# GET /api/student/questions/next?domain_id=dom_9812
+```
+
+```json
+// Response 200 OK
+{
+  "id": "0001A-0002B-0001A-0004E",
+  "type": "MCQ",
+  "difficulty": "MEDIUM",
+  "question_text": "Calculate the value of x if 2x + 5 = 15.",
+  "options": [
+    { "id": "opt-1", "text": "5" },
+    { "id": "opt-2", "text": "10" },
+    { "id": "opt-3", "text": "15" },
+    { "id": "opt-4", "text": "20" }
+  ]
+}
+```
+
+#### Code Snippets
+<Tabs items={['cURL', 'JavaScript', 'TypeScript']}>
+  <Tabs.Tab>
+    ```bash
+    curl -X GET "http://localhost:3000/api/student/questions/next?domain_id=dom_9812" \
+      -H "Cookie: sb-access-token=JWT_VALUE"
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript
+    fetch('/api/student/questions/next?domain_id=dom_9812')
+      .then(res => res.json())
+      .then(data => console.log(data));
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript
+    interface QuestionResponse {
+      id: string;
+      type: string;
+      difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+      question_text: string;
+      options: Array<{ id: string; text: string }>;
+    }
+
+    async function fetchNextQuestion(domainId: string): Promise<QuestionResponse> {
+      const response = await fetch(`/api/student/questions/next?domain_id=${domainId}`);
+      return response.json();
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+### 2. Submit Question Answer
+Grades a student's answer and updates their streak and progress records.
+
+- **Endpoint**: `/api/student/questions/submit`
+- **Method**: `POST`
+- **Authentication Requirements**: Valid Student Session Cookie
+- **Rate Limit**: 30 requests per minute.
+- **Request Body**:
+  - `question_id` (string, required): Unified Crockford Base32 ID.
+  - `selected_option_id` (string, required): Selected option identifier.
+  - `time_spent_ms` (integer, required): Time spent answering in milliseconds.
+
+#### Example Request & Response
+```json
+// POST /api/student/questions/submit
+{
+  "question_id": "0001A-0002B-0001A-0004E",
+  "selected_option_id": "opt-2",
+  "time_spent_ms": 12000
+}
+```
+
+```json
+// Response 200 OK
+{
+  "correct": true,
+  "correct_option_id": "opt-2",
+  "explanation": "Subtract 5 from both sides: 2x = 10, then divide by 2: x = 5.",
+  "xp_earned": 15,
+  "current_streak": 5
+}
+```
+
+#### Code Snippets
+<Tabs items={['cURL', 'JavaScript', 'TypeScript']}>
+  <Tabs.Tab>
+    ```bash
+    curl -X POST http://localhost:3000/api/student/questions/submit \
+      -H "Content-Type: application/json" \
+      -H "Cookie: sb-access-token=JWT_VALUE" \
+      -d '{"question_id":"0001A-0002B-0001A-0004E", "selected_option_id":"opt-2", "time_spent_ms": 12000}'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript
+    fetch('/api/student/questions/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question_id: '0001A-0002B-0001A-0004E',
+        selected_option_id: 'opt-2',
+        time_spent_ms: 12000
+      })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data));
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript
+    interface SubmitPayload {
+      question_id: string;
+      selected_option_id: string;
+      time_spent_ms: number;
+    }
+
+    interface SubmitResponse {
+      correct: boolean;
+      correct_option_id: string;
+      explanation: string;
+      xp_earned: number;
+      current_streak: number;
+    }
+
+    async function submitAnswer(payload: SubmitPayload): Promise<SubmitResponse> {
+      const response = await fetch('/api/student/questions/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      return response.json();
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+### 3. Add Bookmark
+Bookmarks a question for subsequent review.
+
+- **Endpoint**: `/api/student/bookmarks`
+- **Method**: `POST`
+- **Authentication Requirements**: Valid Student Session Cookie
+- **Rate Limit**: 120 requests per minute.
+- **Request Body**:
+  - `question_id` (string, required): Unified Crockford Base32 ID.
+  - `folder_name` (string, required): Bookmark folder.
+  - `note_md` (string, optional): Notes.
+
+#### Example Request & Response
+```json
+// POST /api/student/bookmarks
+{
+  "question_id": "0001A-0002B-0001A-0004E",
+  "folder_name": "Calculus Notes",
+  "note_md": "Review this solution before mock exam #4."
+}
+```
+
+```json
+// Response 200 OK
+{
+  "success": true,
+  "bookmark_id": "bmark_9921"
+}
+```
+
+#### Code Snippets
+<Tabs items={['cURL', 'JavaScript', 'TypeScript']}>
+  <Tabs.Tab>
+    ```bash
+    curl -X POST http://localhost:3000/api/student/bookmarks \
+      -H "Content-Type: application/json" \
+      -H "Cookie: sb-access-token=JWT_VALUE" \
+      -d '{"question_id":"0001A-0002B-0001A-0004E", "folder_name":"Calculus Notes", "note_md": "Review this solution."}'
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```javascript
+    fetch('/api/student/bookmarks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question_id: '0001A-0002B-0001A-0004E',
+        folder_name: 'Calculus Notes',
+        note_md: 'Review this solution.'
+      })
+    })
+    .then(res => res.json())
+    .then(data => console.log(data));
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```typescript
+    interface BookmarkPayload {
+      question_id: string;
+      folder_name: string;
+      note_md?: string;
+    }
+
+    async function addBookmark(payload: BookmarkPayload): Promise<{ success: boolean; bookmark_id: string }> {
+      const response = await fetch('/api/student/bookmarks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      return response.json();
+    }
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+---
+
+## Key Components
+
+- `/api/student/questions/next/route.ts`: Evaluates adaptive scoring weights and returns next item.
+- `/api/student/questions/submit/route.ts`: Grades option choice.
+- `/api/student/bookmarks/route.ts`: Resolves bookmarks write operations.
+
+---
+
+## Database Impact
+
+- **Table `attempts`**: Answer submissions write diagnostic log rows.
+- **Table `profiles`**: Trigger writes increment XP scores and daily streaks count.
+- **Table `bookmarks`**: Inserts bookmark relationships.
+
+---
+
+## Best Practices
+
+<Callout type="warning">
+  **Security Rule**: Never return the `is_correct` field in the options arrays when querying the question endpoints.
+</Callout>
+
+---
+
+## Related Documents
+
+Related Reading:
+- **[Question Management Architecture](../../architecture/question-management)**: Details on unified alphanumeric key compiler triggers.
+- **[Database schemas tables](../../database)**: Schema descriptions for the `attempts` table.
+
