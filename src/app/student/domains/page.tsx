@@ -620,6 +620,14 @@ export default function DomainsScreen() {
             </div>
             
             <div className="flex items-center gap-4">
+              {/* Daily Streak Badge */}
+              <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0">
+                <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
+                  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
+                  {streak}
+                </span>
+              </div>
+
               {/* Search Box */}
               <div className="relative w-64 sm:w-80 select-none">
                 <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -630,39 +638,9 @@ export default function DomainsScreen() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search learning domains..."
-                  className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
+                  className="w-full bg-white dark:bg-slate-900/10 border-2 border-slate-350 dark:border-white/60 rounded-2xl pl-10 pr-4 py-2 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:dark:border-white focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
                 />
               </div>
-
-
-            </div>
-          </div>
-
-          {/* Top Utility Row */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 justify-between select-none">
-
-            {/* Continue Last Learning Shortcut */}
-            <button
-              onClick={() => router.push('/student/dashboard?tab=learning')}
-              className="group flex items-center justify-between gap-6 bg-white border-[3px] border-slate-300/80 dark:bg-slate-900/10 dark:border-slate-700/80 px-6 py-3 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.01)] hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:scale-[1.01] text-left cursor-pointer w-full md:w-[52%] lg:w-[55%] shrink-0"
-            >
-              <div className="space-y-1">
-                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">continue last topic</span>
-                <span className="text-xs font-black text-slate-800 dark:text-slate-200 block leading-none">Percentages (Quantitative)</span>
-              </div>
-              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100/30 dark:bg-blue-950/40 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 transition-colors group-hover:bg-blue-600 group-hover:text-white shadow-[0_2px_6px_rgba(37,99,235,0.05)]">
-                <Play className="w-4 h-4 fill-current ml-0.5" />
-              </div>
-            </button>
-
-            {/* Daily Streak Badge */}
-            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] self-end md:self-auto">
-              <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
-                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
-                {streak}
-              </span>
-            </div>
-
           </div>
 
           {/* Main Bento Grid layout (2x2) */}

@@ -2325,179 +2325,6 @@ export default function StudentDashboard() {
           )}
         </nav>
 
-        {/* User profile popup menu trigger */}
-        <div className="p-4 w-full flex flex-col items-center shrink-0 relative" ref={profileDropdownRef}>
-          <button
-            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            title="User Profile Menu"
-            className={`w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
-          >
-            {profile.avatar && profile.avatar !== 'initial' ? (
-              <img
-                src={profile.avatar}
-                alt="User Avatar"
-                className="w-full h-full object-cover rounded-full"
-              />
-            ) : (
-              <User className="w-5 h-5" />
-            )}
-
-            {/* Red dot notification badge */}
-            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
-          </button>
-
-          {/* User profile dropdown overlay */}
-          {profileDropdownOpen && (
-            <div className="absolute left-[84px] bottom-0 w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
-              {/* Profile details header */}
-              <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
-                  {profile.avatar && profile.avatar !== 'initial' ? (
-                    <img
-                      src={profile.avatar}
-                      alt="User Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                </div>
-                <div className="flex flex-col min-w-0 text-left">
-                  <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
-                    {profile.username || 'Vaishnavi Raparthy'}
-                  </span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
-                    {currentRole?.email || 'shellysros1922@gmail.com'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Menu Options */}
-              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
-
-                {/* My Profile option */}
-                <button
-                  onClick={() => {
-                    setActiveSidebarTab('profile');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <span className="flex-1">My Profile</span>
-                </button>
-
-                {/* Account option */}
-                <button
-                  onClick={() => {
-                    setActiveSidebarTab('settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <span className="flex-1">Account</span>
-                </button>
-
-                {/* Buganizer (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <Bug className="w-4 h-4 shrink-0" />
-                    <span>Buganizer</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Sessions (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <List className="w-4 h-4 shrink-0" />
-                    <span>Sessions</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Troubleshooting option */}
-                <button
-                  onClick={() => {
-                    alert('Troubleshooting utility loaded. Sandbox is operating securely.');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <span className="flex-1">Troubleshooting</span>
-                </button>
-
-                {/* New Features option */}
-                <button
-                  onClick={() => {
-                    setActiveSidebarTab('badges');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                    <span>New Features</span>
-                  </div>
-                  <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
-                </button>
-
-                {/* Theme Toggle option */}
-                <button
-                  onClick={() => {
-                    toggleTheme();
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  {theme === 'dark' ? (
-                    <>
-                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span className="flex-1">Light Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                      <span className="flex-1">Dark Mode</span>
-                    </>
-                  )}
-                </button>
-
-                {/* Notification option */}
-                <button
-                  onClick={() => {
-                    setActiveSidebarTab('settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                    <span>Notification</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
-                </button>
-
-                {/* Divider */}
-                <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
-
-                {/* Logout option */}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
-                >
-                  <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
-                  <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
-                </button>
-
-              </div>
-            </div>
-          )}
-        </div>
       </aside>
 
       {/* 2. Main Workspace Frame */}
@@ -2589,7 +2416,181 @@ export default function StudentDashboard() {
               </button>
             </div>
 
+            {/* User profile popup menu trigger */}
+            {activeSidebarTab === 'dashboard' && (
+              <div className="relative shrink-0" ref={profileDropdownRef}>
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  title="User Profile Menu"
+                  className={`w-10 h-10 rounded-full bg-slate-850 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
+                >
+                  {profile.avatar && profile.avatar !== 'initial' ? (
+                    <img
+                      src={profile.avatar}
+                      alt="User Avatar"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
 
+                  {/* Red dot notification badge */}
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
+                </button>
+
+                {/* User profile dropdown overlay with glassmorphism */}
+                {profileDropdownOpen && (
+                  <div className="absolute right-0 top-12 w-72 bg-white/70 dark:bg-[#0f172a]/70 border border-slate-200 dark:border-slate-800/80 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 backdrop-blur-xl select-none">
+                    {/* Profile details header */}
+                    <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
+                        {profile.avatar && profile.avatar !== 'initial' ? (
+                          <img
+                            src={profile.avatar}
+                            alt="User Avatar"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0 text-left">
+                        <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
+                          {profile.username || 'Vaishnavi Raparthy'}
+                        </span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
+                          {currentRole?.email || 'shellysros1922@gmail.com'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Menu Options */}
+                    <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+
+                      {/* My Profile option */}
+                      <button
+                        onClick={() => {
+                          setActiveSidebarTab('profile');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                        <span className="flex-1">My Profile</span>
+                      </button>
+
+                      {/* Account option */}
+                      <button
+                        onClick={() => {
+                          setActiveSidebarTab('settings');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                        <span className="flex-1">Account</span>
+                      </button>
+
+                      {/* Buganizer (locked option) */}
+                      <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
+                        <div className="flex items-center gap-3">
+                          <Bug className="w-4 h-4 shrink-0" />
+                          <span>Buganizer</span>
+                        </div>
+                        <Lock className="w-3.5 h-3.5" />
+                      </div>
+
+                      {/* Sessions (locked option) */}
+                      <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
+                        <div className="flex items-center gap-3">
+                          <List className="w-4 h-4 shrink-0" />
+                          <span>Sessions</span>
+                        </div>
+                        <Lock className="w-3.5 h-3.5" />
+                      </div>
+
+                      {/* Troubleshooting option */}
+                      <button
+                        onClick={() => {
+                          alert('Troubleshooting utility loaded. Sandbox is operating securely.');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                        <span className="flex-1">Troubleshooting</span>
+                      </button>
+
+                      {/* New Features option */}
+                      <button
+                        onClick={() => {
+                          setActiveSidebarTab('badges');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                          <span>New Features</span>
+                        </div>
+                        <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
+                      </button>
+
+                      {/* Theme Toggle option */}
+                      <button
+                        onClick={() => {
+                          toggleTheme();
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        {theme === 'dark' ? (
+                          <>
+                            <Sun className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                            <span className="flex-1">Light Mode</span>
+                          </>
+                        ) : (
+                          <>
+                            <Moon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                            <span className="flex-1">Dark Mode</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* Notification option */}
+                      <button
+                        onClick={() => {
+                          setActiveSidebarTab('settings');
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Bell className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
+                          <span>Notification</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
+                      </button>
+
+                      {/* Divider */}
+                      <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
+
+                      {/* Logout option */}
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
+                      >
+                        <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
+                        <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
+                      </button>
+
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
           </div>
         </header>
@@ -2647,70 +2648,63 @@ export default function StudentDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                       {/* Card 1: Quant Aptitude */}
-                      <div className="bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-48 hover:shadow-lg transition-all duration-300 group">
-                        <div className="flex justify-between items-start">
-                          <span className="bg-white/80 dark:bg-slate-900/60 border border-[#B8DCE7] dark:border-slate-800 px-3 py-1 rounded-full text-[10px] font-black text-[#1E4E5D] dark:text-[#38BDF8] flex items-center gap-1">
-                            ⭐ 4.9 <span className="text-[9px] text-[#558CA0]">Accuracy: 84%</span>
-                          </span>
-
+                      <div className="bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:shadow-lg transition-all duration-300 group">
+                        <div className="flex justify-between items-start gap-4">
+                          <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
+                            Quant Aptitude
+                          </h3>
                           {/* Diagonal Arrow button */}
                           <button
                             onClick={() => {
                               setActiveSidebarTab('practice');
                               setSelectedDomain('quant');
                             }}
-                            className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
+                            className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
                           >
                             <ChevronRight className="w-5 h-5 text-slate-600 -rotate-45" />
                           </button>
                         </div>
 
-                        <div className="space-y-2 text-left">
-                          <h3 className="text-base font-bold text-slate-800 dark:text-white">Quant Aptitude</h3>
-                          <p className="text-[11px] text-[#47707E] dark:text-slate-400 font-semibold leading-relaxed">
-                            Percentages, Profit & Loss, Ratios, Speed & Distance
-                          </p>
-                        </div>
-
-                        {/* Stacked avatars */}
-                        <div className="flex items-center -space-x-2">
-                          <div className="w-6 h-6 rounded-full bg-blue-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">AR</div>
-                          <div className="w-6 h-6 rounded-full bg-purple-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">SN</div>
-                          <div className="w-6 h-6 rounded-full bg-pink-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">KK</div>
-                          <span className="text-[9.5px] text-[#47707E] dark:text-slate-400 font-bold ml-3">+12 others active</span>
+                        <div className="flex justify-start items-end mt-auto">
+                          <button
+                            onClick={() => {
+                              setActiveSidebarTab('practice');
+                              setSelectedDomain('quant');
+                            }}
+                            className="px-4 py-2 bg-[#1E4E5D] hover:bg-[#153A45] text-white dark:bg-[#38BDF8] dark:hover:bg-[#0EA5E9] dark:text-[#0B303E] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                          >
+                            Continue Last Topic
+                          </button>
                         </div>
                       </div>
 
                       {/* Card 2: Logical Reasoning */}
-                      <div className="bg-[#FDF2F8] dark:bg-[#3B1229]/20 border border-[#FBCFE8] dark:border-[#652047]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-48 hover:shadow-lg transition-all duration-300 group">
-                        <div className="flex justify-between items-start">
-                          <span className="bg-white/80 dark:bg-slate-900/60 border border-[#F9A8D4] dark:border-slate-800 px-3 py-1 rounded-full text-[10px] font-black text-[#9D174D] dark:text-[#F472B6] flex items-center gap-1">
-                            ⭐ 4.8 <span className="text-[9px] text-[#C2410C]">Accuracy: 92%</span>
-                          </span>
-
+                      <div className="bg-[#FDF2F8] dark:bg-[#3B1229]/20 border border-[#FBCFE8] dark:border-[#652047]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:shadow-lg transition-all duration-300 group">
+                        <div className="flex justify-between items-start gap-4">
+                          <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
+                            Logical Reasoning
+                          </h3>
                           <button
                             onClick={() => {
                               setActiveSidebarTab('practice');
                               setSelectedDomain('logical');
                             }}
-                            className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
+                            className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
                           >
                             <ChevronRight className="w-5 h-5 text-slate-600 -rotate-45" />
                           </button>
                         </div>
 
-                        <div className="space-y-2 text-left">
-                          <h3 className="text-base font-bold text-slate-800 dark:text-white">Logical Reasoning</h3>
-                          <p className="text-[11px] text-[#B04A75] dark:text-slate-400 font-semibold leading-relaxed">
-                            Syllogisms, Blood Relations, Seating arrangements, Series
-                          </p>
-                        </div>
-
-                        <div className="flex items-center -space-x-2">
-                          <div className="w-6 h-6 rounded-full bg-green-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">AS</div>
-                          <div className="w-6 h-6 rounded-full bg-yellow-500 border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">RS</div>
-                          <div className="w-6 h-6 rounded-full bg-[#111827] border border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center">VR</div>
-                          <span className="text-[9.5px] text-[#B04A75] dark:text-slate-400 font-bold ml-3">+6 others active</span>
+                        <div className="flex justify-start items-end mt-auto">
+                          <button
+                            onClick={() => {
+                              setActiveSidebarTab('practice');
+                              setSelectedDomain('logical');
+                            }}
+                            className="px-4 py-2 bg-[#9D174D] hover:bg-[#7A0F39] text-white dark:bg-[#F472B6] dark:hover:bg-[#F059A1] dark:text-[#3B1229] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                          >
+                            Continue Last Topic
+                          </button>
                         </div>
                       </div>
 
@@ -3035,20 +3029,7 @@ export default function StudentDashboard() {
                 )}
               </div>
 
-              {/* Hero Title & Subtitle with Blur-Fade-Up Reveal */}
-              <motion.div
-                initial={reducedMotion ? {} : { opacity: 0, y: 15, filter: "blur(4px)" }}
-                animate={reducedMotion ? {} : { opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.6 }}
-                className="text-center space-y-2 relative z-10"
-              >
-                <h1 className="text-2xl font-black uppercase text-slate-900 dark:text-white font-heading">
-                  Your learning roadmap
-                </h1>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                  Click on the active lesson nodes to solve matching assessment questions.
-                </p>
-              </motion.div>
+
 
               {/* Stats Panel Widget (Circular Progress Ring & XP Counter) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8 relative z-10">
@@ -4875,46 +4856,6 @@ export default function StudentDashboard() {
               ==================================================================== */}
           {activeSidebarTab === 'badges' && (
             <div className="space-y-8 animate-fadeIn text-slate-800 dark:text-slate-200">
-              {/* Premium Header HUD card */}
-              <div className="bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 text-white shadow-xl rounded-3xl p-6 sm:p-8 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                {/* Background ambient lighting */}
-                <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-pink-500/5 rounded-full blur-[60px] pointer-events-none" />
-
-                <div className="space-y-3 relative z-10 text-left">
-                  <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3.5 py-1 rounded-full text-[9px] font-black text-amber-400 tracking-wider uppercase">
-                    <Trophy className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
-                    <span>Aptitude Leaderboard Clearance</span>
-                  </div>
-                  <h2 className="text-2xl font-black tracking-tight uppercase leading-tight">
-                    Your Achievements & Badges
-                  </h2>
-                  <p className="text-xs text-slate-400 max-w-xl font-medium leading-relaxed font-semibold">
-                    Track your credentials, progress, and performance across your onboarding and consistency achievements. Keep completing challenges to level up!
-                  </p>
-                </div>
-
-                {/* Score indicators */}
-                <div className="flex flex-col items-center sm:items-start md:items-center bg-slate-950/40 backdrop-blur-md border border-slate-800 p-5 rounded-2xl shrink-0 w-full md:w-auto text-center md:text-left gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold border border-amber-500/30">
-                      🏆
-                    </div>
-                    <div className="text-left flex flex-col">
-                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Unlocked Badges</span>
-                      <span className="text-lg font-black text-white">{unlockedBadgeIds.length} / {badges.length}</span>
-                    </div>
-                  </div>
-                  {/* Progress bar */}
-                  <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-amber-500 to-amber-300 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${badges.length > 0 ? (unlockedBadgeIds.length / badges.length) * 100 : 0}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-6">
                 {/* Achievements Filter Tabs */}
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800/80 pb-5">

@@ -2529,6 +2529,7 @@ export default function LandingPage() {
                         <div className="pt-2">
                           <button
                             type="button"
+                            suppressHydrationWarning
                             onClick={() => setExpandedCardIdx(isExpanded ? null : idx)}
                             className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer group/btn animate-pulse-glow"
                           >
