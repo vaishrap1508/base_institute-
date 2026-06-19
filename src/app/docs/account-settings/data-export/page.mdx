@@ -1,0 +1,82 @@
+import { Callout } from 'nextra/components'
+
+# Data Export
+
+Learn how to back up your personal revision database, export shortcut markdown notes, and import backup archives.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Beginner</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Format</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Data</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Exporting the revision database to JSON files  
+✓ Downloading custom note logs in compiled Markdown  
+✓ Importing backup files to restore progress on other devices  
+✓ Preventing data loss from browser cache resets  
+
+---
+
+## Why Data Export Exists
+
+To guarantee immediate page responsiveness, your shortcuts, folders, and priorities are cached locally in your browser's `localStorage` (`aptitude_revision_db`). 
+
+However, local caches can be wiped if you clear your browser history or use private browsing. **Data Export** allows you to download a backup file of your revision progress.
+
+---
+
+## The Export-Import Lifecycle
+
+```
+[ Active Notes Cache ] ──► [ Click Export Data ] ──► [ Download revision_backup.json ]
+                                                             │
+[ Clear Browser Cache ] ◄── [ Import Backup File ] ◄─────────┘
+```
+
+### 1. Exporting Data
+Click **Export Revision Database** in settings. The system compiles your notes, folders, and priority logs into a single structured JSON payload file.
+
+### 2. Importing Data
+Select **Upload Backup JSON** to restore your revision library, folders, and metrics on a new machine or secondary browser.
+
+---
+
+## Data Export Best Practices
+
+<Callout type="info">
+  **Best Practice: Export your notes monthly**  
+  If you have logged more than 50 custom shortcut notes, download a backup copy. Storing the JSON file on your Google Drive ensures you never lose your revision assets.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Backup Payload Compatibility**  
+  Do not modify the keys inside the exported JSON file manually. Changing structure tags can lead to verification failures when uploading the backup file.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Profile Settings](../account-settings/profile)**
+* **[Privacy Settings](../account-settings/privacy)**
+* **[Notification Channels](../account-settings/notifications)**

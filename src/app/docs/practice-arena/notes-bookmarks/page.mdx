@@ -1,0 +1,103 @@
+import { Callout } from 'nextra/components'
+
+# Personal Notes & Bookmarks
+
+Learn how to quick-save solved questions, classify folders, toggle priority levels, and draft math shortcuts with KaTeX preview blocks.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">4 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Intermediate</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Tab</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">My Notes</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Launching the Quick Save Drawer (380px wide)  
+✓ Categorizing bookmarked items into custom folders  
+✓ Setting revision priority cycles (🔴 High, 🟡 Medium, 🟢 Low)  
+✓ Drafting markdown math notes with live KaTeX mathematical compilation  
+
+---
+
+## Workspace Revision Philosophy
+
+Students should never need to leave the Practice Arena to save, organize, or write shortcuts. Everything occurs in the solving tab:
+
+```
+[ Click Star Icon ] ──► [ Opens Quick Save Drawer ] ──► [ Choose Folder & Priority ] ──► [ Save & Continue ]
+```
+
+---
+
+## Anatomy of the Quick Save Drawer (380px)
+
+The **Quick Save Drawer** slides in from the right edge on bookmark star activation:
+- **Save Status**: Displays `⭐ Saved to Library`.
+- **Folder Selector**: Assign to folders like `Arithmetic Shortcuts`, `Infosys Logic`, `TCS NQT Prep`, or click `+ Create New Folder`.
+- **Priority Flag**: Cycles between High (🔴), Medium (🟡), and Low (🟢) on single-click triggers.
+- **Quick Note Input**: Textarea for capturing immediate insights.
+
+---
+
+## The "My Notes" Tab & KaTeX Mathematics
+
+Once saved, a 4th editorial tab **My Notes** opens next to Written / Video Solutions:
+- **Split Input Editor**: Text input area on top/left, live compiled markdown preview below.
+- **KaTeX Equations**: Type formulas inside dollar delimiters:
+  - Inline: `$Distance = Speed \times Time$` renders as $Distance = Speed \times Time$.
+  - Block: `$$Ratio = \frac{Speed}{Time}$$` renders as:
+    $$Ratio = \frac{Speed}{Time}$$
+
+---
+
+## Personal Shortcut Card
+
+If a note exists, the **Personal Shortcut Card** displays directly below the question stem card. When you revisit the question, your custom notes render instantly:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 My Shortcut
+Ratio of speeds is inverse to ratio of time taken.
+Last reviewed: 2 days ago   [ Edit Shortcut ]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
+## Notes & Bookmarks Best Practices
+
+<Callout type="info">
+  **Best Practice: Adopt the High Priority tag for tricky traps**  
+  Mark questions as `🔴 High Priority` if they contain arithmetic traps. This automatically places them inside your **Today's Revision** queue for weekly review.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Storage Backup**  
+  Notes are cached in browser `localStorage` (`aptitude_revision_db`) to ensure immediate responsiveness. Export your revision data in Account Settings to prevent accidental browser cache loss.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Revision Library](../revision-system/revision-library)**
+* **[Priority Management](../revision-system/priority-management)**
+* **[Note Taking Strategies](../revision-system/note-taking-strategies)**

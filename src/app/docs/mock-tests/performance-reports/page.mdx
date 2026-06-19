@@ -1,0 +1,93 @@
+import { Callout } from 'nextra/components'
+
+# Performance Reports
+
+Learn how to interpret comprehensive mock test reports, analyze percentile shifts, and structure target study plans.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Intermediate</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Scope</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Evaluation</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Navigating the historical performance listings  
+✓ Interpreting percentile rankings relative to other candidates  
+✓ Pinpointing specific concept weaknesses from wrong responses  
+✓ Syncing performance outcomes back to the adaptive engine  
+
+---
+
+## Why Performance Reports Exist
+
+Your scorecard details *how you did today*. A **Performance Report** tracks *how you are progressing over time*:
+- **Historical Trends**: Shows if your speed is improving across tests.
+- **Competency Heatmaps**: Highlights subtopics where your accuracy drops consistently.
+- **Percentile Ranking**: Compares your performance against peer candidates to show your placement readiness.
+
+---
+
+## Anatomical Progression of Performance
+
+```mermaid
+graph TD
+    A[Initial Mock Score: 52%] --> B[System flags Arithmetic as weakness]
+    B --> C[Attempt 20 practice solves + Save shortcuts]
+    C --> D[Second Mock Score: 68%]
+    D --> E[Third Mock Score: 82% - PASS]
+```
+
+### 1. Weakness Mapping
+The report maps your incorrect choices to specific curriculum nodes (e.g. `Quant ➔ Arithmetic ➔ Ratios ➔ Inverse Speeds`).
+
+### 2. Pacing Analysis
+Displays solving times per question category to show if you are spending too long on quantitative questions at the expense of verbal questions.
+
+---
+
+## Interpretation Guidelines
+
+- **Percentile >= 90th**: Highly competitive. You meet the benchmarks for product and top-tier service roles.
+- **Percentile 70th to 90th**: Good progress. Passable for service roles, but require minor speed improvements.
+- **Percentile `<= 70th`**: Concept gaps exist. Focus on the Concept Hub before taking further mock assessments.
+
+---
+
+## Performance Reports Best Practices
+
+<Callout type="info">
+  **Best Practice: Review the concept error log**  
+  Click on **View Error Log** inside the performance report. It lists the exact question stems you missed. Solve them in the Practice Arena with the **Written Solution** tab open to learn the logic patterns.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Stale Performance Data**  
+  Mock tests taken more than 30 days ago do not reflect your current preparation level. Retake a mock test every 10 days to keep your readiness index updated.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Taking a Mock Test](../mock-tests/taking-mock-test)**
+* **[Test Analytics](../mock-tests/test-analytics)**
+* **[Time Management](../mock-tests/time-management)**

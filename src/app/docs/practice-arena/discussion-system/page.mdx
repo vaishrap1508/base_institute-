@@ -1,0 +1,90 @@
+import { Callout } from 'nextra/components'
+
+# Discussion System
+
+Learn how to participate in community discussions, browse peer-voted shortcut tricks, and ask instructor comments.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Beginner</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Community</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Discussion</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Navigating Discussion drawer sub-tabs  
+✓ Upvoting and filtering top peer shortcuts  
+✓ Posting questions and comments to instructors  
+✓ Contributing community notes  
+
+---
+
+## Discussion Drawer Hierarchy
+
+To prevent screen transitions during practice, the **Discussion System** is contained inside a sliding drawer layout:
+- **Comments Tab**: General questions about problem statements or alternate interpretations.
+- **Peer Shortcuts Tab**: Voted shortcuts submitted by other students that optimize solve speeds.
+- **Community Notes Tab**: High-quality structural breakdowns or formulas.
+- **Tricks Tab**: Tricky alternate methods (e.g. working backwards from option choices).
+
+```
++-----------------------------------------------------------+
+| [Discussion Drawer]                                       |
+|  [Comments]  [Peer Shortcuts]  [Community Notes]  [Tricks] |
++-----------------------------------------------------------+
+| Upvoted Peer Shortcut:                                    |
+| " CP = 100x, SP = 120x..." ▲ 25 Upvotes                   |
++-----------------------------------------------------------+
+```
+
+---
+
+## Participating in Discussions
+
+### 1. Finding Top Shortcuts
+Sort comments by **Most Liked** to display community-verified tricks at the top of the feed.
+
+### 2. Comment Guidelines
+When posting comments:
+- Avoid pasting direct answer key letters (e.g., "Answer is A"). Focus on explaining *why* it is A.
+- Write formulas using standard markdown or LaTeX formatting to ensure clean KaTeX mathematical rendering.
+
+---
+
+## Discussion Best Practices
+
+<Callout type="info">
+  **Best Practice: Contribute Your Insights**  
+  If you find a method that solves a hard question in under 45 seconds, share it! Contributing upvoted shortcuts boosts your community reputation profile points.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Moderation and Conduct**  
+  Spamming, posting incorrect answers deliberately, or using aggressive language flags your profile. Repeated moderation flags can lock your account from public leaderboard lists.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Solving Questions](../practice-arena/solving-questions)**
+* **[AI ELI5 Assistant](../practice-arena/ai-assistant)**
+* **[Personal Notes & Bookmarks](../practice-arena/notes-bookmarks)**

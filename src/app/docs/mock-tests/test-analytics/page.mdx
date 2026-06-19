@@ -1,0 +1,96 @@
+import { Callout } from 'nextra/components'
+
+# Test Analytics
+
+Learn how to read mock test scorecards, evaluate section accuracy, audit solve times, and identify weakness margins.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Intermediate</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Focus</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Metrics</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Evaluating your overall score against placement cutoffs  
+✓ Analyzing section-wise correctness ratios  
+✓ Mapping average solve speeds to specific subtopics  
+✓ Tracking performance shifts across multiple test attempts  
+
+---
+
+## Anatomy of the Test Scorecard
+
+Upon completing a mock test, the platform displays a detailed visual report:
+
+```
++-------------------------------------------------------------+
+| [Overall Score: 78%]   [Percentile: 91.2%]  [Status: PASS]  |
++-------------------------------------------------------------+
+| [Section Breakdown]                                         |
+| Quant: 84% accuracy   | Logical: 68% accuracy  | Verbal: 82% |
++-------------------------------------------------------------+
+| [Time Distribution Chart]                                   |
+| Average time per correct: 62s   | Average per incorrect: 88s |
++-------------------------------------------------------------+
+```
+
+### 1. Overall Cutoff Status
+- **PASS**: Meets the historical qualifying benchmark for the target recruiter.
+- **BORDERLINE**: Within 5% of the qualifying line. Remediation advised.
+- **FAIL**: Below the cutoff threshold. Recommended to review foundational paths.
+
+### 2. Time-Accuracy Matrix
+Tracks whether errors were caused by **speed pressure** (high error rates in the final 5 minutes) or **conceptual gaps** (high error rates on specific subtopics regardless of time remaining).
+
+---
+
+## Test Review and Remediation Workflow
+
+```mermaid
+graph TD
+    A[Review Mock Scorecard] --> B[Identify Section with Lowest Accuracy]
+    B --> C[Open Incorrect Answers list]
+    C --> D[Bookmark errors to 📂 Revision folders]
+    D --> E[Log error analysis notes]
+```
+
+---
+
+## Test Analytics Best Practices
+
+<Callout type="info">
+  **Best Practice: Review incorrect answers first**  
+  Do not just look at your final score. Open the incorrect answers feed and click the **Video Solution** tab for each mistake. Understanding the exact point of failure is crucial for improvement.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Time Trap Detection**  
+  Look for questions where you spent more than 150 seconds and still got the answer wrong. These are your **Time Traps**. In future exams, skip these items immediately.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Taking a Mock Test](../mock-tests/taking-mock-test)**
+* **[Time Management](../mock-tests/time-management)**
+* **[Performance Reports](../mock-tests/performance-reports)**

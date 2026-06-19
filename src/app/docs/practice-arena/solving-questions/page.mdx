@@ -1,0 +1,113 @@
+import { Callout } from 'nextra/components'
+
+# Solving Questions
+
+Learn how to utilize the split-pane workspace, solve questions under timed constraints, access formula sheets, and use hotkeys.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">4 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Beginner</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Module</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Practice</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Navigating the split-pane desktop vs stacked mobile layout  
+✓ Monitoring solve durations using the header stopwatch  
+✓ Scratchpad sketching and KaTeX math conversions  
+✓ Speed keys for fluid question transitions  
+
+---
+
+## Why the Practice Arena Layout Exists
+
+Traditional platforms force you to load a new page for every action—solution checks, note logs, discussion inputs, and revisions. **AptiMaster Practice Arena** keeps everything inside a single, self-contained view:
+- **Left Side (70%)**: Focus Workspace containing question breadcrumbs, stem text, options, and submission buttons.
+- **Right Side (30%)**: Revision and Context Drawer (slides in on-demand).
+
+This prevents context switching and maintains solving momentum.
+
+---
+
+## Interactive Workspace Layout
+
+```
++--------------------------------------------------------------+
+| [Breadcrumbs & Badges]                         [Stopwatch ⏱️] |
++--------------------------------------------------------------+
+| [Question Stem Card]                                         |
+| "A merchant sells an item..."                                |
+|                                                              |
+| [Option A] [Option B] [Option C] [Option D]                  |
++--------------------------------------------------------------+
+| [Submit Answer]   [Prev] [Next]    [Quick Notes] [Library]   |
++--------------------------------------------------------------+
+```
+
+### 1. Stopwatch Controls
+- **Location**: Top right header.
+- **Function**: Automatically tracks solve time from the moment the question loads.
+- **Cycle**: Single click pauses the timer (masking the question stem to prevent cheating) and switches color to warning red/maroon-red. Click play to resume.
+
+### 2. Answer Submission
+- **Selecting**: Click option card (cards feature smooth hover lifts).
+- **Evaluating**: Click the primary CTA "Submit". The system evaluates correctness, triggers a success confetti animation, logs attempt stats, and opens the solution tabs.
+
+### 3. Keyboard Navigation Shortcuts
+- `ArrowLeft`: Navigate to the previous question.
+- `ArrowRight`: Navigate to the next question.
+
+---
+
+## Practice Arena Feature Guide
+
+- **Purpose**: Build aptitude fluency through active solving.
+- **Input**: Question Stem + Option Choice + Solve Duration.
+- **Output**: Correction status + Stored solve log.
+- **Common Mistake**: Selecting answers quickly to guess correctness.
+- **Best Practice**: Attempt solving independently for 60 seconds before check submissions.
+
+---
+
+## Example Student Journey
+
+> **TCS Digital Speed Preparation**  
+> Vaishnavi is practicing Arithmetic for her TCS Digital qualifier.
+> - She loads a hard percentage question.
+> - She clicks the stopwatch to lock her focus.
+> - She draws equations on her sketch sheet.
+> - She submits option C in 72 seconds. Correct! Confetti triggers.
+> - She immediately bookmarks the question, saving her shortcut to `📂 Arithmetic Shortcuts`.
+
+---
+
+<Callout type="info">
+  **Best Practice: The 60-Second Challenge**  
+  Keep yourself challenged. If you solve an easy question under 30 seconds, immediately try a medium or hard version of the same subtopic to push your analytical boundaries.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Understanding Feedback](../practice-arena/understanding-feedback)**
+* **[AI ELI5 Assistant](../practice-arena/ai-assistant)**
+* **[Personal Notes & Bookmarks](../practice-arena/notes-bookmarks)**
