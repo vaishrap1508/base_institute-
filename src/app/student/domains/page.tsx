@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 import { 
   Layers, 
   User, 
@@ -360,7 +361,7 @@ export default function DomainsScreen() {
       {/* 1. Left Navigation Sidebar (Reference 2 style) */}
       <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
         {/* Top Logo Button */}
-        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title="Kinetic Hub" onClick={() => router.push('/student/dashboard')}>
+        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title={siteConfig.name} onClick={() => router.push('/student/dashboard')}>
           <Layers className="w-5 h-5" />
         </div>
 
@@ -427,224 +428,82 @@ export default function DomainsScreen() {
           )}
         </nav>
 
-        {/* User profile popup menu trigger */}
-        <div className="p-4 w-full flex flex-col items-center shrink-0 relative" ref={profileDropdownRef}>
-          <button
-            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            title="User Profile Menu"
-            className={`w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative ${profileDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
-          >
-            {profile.avatar && profile.avatar !== 'initial' ? (
-              <img
-                src={profile.avatar}
-                alt="User Avatar"
-                className="w-full h-full object-cover rounded-full"
-              />
-            ) : (
-              <User className="w-5 h-5" />
-            )}
-
-            {/* Red dot notification badge */}
-            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
-          </button>
-
-          {/* User profile dropdown overlay */}
-          {profileDropdownOpen && (
-            <div className="absolute left-[84px] bottom-0 w-72 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 flex flex-col gap-1 z-50 animate-scaleUp text-slate-800 dark:text-slate-200 select-none">
-              {/* Profile details header */}
-              <div className="flex items-center gap-3 p-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 overflow-hidden">
-                  {profile.avatar && profile.avatar !== 'initial' ? (
-                    <img
-                      src={profile.avatar}
-                      alt="User Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
-                </div>
-                <div className="flex flex-col min-w-0 text-left">
-                  <span className="font-bold text-slate-900 dark:text-white text-xs truncate leading-snug">
-                    {profile.username || 'Vaishnavi Raparthy'}
-                  </span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold truncate leading-normal">
-                    {userEmail || 'shellysros1922@gmail.com'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Menu Options */}
-              <div className="flex flex-col pt-1.5 pb-1 text-xs font-bold text-slate-700 dark:text-slate-300">
-
-                {/* My Profile option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=profile');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <User className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <span className="flex-1">My Profile</span>
-                </button>
-
-                {/* Account option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <SettingsIcon className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                  <span className="flex-1">Account</span>
-                </button>
-
-                {/* Buganizer (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-500 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <Bug className="w-4 h-4 shrink-0" />
-                    <span>Buganizer</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Sessions (locked option) */}
-                <div className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 dark:text-slate-605 opacity-60 select-none font-bold">
-                  <div className="flex items-center gap-3">
-                    <List className="w-4 h-4 shrink-0" />
-                    <span>Sessions</span>
-                  </div>
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-
-                {/* Troubleshooting option */}
-                <button
-                  onClick={() => {
-                    alert('Troubleshooting utility loaded. Sandbox is operating securely.');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <HelpCircle className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                  <span className="flex-1">Troubleshooting</span>
-                </button>
-
-                {/* New Features option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=badges');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                    <span>New Features</span>
-                  </div>
-                  <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">New</span>
-                </button>
-
-                {/* Theme Toggle option */}
-                <button
-                  onClick={() => {
-                    toggleTheme();
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 text-left transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  {theme === 'dark' ? (
-                    <>
-                      <Sun className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                      <span className="flex-1">Light Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                      <span className="flex-1">Dark Mode</span>
-                    </>
-                  )}
-                </button>
-
-                {/* Notification option */}
-                <button
-                  onClick={() => {
-                    router.push('/student/dashboard?tab=settings');
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer text-slate-700 dark:text-slate-300 font-bold"
-                >
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-slate-400 dark:text-slate-600 shrink-0" />
-                    <span>Notification</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600" />
-                </button>
-
-                {/* Divider */}
-                <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
-
-                {/* Logout option */}
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setProfileDropdownOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left text-rose-600 dark:text-rose-400 transition-colors cursor-pointer font-bold"
-                >
-                  <LogOut className="w-4 h-4 shrink-0 text-rose-500" />
-                  <span className="flex-1 font-extrabold text-rose-600 dark:text-rose-400">Logout</span>
-                </button>
-
-              </div>
-            </div>
-          )}
-        </div>
       </aside>
 
-      {/* 2. Main content area panel */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar p-8 sm:p-12 relative z-10">
-        
-        <div className="w-full flex-1 flex flex-col justify-between space-y-8 animate-fadeIn">
-          
-          {/* Header Section */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-900 pb-6">
-            <div className="space-y-1.5">
-              <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-tight font-heading">
-                Choose Your Learning Domain
-              </h1>
-              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                Select a domain to continue your preparation journey
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              {/* Daily Streak Badge */}
-              <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0">
-                <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
-                  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
-                  {streak}
-                </span>
-              </div>
+      {/* 2. Main Workspace Frame */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
 
-              {/* Search Box */}
-              <div className="relative w-64 sm:w-80 select-none">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-                </span>
-                <input 
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search learning domains..."
-                  className="w-full bg-white dark:bg-slate-900/10 border-2 border-slate-350 dark:border-white/60 rounded-2xl pl-10 pr-4 py-2 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:dark:border-white focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
-                />
-              </div>
+        {/* Top Header (Reference 2 style) */}
+        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
+          <div className="flex flex-col items-start text-left">
+            <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
+              Choose Your Learning Domain 🎓
+            </h1>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider mt-0.5">
+              Select a domain to continue your preparation journey
+            </p>
           </div>
 
+          <div className="flex items-center gap-4">
+            {/* Daily Streak Badge */}
+            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0">
+              <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
+                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
+                {streak}
+              </span>
+            </div>
+
+            {/* Search Box */}
+            <div className="relative w-64 sm:w-80 select-none">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+              </span>
+              <input 
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search learning domains..."
+                className="w-full bg-white dark:bg-slate-900/10 border-2 border-slate-350 dark:border-white/60 rounded-2xl pl-10 pr-4 py-2 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:dark:border-white focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
+              />
+            </div>
+
+            {/* User role badge */}
+            {currentRole && (
+              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 select-none ml-2">
+                {currentRole.role === 'admin' || currentRole.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'}
+              </div>
+            )}
+
+            {/* User profile button (No dropdown, redirects directly to profile tab) */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => router.push('/student/dashboard?tab=profile')}
+                title="User Profile"
+                className="w-10 h-10 rounded-full bg-slate-850 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative"
+              >
+                {profile.avatar && profile.avatar !== 'initial' ? (
+                  <img
+                    src={profile.avatar}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <User className="w-5 h-5" />
+                )}
+
+                {/* Red dot notification badge */}
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Scrollable Content Panel Area */}
+        <main className="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar p-8 sm:p-12 relative z-10">
+          <div className="w-full flex flex-col space-y-4 animate-fadeIn">
+
           {/* Main Bento Grid layout (2x2) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full py-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full py-0">
             {filteredDomains.length > 0 ? (
               filteredDomains.map((d) => (
                 <div 
@@ -667,7 +526,7 @@ export default function DomainsScreen() {
                     <div className="flex-1 pr-2">
                       
                       {/* Large Header */}
-                      <h2 className="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight leading-none uppercase font-heading transition-colors duration-300">
+                      <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white tracking-tight leading-none uppercase font-heading transition-colors duration-300">
                         {d.title}
                       </h2>
                       
@@ -724,11 +583,10 @@ export default function DomainsScreen() {
             )}
           </div>
 
-
-
         </div>
       </main>
 
+      </div>
     </div>
   );
 }

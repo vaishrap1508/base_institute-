@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { siteConfig } from '@/config/site';
 import {
   Layers,
   ArrowLeft,
@@ -251,7 +252,7 @@ export default function DomainDetailPage() {
       {/* 1. Left Navigation Sidebar (Reference 2 style) */}
       <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
         {/* Top Logo Button */}
-        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title="Kinetic Hub" onClick={() => router.push('/student/dashboard')}>
+        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title={siteConfig.name} onClick={() => router.push('/student/dashboard')}>
           <Layers className="w-5 h-5" />
         </div>
 
@@ -321,19 +322,87 @@ export default function DomainDetailPage() {
 
       </aside>
 
-      {/* 2. Main Content View */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar p-6 md:p-10 relative z-10">
-        <div className="w-full flex-1 flex flex-col justify-between space-y-6">
-          {/* Header Utilities / Breadcrumbs Row */}
-          <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-900 pb-4 select-none">
-            <button
-              onClick={() => router.push('/student/domains')}
-              className="group flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-              <span>Back to Domains</span>
-            </button>
+      {/* 2. Main Workspace Frame */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+
+        {/* Top Header (Reference 2 style) */}
+        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
+          <div className="flex flex-col items-start text-left">
+            <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
+              {domainInfo?.name || 'Loading Domain...'} 🚀
+            </h1>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider mt-0.5">
+              LEARNING JOURNEY DETAIL AND ACCURACY METRICS
+            </p>
           </div>
+
+          <div className="flex items-center gap-4">
+            {/* Daily Streak Badge */}
+            <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0">
+              <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
+                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
+                {streak}
+              </span>
+            </div>
+
+            {/* Search Box */}
+            <div className="relative w-64 sm:w-80 select-none">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Filter concepts..."
+                className="w-full bg-white dark:bg-slate-900/10 border-2 border-slate-350 dark:border-white/60 rounded-2xl pl-10 pr-4 py-2 text-xs text-slate-800 dark:text-slate-200 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:dark:border-white focus:shadow-[0_0_15px_rgba(37,99,235,0.05)] shadow-[0_4px_15px_rgba(0,0,0,0.01)] transition-all"
+              />
+            </div>
+
+            {/* User role badge */}
+            {currentRole && (
+              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 select-none ml-2">
+                {currentRole.role === 'admin' || currentRole.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'}
+              </div>
+            )}
+
+            {/* User profile button */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => router.push('/student/dashboard?tab=profile')}
+                title="User Profile"
+                className="w-10 h-10 rounded-full bg-slate-850 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative"
+              >
+                {profile.avatar && profile.avatar !== 'initial' ? (
+                  <img
+                    src={profile.avatar}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <User className="w-5 h-5" />
+                )}
+
+                {/* Red dot notification badge */}
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Scrollable Content Panel Area */}
+        <main className="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar p-6 md:p-10 relative z-10">
+          <div className="w-full flex-1 flex flex-col justify-between space-y-6">
+            {/* Header Utilities / Breadcrumbs Row */}
+            <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-900 pb-4 select-none">
+              <button
+                onClick={() => router.push('/student/domains')}
+                className="group flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+                <span>Back to Domains</span>
+              </button>
+            </div>
 
           {loading ? (
             /* Premium Shimmer Loading Skeleton */
@@ -362,9 +431,7 @@ export default function DomainDetailPage() {
                     <span>Learning Journey Detail</span>
                   </div>
 
-                  <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-tight font-heading">
-                    {domainInfo?.name}
-                  </h1>
+
 
                   <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl">
                     {domainInfo?.description}
@@ -900,6 +967,7 @@ export default function DomainDetailPage() {
 
         </div>
       </main>
+      </div>
     </div>
   );
 }

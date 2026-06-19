@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
+import { siteConfig } from '@/config/site';
 import { 
   Layers, 
   ArrowRight, 
@@ -113,7 +114,7 @@ interface LandingPageContent {
 // DEFAULT HIGH-FIDELITY PRESETS
 // ==========================================
 const DEFAULT_CONTENT: LandingPageContent = {
-  hero_title: 'MASTER APTITUDE WITH THE KINETIC PLATFORM',
+  hero_title: `MASTER APTITUDE WITH ${siteConfig.nameUpper}`,
   hero_subtitle: 'TRUSTED BY 100K+ STUDENTS AND EMPLOYEES',
   hero_paragraph: "Experience 'No-Compiler' learning speed. A structured roadmap designed to take you from fundamentals to company-specific readiness in record time.",
   hero_btn_primary: 'Start Preparing for Free',
@@ -161,10 +162,10 @@ const DEFAULT_CONTENT: LandingPageContent = {
     { url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&auto=format&fit=crop&q=80', caption: 'Corporate Board Meeting', category: 'Corporate Ties' },
     { url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&auto=format&fit=crop&q=80', caption: 'Big Tech Conference', category: 'Placement Drives' }
   ],
-  mentor_name: 'Vaibhav Sharma',
-  mentor_designation: 'Founder & CEO, Kinetic Platform',
-  mentor_bio: "Hello, I'm Vaibhav Sharma.\nFounder and creator of Kinetic Platform.\nI built this platform to simplify aptitude, verbal ability, and placement preparation through structured learning paths and practical problem solving.\nWhether you're preparing for placements, competitive exams, or simply improving your aptitude skills, this platform is designed to guide you step by step.",
-  mentor_message: 'Remember:\nConsistency beats intensity.\nSmall daily improvements create long-term success.',
+  mentor_name: siteConfig.mentor.name,
+  mentor_designation: siteConfig.mentor.role,
+  mentor_bio: siteConfig.mentor.bio,
+  mentor_message: siteConfig.mentor.message,
   mentor_image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
   mentor_badge_1: '🏆 Founder',
   mentor_badge_2: '🎯 Placement Mentor',
@@ -184,8 +185,8 @@ const DEFAULT_CONTENT: LandingPageContent = {
   curriculum_mock_4: 'assessment',
   
   // Dynamic Logo & Global Copy Defaults
-  header_logo_text: 'KINETIC PLATFORM',
-  header_logo_subtext: 'APTITUDE AI',
+  header_logo_text: siteConfig.logoText,
+  header_logo_subtext: siteConfig.logoSubtext,
   header_btn_text: 'Join for Free',
   bento_title: 'EMPOWERING CAMPUSES',
   bento_desc: 'Interactive workshops, dynamic learning roadmaps, and campus placements engineered to accelerate talent.',
@@ -195,16 +196,10 @@ const DEFAULT_CONTENT: LandingPageContent = {
   faq_title: 'Frequently Asked Questions',
   faq_desc: 'Have questions about our syllabus, adaptive mock tests, or sandbox staging environments? Find answers below.',
   footer_badge_text: 'Operational Clearance: Sandbox Encrypted',
-  footer_copyright: '© 2026 Aptitude AI platform. All rights reserved.'
+  footer_copyright: siteConfig.copyright
 };
 
-const DEFAULT_UNIVERSITIES = [
-  'Vellore Institute of Technology',
-  'SRM University',
-  'BITS Pilani',
-  'Amity University',
-  'KIIT Bhubaneswar'
-];
+const DEFAULT_UNIVERSITIES = siteConfig.defaultUniversities;
 
 interface DemoQuestion {
   topic: string;
@@ -1791,11 +1786,11 @@ export default function LandingPage() {
 
           {/* Heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight">
-            {content.hero_title.split('KINETIC PLATFORM')[0]}
+            {content.hero_title.split(siteConfig.nameUpper)[0]}
             <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent drop-shadow-sm">
-              KINETIC PLATFORM
+              {siteConfig.nameUpper}
             </span>
-            {content.hero_title.split('KINETIC PLATFORM')[1] || ''}
+            {content.hero_title.split(siteConfig.nameUpper)[1] || ''}
           </h1>
 
           {/* Paragraph explanation */}
@@ -1873,7 +1868,7 @@ export default function LandingPage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600/80 animate-glow-green" />
               </div>
               <div className="text-[9px] font-bold text-slate-400 dark:text-slate-600 font-mono tracking-widest uppercase">
-                kinetic-staging-v2.0
+                {siteConfig.stagingVersion}
               </div>
             </div>
 
@@ -2965,35 +2960,32 @@ export default function LandingPage() {
       {/* ==========================================
           CALL TO ACTION (CTA) SECTION
           ========================================== */}
-      <section className="relative w-full border-t border-slate-200 dark:border-slate-900 py-16 px-6 sm:px-12 bg-white dark:bg-slate-950/50">
+      <section className="relative w-full py-20 px-6 sm:px-12 bg-white dark:bg-slate-950 overflow-hidden">
+        {/* Soft flowy decorative background meshes */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-blue-500/5 dark:bg-blue-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-[400px] h-[200px] rounded-full bg-indigo-500/5 dark:bg-indigo-500/10 blur-[100px] pointer-events-none" />
         
-        <div className="max-w-4xl mx-auto">
-          
-          <div className="bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-slate-100/50 dark:from-blue-900/30 dark:via-indigo-950/20 dark:to-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 sm:p-12 text-center space-y-6 relative overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_50%)] pointer-events-none" />
-            
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-              {content.cta_title}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-lg mx-auto leading-relaxed font-medium">
-              {content.cta_subtitle}
-            </p>
+        <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight uppercase font-heading">
+            {content.cta_title}
+          </h2>
+          <p className="text-sm sm:text-base text-slate-650 dark:text-slate-400 max-w-xl mx-auto leading-relaxed font-medium">
+            {content.cta_subtitle}
+          </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3.5 max-w-md mx-auto">
-              <Link 
-                href="/login"
-                className="w-full sm:flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg hover:shadow-blue-500/25 transition-all text-center"
-              >
-                {content.cta_btn_primary}
-              </Link>
-              <button 
-                onClick={() => showNotice("Connecting to support sandbox queue...", "info")}
-                className="w-full sm:flex-1 py-3 px-6 bg-surface hover:bg-surface-2 text-text-desc font-bold text-xs border border-border-default rounded-xl transition-all cursor-pointer"
-              >
-                {content.cta_btn_secondary}
-              </button>
-            </div>
-
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 max-w-md mx-auto">
+            <Link 
+              href="/login"
+              className="w-full sm:flex-1 py-3.5 px-8 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-98 transition-all duration-300 text-center uppercase tracking-wider"
+            >
+              {content.cta_btn_primary}
+            </Link>
+            <button 
+              onClick={() => showNotice("Connecting to support sandbox queue...", "info")}
+              className="w-full sm:flex-1 py-3.5 px-8 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs border border-slate-200 dark:border-slate-800 rounded-2xl hover:scale-[1.02] active:scale-98 transition-all duration-300 cursor-pointer uppercase tracking-wider"
+            >
+              {content.cta_btn_secondary}
+            </button>
           </div>
         </div>
       </section>

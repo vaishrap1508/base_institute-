@@ -775,12 +775,6 @@ export default function OnboardingPage() {
         </Link>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              SECURE ONBOARDING HUD
-            </span>
-          </div>
         </div>
       </header>
 

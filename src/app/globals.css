@@ -1,24 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Geist+Mono:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:is(.dark, .dark *));
 
 :root {
   /* --- COLOR TOKENS --- */
-  --clr-primary: #2563EB;
-  --clr-primary-dark: #1D4ED8;
-  --clr-primary-tint: #DBEAFE;
+  --clr-primary: #7075F4;
+  --clr-primary-dark: #585CE5;
+  --clr-primary-tint: #B6BBFF;
 
-  --clr-secondary: #7C3AED;
-  --clr-secondary-dark: #6D28D9;
-  --clr-secondary-tint: #EDE9FE;
+  --clr-secondary: #4EA8DE;
+  --clr-secondary-dark: #3582CA;
+  --clr-secondary-tint: #AFE3FF;
 
-  --clr-accent: #F59E0B;
-  --clr-accent-dark: #D97706;
-  --clr-accent-tint: #FEF3C7;
+  --clr-accent: #A0A2FF;
+  --clr-accent-dark: #7B7DFF;
+  --clr-accent-tint: #B6BBFF;
 
   --clr-success: #10B981;
-  --clr-success-tint: #D1FAE5;
+  --clr-success-tint: #DAF9E0;
 
   --clr-warning: #F97316;
   --clr-warning-tint: #FFEDD5;
@@ -26,23 +25,24 @@
   --clr-error: #EF4444;
   --clr-error-tint: #FEE2E2;
 
-  --clr-bg: #F8FAFC;
-  --clr-surface: #FFFFFF;
-  --clr-surface-2: #F1F5F9;
+  --clr-bg: #FAF8F5;
+  --clr-surface: #FCFAF7;
+  --clr-surface-2: #F5F2EB;
 
   --clr-text: #0F172A;
   --clr-text-2: #475569;
   --clr-text-3: #94A3B8;
-  --clr-text-link: #2563EB;
+  --clr-text-link: #7075F4;
 
-  --clr-border: #E2E8F0;
-  --clr-border-strong: #CBD5E1;
-  --clr-border-focus: #2563EB;
+  --clr-border: #E5E2DA;
+  --clr-border-strong: #D5D1C6;
+  --clr-border-focus: #7075F4;
 
   /* --- TYPOGRAPHY TOKENS --- */
-  --font-heading: 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-code: 'Geist Mono', monospace;
+  --font-primary: var(--font-open-sans), sans-serif;
+  --font-secondary: var(--font-open-sans), sans-serif;
+  --font-tertiary: var(--font-open-sans), sans-serif;
+  --font-code: var(--font-geist-mono), monospace;
 
   /* --- BORDER RADIUS --- */
   --radius-sm: 6px;
@@ -154,8 +154,9 @@
   --color-red-500: var(--clr-error);
   
   /* Core typography mappings */
-  --font-sans: var(--font-body);
-  --font-heading: var(--font-heading);
+  --font-sans: var(--font-secondary);
+  --font-heading: var(--font-primary);
+  --font-tertiary: var(--font-tertiary);
   --font-mono: var(--font-code);
   
   /* Border Radius overrides */
@@ -193,7 +194,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-body);
+  font-family: var(--font-secondary);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -344,54 +345,54 @@ body {
    DESIGN SYSTEM TYPOGRAPHY CLASSES
    ========================================== */
 .text-h1 {
-  font-family: var(--font-heading);
+  font-family: var(--font-primary);
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 700;
   letter-spacing: -1px;
 }
 
 .text-h2 {
-  font-family: var(--font-heading);
+  font-family: var(--font-primary);
   font-size: clamp(22px, 3vw, 30px);
   font-weight: 600;
   letter-spacing: -0.5px;
 }
 
 .text-h3 {
-  font-family: var(--font-heading);
+  font-family: var(--font-primary);
   font-size: 22px;
   font-weight: 600;
 }
 
 .text-h4 {
-  font-family: var(--font-heading);
+  font-family: var(--font-primary);
   font-size: 18px;
   font-weight: 500;
 }
 
 .text-lg {
-  font-family: var(--font-sans);
+  font-family: var(--font-secondary);
   font-size: 16px;
   font-weight: 400;
   line-height: 1.7;
 }
 
 .text-base {
-  font-family: var(--font-sans);
+  font-family: var(--font-secondary);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.6;
 }
 
 .text-sm {
-  font-family: var(--font-sans);
+  font-family: var(--font-secondary);
   font-size: 13px;
   font-weight: 400;
   line-height: 1.5;
 }
 
 .text-xs {
-  font-family: var(--font-sans);
+  font-family: var(--font-secondary);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -399,7 +400,7 @@ body {
 }
 
 .text-btn {
-  font-family: var(--font-sans);
+  font-family: var(--font-tertiary);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -413,7 +414,7 @@ body {
 .btn-primary {
   background-color: var(--clr-primary);
   color: #FFFFFF;
-  font-family: var(--font-sans);
+  font-family: var(--font-tertiary);
   font-size: 14px;
   font-weight: 500;
   border-radius: var(--radius-md);
@@ -427,7 +428,7 @@ body {
 .btn-secondary {
   background-color: var(--clr-secondary-tint);
   color: var(--clr-secondary);
-  font-family: var(--font-sans);
+  font-family: var(--font-tertiary);
   font-size: 14px;
   font-weight: 500;
   border-radius: var(--radius-md);
@@ -1369,14 +1370,14 @@ select:-webkit-autofill:focus {
 
 /* Typography & Layout Spacing */
 article {
-  font-family: var(--font-body) !important;
+  font-family: var(--font-secondary) !important;
   color: var(--clr-text-2) !important;
   line-height: 1.75 !important;
   font-size: 0.9375rem !important;
 }
 
 article h1 {
-  font-family: var(--font-heading) !important;
+  font-family: var(--font-primary) !important;
   font-weight: 800 !important;
   letter-spacing: -0.03em !important;
   color: var(--clr-text) !important;
@@ -1386,7 +1387,7 @@ article h1 {
 }
 
 article h2 {
-  font-family: var(--font-heading) !important;
+  font-family: var(--font-primary) !important;
   font-weight: 700 !important;
   letter-spacing: -0.02em !important;
   color: var(--clr-text) !important;
@@ -1398,7 +1399,7 @@ article h2 {
 }
 
 article h3 {
-  font-family: var(--font-heading) !important;
+  font-family: var(--font-primary) !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;
   color: var(--clr-text) !important;
