@@ -922,7 +922,6 @@ export default function PracticeArena({
           
           {/* Solving Momentum Widget */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20 rounded-full text-xs font-bold text-orange-600 dark:text-orange-400 shadow-xs" title="Your current correct answer streak and total solved questions today">
-            <Flame className="w-3.5 h-3.5 text-orange-500 fill-current animate-pulse" />
             <span>🔥 {streak} Streak • {solvedCount} Solved</span>
           </div>
 
