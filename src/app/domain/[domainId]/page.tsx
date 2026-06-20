@@ -199,7 +199,17 @@ export default function DomainDetailPage() {
         setProgress(progressRes);
         setWeakest(weakestRes);
         setStrongest(strongestRes);
-        setRadarData(radarRes);
+        // Set base structure with 0 values to trigger expanding render animation
+        const initialRadar = radarRes.map((pt) => ({
+          ...pt,
+          accuracy: 0,
+          mastery: 0,
+          completion: 0
+        }));
+        setRadarData(initialRadar);
+        setTimeout(() => {
+          setRadarData(radarRes);
+        }, 120);
         setInsights(insightsRes);
         setContinueLearning(continueRes);
         setTopics(topicsRes);

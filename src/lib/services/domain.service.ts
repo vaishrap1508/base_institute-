@@ -529,7 +529,7 @@ export async function getRadarData(userId: string, domainId: string): Promise<Ra
     if (!uuid) return fallback;
 
     const { subTopics, conceptIds, questionIds } = await getDomainHierarchyData(uuid);
-    if (subTopics.length === 0) return fallback;
+    if (subTopics.length < 3) return fallback;
 
     // Fetch all progress tracking rows for all concepts in domain
     const { data: progressRows, error: pError } = await supabase
