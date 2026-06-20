@@ -58,6 +58,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
+import { LeaderboardView } from '@/components/student/LeaderboardView';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import PracticeArena from '@/components/PracticeArena';
 import PlacementProfile from '@/components/PlacementProfile';
@@ -2476,11 +2477,6 @@ export default function StudentDashboard() {
 
             {/* User profile popup menu trigger */}
             {/* User role badge */}
-            {currentRole && (
-              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 select-none mr-2">
-                {currentRole.role === 'admin' || currentRole.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'}
-              </div>
-            )}
 
             {/* User profile button (No dropdown, redirects directly to profile tab) */}
             {activeSidebarTab === 'dashboard' && (
@@ -3706,67 +3702,7 @@ export default function StudentDashboard() {
               transition={tabTransition}
               className="w-full space-y-6"
             >
-
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                  <h1 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Active Rankings</h1>
-                </div>
-
-                {/* Leaderboard sub-tabs */}
-                <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900">
-                  {['global', 'friends'].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveLeaderboardTab(tab as any)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${activeLeaderboardTab === tab
-                          ? 'bg-blue-600 text-white'
-                          : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Leaderboard lists */}
-              <div className="space-y-3">
-                {[
-                  { rank: 1, name: 'Sriram Neppalli', xp: '18,920 XP', progress: '94%', self: false },
-                  { rank: 2, name: 'Aditya Sen', xp: '16,400 XP', progress: '88%', self: false },
-                  { rank: 3, name: 'Rohan Sharma', xp: '14,200 XP', progress: '85%', self: false },
-                  { rank: 4, name: 'Ananya Roy', xp: '13,900 XP', progress: '82%', self: false },
-                  { rank: 5, name: 'Kunal Kapoor', xp: '13,500 XP', progress: '80%', self: false },
-                  { rank: 14, name: 'Vaishnavi Raparthy (You)', xp: '12,450 XP', progress: '72%', self: true }
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${item.self
-                        ? 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-900/10 dark:border-blue-950 dark:text-blue-400 shadow-sm'
-                        : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 dark:bg-slate-950/20 dark:border-slate-900/60 dark:hover:bg-slate-900/40 dark:text-slate-300'
-                      }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-xs ${item.rank === 1 ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' :
-                          item.rank === 2 ? 'bg-slate-200 text-slate-700 dark:bg-slate-400/20 dark:text-slate-400' :
-                            item.rank === 3 ? 'bg-amber-50 text-amber-900 dark:bg-amber-700/20 dark:text-amber-700' :
-                              'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'
-                        }`}>
-                        {item.rank}
-                      </span>
-                      <span className="text-sm font-bold text-slate-900 dark:text-white">{item.name}</span>
-                    </div>
-
-                    <div className="flex items-center gap-4 text-xs">
-                      <span className="text-slate-500 font-semibold font-mono">{item.xp}</span>
-                      <span className="font-mono font-black text-blue-600 dark:text-blue-400">{item.progress}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+              <LeaderboardView />
             </motion.div>
           )}
 

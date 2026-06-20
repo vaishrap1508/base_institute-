@@ -370,11 +370,6 @@ export default function DomainDetailPage() {
             </div>
 
             {/* User role badge */}
-            {currentRole && (
-              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 select-none ml-2">
-                {currentRole.role === 'admin' || currentRole.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'}
-              </div>
-            )}
           </div>
         </header>
 
