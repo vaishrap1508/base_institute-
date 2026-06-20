@@ -33,7 +33,8 @@ import {
   BookOpen,
   PlusCircle,
   Sparkle,
-  Flame
+  Flame,
+  Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
@@ -291,6 +292,105 @@ export default function PracticeArena({
   const [discussionTab, setDiscussionTab] = useState<'comments' | 'peer_shortcuts' | 'community_notes' | 'tricks'>('comments');
   const [commentsList, setCommentsList] = useState<Array<{ id: string; user: string; avatar: string; comment: string; time: string; likes: number; isLiked?: boolean }>>([]);
   const [commentInput, setCommentInput] = useState<string>('');
+
+  // Practice Arena three-column layout states
+  const [difficultyFilter, setDifficultyFilter] = useState<'basic' | 'advanced'>('basic');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [middleActiveTab, setMiddleActiveTab] = useState<'description' | 'editorial' | 'submissions' | 'discussions'>('description');
+  const [collapsedFolders, setCollapsedFolders] = useState<Record<string, boolean>>({});
+  const [editorCode, setEditorCode] = useState<string>('');
+  const [activeTestCaseIndex, setActiveTestCaseIndex] = useState<number>(0);
+  const [testCasesResults, setTestCasesResults] = useState<string | null>(null);
+  const [isCompiling, setIsCompiling] = useState<boolean>(false);
+
+  const getPythonSolution = (qId: string) => {
+    switch (qId) {
+      case 'arrays-consec-ones':
+        return `class Solution:
+    def findMaxConsecutiveOnes(self, nums: List[int]) -> int:
+        max_count = 0
+        current_count = 0
+        for num in nums:
+            if num == 1:
+                current_count += 1
+                max_count = max(max_count, current_count)
+            else:
+                current_count = 0
+        return max_count`;
+      case 'arrays-linear-search':
+        return `class Solution:
+    def linearSearch(self, arr: List[int], x: int) -> int:
+        for i in range(len(arr)):
+            if arr[i] == x:
+                return i
+        return -1`;
+      case 'arrays-largest':
+        return `class Solution:
+    def findLargest(self, arr: List[int]) -> int:
+        if not arr:
+            return 0
+        max_val = arr[0]
+        for val in arr[1:]:
+            if val > max_val:
+                max_val = val
+        return max_val`;
+      case 'arrays-second-largest':
+        return `class Solution:
+    def getSecondLargest(self, arr: List[int]) -> int:
+        if len(arr) < 2:
+            return -1
+        largest = second = -float('inf')
+        for x in arr:
+            if x > largest:
+                second = largest
+                largest = x
+            elif x > second and x != largest:
+                second = x
+        return second if second != -float('inf') else -1`;
+      default:
+        return `class Solution:
+    def solve(self, data) -> any:
+        # Write your code here
+        pass`;
+    }
+  };
+
+  const getTestCases = (qId: string) => {
+    switch (qId) {
+      case 'arrays-consec-ones':
+        return [
+          { input: 'nums = [1,1,0,1,1,1]', output: '3' },
+          { input: 'nums = [1,0,1,1,0,1]', output: '2' }
+        ];
+      case 'arrays-linear-search':
+        return [
+          { input: 'arr = [4, 5, 6, 7, 8], x = 6', output: '2' },
+          { input: 'arr = [4, 5, 6, 7, 8], x = 10', output: '-1' }
+        ];
+      case 'arrays-largest':
+        return [
+          { input: 'arr = [1, 8, 3, 22, 9, 7]', output: '22' },
+          { input: 'arr = [5, 5, 5]', output: '5' }
+        ];
+      case 'arrays-second-largest':
+        return [
+          { input: 'arr = [12, 35, 1, 10, 34, 1]', output: '34' },
+          { input: 'arr = [10, 10]', output: '-1' }
+        ];
+      default:
+        return [
+          { input: 'data = [1, 2, 3]', output: 'true' }
+        ];
+    }
+  };
+
+  useEffect(() => {
+    if (activeQuestion) {
+      setEditorCode(getPythonSolution(activeQuestion.id));
+      setTestCasesResults(null);
+      setActiveTestCaseIndex(0);
+    }
+  }, [activeQuestion]);
 
   // Load Revision DB, Custom Folders, and Hard questions on mount
   useEffect(() => {
@@ -776,6 +876,70 @@ export default function PracticeArena({
     );
   };
 
+  // Filter questions by difficulty basic/advanced and search query
+  const filteredQuestions = useMemo(() => {
+    return questions.filter(q => {
+      // Basic has EASY or MEDIUM. Advanced has HARD.
+      const isBasic = q.difficulty === 'EASY' || q.difficulty === 'MEDIUM';
+      const isAdvanced = q.difficulty === 'HARD';
+      const diffMatches = difficultyFilter === 'basic' ? isBasic : isAdvanced;
+      
+      const title = q.questionStem.split('###')[0].trim().toLowerCase();
+      const stem = q.questionStem.toLowerCase();
+      const query = searchQuery.toLowerCase();
+      const searchMatches = title.includes(query) || stem.includes(query) || q.id.toLowerCase().includes(query);
+      
+      return diffMatches && searchMatches;
+    });
+  }, [questions, difficultyFilter, searchQuery]);
+
+  const formatName = (str: string) => {
+    if (!str) return '';
+    return str.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  // Group filtered questions by domainId -> subTopicId
+  const groupedQuestions = useMemo(() => {
+    const groups: Record<string, Record<string, Question[]>> = {};
+    filteredQuestions.forEach(q => {
+      const domain = formatName(q.domainId || 'general');
+      const subtopic = formatName(q.subTopicId || 'practice');
+      if (!groups[domain]) {
+        groups[domain] = {};
+      }
+      if (!groups[domain][subtopic]) {
+        groups[domain][subtopic] = [];
+      }
+      groups[domain][subtopic].push(q);
+    });
+    return groups;
+  }, [filteredQuestions]);
+
+  const toggleFolder = (key: string) => {
+    setCollapsedFolders(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const activeFilteredIndex = useMemo(() => {
+    return filteredQuestions.findIndex(q => q.id === activeQuestion?.id);
+  }, [filteredQuestions, activeQuestion]);
+
+  const handleFilteredPrev = () => {
+    if (activeFilteredIndex > 0) {
+      setActiveQuestion(filteredQuestions[activeFilteredIndex - 1]);
+      setSelectedOptionId(null);
+    }
+  };
+
+  const handleFilteredNext = () => {
+    if (activeFilteredIndex < filteredQuestions.length - 1) {
+      setActiveQuestion(filteredQuestions[activeFilteredIndex + 1]);
+      setSelectedOptionId(null);
+    }
+  };
+
   return (
     <div className="w-full relative text-slate-800 dark:text-slate-100 flex flex-col min-h-screen pb-24 select-text">
       
@@ -967,720 +1131,656 @@ export default function PracticeArena({
       </header>
 
       {/* Main Workspace Panels */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
-          
-          {/* Left panel Question + options (7 columns) */}
-          <section className="lg:col-span-7 space-y-6 text-left">
-            
-            {/* Question Card */}
-            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-6 md:p-8 space-y-6 shadow-xs relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/2 to-transparent pointer-events-none" />
-
-              <div className="flex justify-between items-start gap-4">
-                <h1 className="text-xl md:text-2xl font-bold font-heading text-slate-800 dark:text-white leading-snug tracking-tight">
-                  <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[0].trim())} />
-                </h1>
-                
-                {/* Formula Sheet Trigger */}
-                <button
-                  onClick={() => setIsFormulaDrawerOpen(true)}
-                  className="px-3 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl border border-slate-205 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 dark:text-slate-400 shrink-0 cursor-pointer flex items-center gap-1.5 transition-colors select-none"
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>📖 Formula Sheet</span>
-                </button>
-              </div>
-
-              {/* Pitfalls Learning Context Card */}
-              <div className="p-4 bg-rose-500/5 dark:bg-rose-950/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl text-xs flex gap-3 text-left">
-                <AlertCircle className="w-5 h-5 text-rose-505 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block text-[10px] mb-1 select-none">Common Pitfalls & Concepts</span>
-                  <p className="text-slate-600 dark:text-slate-400 font-medium">
-                    Students solving this question often struggle with:{' '}
-                    {activeQuestion.domainId === 'quant' ? (
-                      <span className="font-bold text-slate-700 dark:text-slate-350">✓ Percentage base mismatches, ✓ Reverse profit compounding, ✓ Fraction approximations.</span>
-                    ) : activeQuestion.domainId === 'logical' ? (
-                      <span className="font-bold text-slate-700 dark:text-slate-355">✓ Relative direction reversals, ✓ Overlooking circular boundaries, ✓ Branching case assumptions.</span>
-                    ) : (
-                      <span className="font-bold text-slate-700 dark:text-slate-355">✓ Context tone interpretation, ✓ Neglecting secondary definitions, ✓ Confusing synonym roots.</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {/* Math preview highlight */}
-              {activeQuestion.questionStem.includes('$$') && (
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/40 border border-slate-250/50 dark:border-slate-850 rounded-2xl flex items-center gap-2 select-none">
-                  <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Supports KaTeX Math Formulas</span>
-                </div>
-              )}
+      {/* Main Workspace Panels */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden w-full bg-slate-50 dark:bg-slate-905 h-[calc(100vh-80px)]">
+        {/* LEFT COLUMN: Sidebar Explorer */}
+        <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex flex-col shrink-0 select-none overflow-hidden h-1/3 md:h-full">
+          {/* Header Toggle basic/advanced */}
+          <div className="p-3 border-b border-slate-205 dark:border-slate-800 flex items-center justify-between select-none">
+            <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl w-full">
+              <button 
+                onClick={() => setDifficultyFilter('basic')}
+                className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                  difficultyFilter === 'basic' 
+                    ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-405 shadow-xs font-extrabold'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+                }`}
+              >
+                Basic
+              </button>
+              <button 
+                onClick={() => setDifficultyFilter('advanced')}
+                className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer ${
+                  difficultyFilter === 'advanced' 
+                    ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-455 shadow-xs font-extrabold'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+                }`}
+              >
+                Advanced
+              </button>
             </div>
+          </div>
 
-            {/* Personal Shortcut Card (collapsed before solving, expanded after solving) */}
-            {activeMeta.notes && (
-              <div className="p-5 bg-amber-500/5 dark:bg-amber-950/10 border border-amber-500/15 dark:border-amber-900/35 rounded-3xl relative overflow-hidden text-left">
-                {!isShortcutExpanded ? (
-                  <button 
-                    onClick={() => setIsShortcutExpanded(true)}
-                    className="w-full flex items-center justify-between text-xs font-black uppercase text-amber-600 dark:text-amber-405 tracking-wider cursor-pointer select-none"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Sparkle className="w-4 h-4 fill-current animate-pulse text-amber-550" />
-                      <span>💡 Personal Notes Available</span>
-                    </div>
-                    <span className="text-[10px] hover:underline">[ Click to Expand ]</span>
-                  </button>
-                ) : (
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center shrink-0">
-                      <Sparkle className="w-5 h-5 fill-current" />
-                    </div>
-                    
-                    <div className="space-y-1.5 flex-1 min-w-0">
-                      <div className="flex justify-between items-center select-none">
-                        <span className="text-xs font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider">💡 My Shortcut</span>
-                        <button 
-                          onClick={() => setIsShortcutExpanded(false)}
-                          className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
-                        >
-                          [ Collapse ]
-                        </button>
-                      </div>
+          {/* Search box */}
+          <div className="p-3 border-b border-slate-100 dark:border-slate-900 select-none">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+              <input 
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search questions..."
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-blue-500 text-slate-700 dark:text-slate-300 font-semibold"
+              />
+            </div>
+          </div>
 
-                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-350 leading-relaxed italic pr-4">
-                        <SafeHtmlWithMath html={markdownToHtml(activeMeta.notes)} />
-                      </p>
-
-                      <button
-                        onClick={() => {
-                          setActiveTab('notes');
-                          if (!isQuestionSubmitted) {
-                            setIsQuickNotesOpen(true);
-                          }
-                        }}
-                        className="text-[9.5px] font-black text-amber-600 hover:text-amber-700 underline uppercase tracking-wider block pt-1 select-none cursor-pointer"
-                      >
-                        [ Edit Shortcut ]
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-            {/* MCQ grid Options */}
-            <div className="space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block select-none">Interactive Options</span>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {activeQuestion.options.map((opt) => {
-                  const isOptionSelected = selectedOptionId === opt.id;
-                  const isCorrectAnswer = opt.isCorrect;
-                  const isUserChosen = selectedAnswers[activeQuestion.id] === opt.id;
-
-                  const showCorrect = isQuestionSubmitted && isCorrectAnswer;
-                  const showWrong = isQuestionSubmitted && isUserChosen && !isCorrectAnswer;
-
-                  return (
-                    <motion.button
-                      key={opt.id}
-                      disabled={isQuestionSubmitted}
-                      onClick={() => setSelectedOptionId(opt.id)}
-                      whileHover={!isQuestionSubmitted ? { scale: 1.01, translateY: -2 } : {}}
-                      whileTap={!isQuestionSubmitted ? { scale: 0.99 } : {}}
-                      className={`p-5 rounded-2xl border text-left flex items-start justify-between gap-4 text-sm transition-all duration-205 relative overflow-hidden group cursor-pointer ${
-                        showCorrect
-                          ? 'border-emerald-500 bg-emerald-50/50 dark:border-emerald-600 dark:bg-emerald-950/20 text-emerald-955 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                          : showWrong
-                            ? 'border-rose-500 bg-rose-50/50 dark:border-rose-600 dark:bg-rose-955/20 text-rose-955 dark:text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] animate-shake'
-                            : isOptionSelected
-                              ? 'border-blue-605 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-955/30 text-slate-900 dark:text-white font-bold shadow-xs'
-                              : 'border-slate-200 bg-white hover:border-blue-500/30 hover:shadow-md dark:border-slate-900 dark:bg-slate-955/40 dark:hover:border-slate-800 text-slate-700 dark:text-slate-350'
-                      }`}
+          {/* File Explorer Tree */}
+          <div className="flex-1 overflow-y-auto p-3 text-left space-y-1 text-xs">
+            {Object.keys(groupedQuestions).length === 0 ? (
+              <div className="text-center text-slate-400 py-8 font-semibold italic">No questions found</div>
+            ) : (
+              Object.entries(groupedQuestions).map(([domain, subTopics]) => {
+                const domainKey = `domain:${domain}`;
+                const isDomainCollapsed = collapsedFolders[domainKey];
+                return (
+                  <div key={domain} className="space-y-1 animate-fadeIn">
+                    {/* Domain Header */}
+                    <button 
+                      onClick={() => toggleFolder(domainKey)}
+                      className="w-full flex items-center justify-between py-1.5 px-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-lg text-slate-800 dark:text-slate-202 font-black tracking-wide cursor-pointer"
                     >
-                      <div className="flex items-start gap-4 min-w-0">
-                        <span className={`w-7 h-7 rounded-xl flex items-center justify-center font-mono font-black text-xs shrink-0 border transition-all duration-200 ${
-                          showCorrect
-                            ? 'border-emerald-300 bg-emerald-100 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-900/30 dark:text-emerald-500'
-                            : showWrong
-                              ? 'border-rose-300 bg-rose-100 text-rose-800 dark:border-rose-800/40 dark:bg-rose-900/30 dark:text-rose-550'
-                              : isOptionSelected
-                                ? 'border-blue-400 bg-blue-100 text-blue-800 dark:border-blue-800/40 dark:bg-blue-900/30 dark:text-blue-450'
-                                : 'border-slate-200 bg-slate-550 text-slate-500 dark:border-slate-850 dark:bg-slate-900/60 dark:text-slate-400'
-                        }`}>
-                          {opt.id}
-                        </span>
-                        
-                        <div className="font-semibold pt-0.5 leading-relaxed">
-                          <SafeHtmlWithMath html={markdownToHtml(opt.text)} />
-                        </div>
+                      <div className="flex items-center gap-1.5">
+                        {isDomainCollapsed ? <Folder className="w-4 h-4 text-blue-505" /> : <FolderOpen className="w-4 h-4 text-blue-505" />}
+                        <span className="truncate">{domain}</span>
                       </div>
+                      <ChevronRight className={`w-3 h-3 transition-transform duration-205 text-slate-400 ${isDomainCollapsed ? '' : 'transform rotate-90'}`} />
+                    </button>
 
-                      {showCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />}
-                      {showWrong && <X className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />}
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Progressive Hint System Card */}
-            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 md:p-6 space-y-4 shadow-xs text-left">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block select-none">💡 Need a hand? Progressive Hints</span>
-              
-              <div className="space-y-3">
-                {/* Hint 1 */}
-                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setShowHint1(!showHint1)}
-                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
-                  >
-                    <span>💡 Hint 1: Core Concept Clue</span>
-                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint1 ? '[ Hide ]' : '[ Reveal ]'}</span>
-                  </button>
-                  {showHint1 && (
-                    <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
-                      <SafeHtmlWithMath html={markdownToHtml(
-                        activeQuestion.domainId === 'quant'
-                          ? "Let the cost price of the article be $100x$. What is the initial marked selling price at a 20% profit?"
-                          : activeQuestion.domainId === 'logical'
-                            ? "Anchor a key candidate seat first (e.g. seating opposite or in fixed spots) before analyzing relative adjacencies."
-                            : "Identify the part of speech and tone of the word. Is it positive, negative, or neutral?"
-                      )} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Hint 2 */}
-                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setShowHint2(!showHint2)}
-                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
-                  >
-                    <span>💡 Hint 2: Equation / Steps Setup</span>
-                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint2 ? '[ Hide ]' : '[ Reveal ]'}</span>
-                  </button>
-                  {showHint2 && (
-                    <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
-                      <SafeHtmlWithMath html={markdownToHtml(
-                        activeQuestion.domainId === 'quant'
-                          ? "If the cost price falls by 20%, the new cost price becomes $80x$. The markup profit is 25% on this new CP."
-                          : activeQuestion.domainId === 'logical'
-                            ? "Check the direction everyone is facing. Facing inward means clockwise is right and anti-clockwise is left."
-                            : "Look for sentence prefix roots. 'Pro-' usually means forward, high-production, or positive."
-                      )} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Hint 3 */}
-                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setShowHint3(!showHint3)}
-                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
-                  >
-                    <span>💡 Hint 3: Step-by-Step Solve Shortcut</span>
-                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint3 ? '[ Hide ]' : '[ Reveal ]'}</span>
-                  </button>
-                  {showHint3 && (
-                    <div className="p-4 bg-white dark:bg-slate-955 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
-                      <SafeHtmlWithMath html={markdownToHtml(
-                        activeQuestion.domainId === 'quant'
-                          ? "New SP = $80x \\times 1.25 = 100x$. The difference between the original SP ($120x$) and new SP ($100x$) is $20x$, which corresponds to $10$. Solve for $x$!"
-                          : activeQuestion.domainId === 'logical'
-                            ? "Draw the circular grid and eliminate candidates that violate the immediate neighbor bounds."
-                            : "Eliminate options representing scarcity or passivity. Prolific implies high output rate."
-                      )} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Question Bank Progress Tracker */}
-            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 space-y-2.5 text-left">
-              <div className="flex justify-between items-center select-none">
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Overall Question Bank Progress</span>
-                <span className="text-[11px] font-mono font-black text-blue-500 dark:text-blue-400">
-                  {currentIndex + 1} / {questions.length} Questions
-                </span>
-              </div>
-              <div className="w-full h-2 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-indigo-650 transition-all duration-300"
-                  style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
-                />
-              </div>
-            </div>
-
-          </section>
-
-          {/* Right panel solution tabs (3 columns) */}
-          <section className="col-span-1 lg:col-span-3 space-y-6 text-left">
-            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 md:p-6 space-y-5 shadow-xs relative flex flex-col h-full min-h-[450px]">
-              {!isQuestionSubmitted ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4 my-auto select-none animate-fadeIn">
-                  <div className="w-14 h-14 bg-slate-105 dark:bg-slate-900 text-slate-400 dark:text-slate-505 rounded-full flex items-center justify-center">
-                    <Lock className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="text-xs font-black uppercase text-slate-800 dark:text-white tracking-widest">Solution Locked</h3>
-                    <p className="text-[11px] text-slate-405 leading-relaxed max-w-[220px] mx-auto">
-                      Solve this question to unlock step-by-step explanations, video walkthroughs, and AI insights.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {/* Switcher headers */}
-                  <div className="flex border-b border-slate-200 dark:border-slate-900 pb-0.5 justify-start gap-1 select-none overflow-x-auto scrollbar-none">
-                    {[
-                      { id: 'written', label: 'Written' },
-                      { id: 'video', label: 'Video' },
-                      { id: 'eli5', label: 'AI ELI5' },
-                      { id: 'notes', label: 'My Notes' }
-                    ].map(tab => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        className={`px-3 py-1.5 text-xs font-black uppercase tracking-wider relative cursor-pointer whitespace-nowrap ${
-                          activeTab === tab.id 
-                            ? 'text-blue-600 dark:text-blue-400 font-extrabold'
-                            : 'text-slate-400 hover:text-slate-650 dark:text-slate-500 dark:hover:text-slate-350'
-                        }`}
-                      >
-                        {tab.label}
-                        {activeTab === tab.id && (
-                          <motion.div
-                            layoutId="editorialActiveTabGlow"
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
-                          />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Tab Panels */}
-                  <div className="min-h-56">
-                    
-                    {activeTab === 'written' && (
-                      <div className="space-y-4 animate-fadeIn text-xs leading-relaxed">
-                        <div className="bg-slate-50/50 dark:bg-slate-900/20 p-4 border border-slate-200/60 dark:border-slate-850 rounded-2xl">
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 select-none">LaTeX Calculations</span>
-                          <div className="text-slate-700 dark:text-slate-300 space-y-2">
-                            <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[1] || activeQuestion.hintText || 'Formula derivation is loading...')} />
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-emerald-500/5 dark:bg-emerald-950/10 border border-emerald-500/10 dark:border-emerald-900/35 rounded-2xl">
-                          <h4 className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 select-none">
-                            <Sparkles className="w-3.5 h-3.5" /> Key Insight
-                          </h4>
-                          <p className="mt-2 text-slate-600 dark:text-slate-400 font-medium">
-                            {activeQuestion.domainId === 'quant' 
-                              ? "Assuming base CP = 100x eliminates fractions. When CP drops to 80x and markup increases to 25%, SP becomes 100x, allowing quick linear mapping."
-                              : "Start circular layouts by anchoring the absolute coordinates bottom node. Relative movements map outward safely."
-                            }
-                          </p>
-                        </div>
-
-                        <div className="p-4 bg-rose-500/5 dark:bg-rose-955/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl">
-                          <h4 className="text-[10px] font-black text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5 select-none">
-                            <AlertTriangle className="w-3.5 h-3.5" /> Common Mistake
-                          </h4>
-                          <p className="mt-2 text-slate-600 dark:text-slate-400 font-medium">
-                            {activeQuestion.domainId === 'quant'
-                              ? "Failing to account for the profit markup on the NEW cost price (e.g. 25% on 80x) rather than the original 100x."
-                              : "Confusing relative directions when candidates face outside the arrangement circle."
-                            }
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === 'video' && (
-                      <div className="space-y-4 animate-fadeIn">
-                        <div className="relative aspect-video bg-black border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs flex flex-col items-center justify-center group">
-                          {(() => {
-                            const ytId = getYouTubeId(activeQuestion.videoUrl);
-                            if (ytId) {
-                              if (isVideoActive) {
-                                return (
-                                  <iframe
-                                    id="youtube-solution-player"
-                                    width="100%"
-                                    height="100%"
-                                    src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`}
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                    className="w-full h-full border-0 absolute inset-0"
-                                  />
-                                );
-                              } else {
-                                return (
-                                  <>
-                                    <img 
-                                      src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} 
-                                      alt="Video Walkthrough"
-                                      className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-102 transition-transform duration-350"
-                                    />
-                                    <button
-                                      onClick={() => setIsVideoActive(true)}
-                                      className="z-10 w-11 h-11 bg-blue-600/90 text-white rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform cursor-pointer"
-                                    >
-                                      <Play className="w-5 h-5 fill-current ml-0.5" />
-                                    </button>
-                                  </>
-                                );
-                              }
-                            }
-                            return <span className="text-xs text-slate-500">Walkthrough video loading...</span>;
-                          })()}
-                        </div>
-
-                        <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold px-0.5 select-none">
-                          <span>By: <strong className="text-slate-650 dark:text-slate-350">Ravi Kumar</strong></span>
-                          <span>Duration: <strong className="text-slate-650 dark:text-slate-350">{activeQuestion.videoDuration || '10 mins'}</strong></span>
-                        </div>
-
-                        {/* Chapters timestamp lists */}
-                        <div className="space-y-2 border-t border-slate-100 dark:border-slate-900 pt-3 text-left">
-                          <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-widest block select-none">Chapters Jump-To</span>
-                          
-                          <div className="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1">
-                            {(activeQuestion.domainId === 'quant' ? [
-                              { time: '0:00', sec: 0, text: 'Variable modeling introduction' },
-                              { time: '1:30', sec: 90, text: 'CP markup calculations' },
-                              { time: '3:15', sec: 195, text: 'Setting up linear SP equations' },
-                              { time: '5:45', sec: 345, text: 'Shortcut method demonstration' }
-                            ] : [
-                              { time: '0:00', sec: 0, text: 'Arrangement coordinates start' },
-                              { time: '2:15', sec: 135, text: 'Anchoring seats logic' },
-                              { time: '4:40', sec: 280, text: 'Final checklist solutions' }
-                            ]).map((note, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => handleJumpToTimestamp(note.sec)}
-                                className="p-2 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-105 hover:border-slate-200 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 text-[11px] font-semibold text-slate-600 dark:text-slate-350 transition-colors flex items-center justify-between text-left cursor-pointer"
+                    {/* SubTopics */}
+                    {!isDomainCollapsed && (
+                      <div className="pl-3 space-y-1 border-l border-slate-150 dark:border-slate-850 ml-3.5">
+                        {Object.entries(subTopics).map(([subtopic, qs]) => {
+                          const subKey = `subtopic:${domain}:${subtopic}`;
+                          const isSubCollapsed = collapsedFolders[subKey];
+                          return (
+                            <div key={subtopic} className="space-y-1">
+                              {/* SubTopic Header */}
+                              <button 
+                                onClick={() => toggleFolder(subKey)}
+                                className="w-full flex items-center justify-between py-1 px-2 hover:bg-slate-50 dark:hover:bg-slate-900/60 rounded-md text-slate-655 dark:text-slate-350 font-bold cursor-pointer"
                               >
-                                <span className="truncate">{note.text}</span>
-                                <span className="font-mono text-[9px] font-black bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 px-1.5 py-0.2 rounded shrink-0">{note.time}</span>
+                                <div className="flex items-center gap-1.5">
+                                  {isSubCollapsed ? <Folder className="w-3.5 h-3.5 text-amber-500" /> : <FolderOpen className="w-3.5 h-3.5 text-amber-500" />}
+                                  <span className="truncate">{subtopic}</span>
+                                </div>
+                                <ChevronRight className={`w-2.5 h-2.5 transition-transform duration-205 text-slate-400 ${isSubCollapsed ? '' : 'transform rotate-90'}`} />
                               </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
 
-                    {activeTab === 'eli5' && (
-                      <div className="space-y-4 animate-fadeIn text-left">
-                        <div className="p-4 bg-blue-500/5 border border-blue-500/10 dark:bg-blue-950/10 dark:border-blue-900/30 rounded-2xl text-xs space-y-3 relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 blur-xl rounded-full animate-pulse" />
-                          
-                          <div className="flex items-center justify-between border-b border-blue-500/10 pb-2 select-none">
-                            <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
-                              <Cpu className="w-4 h-4" /> AI ELI5 Explainer
-                            </span>
-                            <span className="text-[9px] font-mono font-bold text-slate-400">Model: GPT-4o</span>
-                          </div>
-
-                          {eli5Text.length === 0 && !isEli5Generating ? (
-                            <div className="py-6 flex flex-col items-center justify-center text-center">
-                              <p className="text-slate-505 font-semibold mb-4">
-                                Need a simplified, intuitive analogy? Let the AI explain this concept simply!
-                              </p>
-                              <button
-                                onClick={handleStartEli5}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
-                              >
-                                <Sparkles className="w-3.5 h-3.5 animate-bounce" />
-                                <span>Explain Like I'm 5</span>
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="space-y-3 font-medium text-slate-700 dark:text-slate-350">
-                              {eli5Text.map((bullet, idx) => (
-                                <motion.div
-                                  key={idx}
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  className="p-3 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-805 rounded-xl shadow-xs"
-                                >
-                                  {bullet}
-                                </motion.div>
-                              ))}
-                              {isEli5Generating && (
-                                <div className="flex items-center gap-1 text-blue-500 px-1.5 select-none">
-                                  <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                                  <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                                  <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" />
+                              {/* Leaf Questions */}
+                              {!isSubCollapsed && (
+                                <div className="pl-3 space-y-0.5 border-l border-slate-155 dark:border-slate-850/50 ml-3">
+                                  {qs.map(q => {
+                                    const isActive = activeQuestion.id === q.id;
+                                    const qTitle = q.questionStem.split('###')[0].trim();
+                                    return (
+                                      <button 
+                                        key={q.id}
+                                        onClick={() => {
+                                          setActiveQuestion(q);
+                                          setSelectedOptionId(null);
+                                        }}
+                                        className={`w-full text-left py-1 px-2.5 rounded-md flex items-center gap-1.5 font-medium transition-all cursor-pointer ${
+                                          isActive 
+                                            ? 'bg-blue-500/10 text-blue-600 dark:bg-blue-955/20 dark:text-blue-400 font-bold'
+                                            : 'text-slate-500 hover:bg-slate-50/80 dark:text-slate-400 dark:hover:bg-slate-900/40'
+                                        }`}
+                                      >
+                                        <span className="text-[10px] opacity-60">📄</span>
+                                        <span className="truncate">{qTitle}</span>
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               )}
                             </div>
-                          )}
-                        </div>
+                          );
+                        })}
                       </div>
                     )}
-
-                    {activeTab === 'notes' && (
-                      <div className="space-y-4 animate-fadeIn text-xs leading-relaxed text-left flex flex-col">
-                        
-                        {/* Notes meta chips */}
-                        <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900 p-3 border border-slate-200/50 dark:border-slate-850 rounded-2xl select-none">
-                          <div>
-                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Saved Folder</span>
-                            <span className="text-[10.5px] font-bold text-slate-750 dark:text-slate-350 block mt-0.5 truncate">{activeMeta.folder || 'All Saved'}</span>
-                          </div>
-                          <div>
-                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Priority</span>
-                            <span className={`text-[10.5px] font-extrabold block mt-0.5 uppercase ${
-                              activeMeta.priority === 'High' ? 'text-rose-500' : activeMeta.priority === 'Medium' ? 'text-amber-500' : 'text-emerald-500'
-                            }`}>{activeMeta.priority}</span>
-                          </div>
-                        </div>
-
-                        {/* Note textarea input */}
-                        <div className="space-y-1">
-                          <label className="text-[8.5px] font-black text-slate-400 uppercase tracking-widest block select-none">Edit Note Contents</label>
-                          <textarea
-                            value={drawerNotes}
-                            onChange={(e) => {
-                              setDrawerNotes(e.target.value);
-                              saveRevisionMeta(activeQuestion.id, { notes: e.target.value });
-                            }}
-                            placeholder="Type markdown shortcut equations (e.g. $CP = 100x$, ratio speed $\\propto \\frac{1}{time}$)..."
-                            className="w-full h-32 p-3 font-mono border border-slate-250 bg-slate-50/50 dark:bg-slate-900 dark:border-slate-800 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none"
-                          />
-                        </div>
-
-                        {/* KaTeX math Preview compiled */}
-                        <div className="space-y-1.5 pt-1">
-                          <label className="text-[8.5px] font-black text-slate-400 uppercase tracking-widest block select-none">Live LaTeX Preview</label>
-                          <div className="p-3.5 bg-slate-50/50 border border-slate-200/60 dark:bg-slate-900/30 dark:border-slate-850 rounded-2xl text-[11.5px] min-h-[90px] max-h-48 overflow-y-auto">
-                            {drawerNotes.trim() ? (
-                              <SafeHtmlWithMath html={markdownToHtml(drawerNotes)} />
-                            ) : (
-                              <span className="italic text-slate-400">Notes are empty. Start typing above to see math formatting preview...</span>
-                            )}
-                          </div>
-                        </div>
-
                   </div>
-                )}
-
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-
-        </div>
-      </main>
-
-      {/* Sticky Bottom Actions footer bar */}
-      <footer className="fixed bottom-0 left-0 md:left-[76px] right-0 z-30 border-t border-slate-200/40 bg-white/70 backdrop-blur-xl dark:bg-slate-950/70 dark:border-slate-900/40 px-6 py-4.5 select-none">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          
-          {/* Left bottom Submit CTA */}
-          <div className="flex items-center gap-4 text-left">
-            <button
-              onClick={handleSubmitAnswer}
-              disabled={!selectedOptionId || isQuestionSubmitted || isEvaluating}
-              className={`px-8 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-md flex items-center justify-center gap-2 cursor-pointer ${
-                isQuestionSubmitted
-                  ? 'bg-emerald-600 text-white cursor-default shadow-none border border-emerald-500'
-                  : !selectedOptionId
-                    ? 'bg-slate-200 text-slate-400 opacity-60 cursor-not-allowed shadow-none'
-                    : isEvaluating
-                      ? 'bg-blue-600 text-white cursor-wait opacity-80'
-                      : 'bg-blue-600 text-white hover:bg-blue-500 hover:scale-103'
-              }`}
-            >
-              {isQuestionSubmitted ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Answer Submitted</span>
-                </>
-              ) : isEvaluating ? (
-                <>
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Evaluating...</span>
-                </>
-              ) : (
-                <span>Submit Answer</span>
-              )}
-            </button>
-            
-            {!selectedOptionId && !isQuestionSubmitted && (
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Select option to submit</span>
-            )}
-            {selectedOptionId && !isQuestionSubmitted && !isEvaluating && (
-              <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wide flex items-center gap-1">
-                <Check className="w-3 h-3" /> Option {selectedOptionId} Selected
-              </span>
+                );
+              })
             )}
           </div>
 
-          {/* Right bottom items bar */}
-          <div className="flex items-center gap-1.5 self-end sm:self-auto relative">
-            
-            {/* Prev question */}
-            <button
-              onClick={handlePrev}
-              disabled={currentIndex <= 0}
-              className={`p-2.5 rounded-xl border transition-all flex items-center justify-center cursor-pointer ${
-                currentIndex <= 0
-                  ? 'border-slate-100 text-slate-305 dark:border-slate-900 dark:text-slate-800 cursor-not-allowed'
-                  : 'border-slate-200 text-slate-500 bg-slate-50 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800'
-              }`}
-              title="Previous Question (Left Arrow)"
-            >
-              <ChevronLeft className="w-4.5 h-4.5 stroke-[2.5]" />
+          {/* User Profile Bar at bottom */}
+          <div className="p-3 border-t border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex items-center justify-between select-none shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white text-[10px] font-black uppercase shadow-sm">
+                SN
+              </div>
+              <div className="leading-tight text-left">
+                <h5 className="text-[11px] font-black text-slate-800 dark:text-white">Sriram Neppali</h5>
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Level 14 Solver</span>
+              </div>
+            </div>
+            <button className="p-1.5 rounded-lg hover:bg-slate-205 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-655 cursor-pointer">
+              <SettingsIcon className="w-4 h-4" />
             </button>
+          </div>
+        </aside>
 
-            {/* Next question */}
-            <button
-              onClick={handleNext}
-              disabled={currentIndex >= questions.length - 1}
-              className={`p-2.5 rounded-xl border transition-all flex items-center justify-center cursor-pointer ${
-                currentIndex >= questions.length - 1
-                  ? 'border-slate-100 text-slate-305 dark:border-slate-900 dark:text-slate-800 cursor-not-allowed'
-                  : 'border-slate-205 text-slate-505 bg-slate-50 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800'
-              }`}
-              title="Next Question (Right Arrow)"
-            >
-              <ChevronRight className="w-4.5 h-4.5 stroke-[2.5]" />
-            </button>
+        {/* MIDDLE COLUMN: Tabbed Content Pane */}
+        <section className="flex-1 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/20 overflow-hidden flex flex-col h-1/3 md:h-full relative">
+          {/* Tabs Selector Header */}
+          <div className="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-955/20 px-4 select-none shrink-0 overflow-x-auto">
+            {(['description', 'editorial', 'submissions', 'discussions'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setMiddleActiveTab(tab)}
+                className={`py-3.5 px-4 text-[10.5px] font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                  middleActiveTab === tab
+                    ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                    : 'border-transparent text-slate-405 hover:text-slate-655 dark:hover:text-slate-305'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
 
-            <span className="w-px h-6 bg-slate-200 dark:bg-slate-850 mx-1.5" />
+          {/* Active Tab Body content wrapper */}
+          <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 text-left pb-24">
+            {middleActiveTab === 'description' && (
+              <div className="space-y-6 animate-fadeIn">
+                <div>
+                  <h2 className="text-xl md:text-2xl font-bold font-heading text-slate-800 dark:text-white leading-snug tracking-tight">
+                    <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[0].trim())} />
+                  </h2>
+                  <div className="flex flex-wrap items-center gap-2 mt-3 select-none">
+                    <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full border ${
+                      activeQuestion.difficulty === 'EASY' 
+                        ? 'bg-emerald-50 border-emerald-202 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-405 dark:border-emerald-900' 
+                        : activeQuestion.difficulty === 'MEDIUM'
+                          ? 'bg-amber-50 border-amber-200 text-amber-707 dark:bg-amber-955/30 dark:text-amber-405 dark:border-amber-900'
+                          : 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-955/30 dark:text-rose-405 dark:border-rose-900'
+                    }`}>
+                      {activeQuestion.difficulty}
+                    </span>
+                    {(activeQuestion.companyTags.length > 0 ? activeQuestion.companyTags : ['TCS', 'Amazon']).map(company => (
+                      <span key={company} className="text-[9.5px] font-extrabold uppercase px-2 py-0.5 border border-slate-205 dark:border-slate-850 bg-slate-50 dark:bg-slate-900 rounded-md font-mono text-slate-550 dark:text-slate-400">
+                        💼 {company}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
-            {/* 💬 Discussion */}
-            <button
-              onClick={() => setIsDiscussionOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-705 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 font-bold text-[10.5px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
-            >
-              <span>💬</span>
-              <span>Discussion</span>
-            </button>
+                {/* Question stem content details */}
+                <div className="text-sm text-slate-655 dark:text-slate-300 leading-relaxed font-medium space-y-4">
+                  <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[0].trim())} />
+                </div>
 
-            {/* 📝 Notes */}
-            <button
-              onClick={() => setIsQuickNotesOpen(!isQuickNotesOpen)}
-              className={`px-3.5 py-2 rounded-xl border font-bold text-[10.5px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors ${
-                isQuickNotesOpen 
-                  ? 'bg-blue-600 border-blue-500 text-white shadow-xs'
-                  : 'border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400'
-              }`}
-            >
-              <span>📝</span>
-              <span>Notes</span>
-            </button>
+                {/* Pitfalls card */}
+                <div className="p-4 bg-rose-500/5 dark:bg-rose-950/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl text-xs flex gap-3 text-left select-none">
+                  <AlertCircle className="w-5 h-5 text-rose-550 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block text-[10px] mb-1">Common Pitfalls & Concepts</span>
+                    <p className="text-slate-655 dark:text-slate-400 font-medium">
+                      Students solving this question often struggle with:{' '}
+                      {activeQuestion.domainId === 'quant' ? (
+                        <span className="font-bold text-slate-700 dark:text-slate-350">✓ Percentage base mismatches, ✓ Reverse profit compounding, ✓ Fraction approximations.</span>
+                      ) : activeQuestion.domainId === 'logical' ? (
+                        <span className="font-bold text-slate-700 dark:text-slate-350">✓ Relative direction reversals, ✓ Overlooking circular boundaries, ✓ Branching case assumptions.</span>
+                      ) : (
+                        <span className="font-bold text-slate-700 dark:text-slate-350">✓ Context tone interpretation, ✓ Neglecting secondary definitions, ✓ Confusing synonym roots.</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
 
-            {/* Quick Notes popover mini-editor overlay */}
-            <AnimatePresence>
-              {isQuickNotesOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 15 }}
-                  className="absolute bottom-full right-16 mb-3 p-4 glassmorphism-light dark:glassmorphism rounded-2xl w-80 shadow-2xl z-40 text-left space-y-4"
-                >
-                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-900 pb-2 select-none">
-                    <span className="text-[10px] font-black uppercase text-slate-650 dark:text-slate-400 tracking-wider">Quick Note Editor</span>
-                    <button onClick={() => setIsQuickNotesOpen(false)} className="hover:bg-slate-100 p-0.5 rounded cursor-pointer">
-                      <X className="w-3.5 h-3.5 text-slate-400" />
+                {/* Progressive Hints */}
+                <div className="space-y-3">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block select-none">Progressive Hints</span>
+                  
+                  {/* Hint 1 */}
+                  <div className="border border-slate-200/60 dark:border-slate-850 rounded-2xl overflow-hidden bg-slate-50/30 dark:bg-slate-900/15">
+                    <button 
+                      onClick={() => setShowHint1(!showHint1)}
+                      className="w-full p-4 flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/40 select-none cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">💡 Hint 1 (Key Equation Idea)</span>
+                      <ChevronRight className={`w-4 h-4 transition-transform ${showHint1 ? 'transform rotate-90' : ''}`} />
                     </button>
+                    {showHint1 && (
+                      <div className="p-4 border-t border-slate-100 dark:border-slate-900 text-xs text-slate-500 dark:text-slate-400 leading-relaxed bg-white dark:bg-slate-950/20 font-medium">
+                        <SafeHtmlWithMath html={markdownToHtml(activeQuestion.hintText || 'Think about scanning the data linearly.')} />
+                      </div>
+                    )}
                   </div>
 
-                  {/* Priority selector row */}
-                  <div className="space-y-1">
-                    <label className="text-[8px] font-black text-slate-450 uppercase tracking-widest block select-none">Set Priority Flag</label>
-                    <div className="flex gap-2">
-                      {(['High', 'Medium', 'Low'] as const).map(p => (
-                        <button
-                          key={p}
-                          type="button"
-                          onClick={() => saveRevisionMeta(activeQuestion.id, { priority: p })}
-                          className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-xl border transition-colors cursor-pointer ${
-                            activeMeta.priority === p 
-                              ? p === 'High' ? 'bg-rose-500/10 border-rose-500/20 text-rose-505 font-bold' :
-                                p === 'Medium' ? 'bg-amber-500/10 border-amber-500/20 text-amber-505 font-bold' :
-                                'bg-emerald-500/10 border-emerald-500/20 text-emerald-505 font-bold'
-                              : 'border-slate-200 hover:bg-slate-50 dark:border-slate-900 dark:hover:bg-slate-900/60 text-slate-455'
-                          }`}
-                        >
-                          {p === 'High' ? '🔴 High' : p === 'Medium' ? '🟡 Med' : '🟢 Low'}
-                        </button>
-                      ))}
+                  {/* Hint 2 */}
+                  <div className="border border-slate-205/60 dark:border-slate-850 rounded-2xl overflow-hidden bg-slate-50/30 dark:bg-slate-900/15">
+                    <button 
+                      onClick={() => setShowHint2(!showHint2)}
+                      className="w-full p-4 flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-305 hover:bg-slate-50 dark:hover:bg-slate-900/40 select-none cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">💡 Hint 2 (Approach Step)</span>
+                      <ChevronRight className={`w-4 h-4 transition-transform ${showHint2 ? 'transform rotate-90' : ''}`} />
+                    </button>
+                    {showHint2 && (
+                      <div className="p-4 border-t border-slate-100 dark:border-slate-900 text-xs text-slate-500 dark:text-slate-400 leading-relaxed bg-white dark:bg-slate-950/20 font-medium">
+                        Keep track of counts of elements that match the target criteria, resetting counters when they mismatch.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Hint 3 */}
+                  <div className="border border-slate-205/60 dark:border-slate-850 rounded-2xl overflow-hidden bg-slate-50/30 dark:bg-slate-900/15">
+                    <button 
+                      onClick={() => setShowHint3(!showHint3)}
+                      className="w-full p-4 flex justify-between items-center text-xs font-bold text-slate-700 dark:text-slate-305 hover:bg-slate-50 dark:hover:bg-slate-900/40 select-none cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">💡 Hint 3 (Complexity Constraint)</span>
+                      <ChevronRight className={`w-4 h-4 transition-transform ${showHint3 ? 'transform rotate-90' : ''}`} />
+                    </button>
+                    {showHint3 && (
+                      <div className="p-4 border-t border-slate-100 dark:border-slate-900 text-xs text-slate-500 dark:text-slate-400 leading-relaxed bg-white dark:bg-slate-950/20 font-medium">
+                        The solution should run in $O(N)$ time with $O(1)$ space. Nested loops will trigger time-limit exceeded exceptions on large inputs.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {middleActiveTab === 'editorial' && (
+              <div className="space-y-6 animate-fadeIn">
+                <div>
+                  <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest block select-none">Written Solution & Explanation</h3>
+                  <div className="text-sm text-slate-655 dark:text-slate-355 leading-relaxed font-normal mt-4 border border-slate-100 dark:border-slate-900 p-5 rounded-2xl bg-slate-50/20">
+                    <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[1] || '### Step-by-Step Solution:\nNo solution text available.')} />
+                  </div>
+                </div>
+
+                {activeQuestion.videoUrl && (
+                  <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-900">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block select-none">Video Walkthrough</span>
+                    <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-205 dark:border-slate-800 shadow-md">
+                      <iframe
+                        className="w-full h-full"
+                        src={`https://www.youtube.com/embed/${getYouTubeId(activeQuestion.videoUrl) || 'dQw4w9WgXcQ'}`}
+                        title={activeQuestion.videoTitle || 'Video Solution'}
+                        allowFullScreen
+                      />
                     </div>
                   </div>
+                )}
+              </div>
+            )}
 
-                  {/* Note textarea */}
-                  <div className="space-y-1">
-                    <label className="text-[8px] font-black text-slate-455 uppercase tracking-widest block select-none">Shortcut Insight</label>
-                    <textarea
-                      value={drawerNotes}
-                      onChange={(e) => {
-                        setDrawerNotes(e.target.value);
-                        saveRevisionMeta(activeQuestion.id, { notes: e.target.value });
-                      }}
-                      placeholder="Add key insights to look back on..."
-                      className="w-full h-24 p-2.5 text-xs border border-slate-250 bg-slate-50/50 dark:bg-slate-900 dark:border-slate-900 rounded-xl focus:outline-none focus:border-blue-500 text-slate-800 dark:text-slate-100 placeholder-slate-405 resize-none font-medium"
-                    />
-                  </div>
+            {middleActiveTab === 'submissions' && (
+              <div className="space-y-4 animate-fadeIn">
+                <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider block select-none">Submission Records</h3>
+                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-900/10">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-slate-50 dark:bg-slate-900 text-slate-500 uppercase font-black text-[9px] tracking-wider border-b border-slate-200 dark:border-slate-800 select-none">
+                      <tr>
+                        <th className="p-3.5">Submit Time</th>
+                        <th className="p-3.5">Status</th>
+                        <th className="p-3.5">Language</th>
+                        <th className="p-3.5">XP Earned</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-900 font-mono text-[11.5px] font-bold">
+                      {submittedAnswers[activeQuestion.id] && (
+                        <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 animate-fadeIn">
+                          <td className="p-3.5 text-slate-550 dark:text-slate-405">Just now</td>
+                          <td className="p-3.5 text-emerald-500">Accepted (100% test cases)</td>
+                          <td className="p-3.5 text-slate-400">Python 3</td>
+                          <td className="p-3.5 text-emerald-500 font-extrabold">+100 XP</td>
+                        </tr>
+                      )}
+                      <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
+                        <td className="p-3.5 text-slate-400">1 day ago</td>
+                        <td className="p-3.5 text-rose-505">Wrong Answer</td>
+                        <td className="p-3.5 text-slate-400">Python 3</td>
+                        <td className="p-3.5 text-slate-400">0 XP</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
-                  <button
+            {middleActiveTab === 'discussions' && (
+              <div className="space-y-5 animate-fadeIn">
+                <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-900 pb-3 select-none">
+                  <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Forum Discussions ({commentsList.length})</h3>
+                  <button 
                     onClick={() => {
-                      setIsQuickNotesOpen(false);
-                      setToastMessage({ text: 'Note Saved! 📝', isSuccess: true });
-                      setTimeout(() => setToastMessage(null), 2000);
+                      setCommentInput('Share my python implementation: ');
                     }}
-                    className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-black text-[9.5px] uppercase tracking-wider rounded-xl cursor-pointer select-none"
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-black text-[9px] uppercase tracking-wider cursor-pointer shadow-sm"
                   >
-                    Save & Continue
+                    + Share Solution
                   </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
 
-            {/* 📚 Library */}
-            <button
-              onClick={() => setIsLibraryOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 font-bold text-[10.5px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
-            >
-              <span>📚</span>
-              <span>Library</span>
-            </button>
+                {/* Inline Comment posting form */}
+                <div className="space-y-2.5">
+                  <textarea
+                    value={commentInput}
+                    onChange={(e) => setCommentInput(e.target.value)}
+                    placeholder="Have an insight or solution shortcut? Post a comment..."
+                    className="w-full h-20 p-3 text-xs border border-slate-202 bg-slate-50/50 dark:bg-slate-900 dark:border-slate-800 rounded-xl focus:outline-none focus:border-blue-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none font-medium"
+                  />
+                  <div className="flex justify-end select-none">
+                    <button
+                      onClick={handleAddComment}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-505 text-white font-black text-[10px] uppercase tracking-wider rounded-xl cursor-pointer shadow-xs"
+                    >
+                      Post Comment
+                    </button>
+                  </div>
+                </div>
 
-            {/* 🔥 Mark Hard */}
-            <button
-              onClick={handleToggleHard}
-              className={`px-3.5 py-2 rounded-xl border font-bold text-[10.5px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-all ${
-                hardQuestions.includes(activeQuestion.id)
-                  ? 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-950/20 dark:border-rose-900'
-                  : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600 dark:bg-slate-900 dark:border-slate-800'
-              }`}
-            >
-              <span>🔥</span>
-              <span>{hardQuestions.includes(activeQuestion.id) ? 'Hard' : 'Mark Hard'}</span>
-            </button>
+                {/* Comments listing */}
+                <div className="space-y-4">
+                  {commentsList.map(comment => (
+                    <div key={comment.id} className="p-4 border border-slate-100 bg-slate-50/30 dark:border-slate-905/50 dark:bg-slate-905/15 rounded-2xl flex flex-col gap-2 relative">
+                      <div className="flex justify-between items-center select-none">
+                        <div className="flex items-center gap-2">
+                          <img src={comment.avatar} alt={comment.user} className="w-7 h-7 rounded-full border border-slate-205 dark:border-slate-850" />
+                          <div className="flex flex-col text-left leading-tight">
+                            <span className="text-[10.5px] font-black uppercase text-slate-700 dark:text-slate-350">{comment.user}</span>
+                            <span className="text-[8.5px] text-slate-400 font-mono">{comment.time}</span>
+                          </div>
+                        </div>
 
-            {/* 🚩 Report Error */}
-            <button
-              onClick={() => setIsReportModalOpen(true)}
-              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-655 hover:bg-slate-105 dark:bg-slate-900 dark:border-slate-800 flex items-center justify-center cursor-pointer transition-colors"
-              title="Report Error"
-            >
-              <span>🚩</span>
-              <span className="ml-1 text-[10.5px] font-bold uppercase tracking-wider">Report</span>
-            </button>
-
+                        <button
+                          onClick={() => handleLikeComment(comment.id)}
+                          className={`flex items-center gap-1 text-[9.5px] font-mono font-bold px-2 py-0.5 rounded border transition-colors cursor-pointer ${
+                            comment.isLiked 
+                              ? 'bg-blue-50 border-blue-200 text-blue-600' 
+                              : 'bg-white border-slate-200/50 text-slate-450 hover:text-slate-655 dark:bg-slate-900 dark:border-slate-805'
+                          }`}
+                        >
+                          <ThumbsUp className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <span>{comment.likes}</span>
+                        </button>
+                      </div>
+                      <p className="text-xs text-slate-655 dark:text-slate-350 leading-relaxed font-medium text-left">
+                        {comment.comment}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+        </section>
 
+        {/* RIGHT COLUMN: MCQ Panel or Mock IDE */}
+        <section className="w-full md:w-[480px] bg-slate-100/50 dark:bg-slate-950 flex flex-col shrink-0 select-none overflow-hidden h-1/3 md:h-full relative border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-805">
+          {middleActiveTab === 'description' ? (
+            /* MCQ Options Panel */
+            <div className="flex-1 flex flex-col overflow-hidden h-full">
+              <div className="p-4 border-b border-slate-200 dark:border-slate-805 bg-white dark:bg-slate-950 select-none shrink-0 flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase text-slate-700 dark:text-slate-300 tracking-wider">Multiple Choice Options</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Select One Option</span>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                <div className="grid grid-cols-1 gap-3 text-left">
+                  {activeQuestion.options.map((opt) => {
+                    const isSelected = selectedOptionId === opt.id;
+                    const isSubmitted = submittedAnswers[activeQuestion.id];
+                    const isCorrect = opt.isCorrect;
+                    
+                    let cardStyle = 'border-slate-200 dark:border-slate-850 hover:border-slate-300 bg-white dark:bg-slate-900/50';
+                    if (isSelected) {
+                      cardStyle = 'border-blue-500 bg-blue-50/20 dark:bg-blue-955/20';
+                    }
+                    if (isSubmitted) {
+                      if (isCorrect) {
+                        cardStyle = 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-955/25';
+                      } else if (isSelected) {
+                        cardStyle = 'border-rose-500 bg-rose-500/10 dark:bg-rose-955/25';
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={opt.id}
+                        disabled={isSubmitted}
+                        onClick={() => setSelectedOptionId(opt.id)}
+                        className={`w-full p-4 rounded-2xl border text-xs font-semibold flex items-start gap-3.5 transition-all text-left relative ${cardStyle} ${isSubmitted ? 'cursor-default' : 'cursor-pointer hover:scale-101'}`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center font-bold text-[10.5px] uppercase shrink-0 ${
+                          isSelected 
+                            ? 'bg-blue-600 border-blue-600 text-white' 
+                            : 'border-slate-305 dark:border-slate-705 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800'
+                        }`}>
+                          {opt.id}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-slate-750 dark:text-slate-200 mt-0.5 leading-relaxed">
+                            {opt.text}
+                          </p>
+                          {isSubmitted && opt.metadata && (
+                            <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500 mt-1 block">
+                              Popularity: {opt.metadata} of candidates chose this option
+                            </span>
+                          )}
+                        </div>
+                        {isSubmitted && isCorrect && (
+                          <Check className="w-4.5 h-4.5 text-emerald-500 shrink-0 mt-0.5" />
+                        )}
+                        {isSubmitted && !isCorrect && isSelected && (
+                          <X className="w-4.5 h-4.5 text-rose-500 shrink-0 mt-0.5" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Submit Answer CTA bar */}
+              <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 select-none shrink-0 flex flex-col gap-2">
+                <button
+                  onClick={handleSubmitAnswer}
+                  disabled={!selectedOptionId || isQuestionSubmitted || isEvaluating}
+                  className={`w-full py-3.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-200 shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                    isQuestionSubmitted
+                      ? 'bg-emerald-600 text-white cursor-default shadow-none border border-emerald-500'
+                      : !selectedOptionId
+                        ? 'bg-slate-200 text-slate-400 opacity-60 cursor-not-allowed shadow-none'
+                        : isEvaluating
+                          ? 'bg-blue-600 text-white cursor-wait opacity-80'
+                          : 'bg-blue-600 text-white hover:bg-blue-500 hover:scale-102'
+                  }`}
+                >
+                  {isQuestionSubmitted ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Answer Submitted Successfully</span>
+                    </>
+                  ) : isEvaluating ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Evaluating Answer...</span>
+                    </>
+                  ) : (
+                    <span>Submit Answer</span>
+                  )}
+                </button>
+
+                {!selectedOptionId && !isQuestionSubmitted && (
+                  <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest text-center mt-1">Select an option to unlock submission</span>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Python Code IDE Panel */
+            <div className="flex-1 flex flex-col overflow-hidden h-full">
+              {/* IDE Header */}
+              <div className="p-3 border-b border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-950 flex items-center justify-between select-none shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-900 border border-slate-202 dark:border-slate-800 text-slate-655 dark:text-slate-355 rounded font-mono font-bold">
+                    Python 3
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button className="p-1.5 rounded hover:bg-slate-105 dark:hover:bg-slate-900 text-slate-400 hover:text-slate-655 cursor-pointer">
+                    <SettingsIcon className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* IDE Editor Pane */}
+              <div className="flex-1 bg-slate-950 dark:bg-slate-960 overflow-hidden flex font-mono text-[11.5px] leading-relaxed relative animate-fadeIn">
+                {/* Line Numbers */}
+                <div className="w-10 border-r border-slate-805 text-slate-600 text-right pr-2.5 py-4 select-none bg-slate-950/60 leading-relaxed">
+                  {Array.from({ length: 18 }).map((_, i) => (
+                    <div key={i}>{i + 1}</div>
+                  ))}
+                </div>
+
+                {/* Editor Textarea */}
+                <textarea
+                  value={editorCode}
+                  onChange={(e) => setEditorCode(e.target.value)}
+                  className="flex-1 h-full bg-transparent text-emerald-450 font-mono p-4 outline-none resize-none leading-relaxed overflow-y-auto selection:bg-slate-800"
+                  spellCheck="false"
+                />
+              </div>
+
+              {/* Test Cases Pane */}
+              <div className="h-56 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex flex-col overflow-hidden shrink-0 select-none text-left">
+                {/* Tabs */}
+                <div className="flex border-b border-slate-200 dark:border-slate-805 bg-slate-50/40 dark:bg-slate-950/20 px-2 shrink-0">
+                  {getTestCases(activeQuestion.id).map((tc, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveTestCaseIndex(idx)}
+                      className={`py-2 px-3 text-[9px] font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
+                        activeTestCaseIndex === idx
+                          ? 'border-blue-600 text-blue-605 dark:border-blue-405 dark:text-blue-405'
+                          : 'border-transparent text-slate-450 hover:text-slate-655'
+                      }`}
+                    >
+                      Case {idx + 1}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 p-3 overflow-y-auto font-mono text-[10.5px] space-y-2">
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-black text-slate-450 uppercase tracking-wider block">Input Variables</span>
+                    <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-805 rounded-lg text-slate-700 dark:text-slate-300">
+                      {getTestCases(activeQuestion.id)[activeTestCaseIndex]?.input || ''}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[8px] font-black text-slate-450 uppercase tracking-wider block">Expected Output</span>
+                    <div className="p-2 bg-slate-50 dark:bg-slate-900 border border-slate-202 dark:border-slate-805 rounded-lg text-slate-700 dark:text-slate-300">
+                      {getTestCases(activeQuestion.id)[activeTestCaseIndex]?.output || ''}
+                    </div>
+                  </div>
+                  {testCasesResults && (
+                    <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-slate-900 animate-fadeIn">
+                      <span className="text-[8px] font-black text-slate-455 uppercase tracking-wider block">Execution Output</span>
+                      <div className={`p-2 rounded-lg font-bold ${
+                        testCasesResults.includes('Success') 
+                          ? 'bg-emerald-500/10 text-emerald-550 dark:bg-emerald-950/20' 
+                          : 'bg-rose-500/10 text-rose-550 dark:bg-rose-955/20'
+                      }`}>
+                        {testCasesResults}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* IDE Action CTAs */}
+              <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex gap-2 select-none shrink-0">
+                <button
+                  onClick={() => {
+                    setIsCompiling(true);
+                    setTestCasesResults(null);
+                    setTimeout(() => {
+                      setIsCompiling(false);
+                      setTestCasesResults('Success: Test Case Passed!');
+                    }, 800);
+                  }}
+                  disabled={isCompiling}
+                  className="flex-1 py-2 border border-slate-205 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-900/60 rounded-xl text-slate-700 dark:text-slate-300 text-[10.5px] font-black uppercase tracking-wider cursor-pointer"
+                >
+                  {isCompiling ? 'Running...' : 'Run Code'}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsCompiling(true);
+                    setTestCasesResults(null);
+                    setTimeout(() => {
+                      setIsCompiling(false);
+                      setTestCasesResults('Success: All Test Cases Passed! (+100 XP)');
+                      // Set selectedOptionId to the correct answer so we can invoke local state modifications
+                      const correctOpt = activeQuestion.options.find(o => o.isCorrect);
+                      if (correctOpt) {
+                        setSelectedOptionId(correctOpt.id);
+                        handleSubmitAnswer();
+                      }
+                    }, 1000);
+                  }}
+                  disabled={isCompiling}
+                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10.5px] font-black uppercase tracking-wider cursor-pointer shadow-sm"
+                >
+                  {isCompiling ? 'Submitting...' : 'Submit Code'}
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
+
+      {/* Floating Bottom-Right Pagination Nav-Bar Pill */}
+      {filteredQuestions.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 px-3.5 py-2 rounded-2xl shadow-xl flex items-center gap-3.5 select-none font-bold text-xs animate-fadeIn">
+          <button
+            onClick={handleFilteredPrev}
+            disabled={activeFilteredIndex <= 0}
+            className={`p-1.5 rounded-lg border flex items-center justify-center transition-all ${
+              activeFilteredIndex <= 0
+                ? 'border-slate-100 text-slate-300 dark:border-slate-900 dark:text-slate-800 cursor-not-allowed'
+                : 'border-slate-200 hover:bg-slate-105 hover:text-slate-700 text-slate-500 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800 dark:text-slate-400 cursor-pointer'
+            }`}
+            title="Previous Question"
+          >
+            <ChevronLeft className="w-3.5 h-3.5 stroke-[2.5]" />
+          </button>
+
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-405">
+            {activeFilteredIndex + 1} / {filteredQuestions.length}
+          </span>
+
+          <button
+            onClick={handleFilteredNext}
+            disabled={activeFilteredIndex >= filteredQuestions.length - 1}
+            className={`p-1.5 rounded-lg border flex items-center justify-center transition-all ${
+              activeFilteredIndex >= filteredQuestions.length - 1
+                ? 'border-slate-100 text-slate-300 dark:border-slate-900 dark:text-slate-800 cursor-not-allowed'
+                : 'border-slate-200 hover:bg-slate-105 hover:text-slate-700 text-slate-500 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800 dark:text-slate-400 cursor-pointer'
+            }`}
+            title="Next Question"
+          >
+            <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+          </button>
         </div>
-      </footer>
+      )}
+
 
       {/* Slide Drawers & Bottom Sheets overlay systems */}
       <AnimatePresence>
