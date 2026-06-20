@@ -15,6 +15,8 @@ import {
   AlertCircle 
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import { siteConfig } from '@/config/site';
+import { supabase } from '@/lib/supabase';
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -27,6 +29,51 @@ function ResetPasswordContent() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  // Dynamic branding logo configuration
+  const [logoText, setLogoText] = useState(siteConfig.logoText);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const localData = localStorage.getItem('aptitude_landing_page_settings');
+      if (localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          if (parsed.header_logo_text) setLogoText(parsed.header_logo_text);
+        } catch (_) {}
+      }
+    }
+
+    const fetchBranding = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('landing_page_settings')
+          .select('header_logo_text')
+          .eq('id', 'current')
+          .single();
+
+        if (data && !error) {
+          if (data.header_logo_text) setLogoText(data.header_logo_text);
+
+          if (typeof window !== 'undefined') {
+            const localData = localStorage.getItem('aptitude_landing_page_settings');
+            let parsed = {};
+            if (localData) {
+              try { parsed = JSON.parse(localData); } catch (_) {}
+            }
+            localStorage.setItem('aptitude_landing_page_settings', JSON.stringify({
+              ...parsed,
+              header_logo_text: data.header_logo_text
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch branding from Supabase:", err);
+      }
+    };
+
+    fetchBranding();
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -136,7 +183,7 @@ function ResetPasswordContent() {
         <div className="w-9 h-9 rounded bg-blue-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(37,99,235,0.3)]">
           <Layers className="w-5 h-5" />
         </div>
-        <span className="font-extrabold tracking-tight text-xs text-slate-800 dark:text-slate-200">THE LUCID INTELLECTUAL</span>
+        <span className="font-extrabold tracking-tight text-xs text-slate-800 dark:text-slate-200">{logoText}</span>
       </div>
 
       {/* Form Card */}

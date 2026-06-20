@@ -2354,7 +2354,7 @@ export default function StudentDashboard() {
       </aside>
 
       {/* 2. Main Workspace Frame */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-30">
 
         {/* Top Header (Reference 2 style) */}
         <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">

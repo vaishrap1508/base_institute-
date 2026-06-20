@@ -198,6 +198,17 @@ export default function PracticeArena({
   const [isQuickNotesOpen, setIsQuickNotesOpen] = useState<boolean>(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
 
+  // Formula sheet drawer
+  const [isFormulaDrawerOpen, setIsFormulaDrawerOpen] = useState<boolean>(false);
+
+  // Progressive Hints
+  const [showHint1, setShowHint1] = useState<boolean>(false);
+  const [showHint2, setShowHint2] = useState<boolean>(false);
+  const [showHint3, setShowHint3] = useState<boolean>(false);
+
+  // Shortcut expansion
+  const [isShortcutExpanded, setIsShortcutExpanded] = useState<boolean>(false);
+
   // Local Storage Revision Meta Database
   const [revisionDB, setRevisionDB] = useState<Record<string, RevisionMeta>>({});
   const [customFolders, setCustomFolders] = useState<string[]>(['Arithmetic Shortcuts', 'TCS NQT Prep', 'Infosys Logic', 'Geometry Formulas']);
@@ -214,6 +225,29 @@ export default function PracticeArena({
       lastRevised: ''
     };
   }, [activeQuestion, revisionDB, bookmarks]);
+
+  // Get Question Status helper
+  const getQuestionStatus = () => {
+    if (!activeQuestion) return { label: 'Unattempted', color: 'text-slate-500 bg-slate-500/10 border-slate-500/20 dark:text-slate-400', dot: '⚪' };
+    const isSolved = submittedAnswers[activeQuestion.id];
+    const isBookmarked = bookmarks.includes(activeQuestion.id);
+    const isHard = hardQuestions.includes(activeQuestion.id);
+    const hasNotes = activeMeta.notes && activeMeta.notes.trim().length > 0;
+    
+    if (isSolved && hasNotes && !isHard) {
+      return { label: 'Mastered', color: 'text-purple-700 bg-purple-500/10 border-purple-500/20 dark:text-purple-400 dark:border-purple-900/50', dot: '🟣' };
+    }
+    if (isSolved && isHard) {
+      return { label: 'Needs Revision', color: 'text-amber-700 bg-amber-500/10 border-amber-500/20 dark:text-amber-400 dark:border-amber-900/50', dot: '🟡' };
+    }
+    if (isSolved) {
+      return { label: 'Solved', color: 'text-emerald-700 bg-emerald-500/10 border-emerald-500/20 dark:text-emerald-400 dark:border-emerald-900/50', dot: '🟢' };
+    }
+    if (isBookmarked) {
+      return { label: 'Bookmarked', color: 'text-blue-700 bg-blue-500/10 border-blue-500/20 dark:text-blue-400 dark:border-blue-900/50', dot: '🔵' };
+    }
+    return { label: 'Unattempted', color: 'text-slate-550 bg-slate-500/5 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400', dot: '⚪' };
+  };
 
   // Temporary drawer edit states
   const [drawerFolder, setDrawerFolder] = useState<string>('All Saved');
@@ -297,6 +331,22 @@ export default function PracticeArena({
     setDrawerPriority(activeMeta.priority || 'Medium');
     setDrawerNotes(activeMeta.notes || '');
 
+    // Reset progressive hints
+    setShowHint1(false);
+    setShowHint2(false);
+    setShowHint3(false);
+
+    // Set shortcut note expansion state initially based on if solved
+    setIsShortcutExpanded(!!submittedAnswers[activeQuestion.id]);
+
+    // Default the Library sheet's active filter to current question topic context
+    const defaultFilter = activeQuestion.domainId === 'quant' 
+      ? 'Arithmetic Shortcuts' 
+      : activeQuestion.domainId === 'logical' 
+        ? 'Infosys Logic' 
+        : 'all_saved';
+    setLibraryActiveFilter(defaultFilter);
+
     // Load comments list
     const mockComments = [
       { id: '1', user: 'Ananya Sharma', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', comment: 'The selling price formula shortcut is extremely handy here. Saved me solid two minutes!', time: '2h ago', likes: 14 },
@@ -306,6 +356,13 @@ export default function PracticeArena({
     setCommentsList(mockComments);
 
   }, [activeQuestion, activeMeta]);
+
+  // Auto expand shortcut notes when question gets submitted/solved
+  useEffect(() => {
+    if (activeQuestion && submittedAnswers[activeQuestion.id]) {
+      setIsShortcutExpanded(true);
+    }
+  }, [submittedAnswers, activeQuestion]);
 
   // Timer Tick implementation
   useEffect(() => {
@@ -756,7 +813,7 @@ export default function PracticeArena({
       </AnimatePresence>
 
       {/* Sticky Header Glass Panel */}
-      <header className="sticky top-0 z-30 w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md dark:bg-slate-950/70 dark:border-slate-900 px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <header className="sticky top-0 z-30 w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md dark:bg-slate-950/70 dark:border-slate-900 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         
         {/* Left segments: Breadcrumbs & Meta */}
         <div className="flex flex-col gap-1 text-left">
@@ -792,64 +849,94 @@ export default function PracticeArena({
 
             {/* Asked in badges */}
             <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-800 pl-3">
-              <span className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Asked In:</span>
-              <div className="flex items-center gap-1">
-                {(activeQuestion.companyTags.length > 0 ? activeQuestion.companyTags : ['TCS', 'Amazon']).map(company => (
-                  <span key={company} className="text-[9px] font-extrabold uppercase font-mono px-1.5 py-0.2 bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-slate-800 rounded">
-                    {company}
-                  </span>
-                ))}
+              <span className="text-[9px] font-bold text-slate-405 tracking-wider uppercase">Asked In:</span>
+              <div className="flex items-center gap-1.5">
+                {(activeQuestion.companyTags.length > 0 ? activeQuestion.companyTags : ['TCS', 'Amazon']).map(company => {
+                  const compKey = company.toUpperCase();
+                  const compStyles: Record<string, string> = {
+                    AMAZON: 'bg-orange-500/10 border-orange-500/25 text-orange-700 dark:text-orange-400 dark:border-orange-950/40',
+                    TCS: 'bg-blue-600/10 border-blue-600/25 text-blue-700 dark:text-blue-400 dark:border-blue-950/40',
+                    INFOSYS: 'bg-indigo-600/10 border-indigo-600/25 text-indigo-700 dark:text-indigo-400 dark:border-indigo-950/40',
+                    WIPRO: 'bg-purple-500/10 border-purple-500/25 text-purple-700 dark:text-purple-400 dark:border-purple-950/40',
+                    COGNIZANT: 'bg-teal-500/10 border-teal-500/25 text-teal-700 dark:text-teal-400 dark:border-teal-950/40',
+                  };
+                  const style = compStyles[compKey] || 'bg-slate-100 dark:bg-slate-900 border-slate-200 text-slate-550 dark:text-slate-400 dark:border-slate-800';
+                  return (
+                    <span key={company} className={`text-[9.5px] font-extrabold uppercase px-2 py-0.5 border rounded-md font-mono ${style}`}>
+                      💼 {company}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          {/* Section 4: Folder & Priority Revision Chips */}
-          {activeMeta.saved && (
-            <div className="flex flex-wrap items-center gap-2 mt-2 select-none">
-              <button 
-                onClick={() => setIsSaveDrawerOpen(true)}
-                className="flex items-center gap-1 bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider cursor-pointer hover:bg-blue-500/15"
-              >
-                <Star className="w-2.5 h-2.5 fill-current" />
-                <span>Saved</span>
-              </button>
+          {/* Folder & Priority Revision Chips */}
+          <div className="flex flex-wrap items-center gap-2 mt-2.5 select-none">
+            <button 
+              onClick={handleBookmarkStarClick}
+              className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-black uppercase tracking-wider cursor-pointer border transition-colors ${
+                activeMeta.saved
+                  ? 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400 hover:bg-amber-500/15'
+                  : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-450 hover:bg-slate-200 dark:hover:bg-slate-800/80'
+              }`}
+            >
+              <Star className={`w-2.5 h-2.5 ${activeMeta.saved ? 'fill-current text-amber-500' : ''}`} />
+              <span>{activeMeta.saved ? '⭐ Saved' : 'Save Question'}</span>
+            </button>
 
-              <button 
-                onClick={() => setIsSaveDrawerOpen(true)}
-                className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 text-slate-600 dark:text-slate-400 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800/80"
-              >
-                <FolderOpen className="w-2.5 h-2.5" />
-                <span>{activeMeta.folder || 'All Saved'}</span>
-              </button>
+            <button 
+              onClick={() => setIsSaveDrawerOpen(true)}
+              className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 text-slate-655 dark:text-slate-400 px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800/85"
+            >
+              <FolderOpen className="w-2.5 h-2.5 text-blue-500" />
+              <span>📂 {activeMeta.folder || 'All Saved'}</span>
+            </button>
 
-              <button 
-                onClick={handleCyclePriority}
-                className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider cursor-pointer transition-colors ${
-                  activeMeta.priority === 'High' 
-                    ? 'bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-450 hover:bg-rose-500/15'
-                    : activeMeta.priority === 'Medium'
-                      ? 'bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-450 hover:bg-amber-500/15'
-                      : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-450 hover:bg-emerald-500/15'
-                }`}
-                title="Click to cycle priority"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-current shrink-0" />
-                <span>{activeMeta.priority} Priority</span>
-              </button>
+            <button 
+              onClick={handleCyclePriority}
+              className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-black uppercase tracking-wider cursor-pointer transition-colors ${
+                activeMeta.priority === 'High' 
+                  ? 'bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-450 hover:bg-rose-500/15'
+                  : activeMeta.priority === 'Medium'
+                    ? 'bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-450 hover:bg-amber-500/15'
+                    : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-450 hover:bg-emerald-500/15'
+              }`}
+              title="Click to cycle priority"
+            >
+              <span className="shrink-0">{activeMeta.priority === 'High' ? '🔴' : activeMeta.priority === 'Medium' ? '🟡' : '🟢'}</span>
+              <span>{activeMeta.priority} Priority</span>
+            </button>
 
-              {activeMeta.lastRevised && (
-                <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-850/60 text-slate-400 px-2.5 py-0.5 rounded-full text-[8.5px] font-semibold">
-                  <Clock className="w-2.5 h-2.5" />
-                  <span>Revised {activeMeta.lastRevised}</span>
-                </div>
-              )}
-            </div>
-          )}
+            {activeMeta.lastRevised && (
+              <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-850/60 text-slate-400 px-2.5 py-0.5 rounded-full text-[9px] font-semibold">
+                <span>🕒 Revised {activeMeta.lastRevised}</span>
+              </div>
+            )}
+          </div>
 
         </div>
 
-        {/* Right segment: stopwatch pill & Star bookmark */}
-        <div className="flex items-center gap-3 self-end sm:self-auto select-none">
+        {/* Right segment: status, momentum, timer & Star bookmark */}
+        <div className="flex flex-wrap items-center gap-3 self-end sm:self-auto select-none justify-end">
+          
+          {/* Solving Momentum Widget */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20 rounded-full text-xs font-bold text-orange-600 dark:text-orange-400 shadow-xs" title="Your current correct answer streak and total solved questions today">
+            <Flame className="w-3.5 h-3.5 text-orange-500 fill-current animate-pulse" />
+            <span>🔥 {streak} Streak • {solvedCount} Solved</span>
+          </div>
+
+          {/* Question Status Badge */}
+          {(() => {
+            const status = getQuestionStatus();
+            return (
+              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold ${status.color}`}>
+                <span>{status.dot}</span>
+                <span>{status.label}</span>
+              </div>
+            );
+          })()}
+
           {/* Live stopwatch pill */}
           <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 dark:bg-slate-900/60 dark:border-slate-800 rounded-full shadow-xs">
             <Clock className={`w-3.5 h-3.5 ${isTimerPaused ? 'text-rose-600' : 'text-slate-400'}`} />
@@ -885,7 +972,7 @@ export default function PracticeArena({
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
           
           {/* Left panel Question + options (7 columns) */}
-          <section className={`space-y-6 text-left transition-all duration-300 ${isQuestionSubmitted ? 'lg:col-span-7' : 'lg:col-span-10'}`}>
+          <section className="lg:col-span-7 space-y-6 text-left">
             
             {/* Question Card */}
             <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-6 md:p-8 space-y-6 shadow-xs relative overflow-hidden">
@@ -896,14 +983,32 @@ export default function PracticeArena({
                   <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[0].trim())} />
                 </h1>
                 
-                {/* Copy Formula trigger */}
+                {/* Formula Sheet Trigger */}
                 <button
-                  onClick={handleCopyFormula}
-                  className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 dark:text-slate-400 shrink-0 cursor-pointer flex items-center gap-1.5 transition-colors"
+                  onClick={() => setIsFormulaDrawerOpen(true)}
+                  className="px-3 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl border border-slate-205 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 dark:text-slate-400 shrink-0 cursor-pointer flex items-center gap-1.5 transition-colors select-none"
                 >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>{copiedFormulaText ? 'Copied!' : 'Formula'}</span>
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>📖 Formula Sheet</span>
                 </button>
+              </div>
+
+              {/* Pitfalls Learning Context Card */}
+              <div className="p-4 bg-rose-500/5 dark:bg-rose-950/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl text-xs flex gap-3 text-left">
+                <AlertCircle className="w-5 h-5 text-rose-505 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block text-[10px] mb-1 select-none">Common Pitfalls & Concepts</span>
+                  <p className="text-slate-600 dark:text-slate-400 font-medium">
+                    Students solving this question often struggle with:{' '}
+                    {activeQuestion.domainId === 'quant' ? (
+                      <span className="font-bold text-slate-700 dark:text-slate-350">✓ Percentage base mismatches, ✓ Reverse profit compounding, ✓ Fraction approximations.</span>
+                    ) : activeQuestion.domainId === 'logical' ? (
+                      <span className="font-bold text-slate-700 dark:text-slate-355">✓ Relative direction reversals, ✓ Overlooking circular boundaries, ✓ Branching case assumptions.</span>
+                    ) : (
+                      <span className="font-bold text-slate-700 dark:text-slate-355">✓ Context tone interpretation, ✓ Neglecting secondary definitions, ✓ Confusing synonym roots.</span>
+                    )}
+                  </p>
+                </div>
               </div>
 
               {/* Math preview highlight */}
@@ -915,41 +1020,60 @@ export default function PracticeArena({
               )}
             </div>
 
-            {/* Section 3: Personal Shortcut Card (visible if active note exists) */}
+            {/* Personal Shortcut Card (collapsed before solving, expanded after solving) */}
             {activeMeta.notes && (
-              <div className="p-5 bg-amber-500/5 dark:bg-amber-950/10 border border-amber-500/15 dark:border-amber-900/35 rounded-3xl relative overflow-hidden text-left flex gap-3">
-                <div className="w-10 h-10 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center shrink-0">
-                  <Sparkle className="w-5 h-5 fill-current" />
-                </div>
-                
-                <div className="space-y-1.5 flex-1 min-w-0">
-                  <div className="flex justify-between items-center select-none">
-                    <span className="text-xs font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider">💡 My Shortcut</span>
-                    <span className="text-[9px] font-mono text-slate-400">Revised: {activeMeta.lastRevised || '2 days ago'}</span>
-                  </div>
-
-                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-350 leading-relaxed italic pr-4">
-                    {activeMeta.notes}
-                  </p>
-
-                  <button
-                    onClick={() => {
-                      setActiveTab('notes');
-                      if (!isQuestionSubmitted) {
-                        setIsQuickNotesOpen(true);
-                      }
-                    }}
-                    className="text-[9.5px] font-black text-amber-600 hover:text-amber-700 underline uppercase tracking-wider block pt-1 select-none cursor-pointer"
+              <div className="p-5 bg-amber-500/5 dark:bg-amber-950/10 border border-amber-500/15 dark:border-amber-900/35 rounded-3xl relative overflow-hidden text-left">
+                {!isShortcutExpanded ? (
+                  <button 
+                    onClick={() => setIsShortcutExpanded(true)}
+                    className="w-full flex items-center justify-between text-xs font-black uppercase text-amber-600 dark:text-amber-405 tracking-wider cursor-pointer select-none"
                   >
-                    [ Edit Shortcut ]
+                    <div className="flex items-center gap-2">
+                      <Sparkle className="w-4 h-4 fill-current animate-pulse text-amber-550" />
+                      <span>💡 Personal Notes Available</span>
+                    </div>
+                    <span className="text-[10px] hover:underline">[ Click to Expand ]</span>
                   </button>
-                </div>
+                ) : (
+                  <div className="flex gap-3">
+                    <div className="w-10 h-10 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center shrink-0">
+                      <Sparkle className="w-5 h-5 fill-current" />
+                    </div>
+                    
+                    <div className="space-y-1.5 flex-1 min-w-0">
+                      <div className="flex justify-between items-center select-none">
+                        <span className="text-xs font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider">💡 My Shortcut</span>
+                        <button 
+                          onClick={() => setIsShortcutExpanded(false)}
+                          className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                        >
+                          [ Collapse ]
+                        </button>
+                      </div>
+
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-350 leading-relaxed italic pr-4">
+                        <SafeHtmlWithMath html={markdownToHtml(activeMeta.notes)} />
+                      </p>
+
+                      <button
+                        onClick={() => {
+                          setActiveTab('notes');
+                          if (!isQuestionSubmitted) {
+                            setIsQuickNotesOpen(true);
+                          }
+                        }}
+                        className="text-[9.5px] font-black text-amber-600 hover:text-amber-700 underline uppercase tracking-wider block pt-1 select-none cursor-pointer"
+                      >
+                        [ Edit Shortcut ]
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-
             {/* MCQ grid Options */}
             <div className="space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block">Interactive Options</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block select-none">Interactive Options</span>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activeQuestion.options.map((opt) => {
@@ -969,12 +1093,12 @@ export default function PracticeArena({
                       whileTap={!isQuestionSubmitted ? { scale: 0.99 } : {}}
                       className={`p-5 rounded-2xl border text-left flex items-start justify-between gap-4 text-sm transition-all duration-205 relative overflow-hidden group cursor-pointer ${
                         showCorrect
-                          ? 'border-emerald-500 bg-emerald-50/50 dark:border-emerald-600 dark:bg-emerald-950/20 text-emerald-950 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                          ? 'border-emerald-500 bg-emerald-50/50 dark:border-emerald-600 dark:bg-emerald-950/20 text-emerald-955 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
                           : showWrong
-                            ? 'border-rose-500 bg-rose-50/50 dark:border-rose-600 dark:bg-rose-950/20 text-rose-950 dark:text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] animate-shake'
+                            ? 'border-rose-500 bg-rose-50/50 dark:border-rose-600 dark:bg-rose-955/20 text-rose-955 dark:text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] animate-shake'
                             : isOptionSelected
-                              ? 'border-blue-600 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-950/30 text-slate-900 dark:text-white font-bold shadow-xs'
-                              : 'border-slate-200 bg-white hover:border-blue-500/30 hover:shadow-md dark:border-slate-900 dark:bg-slate-950/40 dark:hover:border-slate-800 text-slate-700 dark:text-slate-350'
+                              ? 'border-blue-605 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-955/30 text-slate-900 dark:text-white font-bold shadow-xs'
+                              : 'border-slate-200 bg-white hover:border-blue-500/30 hover:shadow-md dark:border-slate-900 dark:bg-slate-955/40 dark:hover:border-slate-800 text-slate-700 dark:text-slate-350'
                       }`}
                     >
                       <div className="flex items-start gap-4 min-w-0">
@@ -982,10 +1106,10 @@ export default function PracticeArena({
                           showCorrect
                             ? 'border-emerald-300 bg-emerald-100 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-900/30 dark:text-emerald-500'
                             : showWrong
-                              ? 'border-rose-300 bg-rose-100 text-rose-800 dark:border-rose-800/40 dark:bg-rose-900/30 dark:text-rose-500'
+                              ? 'border-rose-300 bg-rose-100 text-rose-800 dark:border-rose-800/40 dark:bg-rose-900/30 dark:text-rose-550'
                               : isOptionSelected
-                                ? 'border-blue-400 bg-blue-100 text-blue-800 dark:border-blue-800/40 dark:bg-blue-900/30 dark:text-blue-400'
-                                : 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-850 dark:bg-slate-900/60 dark:text-slate-400'
+                                ? 'border-blue-400 bg-blue-100 text-blue-800 dark:border-blue-800/40 dark:bg-blue-900/30 dark:text-blue-450'
+                                : 'border-slate-200 bg-slate-550 text-slate-500 dark:border-slate-850 dark:bg-slate-900/60 dark:text-slate-400'
                         }`}>
                           {opt.id}
                         </span>
@@ -1003,27 +1127,121 @@ export default function PracticeArena({
               </div>
             </div>
 
+            {/* Progressive Hint System Card */}
+            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 md:p-6 space-y-4 shadow-xs text-left">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block select-none">💡 Need a hand? Progressive Hints</span>
+              
+              <div className="space-y-3">
+                {/* Hint 1 */}
+                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
+                  <button
+                    onClick={() => setShowHint1(!showHint1)}
+                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
+                  >
+                    <span>💡 Hint 1: Core Concept Clue</span>
+                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint1 ? '[ Hide ]' : '[ Reveal ]'}</span>
+                  </button>
+                  {showHint1 && (
+                    <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
+                      <SafeHtmlWithMath html={markdownToHtml(
+                        activeQuestion.domainId === 'quant'
+                          ? "Let the cost price of the article be $100x$. What is the initial marked selling price at a 20% profit?"
+                          : activeQuestion.domainId === 'logical'
+                            ? "Anchor a key candidate seat first (e.g. seating opposite or in fixed spots) before analyzing relative adjacencies."
+                            : "Identify the part of speech and tone of the word. Is it positive, negative, or neutral?"
+                      )} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Hint 2 */}
+                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
+                  <button
+                    onClick={() => setShowHint2(!showHint2)}
+                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
+                  >
+                    <span>💡 Hint 2: Equation / Steps Setup</span>
+                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint2 ? '[ Hide ]' : '[ Reveal ]'}</span>
+                  </button>
+                  {showHint2 && (
+                    <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
+                      <SafeHtmlWithMath html={markdownToHtml(
+                        activeQuestion.domainId === 'quant'
+                          ? "If the cost price falls by 20%, the new cost price becomes $80x$. The markup profit is 25% on this new CP."
+                          : activeQuestion.domainId === 'logical'
+                            ? "Check the direction everyone is facing. Facing inward means clockwise is right and anti-clockwise is left."
+                            : "Look for sentence prefix roots. 'Pro-' usually means forward, high-production, or positive."
+                      )} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Hint 3 */}
+                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
+                  <button
+                    onClick={() => setShowHint3(!showHint3)}
+                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
+                  >
+                    <span>💡 Hint 3: Step-by-Step Solve Shortcut</span>
+                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint3 ? '[ Hide ]' : '[ Reveal ]'}</span>
+                  </button>
+                  {showHint3 && (
+                    <div className="p-4 bg-white dark:bg-slate-955 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
+                      <SafeHtmlWithMath html={markdownToHtml(
+                        activeQuestion.domainId === 'quant'
+                          ? "New SP = $80x \\times 1.25 = 100x$. The difference between the original SP ($120x$) and new SP ($100x$) is $20x$, which corresponds to $10$. Solve for $x$!"
+                          : activeQuestion.domainId === 'logical'
+                            ? "Draw the circular grid and eliminate candidates that violate the immediate neighbor bounds."
+                            : "Eliminate options representing scarcity or passivity. Prolific implies high output rate."
+                      )} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Question Bank Progress Tracker */}
+            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 space-y-2.5 text-left">
+              <div className="flex justify-between items-center select-none">
+                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Overall Question Bank Progress</span>
+                <span className="text-[11px] font-mono font-black text-blue-500 dark:text-blue-400">
+                  {currentIndex + 1} / {questions.length} Questions
+                </span>
+              </div>
+              <div className="w-full h-2 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-500 to-indigo-650 transition-all duration-300"
+                  style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+                />
+              </div>
+            </div>
+
           </section>
 
           {/* Right panel solution tabs (3 columns) */}
-          <AnimatePresence>
-            {isQuestionSubmitted && (
-              <motion.section
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="col-span-1 lg:col-span-3 space-y-6 text-left"
-              >
-                
-                <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 md:p-6 space-y-5 shadow-xs relative">
-                  
+          <section className="col-span-1 lg:col-span-3 space-y-6 text-left">
+            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 md:p-6 space-y-5 shadow-xs relative flex flex-col h-full min-h-[450px]">
+              {!isQuestionSubmitted ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4 my-auto select-none animate-fadeIn">
+                  <div className="w-14 h-14 bg-slate-105 dark:bg-slate-900 text-slate-400 dark:text-slate-505 rounded-full flex items-center justify-center">
+                    <Lock className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-xs font-black uppercase text-slate-800 dark:text-white tracking-widest">Solution Locked</h3>
+                    <p className="text-[11px] text-slate-405 leading-relaxed max-w-[220px] mx-auto">
+                      Solve this question to unlock step-by-step explanations, video walkthroughs, and AI insights.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
                   {/* Switcher headers */}
                   <div className="flex border-b border-slate-200 dark:border-slate-900 pb-0.5 justify-start gap-1 select-none overflow-x-auto scrollbar-none">
                     {[
                       { id: 'written', label: 'Written' },
                       { id: 'video', label: 'Video' },
                       { id: 'eli5', label: 'AI ELI5' },
-                      { id: 'notes', label: 'My Notes' } // Section 2: My Notes Tab
+                      { id: 'notes', label: 'My Notes' }
                     ].map(tab => (
                       <button
                         key={tab.id}
@@ -1069,7 +1287,7 @@ export default function PracticeArena({
                           </p>
                         </div>
 
-                        <div className="p-4 bg-rose-500/5 dark:bg-rose-950/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl">
+                        <div className="p-4 bg-rose-500/5 dark:bg-rose-955/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl">
                           <h4 className="text-[10px] font-black text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5 select-none">
                             <AlertTriangle className="w-3.5 h-3.5" /> Common Mistake
                           </h4>
@@ -1146,7 +1364,7 @@ export default function PracticeArena({
                               <button
                                 key={idx}
                                 onClick={() => handleJumpToTimestamp(note.sec)}
-                                className="p-2 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100 hover:border-slate-200 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 text-[11px] font-semibold text-slate-600 dark:text-slate-350 transition-colors flex items-center justify-between text-left cursor-pointer"
+                                className="p-2 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-105 hover:border-slate-200 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 text-[11px] font-semibold text-slate-600 dark:text-slate-350 transition-colors flex items-center justify-between text-left cursor-pointer"
                               >
                                 <span className="truncate">{note.text}</span>
                                 <span className="font-mono text-[9px] font-black bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 px-1.5 py-0.2 rounded shrink-0">{note.time}</span>
@@ -1171,7 +1389,7 @@ export default function PracticeArena({
 
                           {eli5Text.length === 0 && !isEli5Generating ? (
                             <div className="py-6 flex flex-col items-center justify-center text-center">
-                              <p className="text-slate-500 font-semibold mb-4">
+                              <p className="text-slate-505 font-semibold mb-4">
                                 Need a simplified, intuitive analogy? Let the AI explain this concept simply!
                               </p>
                               <button
@@ -1189,7 +1407,7 @@ export default function PracticeArena({
                                   key={idx}
                                   initial={{ opacity: 0, x: -10 }}
                                   animate={{ opacity: 1, x: 0 }}
-                                  className="p-3 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 rounded-xl shadow-xs"
+                                  className="p-3 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-805 rounded-xl shadow-xs"
                                 >
                                   {bullet}
                                 </motion.div>
@@ -1207,7 +1425,6 @@ export default function PracticeArena({
                       </div>
                     )}
 
-                    {/* Section 2: My Notes Tab panel content */}
                     {activeTab === 'notes' && (
                       <div className="space-y-4 animate-fadeIn text-xs leading-relaxed text-left flex flex-col">
                         
@@ -1251,21 +1468,20 @@ export default function PracticeArena({
                           </div>
                         </div>
 
-                      </div>
-                    )}
-
                   </div>
+                )}
 
-                </div>
-              </motion.section>
-            )}
-          </AnimatePresence>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
 
         </div>
       </main>
 
       {/* Sticky Bottom Actions footer bar */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200/80 bg-white/90 backdrop-blur-md dark:bg-slate-950/90 dark:border-slate-900 px-6 py-4.5 select-none">
+      <footer className="fixed bottom-0 left-0 md:left-[76px] right-0 z-30 border-t border-slate-200/40 bg-white/70 backdrop-blur-xl dark:bg-slate-950/70 dark:border-slate-900/40 px-6 py-4.5 select-none">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           
           {/* Left bottom Submit CTA */}
@@ -1332,7 +1548,7 @@ export default function PracticeArena({
               className={`p-2.5 rounded-xl border transition-all flex items-center justify-center cursor-pointer ${
                 currentIndex >= questions.length - 1
                   ? 'border-slate-100 text-slate-305 dark:border-slate-900 dark:text-slate-800 cursor-not-allowed'
-                  : 'border-slate-200 text-slate-500 bg-slate-50 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800'
+                  : 'border-slate-205 text-slate-505 bg-slate-50 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800'
               }`}
               title="Next Question (Right Arrow)"
             >
@@ -1341,36 +1557,36 @@ export default function PracticeArena({
 
             <span className="w-px h-6 bg-slate-200 dark:bg-slate-850 mx-1.5" />
 
-            {/* Discuss */}
+            {/* 💬 Discussion */}
             <button
               onClick={() => setIsDiscussionOpen(true)}
-              className="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors animate-fadeIn"
+              className="px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-705 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 font-bold text-[10.5px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
             >
-              <MessageSquare className="w-3.5 h-3.5" />
-              <span>Discuss</span>
+              <span>💬</span>
+              <span>Discussion</span>
             </button>
 
-            {/* Section 6: Upgrade Notes Button to Quick Notes popover */}
+            {/* 📝 Notes */}
             <button
               onClick={() => setIsQuickNotesOpen(!isQuickNotesOpen)}
-              className={`px-4 py-2.5 rounded-xl border font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors ${
+              className={`px-3.5 py-2 rounded-xl border font-bold text-[10.5px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors ${
                 isQuickNotesOpen 
                   ? 'bg-blue-600 border-blue-500 text-white shadow-xs'
                   : 'border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400'
               }`}
             >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span>Quick Notes</span>
+              <span>📝</span>
+              <span>Notes</span>
             </button>
 
-            {/* Section 6: Quick Notes popover mini-editor overlay */}
+            {/* Quick Notes popover mini-editor overlay */}
             <AnimatePresence>
               {isQuickNotesOpen && (
                 <motion.div
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 15 }}
-                  className="absolute bottom-full right-16 mb-3 p-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl w-80 shadow-2xl z-40 text-left space-y-4"
+                  className="absolute bottom-full right-16 mb-3 p-4 glassmorphism-light dark:glassmorphism rounded-2xl w-80 shadow-2xl z-40 text-left space-y-4"
                 >
                   <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-900 pb-2 select-none">
                     <span className="text-[10px] font-black uppercase text-slate-650 dark:text-slate-400 tracking-wider">Quick Note Editor</span>
@@ -1393,7 +1609,7 @@ export default function PracticeArena({
                               ? p === 'High' ? 'bg-rose-500/10 border-rose-500/20 text-rose-505 font-bold' :
                                 p === 'Medium' ? 'bg-amber-500/10 border-amber-500/20 text-amber-505 font-bold' :
                                 'bg-emerald-500/10 border-emerald-500/20 text-emerald-505 font-bold'
-                              : 'border-slate-200 hover:bg-slate-50 dark:border-slate-900 dark:hover:bg-slate-900/60 text-slate-450'
+                              : 'border-slate-200 hover:bg-slate-50 dark:border-slate-900 dark:hover:bg-slate-900/60 text-slate-455'
                           }`}
                         >
                           {p === 'High' ? '🔴 High' : p === 'Medium' ? '🟡 Med' : '🟢 Low'}
@@ -1404,7 +1620,7 @@ export default function PracticeArena({
 
                   {/* Note textarea */}
                   <div className="space-y-1">
-                    <label className="text-[8px] font-black text-slate-450 uppercase tracking-widest block select-none">Shortcut Insight</label>
+                    <label className="text-[8px] font-black text-slate-455 uppercase tracking-widest block select-none">Shortcut Insight</label>
                     <textarea
                       value={drawerNotes}
                       onChange={(e) => {
@@ -1430,35 +1646,36 @@ export default function PracticeArena({
               )}
             </AnimatePresence>
 
-            {/* Section 5: Revision Library Button */}
+            {/* 📚 Library */}
             <button
               onClick={() => setIsLibraryOpen(true)}
-              className="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
+              className="px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 font-bold text-[10.5px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-colors"
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <span>📚</span>
               <span>Library</span>
             </button>
 
-            {/* Mark hard */}
+            {/* 🔥 Mark Hard */}
             <button
               onClick={handleToggleHard}
-              className={`p-2.5 rounded-xl border transition-all flex items-center justify-center cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl border font-bold text-[10.5px] uppercase tracking-wider flex items-center gap-1.5 cursor-pointer transition-all ${
                 hardQuestions.includes(activeQuestion.id)
                   ? 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-950/20 dark:border-rose-900'
                   : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600 dark:bg-slate-900 dark:border-slate-800'
               }`}
-              title={hardQuestions.includes(activeQuestion.id) ? "Marked as Hard" : "Mark as Hard"}
             >
-              <Bookmark className={`w-4.5 h-4.5 stroke-[2.5] ${hardQuestions.includes(activeQuestion.id) ? 'fill-current' : ''}`} />
+              <span>🔥</span>
+              <span>{hardQuestions.includes(activeQuestion.id) ? 'Hard' : 'Mark Hard'}</span>
             </button>
 
-            {/* Report modal */}
+            {/* 🚩 Report Error */}
             <button
               onClick={() => setIsReportModalOpen(true)}
-              className="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-655 hover:bg-slate-100 dark:bg-slate-900 dark:border-slate-800 flex items-center justify-center cursor-pointer transition-colors animate-fadeIn"
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 hover:text-slate-655 hover:bg-slate-105 dark:bg-slate-900 dark:border-slate-800 flex items-center justify-center cursor-pointer transition-colors"
               title="Report Error"
             >
-              <Flag className="w-4.5 h-4.5 stroke-[2.5]" />
+              <span>🚩</span>
+              <span className="ml-1 text-[10.5px] font-bold uppercase tracking-wider">Report</span>
             </button>
 
           </div>
@@ -1469,15 +1686,15 @@ export default function PracticeArena({
       {/* Slide Drawers & Bottom Sheets overlay systems */}
       <AnimatePresence>
         
-        {/* 1. Quick Save Drawer (Slide-in from right, 380px wide) */}
-        {isSaveDrawerOpen && (
+        {/* 0. LaTeX Formula Sheet Drawer */}
+        {isFormulaDrawerOpen && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.4 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsSaveDrawerOpen(false)}
-              className="fixed inset-0 bg-black z-45 cursor-pointer"
+              onClick={() => setIsFormulaDrawerOpen(false)}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-45 cursor-pointer"
             />
             
             <motion.div
@@ -1485,9 +1702,114 @@ export default function PracticeArena({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.22 }}
-              className="fixed top-0 right-0 h-full w-full max-w-[380px] bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-900 z-50 shadow-2xl flex flex-col text-left select-none"
+              className="fixed top-0 right-0 h-full w-full max-w-[420px] glassmorphism-light dark:glassmorphism z-50 shadow-2xl flex flex-col text-left select-text"
             >
-              <div className="p-5 border-b border-slate-200 dark:border-slate-900 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/40">
+              <div className="p-5 border-b border-slate-200/50 dark:border-slate-900/50 flex justify-between items-center bg-slate-50/30 dark:bg-slate-900/20">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-blue-500" />
+                  <span className="text-xs font-black uppercase text-slate-700 dark:text-white tracking-widest">📖 Formula Sheet</span>
+                </div>
+                <button onClick={() => setIsFormulaDrawerOpen(false)} className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-850 cursor-pointer">
+                  <X className="w-4 h-4 text-slate-400" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                <p className="text-xs text-slate-400 dark:text-slate-500 select-none">
+                  Review essential concepts and formulas with LaTeX math notation.
+                </p>
+
+                {/* Section: Percentages */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-extrabold uppercase text-blue-600 dark:text-blue-450 select-none">Percentages & Fractions</h4>
+                  <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-3">
+                    <div className="text-xs leading-relaxed">
+                      <strong>Base Formula:</strong>
+                      <div className="my-2">
+                        <SafeHtmlWithMath html={markdownToHtml('$$Percentage = \\frac{\\text{Value}}{\\text{Total}} \\times 100\\%$$')} />
+                      </div>
+                    </div>
+                    <div className="text-xs leading-relaxed">
+                      <strong>Fraction Conversions:</strong>
+                      <div className="grid grid-cols-2 gap-2 mt-2 font-mono text-[11px]">
+                        <div><SafeHtmlWithMath html={markdownToHtml('$\\frac{1}{2} = 50\\%$')} /></div>
+                        <div><SafeHtmlWithMath html={markdownToHtml('$\\frac{1}{3} = 33.33\\%$')} /></div>
+                        <div><SafeHtmlWithMath html={markdownToHtml('$\\frac{1}{4} = 25\\%$')} /></div>
+                        <div><SafeHtmlWithMath html={markdownToHtml('$\\frac{1}{5} = 20\\%$')} /></div>
+                        <div><SafeHtmlWithMath html={markdownToHtml('$\\frac{1}{6} = 16.67\\%$')} /></div>
+                        <div><SafeHtmlWithMath html={markdownToHtml('$\\frac{1}{8} = 12.5\\%$')} /></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section: Profit & Loss */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-extrabold uppercase text-emerald-605 dark:text-emerald-450 select-none">Profit & Loss</h4>
+                  <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-3">
+                    <div className="text-xs leading-relaxed space-y-2 font-mono text-[11px]">
+                      <div><SafeHtmlWithMath html={markdownToHtml('$\\text{Profit} = SP - CP$')} /></div>
+                      <div><SafeHtmlWithMath html={markdownToHtml('$\\text{Loss} = CP - SP$')} /></div>
+                      <div><SafeHtmlWithMath html={markdownToHtml('$\\text{Profit}\\% = \\frac{\\text{Profit}}{CP} \\times 100$')} /></div>
+                      <div><SafeHtmlWithMath html={markdownToHtml('$SP = CP \\times \\left(1 + \\frac{\\text{Profit}\\%}{100}\\right)$')} /></div>
+                      <div><SafeHtmlWithMath html={markdownToHtml('$CP = \\frac{SP \\times 100}{100 + \\text{Profit}\\%}$')} /></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section: Ratios */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-extrabold uppercase text-amber-600 dark:text-amber-450 select-none">Ratios & Proportions</h4>
+                  <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-205 dark:border-slate-850 rounded-2xl space-y-3">
+                    <div className="text-xs leading-relaxed space-y-2">
+                      <div><strong>Compound Ratio:</strong> of $a:b$ and $c:d$ is <SafeHtmlWithMath html={markdownToHtml('$ac:bd$')} /></div>
+                      <div><strong>Duplicate Ratio:</strong> of $a:b$ is <SafeHtmlWithMath html={markdownToHtml('$a^2 : b^2$')} /></div>
+                      <div><strong>Sub-duplicate Ratio:</strong> of $a:b$ is <SafeHtmlWithMath html={markdownToHtml('$\\sqrt{a} : \\sqrt{b}$')} /></div>
+                      <div><strong>Inverse Ratio:</strong> of $a:b$ is <SafeHtmlWithMath html={markdownToHtml('$b:a$')} /></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section: Time & Work */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-extrabold uppercase text-purple-600 dark:text-purple-450 select-none">Time & Work</h4>
+                  <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-3">
+                    <div className="text-xs leading-relaxed space-y-2">
+                      <div><SafeHtmlWithMath html={markdownToHtml('$\\text{Work} = \\text{Rate} \\times \\text{Time}$')} /></div>
+                      <div className="font-semibold text-slate-500 pt-1">Group Formula:</div>
+                      <div className="my-2">
+                        <SafeHtmlWithMath html={markdownToHtml('$$\\frac{M_1 D_1 H_1}{W_1} = \\frac{M_2 D_2 H_2}{W_2}$$')} />
+                      </div>
+                      <div>If A completes in $x$ days, A's 1-day work = <SafeHtmlWithMath html={markdownToHtml('$\\frac{1}{x}$')} /></div>
+                      <div>Combined Rate of A & B = <SafeHtmlWithMath html={markdownToHtml('$\\frac{1}{x} + \\frac{1}{y}$')} /></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </motion.div>
+          </>
+        )}
+
+        {/* 1. Quick Save Drawer (Slide-in from right, 380px wide) */}
+        {isSaveDrawerOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSaveDrawerOpen(false)}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-45 cursor-pointer"
+            />
+            
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.22 }}
+              className="fixed top-0 right-0 h-full w-full max-w-[380px] glassmorphism-light dark:glassmorphism z-50 shadow-2xl flex flex-col text-left select-none"
+            >
+              <div className="p-5 border-b border-slate-200/50 dark:border-slate-900/50 flex justify-between items-center bg-slate-50/30 dark:bg-slate-900/20">
                 <div className="flex items-center gap-2">
                   <Star className="w-4 h-4 text-amber-500 fill-current" />
                   <span className="text-xs font-black uppercase text-slate-700 dark:text-white tracking-wider">Save to Library</span>
@@ -1592,10 +1914,10 @@ export default function PracticeArena({
           <>
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.4 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsLibraryOpen(false)}
-              className="fixed inset-0 bg-black z-40 cursor-pointer"
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 cursor-pointer"
             />
             
             <motion.div
@@ -1603,7 +1925,7 @@ export default function PracticeArena({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed bottom-0 left-0 right-0 h-[70vh] bg-white dark:bg-slate-950 border-t border-slate-250 dark:border-slate-900 z-50 shadow-2xl flex flex-col md:flex-row text-left"
+              className="fixed bottom-0 left-0 md:left-[76px] right-0 h-[70vh] glassmorphism-light dark:glassmorphism z-50 shadow-2xl flex flex-col md:flex-row text-left"
             >
               
               {/* Left Sidebar Management (Filters / Folders) */}
@@ -1694,7 +2016,7 @@ export default function PracticeArena({
               <div className="flex-1 p-6 flex flex-col min-w-0">
                 
                 {/* Library Header Actions */}
-                <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-900 pb-4 select-none">
+                <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-slate-900/50 pb-4 select-none">
                   <div>
                     <h3 className="text-sm font-black uppercase text-slate-800 dark:text-white tracking-widest flex items-center gap-1.5">
                       <FolderOpen className="w-4 h-4 text-blue-500" />
@@ -1708,14 +2030,14 @@ export default function PracticeArena({
                 </div>
 
                 {/* Search Bar + Sorting Headers */}
-                <div className="py-4 flex flex-col sm:flex-row gap-4 items-center justify-between border-b border-slate-100 dark:border-slate-900 select-none">
+                <div className="py-4 flex flex-col sm:flex-row gap-4 items-center justify-between border-b border-slate-200/40 dark:border-slate-900/40 select-none">
                   <div className="w-full sm:max-w-xs relative">
                     <input
                       type="text"
                       placeholder="Search title, stems, or notes..."
                       value={librarySearch}
                       onChange={e => setLibrarySearch(e.target.value)}
-                      className="w-full pl-3 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 dark:bg-slate-900 dark:border-slate-850 rounded-xl focus:outline-none focus:border-blue-500 placeholder-slate-400"
+                      className="w-full pl-3 pr-8 py-2 text-xs bg-slate-50/50 border border-slate-200/50 dark:bg-slate-900/30 dark:border-slate-850/50 rounded-xl focus:outline-none focus:border-blue-500 placeholder-slate-400"
                     />
                     {librarySearch ? (
                       <button onClick={() => setLibrarySearch('')} className="absolute right-2 top-2 text-slate-400 hover:text-slate-600">
@@ -2047,16 +2369,16 @@ export default function PracticeArena({
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none">
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsReportModalOpen(false)}
-              className="absolute inset-0 bg-black"
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, translateY: 10 }}
               animate={{ opacity: 1, scale: 1, translateY: 0 }}
               exit={{ opacity: 0, scale: 0.95, translateY: 10 }}
-              className="bg-white dark:bg-slate-950 rounded-3xl p-6 w-full max-w-[440px] shadow-2xl border border-slate-200 dark:border-slate-900 relative z-10 text-left space-y-5"
+              className="glassmorphism-light dark:glassmorphism rounded-3xl p-6 w-full max-w-[440px] shadow-2xl relative z-10 text-left space-y-5"
             >
               <div className="flex justify-between items-center">
                 <h4 className="text-sm font-black uppercase text-slate-800 dark:text-white tracking-widest flex items-center gap-1.5">
