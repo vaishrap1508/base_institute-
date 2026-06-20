@@ -209,30 +209,133 @@ const getFallbackDomainData = (slug: string) => {
 // DOMAIN SERVICE WRAPPER
 // -------------------------------------------------------------
 
+// Promise-based caches to prevent redundant requests (cache stampedes) and optimize click/navigation speeds.
+const domainUuidPromises = new Map<string, Promise<string | null>>();
+const domainHierarchyPromises = new Map<string, Promise<DomainHierarchyData>>();
+
+/**
+ * Helper to resolve slug/id to UUID
+ */
+function resolveDomainIdToUuid(domainId: string): Promise<string | null> {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(domainId);
+  if (isUuid) return Promise.resolve(domainId);
+
+  const cacheKey = domainId.toLowerCase();
+  if (domainUuidPromises.has(cacheKey)) {
+    return domainUuidPromises.get(cacheKey)!;
+  }
+
+  const promise = (async () => {
+    const slugMap: Record<string, string> = {
+      'quantitative-aptitude': 'Quantitative Aptitude',
+      'logical-reasoning': 'Logical Reasoning',
+      'verbal-ability': 'Verbal Ability',
+      'coding-dsa': 'Coding & DSA',
+      'coding-and-dsa': 'Coding & DSA'
+    };
+    const mappedName = slugMap[domainId.toLowerCase()] || domainId.replace(/-/g, ' ');
+    
+    try {
+      const { data, error } = await supabase
+        .from('domains')
+        .select('id')
+        .ilike('name', mappedName)
+        .maybeSingle();
+
+      if (error || !data) return null;
+      return data.id;
+    } catch {
+      return null;
+    }
+  })();
+
+  domainUuidPromises.set(cacheKey, promise);
+  return promise;
+}
+
+/**
+ * Helper to get domain hierarchy in a single query
+ */
+interface DomainHierarchyData {
+  subTopics: any[];
+  subTopicIds: string[];
+  conceptIds: string[];
+  questionIds: string[];
+  questionIdToSubTopicName: Record<string, string>;
+  conceptIdToSubTopicName: Record<string, string>;
+}
+
+function getDomainHierarchyData(domainUuid: string): Promise<DomainHierarchyData> {
+  if (domainHierarchyPromises.has(domainUuid)) {
+    return domainHierarchyPromises.get(domainUuid)!;
+  }
+
+  const promise = (async () => {
+    const subTopicIds: string[] = [];
+    const conceptIds: string[] = [];
+    const questionIds: string[] = [];
+    const questionIdToSubTopicName: Record<string, string> = {};
+    const conceptIdToSubTopicName: Record<string, string> = {};
+
+    try {
+      const { data: subTopics, error } = await supabase
+        .from('sub_topics')
+        .select('id, name, concepts:concepts(id, name, questions:questions(id))')
+        .eq('domain_id', domainUuid);
+
+      if (error || !subTopics) {
+        return { subTopics: [], subTopicIds, conceptIds, questionIds, questionIdToSubTopicName, conceptIdToSubTopicName };
+      }
+
+      subTopics.forEach((st: any) => {
+        subTopicIds.push(st.id);
+        if (st.concepts) {
+          st.concepts.forEach((c: any) => {
+            conceptIds.push(c.id);
+            conceptIdToSubTopicName[c.id] = st.name;
+            if (c.questions) {
+              c.questions.forEach((q: any) => {
+                questionIds.push(q.id);
+                questionIdToSubTopicName[q.id] = st.name;
+              });
+            }
+          });
+        }
+      });
+
+      return {
+        subTopics,
+        subTopicIds,
+        conceptIds,
+        questionIds,
+        questionIdToSubTopicName,
+        conceptIdToSubTopicName
+      };
+    } catch (err) {
+      console.warn("getDomainHierarchyData error:", err);
+      return { subTopics: [], subTopicIds, conceptIds, questionIds, questionIdToSubTopicName, conceptIdToSubTopicName };
+    }
+  })();
+
+  domainHierarchyPromises.set(domainUuid, promise);
+  return promise;
+}
+
 /**
  * Fetch a domain detail row using ID or Slug
  */
 export async function getDomainById(domainId: string): Promise<DomainInfo> {
   const fallback = getFallbackDomainData(domainId).info;
   try {
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(domainId);
-    let query = supabase.from('domains').select('id, name');
-    
-    if (isUuid) {
-      query = query.eq('id', domainId);
-    } else {
-      const slugMap: Record<string, string> = {
-        'quantitative-aptitude': 'Quantitative Aptitude',
-        'logical-reasoning': 'Logical Reasoning',
-        'verbal-ability': 'Verbal Ability',
-        'coding-dsa': 'Coding & DSA',
-        'coding-and-dsa': 'Coding & DSA'
-      };
-      const mappedName = slugMap[domainId.toLowerCase()] || domainId.replace(/-/g, ' ');
-      query = query.ilike('name', mappedName);
-    }
+    const uuid = await resolveDomainIdToUuid(domainId);
+    if (!uuid) return fallback;
 
-    const { data, error } = await query.maybeSingle();
+    const { data, error } = await supabase
+      .from('domains')
+      .select('id, name')
+      .eq('id', uuid)
+      .maybeSingle();
+
     if (error || !data) {
       console.warn("getDomainById Query failed/empty. Falling back.", error?.message);
       return fallback;
@@ -255,30 +358,13 @@ export async function getDomainById(domainId: string): Promise<DomainInfo> {
 export async function getDomainProgress(userId: string, domainId: string): Promise<DomainProgress> {
   const fallback = getFallbackDomainData(domainId).progress;
   try {
-    // 1. Fetch all questions in this domain
-    const { data: subTopics, error: stError } = await supabase
-      .from('sub_topics')
-      .select('id')
-      .eq('domain_id', domainId);
-    if (stError || !subTopics || subTopics.length === 0) return fallback;
+    const uuid = await resolveDomainIdToUuid(domainId);
+    if (!uuid) return fallback;
 
-    const subTopicIds = subTopics.map(st => st.id);
-    const { data: concepts, error: cError } = await supabase
-      .from('concepts')
-      .select('id')
-      .in('sub_topic_id', subTopicIds);
-    if (cError || !concepts || concepts.length === 0) return fallback;
+    const { questionIds } = await getDomainHierarchyData(uuid);
+    if (questionIds.length === 0) return fallback;
 
-    const conceptIds = concepts.map(c => c.id);
-    const { data: questions, error: qError } = await supabase
-      .from('questions')
-      .select('id')
-      .in('concept_id', conceptIds);
-    if (qError || !questions || questions.length === 0) return fallback;
-
-    const questionIds = questions.map(q => q.id);
-
-    // 2. Fetch solved progress
+    // 1. Fetch solved progress
     const { data: solved, error: solvedError } = await supabase
       .from('user_progress')
       .select('question_id')
@@ -287,7 +373,7 @@ export async function getDomainProgress(userId: string, domainId: string): Promi
       .in('question_id', questionIds);
     if (solvedError) return fallback;
 
-    // 3. Fetch accuracy from attempts table (if exists)
+    // 2. Fetch accuracy from attempts table (if exists)
     const { data: attempts, error: attError } = await supabase
       .from('question_attempts')
       .select('is_correct')
@@ -305,10 +391,10 @@ export async function getDomainProgress(userId: string, domainId: string): Promi
     }
 
     return {
-      overallMastery: overallMastery || fallback.overallMastery,
-      solvedCount: solvedCount || fallback.solvedCount,
-      totalCount: totalCount || fallback.totalCount,
-      accuracy: accuracy || fallback.accuracy
+      overallMastery: overallMastery,
+      solvedCount: solvedCount,
+      totalCount: totalCount,
+      accuracy: accuracy
     };
   } catch (err) {
     console.warn("getDomainProgress failed. Returning fallback.", err);
@@ -340,23 +426,30 @@ export async function getConceptProgress(userId: string, conceptId: string): Pro
 export async function getWeakestTopic(userId: string, domainId: string): Promise<{ name: string; accuracy: number }> {
   const fallback = getFallbackDomainData(domainId).weakest;
   try {
+    const uuid = await resolveDomainIdToUuid(domainId);
+    if (!uuid) return fallback;
+
+    const { questionIds, questionIdToSubTopicName } = await getDomainHierarchyData(uuid);
+    if (questionIds.length === 0) return fallback;
+
     const { data, error } = await supabase
       .from('question_attempts')
-      .select('is_correct, question:questions(concept:concepts(sub_topic:sub_topics(domain_id, name)))')
-      .eq('user_id', userId);
+      .select('question_id, is_correct')
+      .eq('user_id', userId)
+      .in('question_id', questionIds);
 
     if (error || !data || data.length === 0) return fallback;
 
     // Filter and group by sub-topic name
     const grouped: Record<string, { total: number; correct: number }> = {};
     data.forEach((att: any) => {
-      const subTopic = att.question?.concept?.sub_topic;
-      if (subTopic && subTopic.domain_id === domainId) {
-        if (!grouped[subTopic.name]) {
-          grouped[subTopic.name] = { total: 0, correct: 0 };
+      const subTopicName = questionIdToSubTopicName[att.question_id];
+      if (subTopicName) {
+        if (!grouped[subTopicName]) {
+          grouped[subTopicName] = { total: 0, correct: 0 };
         }
-        grouped[subTopic.name].total += 1;
-        if (att.is_correct) grouped[subTopic.name].correct += 1;
+        grouped[subTopicName].total += 1;
+        if (att.is_correct) grouped[subTopicName].correct += 1;
       }
     });
 
@@ -383,22 +476,29 @@ export async function getWeakestTopic(userId: string, domainId: string): Promise
 export async function getStrongestTopic(userId: string, domainId: string): Promise<{ name: string; accuracy: number }> {
   const fallback = getFallbackDomainData(domainId).strongest;
   try {
+    const uuid = await resolveDomainIdToUuid(domainId);
+    if (!uuid) return fallback;
+
+    const { questionIds, questionIdToSubTopicName } = await getDomainHierarchyData(uuid);
+    if (questionIds.length === 0) return fallback;
+
     const { data, error } = await supabase
       .from('question_attempts')
-      .select('is_correct, question:questions(concept:concepts(sub_topic:sub_topics(domain_id, name)))')
-      .eq('user_id', userId);
+      .select('question_id, is_correct')
+      .eq('user_id', userId)
+      .in('question_id', questionIds);
 
     if (error || !data || data.length === 0) return fallback;
 
     const grouped: Record<string, { total: number; correct: number }> = {};
     data.forEach((att: any) => {
-      const subTopic = att.question?.concept?.sub_topic;
-      if (subTopic && subTopic.domain_id === domainId) {
-        if (!grouped[subTopic.name]) {
-          grouped[subTopic.name] = { total: 0, correct: 0 };
+      const subTopicName = questionIdToSubTopicName[att.question_id];
+      if (subTopicName) {
+        if (!grouped[subTopicName]) {
+          grouped[subTopicName] = { total: 0, correct: 0 };
         }
-        grouped[subTopic.name].total += 1;
-        if (att.is_correct) grouped[subTopic.name].correct += 1;
+        grouped[subTopicName].total += 1;
+        if (att.is_correct) grouped[subTopicName].correct += 1;
       }
     });
 
@@ -425,58 +525,73 @@ export async function getStrongestTopic(userId: string, domainId: string): Promi
 export async function getRadarData(userId: string, domainId: string): Promise<RadarPoint[]> {
   const fallback = getFallbackDomainData(domainId).radar;
   try {
-    // Fetch subtopics & concepts in domain
-    const { data: subTopics, error: stError } = await supabase
-      .from('sub_topics')
-      .select('id, name')
-      .eq('domain_id', domainId);
-    if (stError || !subTopics || subTopics.length === 0) return fallback;
+    const uuid = await resolveDomainIdToUuid(domainId);
+    if (!uuid) return fallback;
+
+    const { subTopics, conceptIds, questionIds } = await getDomainHierarchyData(uuid);
+    if (subTopics.length < 3) return fallback;
+
+    // Fetch all progress tracking rows for all concepts in domain
+    const { data: progressRows, error: pError } = await supabase
+      .from('progress_tracking')
+      .select('concept_id, progress_percent')
+      .eq('user_id', userId)
+      .in('concept_id', conceptIds);
+
+    // Map of concept_id -> progress_percent
+    const progressMap: Record<string, number> = {};
+    if (!pError && progressRows) {
+      progressRows.forEach(row => {
+        progressMap[row.concept_id] = row.progress_percent;
+      });
+    }
+
+    // Fetch all attempts for all questions in domain
+    const { data: attemptsRows, error: attError } = await supabase
+      .from('question_attempts')
+      .select('question_id, is_correct')
+      .eq('user_id', userId)
+      .in('question_id', questionIds);
+
+    // Map of question_id -> list of attempt is_correct
+    const attemptsMap: Record<string, boolean[]> = {};
+    if (!attError && attemptsRows) {
+      attemptsRows.forEach(row => {
+        if (!attemptsMap[row.question_id]) {
+          attemptsMap[row.question_id] = [];
+        }
+        attemptsMap[row.question_id].push(row.is_correct);
+      });
+    }
 
     const points: RadarPoint[] = [];
 
-    // For each subtopic, calculate completeness and accuracy
     for (const st of subTopics) {
-      const { data: concepts, error: cError } = await supabase
-        .from('concepts')
-        .select('id')
-        .eq('sub_topic_id', st.id);
+      const stConcepts = st.concepts || [];
+      if (stConcepts.length === 0) continue;
 
-      if (cError || !concepts || concepts.length === 0) continue;
-      const conceptIds = concepts.map(c => c.id);
+      const stConceptIds = stConcepts.map((c: any) => c.id);
 
-      // Average completion/progress percent
-      const { data: progressRows, error: pError } = await supabase
-        .from('progress_tracking')
-        .select('progress_percent')
-        .eq('user_id', userId)
-        .in('concept_id', conceptIds);
-
+      // Average completion/progress percent for this subtopic
       let completionSum = 0;
-      if (!pError && progressRows && progressRows.length > 0) {
-        completionSum = progressRows.reduce((acc, row) => acc + row.progress_percent, 0);
-      }
-      const completionAvg = Math.round(completionSum / conceptIds.length) || 0;
+      stConceptIds.forEach((cid: string) => {
+        completionSum += progressMap[cid] || 0;
+      });
+      const completionAvg = Math.round(completionSum / stConceptIds.length) || 0;
 
-      // Accuracy from attempts
-      const { data: questions, error: qError } = await supabase
-        .from('questions')
-        .select('id')
-        .in('concept_id', conceptIds);
+      // Accuracy for this subtopic
+      let totalAttempts = 0;
+      let correctAttempts = 0;
+      stConcepts.forEach((c: any) => {
+        const cQuestions = c.questions || [];
+        cQuestions.forEach((q: any) => {
+          const qAttempts = attemptsMap[q.id] || [];
+          totalAttempts += qAttempts.length;
+          correctAttempts += qAttempts.filter(val => val).length;
+        });
+      });
 
-      let accuracy = 50; // default average
-      if (!qError && questions && questions.length > 0) {
-        const questionIds = questions.map(q => q.id);
-        const { data: attempts } = await supabase
-          .from('question_attempts')
-          .select('is_correct')
-          .eq('user_id', userId)
-          .in('question_id', questionIds);
-
-        if (attempts && attempts.length > 0) {
-          const correct = attempts.filter(a => a.is_correct).length;
-          accuracy = Math.round((correct / attempts.length) * 100);
-        }
-      }
+      const accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 50;
 
       points.push({
         axis: st.name,
@@ -487,7 +602,8 @@ export async function getRadarData(userId: string, domainId: string): Promise<Ra
     }
 
     return points.length > 0 ? points : fallback;
-  } catch {
+  } catch (err) {
+    console.warn("getRadarData failed, returning fallback:", err);
     return fallback;
   }
 }
@@ -498,88 +614,90 @@ export async function getRadarData(userId: string, domainId: string): Promise<Ra
 export async function getSmartInsights(userId: string, domainId: string): Promise<SmartInsight[]> {
   const fallback = getFallbackDomainData(domainId).insights;
   try {
+    const uuid = await resolveDomainIdToUuid(domainId);
+    if (!uuid) return fallback;
+
+    const { conceptIds, questionIds } = await getDomainHierarchyData(uuid);
+    if (conceptIds.length === 0) return fallback;
+
     const insights: SmartInsight[] = [];
     
-    // Fetch last session in this domain
-    const { data: subTopics } = await supabase
-      .from('sub_topics')
+    // Insight 1: Check stale concepts (> 7 days)
+    const { data: lastSessions } = await supabase
+      .from('learning_sessions')
+      .select('concept_id, created_at')
+      .eq('user_id', userId)
+      .in('concept_id', conceptIds)
+      .order('created_at', { ascending: false });
+
+    // Fetch concepts info to map names
+    const { data: conceptsInfo } = await supabase
+      .from('concepts')
       .select('id, name')
-      .eq('domain_id', domainId);
+      .in('id', conceptIds);
 
-    if (subTopics && subTopics.length > 0) {
-      const subTopicIds = subTopics.map(st => st.id);
-      const { data: concepts } = await supabase
-        .from('concepts')
-        .select('id, name')
-        .in('sub_topic_id', subTopicIds);
+    const conceptsMap: Record<string, string> = {};
+    if (conceptsInfo) {
+      conceptsInfo.forEach(c => {
+        conceptsMap[c.id] = c.name;
+      });
+    }
 
-      if (concepts && concepts.length > 0) {
-        const conceptIds = concepts.map(c => c.id);
-        
-        // Insight 1: Check stale concepts (> 7 days)
-        const { data: lastSessions } = await supabase
-          .from('learning_sessions')
-          .select('concept_id, created_at')
-          .eq('user_id', userId)
-          .in('concept_id', conceptIds)
-          .order('created_at', { ascending: false });
+    if (lastSessions && lastSessions.length > 0) {
+      const newestSession = lastSessions[0];
+      const daysAgo = Math.floor((Date.now() - new Date(newestSession.created_at).getTime()) / (1000 * 3600 * 24));
+      if (daysAgo >= 7) {
+        const conceptName = conceptsMap[newestSession.concept_id] || 'previous topics';
+        insights.push({
+          id: 'ins-stale',
+          text: `You have not practiced ${conceptName} for ${daysAgo} days. Review active modules.`,
+          type: 'warning'
+        });
+      }
+    }
 
-        if (lastSessions && lastSessions.length > 0) {
-          const newestSession = lastSessions[0];
-          const daysAgo = Math.floor((Date.now() - new Date(newestSession.created_at).getTime()) / (1000 * 3600 * 24));
-          if (daysAgo >= 7) {
-            const conceptName = concepts.find(c => c.id === newestSession.concept_id)?.name || 'previous topics';
-            insights.push({
-              id: 'ins-stale',
-              text: `You have not practiced ${conceptName} for ${daysAgo} days. Review active modules.`,
-              type: 'warning'
-            });
-          }
-        }
+    // Insight 2: Drop in accuracy warnings
+    const { data: attempts } = await supabase
+      .from('question_attempts')
+      .select('question_id, is_correct, created_at')
+      .eq('user_id', userId)
+      .in('question_id', questionIds)
+      .order('created_at', { ascending: false })
+      .limit(20);
 
-        // Insight 2: Drop in accuracy warnings
-        const { data: attempts } = await supabase
-          .from('question_attempts')
-          .select('is_correct, created_at')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false })
-          .limit(20);
+    if (attempts && attempts.length >= 10) {
+      const half = Math.floor(attempts.length / 2);
+      const recentAttempts = attempts.slice(0, half);
+      const pastAttempts = attempts.slice(half);
 
-        if (attempts && attempts.length >= 10) {
-          const half = Math.floor(attempts.length / 2);
-          const recentAttempts = attempts.slice(0, half);
-          const pastAttempts = attempts.slice(half);
+      const recentAcc = recentAttempts.filter(a => a.is_correct).length / half;
+      const pastAcc = pastAttempts.filter(a => a.is_correct).length / (attempts.length - half);
 
-          const recentAcc = recentAttempts.filter(a => a.is_correct).length / half;
-          const pastAcc = pastAttempts.filter(a => a.is_correct).length / (attempts.length - half);
+      if (pastAcc - recentAcc >= 0.1) {
+        const dropPct = Math.round((pastAcc - recentAcc) * 100);
+        insights.push({
+          id: 'ins-drop',
+          text: `Alert: Recent question accuracy dropped by ${dropPct}% compared to past averages.`,
+          type: 'info'
+        });
+      }
+    }
 
-          if (pastAcc - recentAcc >= 0.1) {
-            const dropPct = Math.round((pastAcc - recentAcc) * 100);
-            insights.push({
-              id: 'ins-drop',
-              text: `Alert: Recent question accuracy dropped by ${dropPct}% compared to past averages.`,
-              type: 'info'
-            });
-          }
-        }
+    // Insight 3: Readiness metric
+    const { data: progressRows } = await supabase
+      .from('progress_tracking')
+      .select('progress_percent')
+      .eq('user_id', userId)
+      .in('concept_id', conceptIds);
 
-        // Insight 3: Readiness metric
-        const { data: progressRows } = await supabase
-          .from('progress_tracking')
-          .select('progress_percent')
-          .eq('user_id', userId)
-          .in('concept_id', conceptIds);
-
-        if (progressRows && progressRows.length > 0) {
-          const avgProg = Math.round(progressRows.reduce((a, b) => a + b.progress_percent, 0) / progressRows.length);
-          if (avgProg >= 50) {
-            insights.push({
-              id: 'ins-ready',
-              text: `Fantastic! You are ${avgProg}% prepared for target campus placement drives in this domain.`,
-              type: 'success'
-            });
-          }
-        }
+    if (progressRows && progressRows.length > 0) {
+      const avgProg = Math.round(progressRows.reduce((a, b) => a + b.progress_percent, 0) / progressRows.length);
+      if (avgProg >= 50) {
+        insights.push({
+          id: 'ins-ready',
+          text: `Fantastic! You are ${avgProg}% prepared for target campus placement drives in this domain.`,
+          type: 'success'
+        });
       }
     }
 
@@ -603,21 +721,11 @@ export async function getSmartInsights(userId: string, domainId: string): Promis
 export async function getContinueLearning(userId: string, domainId: string): Promise<ContinueLearning> {
   const fallback = getFallbackDomainData(domainId).continue;
   try {
-    const { data: subTopics } = await supabase
-      .from('sub_topics')
-      .select('id')
-      .eq('domain_id', domainId);
+    const uuid = await resolveDomainIdToUuid(domainId);
+    if (!uuid) return fallback;
 
-    if (!subTopics || subTopics.length === 0) return fallback;
-    const subTopicIds = subTopics.map(st => st.id);
-
-    const { data: concepts } = await supabase
-      .from('concepts')
-      .select('id, name')
-      .in('sub_topic_id', subTopicIds);
-
-    if (!concepts || concepts.length === 0) return fallback;
-    const conceptIds = concepts.map(c => c.id);
+    const { conceptIds } = await getDomainHierarchyData(uuid);
+    if (conceptIds.length === 0) return fallback;
 
     // Get lowest progress that is In Progress
     const { data: progressTracking } = await supabase
@@ -631,7 +739,13 @@ export async function getContinueLearning(userId: string, domainId: string): Pro
 
     if (progressTracking && progressTracking.length > 0) {
       const nextConcept = progressTracking[0];
-      const name = concepts.find(c => c.id === nextConcept.concept_id)?.name || fallback.name;
+      const { data: conceptInfo } = await supabase
+        .from('concepts')
+        .select('name')
+        .eq('id', nextConcept.concept_id)
+        .maybeSingle();
+
+      const name = conceptInfo?.name || fallback.name;
       return {
         topicId: nextConcept.concept_id,
         name: name,
@@ -653,65 +767,86 @@ export async function getContinueLearning(userId: string, domainId: string): Pro
 export async function getDomainTopicsGrid(userId: string, domainId: string): Promise<TopicProgress[]> {
   const fallback = getFallbackDomainData(domainId).topics;
   try {
-    const { data: subTopics, error: stError } = await supabase
-      .from('sub_topics')
-      .select('id, name')
-      .eq('domain_id', domainId);
+    const uuid = await resolveDomainIdToUuid(domainId);
+    if (!uuid) return fallback;
 
-    if (stError || !subTopics || subTopics.length === 0) return fallback;
+    const { subTopics, conceptIds, questionIds } = await getDomainHierarchyData(uuid);
+    if (subTopics.length === 0) return fallback;
+
+    // 1. Fetch progress_tracking rows in batch
+    const { data: progressRows } = await supabase
+      .from('progress_tracking')
+      .select('concept_id, progress_percent, status')
+      .eq('user_id', userId)
+      .in('concept_id', conceptIds);
+
+    const progressMap: Record<string, { progress_percent: number; status: string }> = {};
+    if (progressRows) {
+      progressRows.forEach(row => {
+        progressMap[row.concept_id] = {
+          progress_percent: row.progress_percent,
+          status: row.status
+        };
+      });
+    }
+
+    // 2. Fetch user_progress solved rows in batch
+    const { data: solvedRows } = await supabase
+      .from('user_progress')
+      .select('question_id')
+      .eq('user_id', userId)
+      .eq('is_solved', true)
+      .in('question_id', questionIds);
+
+    const solvedSet = new Set<string>();
+    if (solvedRows) {
+      solvedRows.forEach(row => {
+        solvedSet.add(row.question_id);
+      });
+    }
+
+    // 3. Fetch question_attempts rows in batch
+    const { data: attemptsRows } = await supabase
+      .from('question_attempts')
+      .select('question_id, is_correct')
+      .eq('user_id', userId)
+      .in('question_id', questionIds);
+
+    const attemptsMap: Record<string, boolean[]> = {};
+    if (attemptsRows) {
+      attemptsRows.forEach(row => {
+        if (!attemptsMap[row.question_id]) {
+          attemptsMap[row.question_id] = [];
+        }
+        attemptsMap[row.question_id].push(row.is_correct);
+      });
+    }
 
     const gridItems: TopicProgress[] = [];
 
     for (const st of subTopics) {
-      const { data: concepts, error: cError } = await supabase
-        .from('concepts')
-        .select('id, name')
-        .eq('sub_topic_id', st.id);
-
-      if (cError || !concepts || concepts.length === 0) continue;
-
-      for (const concept of concepts) {
-        // Fetch progress row
-        const { data: progRow } = await supabase
-          .from('progress_tracking')
-          .select('progress_percent, status')
-          .eq('user_id', userId)
-          .eq('concept_id', concept.id)
-          .maybeSingle();
-
-        // Calculate questions count & attempts accuracy
-        const { data: questions } = await supabase
-          .from('questions')
-          .select('id')
-          .eq('concept_id', concept.id);
-
-        const totalCount = questions?.length || 15;
+      const stConcepts = st.concepts || [];
+      for (const concept of stConcepts) {
+        const cQuestions = concept.questions || [];
+        const totalCount = cQuestions.length || 15;
         let solved = 0;
-        let accuracy = 50;
+        let correctAttempts = 0;
+        let totalAttempts = 0;
 
-        if (questions && questions.length > 0) {
-          const qIds = questions.map(q => q.id);
-          const { data: solvedRows } = await supabase
-            .from('user_progress')
-            .select('question_id')
-            .eq('user_id', userId)
-            .eq('is_solved', true)
-            .in('question_id', qIds);
-          solved = solvedRows?.length || 0;
-
-          const { data: attempts } = await supabase
-            .from('question_attempts')
-            .select('is_correct')
-            .eq('user_id', userId)
-            .in('question_id', qIds);
-
-          if (attempts && attempts.length > 0) {
-            const correct = attempts.filter(a => a.is_correct).length;
-            accuracy = Math.round((correct / attempts.length) * 100);
+        cQuestions.forEach((q: any) => {
+          if (solvedSet.has(q.id)) {
+            solved += 1;
           }
-        }
+          const qAttempts = attemptsMap[q.id] || [];
+          totalAttempts += qAttempts.length;
+          correctAttempts += qAttempts.filter(val => val).length;
+        });
 
+        const accuracy = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 50;
+
+        const progRow = progressMap[concept.id];
         const progressPercent = progRow?.progress_percent ?? Math.round((solved / (totalCount || 1)) * 100);
+        
         let status = progRow?.status as 'Locked' | 'In Progress' | 'Completed';
         if (!status) {
           status = progressPercent === 100 ? 'Completed' : (progressPercent > 0 ? 'In Progress' : 'Locked');

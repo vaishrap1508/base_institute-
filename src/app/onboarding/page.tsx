@@ -25,6 +25,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
+import { siteConfig } from '@/config/site';
 import { INDIAN_STATES, INDIAN_COLLEGES } from '@/data/indianColleges';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -227,6 +228,55 @@ const generateUsernameSuggestions = (name: string): string[] => {
 export default function OnboardingPage() {
   const router = useRouter();
   const authSupabase = createAuthClient();
+
+  // Dynamic branding logo configuration
+  const [logoText, setLogoText] = useState(siteConfig.logoText);
+  const [logoSubtext, setLogoSubtext] = useState(siteConfig.logoSubtext);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const localData = localStorage.getItem('aptitude_landing_page_settings');
+      if (localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          if (parsed.header_logo_text) setLogoText(parsed.header_logo_text);
+          if (parsed.header_logo_subtext) setLogoSubtext(parsed.header_logo_subtext);
+        } catch (_) {}
+      }
+    }
+
+    const fetchBranding = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('landing_page_settings')
+          .select('header_logo_text, header_logo_subtext')
+          .eq('id', 'current')
+          .single();
+
+        if (data && !error) {
+          if (data.header_logo_text) setLogoText(data.header_logo_text);
+          if (data.header_logo_subtext) setLogoSubtext(data.header_logo_subtext);
+
+          if (typeof window !== 'undefined') {
+            const localData = localStorage.getItem('aptitude_landing_page_settings');
+            let parsed = {};
+            if (localData) {
+              try { parsed = JSON.parse(localData); } catch (_) {}
+            }
+            localStorage.setItem('aptitude_landing_page_settings', JSON.stringify({
+              ...parsed,
+              header_logo_text: data.header_logo_text,
+              header_logo_subtext: data.header_logo_subtext
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch branding from Supabase:", err);
+      }
+    };
+
+    fetchBranding();
+  }, []);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -769,18 +819,12 @@ export default function OnboardingPage() {
             <Layers className="w-4.5 h-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold tracking-tight text-xs text-slate-900 dark:text-white">THE LUCID INTELLECTUAL</span>
-            <span className="text-[8px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">Aptitude & Verbal Studio</span>
+            <span className="font-extrabold tracking-tight text-xs text-slate-900 dark:text-white">{logoText}</span>
+            <span className="text-[8px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">{logoSubtext}</span>
           </div>
         </Link>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              SECURE ONBOARDING HUD
-            </span>
-          </div>
         </div>
       </header>
 

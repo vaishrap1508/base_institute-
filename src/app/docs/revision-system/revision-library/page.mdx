@@ -1,0 +1,99 @@
+import { Callout } from 'nextra/components'
+
+# Revision Library
+
+Learn how to use the 70% height Revision Bottom Sheet, manage system/custom folders, and search text-highlights.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">4 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Intermediate</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Interface</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Bottom Sheet</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Opening the Revision Library bottom sheet (70% Height)  
+✓ Filtering items using system and custom folders  
+✓ Sorting by Date, Topic, Last Revised, and Priority  
+✓ Running real-time queries with text matching highlights  
+
+---
+
+## Why the Revision Library Exists
+
+Students shouldn't navigate to separate pages to review past items. The **Revision Library** slides up as a 70% overlay over the Practice Arena when you click the "Library" button in the bottom bar, letting you review past items while keeping your active question loaded.
+
+---
+
+## Anatomy of the Revision Library (70% Height)
+
+```
++--------------------------------------------------------------+
+| [Revision Library]                       [Search Input 🔍]   |
++--------------------------------------------------------------+
+| [Left Sidebar: Folders]        | [Main Panel: Content Feed]  |
+| ⭐ All Saved                   | Sort: [Date] [Topic] [Pri]  |
+| 🕒 Last 50                     |                             |
+| 🔥 Hard Questions              | [ Today's Pinned Queue ]    |
+| 📝 Without Notes               |   #q120 - TCS NQT High      |
+|                                |                             |
+| [Custom Folders]               | [ Search Feed Cards ]       |
+| 📂 Arithmetic Shortcuts (12)   |   Shows text snippet matches|
++--------------------------------------------------------------+
+```
+
+### 1. Left Sidebar Navigation
+- **System Folders**: Stored presets (`All Saved`, `Last 50`, `Hard Questions`, `Without Notes`).
+- **Custom Folders**: Student-created folders displaying active solve counts (e.g. `Infosys Logic (24)`).
+
+### 2. Main Panel Content Feed
+- **Today's Revision (Pinned Queue)**: Pushes all High Priority (`🔴`) items to the top of the viewport.
+- **Search Feed Cards**: Displays topic tags, date added, priority markers, note snippets, and a quick "Open" button that loads the question instantly in the underlying solver.
+
+---
+
+## Real-Time Search & Query Highlighting
+
+The search bar queries the Question Stem, ID, Topic, and your saved note logs:
+- **Instant Filtering**: Feed updates on keyup.
+- **Visual Highlight**: Matches are highlighted using an inline `<mark>` tag wrapper (`bg-yellow-200` / `dark:bg-yellow-800`).
+
+---
+
+## Revision Library Best Practices
+
+<Callout type="info">
+  **Best Practice: Sort by Priority weekly**  
+  Every Sunday, open the Revision Library, click the `Priority` sort tab, and re-solve all `🔴 High` and `🟡 Medium` questions to verify your retention.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Keep the active question state in mind**  
+  Clicking "Open" on a card in the Revision feed will replace the active question in your Practice Arena workspace. Make sure to submit your current question answer before switching.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Personal Notes & Bookmarks](../practice-arena/notes-bookmarks)**
+* **[Folder Organization](../revision-system/folder-organization)**
+* **[Priority Management](../revision-system/priority-management)**

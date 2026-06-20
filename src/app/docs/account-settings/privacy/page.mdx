@@ -1,0 +1,92 @@
+import { Callout } from 'nextra/components'
+
+# Privacy
+
+Learn how to control your profile visibility, hide ranking cards, and toggle recruiter accessibility.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Beginner</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Topic</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Privacy</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Toggling profile visibility levels (Public, Recruiter, Friends, Private)  
+✓ Anonymizing leaderboard list appearances  
+✓ Controlling database access with Row-Level Security (RLS) policies  
+✓ Restricting access to academic CGPA credentials  
+
+---
+
+## Profile Visibility Levels
+
+Our platform provides four privacy settings:
+
+### 1. Public Mode
+- **Visibility**: Anyone can view your profile page, completed badges, activity heatmaps, and readiness radar.
+- **Leaderboards**: Fully visible with name and college tags.
+
+### 2. Recruiter Visible Mode (Recommended)
+- **Visibility**: Only verified partner recruitment managers and platform administrators can view your details.
+- **Leaderboards**: Displayed as anonymous values (e.g. `Candidate #3402`).
+
+### 3. Friends Only Mode
+- **Visibility**: Restricted to students in your same university cohort or batch.
+
+### 4. Private Mode
+- **Visibility**: Completely restricted. Only you can view your progress reports and profile cards.
+- **Leaderboards**: Completely hidden from all listings.
+
+---
+
+## Row-Level Security (RLS) Integration
+
+Privacy settings are enforced at the database query layer:
+
+```
+[ Client Query Profile ] ➔ [ Supabase RLS Evaluator ] ➔ Check target visibility state
+                                                             │
+                                                             ├──► Private ➔ Reject query
+                                                             └──► Recruiter Visible ➔ Match Role
+```
+
+---
+
+## Privacy Best Practices
+
+<Callout type="info">
+  **Best Practice: Use Recruiter Visible to secure job matches**  
+  Keep profile visibility set to **Recruiter Visible**. This keeps your stats hidden from public Google searches while ensuring placement cells can filter your skills for target recruitment drives.
+</Callout>
+
+<Callout type="warning">
+  **Warning: CGPA Privacy**  
+  Regardless of visibility settings, your numerical CGPA and rank indices are never displayed publicly. Recruiters view them as qualifying checkmarks (e.g. `CGPA Criterion Met`).
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Profile Settings](../account-settings/profile)**
+* **[Notification Channels](../account-settings/notifications)**
+* **[Data Export Options](../account-settings/data-export)**

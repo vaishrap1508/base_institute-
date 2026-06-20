@@ -1,28 +1,27 @@
-import { Callout } from 'nextra/components'
+import { Cards, Callout } from 'nextra/components'
 
-<div className="relative overflow-hidden rounded-[24px] border border-slate-200/60 dark:border-slate-800/80 bg-linear-to-br from-blue-50/50 to-indigo-50/20 dark:from-slate-950/80 dark:to-slate-900/30 p-8 md:p-12 mb-10 shadow-xs mt-4">
+# AptiMaster Placement Academy
+
+Welcome to the official **AptiMaster Placement Academy Knowledge Base**. This is a comprehensive learning and revision workspace designed to prepare you for technical and aptitude interviews at top-tier companies.
+
+---
+
+<div className="relative overflow-hidden rounded-[24px] border border-blue-200/50 dark:border-slate-800/80 bg-linear-to-br from-blue-50/50 to-indigo-50/20 dark:from-slate-950/80 dark:to-slate-900/30 p-8 md:p-12 mb-10 shadow-xs mt-4">
   <div className="absolute top-0 right-0 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
   <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-  <div className="relative z-10 max-w-2xl flex flex-col gap-4">
+  <div className="relative z-10 flex flex-col gap-4">
     <div className="inline-flex items-center gap-1.5 bg-blue-100/60 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-500/20 text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full self-start">
-      Engineering Knowledge Base
+      Student Prep Guide
     </div>
-    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white my-0 leading-tight">
-      Kinetic Developer Hub
+    <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white my-0 leading-tight">
+      Solve, Learn, Revise
     </h1>
-    <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed my-0">
-      Access the official engineering specifications, API reference blocks, Supabase schema designs, and continuous deployment checklists for the Kinetic Hub.
+    <div className="text-sm md:text-base text-slate-650 dark:text-slate-400 leading-relaxed my-0">
+      Master quantitative aptitude, logical sequences, verbal mastery, and coding logic in a gamified, self-contained revision environment.
     </div>
     <div className="flex flex-wrap items-center gap-4 mt-6">
-      <div className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 shadow-xs hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 max-w-xs w-full">
-        <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-        <span className="text-xs text-slate-400 dark:text-slate-500">Search documentation...</span>
-        <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 px-1.5 font-mono text-[9px] font-medium text-slate-400 dark:text-slate-500">
-          <span className="text-xs">⌘</span>K
-        </kbd>
-      </div>
-      <a href="./docs/getting-started" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold text-xs px-6 py-3.5 rounded-xl shadow-xs transition-all hover:translate-y-[-1px] no-underline">
-        Start Reading
+      <a href="./getting-started/welcome" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold text-xs px-6 py-3.5 rounded-xl shadow-xs transition-all hover:translate-y-[-1px] no-underline">
+        Get Started
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
       </a>
     </div>
@@ -31,200 +30,102 @@ import { Callout } from 'nextra/components'
 
 ---
 
-## Overview
+## Academy Structure
 
-Kinetic is an advanced, gamified learning platform tailored for student education and cohort management. The application features an adaptive learning dashboard, structured curriculum domains, visual questions engines, real-time feedback systems, and editorial pipelines for content creation and review.
+Our academy organizes learning and practice into 8 progressive chapters:
 
----
-
-<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 mt-6">
-  <div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-1 text-center md:text-left shadow-2xs">
-    <span className="text-3xl font-black text-blue-600 dark:text-blue-400">62</span>
-    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Documentation Pages</span>
-  </div>
-  <div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-1 text-center md:text-left shadow-2xs">
-    <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400">230</span>
-    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Internal Links</span>
-  </div>
-  <div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-1 text-center md:text-left shadow-2xs">
-    <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">0</span>
-    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Broken Links</span>
-  </div>
-  <div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-5 flex items-center justify-between gap-1 shadow-2xs">
-    <div className="flex flex-col text-center md:text-left">
-      <span className="text-base font-bold text-slate-850 dark:text-slate-100 leading-tight">Ready</span>
-      <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1 justify-center md:justify-start">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block" /> Production
-      </span>
-    </div>
-    <div className="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-650 dark:text-emerald-400">
-      <svg className="w-5 h-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-    </div>
-  </div>
-</div>
-
----
-
-## Documentation Sections
-
-Explore the key resource domains of the platform:
-
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-  <a href="./docs/getting-started" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-    </div>
-    <div className="w-10 h-10 rounded-xl bg-blue-100/60 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-    </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 mb-10">
+  <a href="./getting-started/welcome" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
     <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-      Quick Start
+      1. Getting Started
     </h3>
     <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-      Step-by-step instructions to configure variables, set up database tables, and run development servers locally.
+      Learn how the placement prep cycle works, customize your student profile, and establish targeted preparation goals.
     </div>
   </a>
-  <a href="./docs/architecture" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-    </div>
-    <div className="w-10 h-10 rounded-xl bg-violet-100/60 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
-    </div>
-    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-      Architecture Specs
+
+  <a href="./learning-system/concept-hub" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
+    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      2. Learning System
     </h3>
     <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-      Deep dive into layering models, Google OAuth sequence diagrams, and learning flow blueprints.
+      Browse the Concept Hub, follow structured Learning Paths, use topic navigation, and get AI-guided recommendations.
     </div>
   </a>
-  <a href="./docs/student-platform" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-    </div>
-    <div className="w-10 h-10 rounded-xl bg-amber-100/60 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>
-    </div>
-    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-      Product Documentation
+
+  <a href="./practice-arena/solving-questions" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
+    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      3. Practice Arena
     </h3>
     <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-      Curriculum directory, interactive practice arena, discussion forums, and gamified streak boards.
+      Solve questions, view video/written explanations, utilize the AI ELI5 helper, and log insights without leaving the solver pane.
     </div>
   </a>
-  <a href="./docs/api" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-    </div>
-    <div className="w-10 h-10 rounded-xl bg-emerald-100/60 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-    </div>
-    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-      API Reference
+
+  <a href="./revision-system/revision-library" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
+    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      4. Revision System
     </h3>
     <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-      Auth, questions directories, domain tracking, and telemetry event logging REST payload models.
+      Build and organize customized folders, categorize by revision priority, and review shortcuts with the Revision Library.
     </div>
   </a>
-  <a href="./docs/database" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-    </div>
-    <div className="w-10 h-10 rounded-xl bg-cyan-100/60 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
-    </div>
-    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-      Database
+
+  <a href="./mock-tests/taking-mock-test" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
+    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      5. Mock Tests
     </h3>
     <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-      Entity-Relationship models, Row-Level Security policy layers, table schemas, and SQL migration records.
+      Verify exam readiness using timed mock assessments, detailed test analytics, and target speed logs.
     </div>
   </a>
-  <a href="./docs/deployment" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-    </div>
-    <div className="w-10 h-10 rounded-xl bg-rose-100/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-    </div>
-    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-      Deployment
+
+  <a href="./progress-rankings/streaks" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
+    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      6. Progress & Rankings
     </h3>
     <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-      Pipeline validation checks, Vercel deployments, build hooks configs, and environment checklist criteria.
+      Keep learning streaks alive, accumulate XP, levels, and badges, and gauge your Placement Readiness Index (PRI).
     </div>
   </a>
-  <a href="./docs/troubleshooting" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-    </div>
-    <div className="w-10 h-10 rounded-xl bg-orange-100/60 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-    </div>
-    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-      Troubleshooting
+
+  <a href="./ai-features/ai-mentor" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
+    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      7. AI Features
     </h3>
     <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-      Diagnosing and resolving compiling build checks, database limits, and middleware callback warnings.
+      Use the AI Mentor for target insights, trigger simple ELI5 breakdowns, and receive adaptive solution feedback.
     </div>
   </a>
-  <a href="./docs/content-creator" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
-    <div className="absolute top-4 right-4 text-slate-300 dark:text-slate-700 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-    </div>
-    <div className="w-10 h-10 rounded-xl bg-teal-100/60 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-250">
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-    </div>
-    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-      Content Creator Guide
+
+  <a href="./account-settings/profile" className="group relative block p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500/50 dark:hover:border-blue-400/40 hover:shadow-lg transition-all duration-300 no-underline">
+    <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 m-0 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      8. Account & Settings
     </h3>
     <div className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-0 leading-relaxed">
-      Learn how to structure metadata, map curriculum domains, and verify math equations.
+      Adjust visibility preferences (Public vs Recruiter), manage notification channels, and export revision databases.
     </div>
   </a>
 </div>
 
 ---
 
-<div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-6 mt-10 shadow-xs">
-  <h3 className="text-base font-extrabold text-slate-800 dark:text-white m-0 flex items-center gap-2">
-    <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-    Most Visited Documents
-  </h3>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-    <a href="./docs/architecture/system-overview" className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/20 hover:border-indigo-500/50 dark:hover:border-indigo-400/40 hover:bg-white dark:hover:bg-slate-900/40 transition-all duration-200 no-underline">
-      <div className="flex flex-col">
-        <span className="text-xs font-bold text-slate-850 dark:text-slate-200">System Overview Blueprint</span>
-        <span className="text-[10px] text-slate-400 mt-1">Multi-tier service maps</span>
-      </div>
-      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-    </a>
-    <a href="./docs/database/schema-overview" className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/20 hover:border-indigo-500/50 dark:hover:border-indigo-400/40 hover:bg-white dark:hover:bg-slate-900/40 transition-all duration-200 no-underline">
-      <div className="flex flex-col">
-        <span className="text-xs font-bold text-slate-850 dark:text-slate-200">Database Schema Design</span>
-        <span className="text-[10px] text-slate-400 mt-1">RLS policies and ER diagrams</span>
-      </div>
-      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-    </a>
-    <a href="./docs/api/analytics-api" className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/20 hover:border-indigo-500/50 dark:hover:border-indigo-400/40 hover:bg-white dark:hover:bg-slate-900/40 transition-all duration-200 no-underline">
-      <div className="flex flex-col">
-        <span className="text-xs font-bold text-slate-850 dark:text-slate-200">Student Telemetry Logs API</span>
-        <span className="text-[10px] text-slate-400 mt-1">POST activity endpoint payload specs</span>
-      </div>
-      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-    </a>
-    <a href="./docs/api/authentication-api" className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/20 hover:border-indigo-500/50 dark:hover:border-indigo-400/40 hover:bg-white dark:hover:bg-slate-900/40 transition-all duration-200 no-underline">
-      <div className="flex flex-col">
-        <span className="text-xs font-bold text-slate-850 dark:text-slate-200">OAuth Credentials Exchange</span>
-        <span className="text-[10px] text-slate-400 mt-1">JWT middleware validations</span>
-      </div>
-      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-    </a>
-  </div>
-</div>
+## Guided Student Journey
 
----
+We recommend adopting this loop to maximize your accuracy and solve times:
+
+```mermaid
+graph TD
+    A[1. Concept Video / Hub] --> B[2. Solve in Practice Arena]
+    B --> C{Correct?}
+    C -- No --> D[3. Read written hint / View Video Solution / Ask AI ELI5]
+    C -- Yes --> E[4. Bookmark & Save custom Shortcut Note]
+    D --> E
+    E --> F[5. Revise High Priority items weekly]
+    F --> G[6. Test speed with Mock Tests]
+    G --> H[Placement Ready!]
+```
 
 <Callout type="info">
-  **Documentation Search**: Use the search input in the global header bar (`⌘ K` or `Ctrl K`) to instantly scan all pages, components, schemas, and API references indexed dynamically via Pagefind.
+  **Best Practice**: Start with **[Getting Started: Welcome](./getting-started/welcome)** to personalize your preparation target, choose your company goals, and customize your placement profile.
 </Callout>

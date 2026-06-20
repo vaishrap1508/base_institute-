@@ -1,0 +1,90 @@
+import { Callout } from 'nextra/components'
+
+# Priority Management
+
+Learn how to assign revision importance tags, cycle between priority levels, and sort reviews by priority tiers.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Beginner</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Category</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Priority</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ The purpose of the 3-state priority flag (High, Medium, Low)  
+✓ Toggling values instantly within header chips and drawers  
+✓ Filtering the Revision Library for high-priority queues  
+✓ Transitioning items from High to Low priority as confidence improves  
+
+---
+
+## Why Priority Management Exists
+
+A common issue in placement preparation is reviewing simple questions over and over while ignoring the complex ones. **Priority flags** keep you focused on the problems that challenge you:
+- **🔴 High Priority**: Reserved for questions where you made a fundamental logical error or struggled to set up equations.
+- **🟡 Medium Priority**: Questions solved correctly, but where you took more than 120 seconds.
+- **🟢 Low Priority**: Foundational questions saved for formula records.
+
+---
+
+## Interactive Priority Selector
+
+Priority can be edited instantly in 3 locations:
+
+```
+[ Active Question ]
+     ├──► Breadcrumb Badge: click to cycle (🔴 ➔ 🟡 ➔ 🟢)
+     ├──► Quick Save Drawer: toggle circles in right panel
+     └──► Quick Notes: edit button in bottom overlay popup
+```
+
+---
+
+## The Today's Revision Queue
+
+Marking questions as `🔴 High Priority` automatically injects them into the **Today's Revision Queue** inside the Revision Library.
+- **Visual Callout**: An inline `Flame` icon flags these items.
+- **Order**: Pinned to the top of the feed to ensure they are the first items reviewed when study sessions begin.
+
+---
+
+## Priority Management Best Practices
+
+<Callout type="info">
+  **Best Practice: Downgrade Priority systematically**  
+  When re-solving High Priority items during weekly reviews:
+  - If you solve it correctly in under 60 seconds, downgrade it to `🟡 Medium`.
+  - If you solve it instantly without checking hints, downgrade to `🟢 Low` or remove the bookmark.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Flag Inflation**  
+  Do not mark every question as High Priority. If more than 30% of your bookmarked questions are High Priority, the Revision Library feed becomes cluttered. Reserve High Priority for true logical bottlenecks.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Revision Library](../revision-system/revision-library)**
+* **[Folder Organization](../revision-system/folder-organization)**
+* **[Note Taking Strategies](../revision-system/note-taking-strategies)**
