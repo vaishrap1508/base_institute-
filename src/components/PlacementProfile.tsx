@@ -638,16 +638,6 @@ export default function PlacementProfile({
               </div>
             ))}
           </div>
-
-          <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl flex items-start gap-3">
-            <Cpu className={`w-5 h-5 shrink-0 mt-0.5 ${stylePreset.iconColor}`} />
-            <div className="leading-tight text-left">
-              <span className="text-[10px] font-black uppercase text-slate-800 dark:text-white">Prep Recommendation</span>
-              <p className="text-[10.5px] font-semibold text-slate-500 mt-1 leading-relaxed">
-                Strong Logic and Quant scores. Improve <strong className={`${stylePreset.accentText} font-black`}>Verbal Accuracy</strong> and <strong className="text-slate-800 dark:text-white font-black">Solving Speed</strong> to unlock higher-tier matches like Amazon and Google.
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Right Card: Weekly Performance Widget (5 columns) */}
