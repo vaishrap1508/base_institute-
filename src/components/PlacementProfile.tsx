@@ -539,27 +539,8 @@ export default function PlacementProfile({
           </div>
         </div>
 
-        {/* SIDE PANELS: Readiness Circular progress & Rank Card summary */}
+        {/* SIDE PANELS: Current Rank Tier & Styling Preset Card */}
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto shrink-0 select-none z-10">
-          {/* Readiness Circular progress card */}
-          <div className={`${stylePreset.cardBg} rounded-2xl p-4 flex flex-col items-center justify-center text-center w-full sm:w-36 aspect-square`}>
-            <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none block mb-3">Readiness Index</span>
-            <div className="relative w-16 h-16">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="32" cy="32" r="26" stroke="rgba(226,232,240,0.06)" strokeWidth="4.5" fill="transparent" />
-                <circle cx="32" cy="32" r="26" stroke="#10B981" strokeWidth="4.5" fill="transparent"
-                  strokeDasharray={2 * Math.PI * 26}
-                  strokeDashoffset={2 * Math.PI * 26 * (1 - 0.796)}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
-                <span className="font-mono text-base font-black text-slate-800 dark:text-white">79%</span>
-              </div>
-            </div>
-            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest mt-3">Good Status</span>
-          </div>
-
           {/* Current Rank Tier Card */}
           <div className={`${stylePreset.cardBg} rounded-2xl p-4 flex flex-col justify-between w-full sm:w-44 text-left`}>
             <div className="space-y-1">
