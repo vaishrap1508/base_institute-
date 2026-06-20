@@ -66,9 +66,9 @@ const DOMAINS_CONCEPTS: DomainData[] = [
     id: 'quant',
     name: 'Quantitative Aptitude',
     icon: '🔢',
-    color: '#3B82F6',
-    bgGlow: 'hover:shadow-[0_20px_40px_rgba(59,130,246,0.08)] hover:border-blue-200/80 dark:hover:border-blue-900/60 dark:hover:shadow-[0_20px_40px_rgba(59,130,246,0.12)]',
-    btnColor: 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 dark:bg-blue-500 dark:hover:bg-blue-400',
+    color: 'var(--clr-primary)',
+    bgGlow: 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]',
+    btnColor: 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]',
     subTopics: [
       {
         id: 'arithmetic',
@@ -276,9 +276,9 @@ const DOMAINS_CONCEPTS: DomainData[] = [
     id: 'logical',
     name: 'Logical Reasoning',
     icon: '🧩',
-    color: '#8B5CF6',
-    bgGlow: 'hover:shadow-[0_20px_40px_rgba(139,92,246,0.08)] hover:border-purple-200/80 dark:hover:border-purple-900/60 dark:hover:shadow-[0_20px_40px_rgba(139,92,246,0.12)]',
-    btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20 dark:bg-purple-500 dark:hover:bg-purple-400',
+    color: 'var(--clr-primary)',
+    bgGlow: 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]',
+    btnColor: 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]',
     subTopics: [
       {
         id: 'arrangements',
@@ -390,9 +390,9 @@ const DOMAINS_CONCEPTS: DomainData[] = [
     id: 'verbal',
     name: 'Verbal Ability',
     icon: '📖',
-    color: '#10B981',
-    bgGlow: 'hover:shadow-[0_20px_40px_rgba(16,185,129,0.08)] hover:border-emerald-200/80 dark:hover:border-emerald-900/60 dark:hover:shadow-[0_20px_40px_rgba(16,185,129,0.12)]',
-    btnColor: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 dark:bg-emerald-500 dark:hover:bg-emerald-400',
+    color: 'var(--clr-primary)',
+    bgGlow: 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]',
+    btnColor: 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]',
     subTopics: [
       {
         id: 'grammar',
@@ -436,9 +436,9 @@ const DOMAINS_CONCEPTS: DomainData[] = [
     id: 'coding',
     name: 'Coding & DSA',
     icon: '💻',
-    color: '#F97316',
-    bgGlow: 'hover:shadow-[0_20px_40px_rgba(249,115,22,0.08)] hover:border-orange-200/80 dark:hover:border-orange-900/60 dark:hover:shadow-[0_20px_40px_rgba(249,115,22,0.12)]',
-    btnColor: 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20 dark:bg-orange-500 dark:hover:bg-orange-400',
+    color: 'var(--clr-primary)',
+    bgGlow: 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]',
+    btnColor: 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]',
     subTopics: [
       {
         id: 'structures',
@@ -790,7 +790,7 @@ export default function ConceptHubTab({
                   {/* Section 1: Concept summary list */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-blue-500" />
+                      <Sparkles className="w-5 h-5 text-[var(--clr-primary)]" />
                       Core Cheatsheet Points
                     </h4>
                     <ul className="space-y-3">
@@ -809,7 +809,7 @@ export default function ConceptHubTab({
                   {selectedConcept.formulas.length > 0 && (
                     <div className="space-y-4">
                       <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                        <Calculator className="w-5 h-5 text-purple-500" />
+                        <Calculator className="w-5 h-5 text-[var(--clr-primary)]" />
                         Key Rules & Formulas
                       </h4>
                       <div className="space-y-4">
@@ -822,7 +822,7 @@ export default function ConceptHubTab({
                               {formula.label}
                             </span>
                             {/* Pseudo LaTeX styled equation block */}
-                            <div className="bg-white dark:bg-slate-950 px-4 py-3 rounded-xl border border-slate-200/40 dark:border-slate-900/80 font-mono text-xs text-center select-all font-semibold overflow-x-auto text-blue-600 dark:text-blue-400">
+                            <div className="bg-white dark:bg-slate-950 px-4 py-3 rounded-xl border border-slate-200/40 dark:border-slate-900/80 font-mono text-xs text-center select-all font-semibold overflow-x-auto text-[var(--clr-primary)] dark:text-[var(--clr-primary)]">
                               {formula.equation}
                             </div>
                           </div>

@@ -85,7 +85,7 @@ export default function PlacementProfile({
   const [rankCardType, setRankCardType] = useState<'LinkedIn' | 'WhatsApp' | 'Instagram' | 'Placement Resume'>('LinkedIn');
 
   // Theme presets & theme mode
-  const [themePreset, setThemePreset] = useState<string>('Midnight Blue');
+  const [customColor, setCustomColor] = useState<string>('#3B82F6');
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('dark');
 
   // Active tooltip coordinate mapping for SVG components
@@ -100,11 +100,53 @@ export default function PlacementProfile({
     timeSpent: string;
   } | null>(null);
 
+  // Darken/lighten color brightness helper
+  const adjustColorBrightness = (hex: string, percent: number): string => {
+    let color = hex.startsWith('#') ? hex.slice(1) : hex;
+    
+    // Parse hex values
+    let r = parseInt(color.substring(0, 2), 16);
+    let g = parseInt(color.substring(2, 4), 16);
+    let b = parseInt(color.substring(4, 6), 16);
+
+    // Apply percent adjustment
+    r = Math.max(0, Math.min(255, r + Math.round(2.55 * percent)));
+    g = Math.max(0, Math.min(255, g + Math.round(2.55 * percent)));
+    b = Math.max(0, Math.min(255, b + Math.round(2.55 * percent)));
+
+    // Format back to hex
+    const rHex = r.toString(16).padStart(2, '0');
+    const gHex = g.toString(16).padStart(2, '0');
+    const bHex = b.toString(16).padStart(2, '0');
+
+    return `#${rHex}${gHex}${bHex}`;
+  };
+
+  const applyBrandColor = (color: string) => {
+    if (typeof window === 'undefined') return;
+    const root = document.documentElement;
+    root.style.setProperty('--clr-primary', color);
+    root.style.setProperty('--clr-primary-dark', adjustColorBrightness(color, -15));
+    root.style.setProperty('--clr-primary-tint', color + '20'); // 12% opacity in hex
+
+    // Parse and set rgb
+    const cleanColor = color.startsWith('#') ? color.slice(1) : color;
+    const r = parseInt(cleanColor.substring(0, 2), 16);
+    const g = parseInt(cleanColor.substring(2, 4), 16);
+    const b = parseInt(cleanColor.substring(4, 6), 16);
+    root.style.setProperty('--clr-primary-rgb', `${r}, ${g}, ${b}`);
+  };
+
   // Load custom visual overrides from local storage
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedPreset = localStorage.getItem('aptitude_profile_theme_preset');
-      if (savedPreset) setThemePreset(savedPreset);
+      const savedColor = localStorage.getItem('aptitude_custom_brand_color');
+      if (savedColor) {
+        setCustomColor(savedColor);
+        applyBrandColor(savedColor);
+      } else {
+        applyBrandColor('#3B82F6');
+      }
 
       const storedTheme = localStorage.getItem('theme');
       if (storedTheme === 'light' || storedTheme === 'dark') {
@@ -115,12 +157,13 @@ export default function PlacementProfile({
     }
   }, []);
 
-  const changeThemePreset = (preset: string) => {
-    setThemePreset(preset);
+  const changeCustomColor = (color: string) => {
+    setCustomColor(color);
+    applyBrandColor(color);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('aptitude_profile_theme_preset', preset);
+      localStorage.setItem('aptitude_custom_brand_color', color);
     }
-    setCustomToast(`Theme Preset changed to ${preset}! ✨`);
+    setCustomToast(`Theme color updated successfully! 🎨`);
     setTimeout(() => setCustomToast(null), 2000);
   };
 
@@ -163,65 +206,17 @@ export default function PlacementProfile({
 
   // Preset style mapping helper
   const stylePreset = useMemo(() => {
-    switch (themePreset) {
-      case 'Corporate Light':
-        return {
-          cardBg: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs',
-          accentText: 'text-slate-800 dark:text-slate-200',
-          accentTextSub: 'text-slate-500',
-          accentBtn: 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 border-transparent',
-          meshGradient: 'from-slate-400/5 via-transparent to-slate-400/5',
-          dividerClass: 'border-slate-200 dark:border-slate-800',
-          iconColor: 'text-slate-600 dark:text-slate-400',
-          badgeColor: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-350 border-slate-200 dark:border-slate-700'
-        };
-      case 'Placement Gold':
-        return {
-          cardBg: 'bg-white dark:bg-slate-900/60 border border-amber-500/20 dark:border-amber-900/40 shadow-sm',
-          accentText: 'text-amber-500 dark:text-amber-400',
-          accentTextSub: 'text-amber-600/70 dark:text-amber-400/60',
-          accentBtn: 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:opacity-90 border-transparent',
-          meshGradient: 'from-amber-600/5 via-transparent to-yellow-600/5',
-          dividerClass: 'border-amber-500/10 dark:border-amber-900/20',
-          iconColor: 'text-amber-500',
-          badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-        };
-      case 'Neon Purple':
-        return {
-          cardBg: 'bg-white dark:bg-slate-900/60 border border-purple-500/20 dark:border-purple-900/40 shadow-sm',
-          accentText: 'text-purple-500 dark:text-purple-400',
-          accentTextSub: 'text-purple-600/70 dark:text-purple-400/60',
-          accentBtn: 'bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:opacity-90 border-transparent',
-          meshGradient: 'from-purple-600/5 via-transparent to-pink-600/5',
-          dividerClass: 'border-purple-500/10 dark:border-purple-900/20',
-          iconColor: 'text-purple-500 dark:text-purple-400',
-          badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
-        };
-      case 'Emerald':
-        return {
-          cardBg: 'bg-white dark:bg-slate-900/60 border border-emerald-500/20 dark:border-emerald-900/40 shadow-sm',
-          accentText: 'text-emerald-500 dark:text-emerald-400',
-          accentTextSub: 'text-emerald-600/70 dark:text-emerald-400/60',
-          accentBtn: 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white hover:opacity-90 border-transparent',
-          meshGradient: 'from-emerald-600/5 via-transparent to-teal-600/5',
-          dividerClass: 'border-emerald-500/10 dark:border-emerald-900/20',
-          iconColor: 'text-emerald-500',
-          badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-        };
-      case 'Midnight Blue':
-      default:
-        return {
-          cardBg: 'bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-900 shadow-sm',
-          accentText: 'text-blue-600 dark:text-blue-400',
-          accentTextSub: 'text-slate-400 dark:text-slate-500',
-          accentBtn: 'bg-blue-600 hover:bg-blue-500 text-white border-transparent',
-          meshGradient: 'from-blue-600/5 via-transparent to-indigo-600/5',
-          dividerClass: 'border-slate-100 dark:border-slate-900',
-          iconColor: 'text-blue-500',
-          badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-        };
-    }
-  }, [themePreset]);
+    return {
+      cardBg: 'bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-900 shadow-sm',
+      accentText: 'text-[var(--clr-primary)]',
+      accentTextSub: 'opacity-85 text-[var(--clr-primary)]',
+      accentBtn: 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white shadow-lg border-transparent transition-all',
+      meshGradient: 'from-[var(--clr-primary)]/5 via-transparent to-[var(--clr-primary)]/5',
+      dividerClass: 'border-slate-200/50 dark:border-slate-800/60',
+      iconColor: 'text-[var(--clr-primary)]',
+      badgeColor: 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)] border-[var(--clr-primary)]/20'
+    };
+  }, []);
 
   // Radar chart configuration parameters
   const radarData = [
@@ -542,67 +537,84 @@ export default function PlacementProfile({
         {/* SIDE PANELS: Current Rank Tier & Styling Preset Card */}
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto shrink-0 select-none z-10">
           {/* Current Rank Tier Card */}
-          <div className={`${stylePreset.cardBg} rounded-2xl p-4 flex flex-col justify-between w-full sm:w-44 text-left`}>
-            <div className="space-y-1">
-              <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Aptitude Rank</span>
-              <h4 className="text-sm font-black text-slate-900 dark:text-white tracking-wide uppercase">Gold III</h4>
-              <span className="text-[9px] font-bold text-slate-400 font-mono">Top 12% global tier</span>
+          <div className={`${stylePreset.cardBg} rounded-2xl p-5 md:p-6 flex flex-col justify-between w-full sm:w-60 min-h-[170px] text-left`}>
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Aptitude Rank</span>
+              <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-wide uppercase">Gold III</h4>
+              <span className="text-xs font-bold text-slate-400 font-mono">Top 12% global tier</span>
             </div>
             
-            <div className="space-y-1.5 pt-4">
-              <div className="flex justify-between items-center text-[8px] font-bold font-mono text-slate-500 uppercase">
+            <div className="space-y-2 pt-4">
+              <div className="flex justify-between items-center text-[10px] font-bold font-mono text-slate-500 uppercase">
                 <span>To Gold IV</span>
                 <span>260 XP Needed</span>
               </div>
-              <div className="w-full bg-slate-100 dark:bg-slate-950 h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-100 dark:bg-slate-950 h-2 rounded-full overflow-hidden">
                 <div className="bg-amber-500 h-full rounded-full" style={{ width: '45%' }} />
               </div>
             </div>
           </div>
 
           {/* Preset selector panel & Mode Toggles */}
-          <div className={`${stylePreset.cardBg} rounded-2xl p-4 flex flex-col justify-between w-full sm:w-44 gap-4`}>
-            {/* Visual themes select */}
-            <div className="space-y-2 text-left">
-              <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Styling Preset</span>
-              <div className="flex items-center gap-1.5">
+          <div className={`${stylePreset.cardBg} rounded-2xl p-5 md:p-6 flex flex-col justify-between w-full sm:w-60 min-h-[170px] gap-6`}>
+            {/* Custom Brand Color Palette */}
+            <div className="space-y-2.5 text-left">
+              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">COLOR PALETTE</span>
+              <div className="flex items-center gap-2 flex-wrap">
                 {[
-                  { name: 'Midnight Blue', color: 'bg-blue-600 border-blue-400' },
-                  { name: 'Corporate Light', color: 'bg-slate-400 border-slate-300 dark:bg-slate-600' },
-                  { name: 'Placement Gold', color: 'bg-amber-500 border-amber-300' },
-                  { name: 'Neon Purple', color: 'bg-purple-600 border-purple-400' },
-                  { name: 'Emerald', color: 'bg-emerald-600 border-emerald-400' }
+                  { name: 'Blue', hex: '#3B82F6', bg: 'bg-[#3B82F6] border-blue-300' },
+                  { name: 'Indigo', hex: '#6366F1', bg: 'bg-[#6366F1] border-indigo-300' },
+                  { name: 'Purple', hex: '#8B5CF6', bg: 'bg-[#8B5CF6] border-purple-300' },
+                  { name: 'Rose', hex: '#F43F5E', bg: 'bg-[#F43F5E] border-rose-300' },
+                  { name: 'Amber', hex: '#F59E0B', bg: 'bg-[#F59E0B] border-amber-300' },
+                  { name: 'Emerald', hex: '#10B981', bg: 'bg-[#10B981] border-emerald-300' }
                 ].map((preset) => (
                   <button
                     key={preset.name}
-                    onClick={() => changeThemePreset(preset.name)}
-                    className={`w-5 h-5 rounded-full cursor-pointer transition-all border ${preset.color} ${themePreset === preset.name ? 'scale-120 ring-2 ring-blue-500/20 shadow-md' : 'opacity-70 hover:opacity-100'}`}
+                    onClick={() => changeCustomColor(preset.hex)}
+                    className={`w-6.5 h-6.5 rounded-full cursor-pointer transition-all border ${preset.bg} ${customColor === preset.hex ? 'scale-120 ring-2 ring-white/40 shadow-md' : 'opacity-75 hover:opacity-100'}`}
                     title={preset.name}
                   />
                 ))}
+                
+                {/* Custom Color Picker Swatch */}
+                <div className="relative w-6.5 h-6.5 rounded-full overflow-hidden border border-slate-350 dark:border-slate-700 bg-gradient-to-tr from-pink-500 via-purple-500 to-blue-500 cursor-pointer hover:scale-110 active:scale-95 transition-all shadow-xs flex items-center justify-center" title="Choose custom color">
+                  <span className="text-[10px] text-white font-black select-none pointer-events-none">+</span>
+                  <input
+                    type="color"
+                    value={customColor}
+                    onChange={(e) => changeCustomColor(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Dark/Light mode switch */}
-            <div className="space-y-2 text-left">
-              <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Viewport Mode</span>
-              <div className="grid grid-cols-3 gap-1 bg-slate-50 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/50 dark:border-slate-900">
+            <div className="space-y-2.5 text-left">
+              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Viewport Mode</span>
+              <div className="grid grid-cols-3 gap-1 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200/50 dark:border-slate-900">
                 {[
-                  { id: 'light', label: '☀ Light' },
-                  { id: 'dark', label: '🌙 Dark' },
-                  { id: 'system', label: '💻 Sys' }
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleThemeChange(item.id as any)}
-                    className={`py-1 text-[8.5px] font-bold rounded-lg cursor-pointer transition-all ${themeMode === item.id 
-                      ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-2xs font-extrabold'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                    }`}
-                  >
-                    {item.label.split(' ')[0]}
-                  </button>
-                ))}
+                  { id: 'light', icon: Sun, label: 'Light' },
+                  { id: 'dark', icon: Moon, label: 'Dark' },
+                  { id: 'system', icon: Laptop, label: 'Sys' }
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = themeMode === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleThemeChange(item.id as any)}
+                      className={`py-2 px-1 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-300 ${isActive 
+                        ? 'bg-white dark:bg-slate-800 text-[var(--clr-primary)] shadow-md'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-slate-900/50'
+                      }`}
+                      title={item.label}
+                    >
+                      <Icon className={`w-5.5 h-5.5 transition-transform duration-300 ${isActive ? 'scale-110 stroke-[2.5]' : 'stroke-[2]'}`} />
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -959,16 +971,10 @@ export default function PlacementProfile({
                       border = '#3B82F6';
                     }
 
-                    // Theme presets overrides for heatmap colors
-                    if (themePreset === 'Placement Gold' && cell.solves > 0) {
-                      color = cell.solves >= 6 ? '#D97706' : cell.solves >= 3 ? 'rgba(245, 158, 11, 0.5)' : 'rgba(217, 119, 6, 0.15)';
-                      border = cell.solves >= 6 ? '#F59E0B' : 'rgba(245, 158, 11, 0.3)';
-                    } else if (themePreset === 'Neon Purple' && cell.solves > 0) {
-                      color = cell.solves >= 6 ? '#7C3AED' : cell.solves >= 3 ? 'rgba(139, 92, 246, 0.5)' : 'rgba(124, 58, 237, 0.15)';
-                      border = cell.solves >= 6 ? '#8B5CF6' : 'rgba(139, 92, 246, 0.3)';
-                    } else if (themePreset === 'Emerald' && cell.solves > 0) {
-                      color = cell.solves >= 6 ? '#059669' : cell.solves >= 3 ? 'rgba(16, 185, 129, 0.5)' : 'rgba(5, 150, 105, 0.15)';
-                      border = cell.solves >= 6 ? '#10B981' : 'rgba(16, 185, 129, 0.3)';
+                    // Dynamic custom color theme mapping for heatmap colors
+                    if (cell.solves > 0) {
+                      color = cell.solves >= 6 ? customColor : cell.solves >= 3 ? `${customColor}80` : `${customColor}20`;
+                      border = cell.solves >= 6 ? customColor : `${customColor}40`;
                     }
 
                     if (document.documentElement.classList.contains('dark') === false && cell.solves === 0) {

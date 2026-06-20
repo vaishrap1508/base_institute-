@@ -239,77 +239,47 @@ const getCategoryEmoji = (cat: string) => {
   }
 };
 
+const adjustColorBrightness = (hex: string, percent: number): string => {
+  let color = hex.startsWith('#') ? hex.slice(1) : hex;
+  let r = parseInt(color.substring(0, 2), 16);
+  let g = parseInt(color.substring(2, 4), 16);
+  let b = parseInt(color.substring(4, 6), 16);
+  r = Math.max(0, Math.min(255, r + Math.round(2.55 * percent)));
+  g = Math.max(0, Math.min(255, g + Math.round(2.55 * percent)));
+  b = Math.max(0, Math.min(255, b + Math.round(2.55 * percent)));
+  const rHex = r.toString(16).padStart(2, '0');
+  const gHex = g.toString(16).padStart(2, '0');
+  const bHex = b.toString(16).padStart(2, '0');
+  return `#${rHex}${gHex}${bHex}`;
+};
+
+const applyBrandColor = (color: string) => {
+  if (typeof window === 'undefined') return;
+  const root = document.documentElement;
+  root.style.setProperty('--clr-primary', color);
+  root.style.setProperty('--clr-primary-dark', adjustColorBrightness(color, -15));
+  root.style.setProperty('--clr-primary-tint', color + '20'); // 12% opacity in hex
+
+  // Parse and set rgb
+  const cleanColor = color.startsWith('#') ? color.slice(1) : color;
+  const r = parseInt(cleanColor.substring(0, 2), 16);
+  const g = parseInt(cleanColor.substring(2, 4), 16);
+  const b = parseInt(cleanColor.substring(4, 6), 16);
+  root.style.setProperty('--clr-primary-rgb', `${r}, ${g}, ${b}`);
+};
+
 const getAccentClass = (colorId: string, type: 'bg' | 'border' | 'text' | 'combined' | 'badge' | 'button' | 'ring') => {
-  switch (colorId) {
-    case 'emerald':
-      if (type === 'bg') return 'bg-emerald-500';
-      if (type === 'border') return 'border-emerald-500';
-      if (type === 'text') return 'text-emerald-600 dark:text-emerald-400';
-      if (type === 'badge') return 'bg-emerald-500 border-emerald-400 text-white shadow-emerald-500/20';
-      if (type === 'button') return 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg hover:shadow-emerald-500/20';
-      if (type === 'ring') return 'stroke-emerald-600 dark:stroke-emerald-400';
-      return 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400';
-    case 'purple':
-      if (type === 'bg') return 'bg-purple-500';
-      if (type === 'border') return 'border-purple-500';
-      if (type === 'text') return 'text-purple-600 dark:text-purple-400';
-      if (type === 'badge') return 'bg-purple-600 border-purple-500 text-white shadow-purple-500/20';
-      if (type === 'button') return 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg hover:shadow-purple-500/20';
-      if (type === 'ring') return 'stroke-purple-600 dark:stroke-purple-400';
-      return 'bg-purple-50 border-purple-300 text-purple-600 dark:bg-purple-950/30 dark:border-purple-900 dark:text-purple-400';
-    case 'amber':
-      if (type === 'bg') return 'bg-amber-500';
-      if (type === 'border') return 'border-amber-500';
-      if (type === 'text') return 'text-amber-600 dark:text-amber-400';
-      if (type === 'badge') return 'bg-amber-500 border-amber-400 text-white shadow-amber-500/20';
-      if (type === 'button') return 'bg-amber-600 hover:bg-amber-500 text-white shadow-lg hover:shadow-amber-500/20';
-      if (type === 'ring') return 'stroke-amber-600 dark:stroke-amber-400';
-      return 'bg-amber-50 border-amber-300 text-amber-600 dark:bg-amber-950/30 dark:border-amber-900 dark:text-amber-400';
-    case 'rose':
-      if (type === 'bg') return 'bg-rose-500';
-      if (type === 'border') return 'border-rose-500';
-      if (type === 'text') return 'text-rose-600 dark:text-rose-400';
-      if (type === 'badge') return 'bg-rose-500 border-rose-400 text-white shadow-rose-500/20';
-      if (type === 'button') return 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg hover:shadow-rose-500/20';
-      if (type === 'ring') return 'stroke-rose-600 dark:stroke-rose-400';
-      return 'bg-rose-50 border-rose-300 text-rose-600 dark:bg-rose-950/30 dark:border-rose-900 dark:text-rose-400';
-    case 'orange':
-      if (type === 'bg') return 'bg-orange-500';
-      if (type === 'border') return 'border-orange-500';
-      if (type === 'text') return 'text-orange-600 dark:text-orange-400';
-      if (type === 'badge') return 'bg-orange-500 border-orange-400 text-white shadow-orange-500/20';
-      if (type === 'button') return 'bg-orange-600 hover:bg-orange-500 text-white shadow-lg hover:shadow-orange-500/20';
-      if (type === 'ring') return 'stroke-orange-600 dark:stroke-orange-400';
-      return 'bg-orange-50 border-orange-300 text-orange-600 dark:bg-orange-950/30 dark:border-orange-900 dark:text-orange-400';
-    case 'teal':
-      if (type === 'bg') return 'bg-teal-500';
-      if (type === 'border') return 'border-teal-500';
-      if (type === 'text') return 'text-teal-600 dark:text-teal-400';
-      if (type === 'badge') return 'bg-teal-500 border-teal-400 text-white shadow-teal-500/20';
-      if (type === 'button') return 'bg-teal-600 hover:bg-teal-500 text-white shadow-lg hover:shadow-teal-500/20';
-      if (type === 'ring') return 'stroke-teal-600 dark:stroke-teal-400';
-      return 'bg-teal-50 border-teal-300 text-teal-600 dark:bg-teal-950/30 dark:border-teal-900 dark:text-teal-400';
-    case 'indigo':
-      if (type === 'bg') return 'bg-indigo-500';
-      if (type === 'border') return 'border-indigo-500';
-      if (type === 'text') return 'text-indigo-600 dark:text-indigo-400';
-      if (type === 'badge') return 'bg-indigo-600 border-indigo-500 text-white shadow-indigo-500/20';
-      if (type === 'button') return 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg hover:shadow-indigo-500/20';
-      if (type === 'ring') return 'stroke-indigo-600 dark:stroke-indigo-400';
-      return 'bg-indigo-50 border-indigo-300 text-indigo-600 dark:bg-indigo-950/30 dark:border-indigo-900 dark:text-indigo-400';
-    case 'blue':
-    default:
-      if (type === 'bg') return 'bg-blue-500';
-      if (type === 'border') return 'border-blue-500';
-      if (type === 'text') return 'text-blue-600 dark:text-blue-400';
-      if (type === 'badge') return 'bg-blue-600 border-blue-500 text-white shadow-blue-500/20';
-      if (type === 'button') return 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg hover:shadow-blue-500/25';
-      if (type === 'ring') return 'stroke-blue-600 dark:stroke-blue-400';
-      return 'bg-blue-50 border-blue-300 text-blue-600 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-400';
-  }
+  if (type === 'bg') return 'bg-[var(--clr-primary)]';
+  if (type === 'border') return 'border-[var(--clr-primary)]';
+  if (type === 'text') return 'text-[var(--clr-primary)]';
+  if (type === 'badge') return 'bg-[var(--clr-primary)] border-[var(--clr-primary-dark)] text-white shadow-[0_0_15px_rgba(var(--clr-primary-rgb),0.2)]';
+  if (type === 'button') return 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white shadow-lg hover:shadow-[0_0_15px_rgba(var(--clr-primary-rgb),0.25)]';
+  if (type === 'ring') return 'stroke-[var(--clr-primary)]';
+  return 'bg-[var(--clr-primary-tint)] border-[var(--clr-primary)]/20 text-[var(--clr-primary)] dark:bg-[var(--clr-primary-tint)] dark:border-[var(--clr-primary)]/20 dark:text-[var(--clr-primary)]';
 };
 
 const getHexColor = (colorId: string) => {
+  if (colorId && colorId.startsWith('#')) return colorId;
   switch (colorId) {
     case 'emerald': return '#10B981';
     case 'purple': return '#8B5CF6';
@@ -1438,6 +1408,7 @@ export default function StudentDashboard() {
   const [confettiStyle, setConfettiStyle] = useState<'confetti' | 'fireworks' | 'none'>('confetti');
   const [soundWaveActive, setSoundWaveActive] = useState<boolean>(false);
   const [accentColor, setAccentColor] = useState<string>('blue');
+  const [customColor, setCustomColor] = useState<string>('#3B82F6');
   const [layoutDensity, setLayoutDensity] = useState<'compact' | 'normal' | 'spacious'>('normal');
   const [celebrationActive, setCelebrationActive] = useState<boolean>(false);
 
@@ -1799,8 +1770,20 @@ export default function StudentDashboard() {
   };
 
   const handleAccentColorChange = (color: string) => {
-    setAccentColor(color);
-    localStorage.setItem('aptitude_accent_color', color);
+    if (color.startsWith('#')) {
+      setCustomColor(color);
+      applyBrandColor(color);
+      setAccentColor('custom');
+      localStorage.setItem('aptitude_accent_color', 'custom');
+      localStorage.setItem('aptitude_custom_brand_color', color);
+    } else {
+      const presetHex = getHexColor(color);
+      setAccentColor(color);
+      setCustomColor(presetHex);
+      applyBrandColor(presetHex);
+      localStorage.setItem('aptitude_accent_color', color);
+      localStorage.setItem('aptitude_custom_brand_color', presetHex);
+    }
   };
 
   const handleDensityChange = (density: 'compact' | 'normal' | 'spacious') => {
@@ -1850,6 +1833,14 @@ export default function StudentDashboard() {
 
     const savedAccentColor = localStorage.getItem('aptitude_accent_color');
     if (savedAccentColor) setAccentColor(savedAccentColor);
+
+    const savedCustomColor = localStorage.getItem('aptitude_custom_brand_color');
+    if (savedCustomColor) {
+      setCustomColor(savedCustomColor);
+      applyBrandColor(savedCustomColor);
+    } else {
+      applyBrandColor('#3B82F6');
+    }
 
     const savedDensity = localStorage.getItem('aptitude_layout_density');
     if (savedDensity) setLayoutDensity(savedDensity as any);
@@ -2284,13 +2275,13 @@ export default function StudentDashboard() {
     <div className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
 
       {/* Glow Backdrops */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/5 blur-[140px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[var(--clr-primary)]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-[var(--clr-primary-dark)]/5 blur-[140px] pointer-events-none" />
 
       {/* 1. Left Navigation Sidebar (Reference 2 style) */}
       <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
         {/* Top Logo Button */}
-        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title={siteConfig.name}>
+        <div className="w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title={siteConfig.name}>
           <Layers className="w-5 h-5" />
         </div>
 
@@ -2313,14 +2304,14 @@ export default function StudentDashboard() {
                 title={tab.label}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer relative group/sidebar-btn ${
                   isActive
-                    ? 'text-white dark:text-slate-900 shadow-md scale-105 z-10 font-bold'
+                    ? 'text-white shadow-md scale-105 z-10 font-bold'
                     : 'text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 hover:scale-105 z-10'
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeSidebarGlow"
-                    className="absolute inset-0 bg-[#111827] dark:bg-white rounded-full z-0 shadow-[0_0_15px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                    className="absolute inset-0 bg-[var(--clr-primary)] rounded-full z-0 shadow-[0_0_15px_rgba(var(--clr-primary-rgb),0.3)]"
                     transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                   />
                 )}
@@ -2577,7 +2568,7 @@ export default function StudentDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                       {/* Card 1: Quant Aptitude */}
-                      <div className="bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group">
+                      <div className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group">
                         <div className="flex justify-between items-start gap-4">
                           <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
                             Quant Aptitude
@@ -2600,7 +2591,7 @@ export default function StudentDashboard() {
                               setActiveSidebarTab('practice');
                               setSelectedDomain('quant');
                             }}
-                            className="px-4 py-2 bg-[#1E4E5D] hover:bg-[#153A45] text-white dark:bg-[#38BDF8] dark:hover:bg-[#0EA5E9] dark:text-[#0B303E] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            className="px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
                           >
                             Continue Last Topic
                           </button>
@@ -2608,7 +2599,7 @@ export default function StudentDashboard() {
                       </div>
 
                       {/* Card 2: Logical Reasoning */}
-                      <div className="bg-[#FDF2F8] dark:bg-[#3B1229]/20 border border-[#FBCFE8] dark:border-[#652047]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group">
+                      <div className="bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group">
                         <div className="flex justify-between items-start gap-4">
                           <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
                             Logical Reasoning
@@ -2630,7 +2621,7 @@ export default function StudentDashboard() {
                               setActiveSidebarTab('practice');
                               setSelectedDomain('logical');
                             }}
-                            className="px-4 py-2 bg-[#9D174D] hover:bg-[#7A0F39] text-white dark:bg-[#F472B6] dark:hover:bg-[#F059A1] dark:text-[#3B1229] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            className="px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
                           >
                             Continue Last Topic
                           </button>
@@ -2647,34 +2638,34 @@ export default function StudentDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
                       {/* Completed Stat */}
-                      <div className="bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
+                      <div className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
                         <div className="space-y-1 text-left">
                           <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Completed</span>
-                          <span className="text-xl font-black text-[#065F46] dark:text-[#34D399] font-mono leading-none">{solvedCount} Modules</span>
+                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">{solvedCount} Modules</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#C7E9E1] dark:border-[#205D4F]/30 flex items-center justify-center text-[#065F46] dark:text-[#34D399] -rotate-45 group-hover:scale-105 transition-transform">
+                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/20 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
                           <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>
 
-                      {/* Score Stat */}
-                      <div className="bg-[#FEF3C7] dark:bg-[#3D2C08]/20 border border-[#FDE68A] dark:border-[#6B4E0E]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
+                      {/* Your Streak Stat */}
+                      <div className="bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
                         <div className="space-y-1 text-left">
                           <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Your Streak</span>
-                          <span className="text-xl font-black text-[#92400E] dark:text-[#FBBF24] font-mono leading-none">{streak} Days</span>
+                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">{streak} Days</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#FDE68A] dark:border-[#6B4E0E]/20 flex items-center justify-center text-[#92400E] dark:text-[#FBBF24] -rotate-45 group-hover:scale-105 transition-transform">
+                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/15 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
                           <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>
 
                       {/* Active Stat */}
-                      <div className="bg-[#F3E8FF] dark:bg-[#2A154D]/20 border border-[#E9D5FF] dark:border-[#53289E]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
+                      <div className="bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
                         <div className="space-y-1 text-left">
                           <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Level</span>
-                          <span className="text-xl font-black text-[#6B21A8] dark:text-[#C084FC] font-mono leading-none">Lvl 12 (#14)</span>
+                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">Lvl 12 (#14)</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#E9D5FF] dark:border-[#53289E]/20 flex items-center justify-center text-[#6B21A8] dark:text-[#C084FC] -rotate-45 group-hover:scale-105 transition-transform">
+                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/10 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
                           <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>
@@ -2682,10 +2673,10 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Large Yellow Active concept banner (Reference 2 style) */}
-                    <div className="bg-[#FFFBEB] dark:bg-[#251E0E]/40 border border-[#FEF3C7] dark:border-[#4B3B18]/30 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out">
+                    <div className="bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out">
                       <div className="space-y-3 text-left flex-1 w-full">
                         <div className="flex items-center gap-2">
-                          <span className="bg-amber-100 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                          <span className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/10 border border-[var(--clr-primary)]/20 text-[var(--clr-primary)] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
                             Active Track Unit
                           </span>
                           <span className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold">QUANT APTITUDE</span>
@@ -2700,9 +2691,9 @@ export default function StudentDashboard() {
                             <span>Concept Completion</span>
                             <span className="font-mono">{challengeCompletedCount} / 15 solved lessons</span>
                           </div>
-                          <div className="w-full bg-slate-200/60 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                          <div className="w-full bg-slate-200/60 dark:bg-slate-850 h-2.5 rounded-full overflow-hidden">
                             <div
-                              className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                              className="bg-[var(--clr-primary)] h-full rounded-full transition-all duration-500"
                               style={{ width: `${(challengeCompletedCount / 15) * 100}%` }}
                             />
                           </div>
@@ -2714,7 +2705,7 @@ export default function StudentDashboard() {
                         onClick={() => {
                           setActiveSidebarTab('learning');
                         }}
-                        className="w-12 h-12 rounded-full bg-amber-500 text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
+                        className="w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
                       >
                         <ChevronRight className="w-6 h-6 text-white -rotate-45" />
                       </button>
@@ -3182,7 +3173,7 @@ export default function StudentDashboard() {
                   >
 
                     {/* SVG Curve Canvas */}
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" viewBox="0 0 1000 800" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-[0_0_15px_rgba(var(--clr-primary-rgb),0.3)]" viewBox="0 0 1000 800" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
                         <linearGradient id="completed-grad" x1="0" y1="0" x2="1" y2="1">
                           <stop offset="0%" stopColor="#10B981" />
@@ -3190,15 +3181,15 @@ export default function StudentDashboard() {
                         </linearGradient>
                         <linearGradient id="active-grad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#10B981" />
-                          <stop offset="100%" stopColor="#2563EB" />
+                          <stop offset="100%" stopColor="var(--clr-primary)" />
                         </linearGradient>
                         <linearGradient id="active-flow-grad" x1="0" y1="0" x2="100%" y2="0" gradientUnits="userSpaceOnUse">
                           <stop offset="0%" stopColor="#10B981" />
-                          <stop offset="50%" stopColor="#3B82F6" />
+                          <stop offset="50%" stopColor="var(--clr-primary)" />
                           <stop offset="100%" stopColor="#10B981" />
                         </linearGradient>
                         <filter id="active-glow" x="-30%" y="-30%" width="160%" height="160%">
-                          <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#3B82F6" floodOpacity="0.5" />
+                          <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="var(--clr-primary)" floodOpacity="0.5" />
                         </filter>
                         <filter id="completed-glow" x="-30%" y="-30%" width="160%" height="160%">
                           <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#10B981" floodOpacity="0.35" />
@@ -3319,14 +3310,14 @@ export default function StudentDashboard() {
 
                       {/* Animated Traveling Glow Orb along the completed path */}
                       {completedSegments.length > 0 && (
-                        <circle r="6" fill="#60A5FA" className="filter drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">
+                        <circle r="6" fill="var(--clr-primary)" className="filter drop-shadow-[0_0_8px_rgba(var(--clr-primary-rgb),0.8)]">
                           <animateMotion
-                            dur="5s"
-                            repeatCount="indefinite"
-                            path={motionPath}
-                          />
-                        </circle>
-                      )}
+                             dur="5s"
+                             repeatCount="indefinite"
+                             path={motionPath}
+                           />
+                         </circle>
+                       )}
                     </svg>
 
 
@@ -3357,7 +3348,7 @@ export default function StudentDashboard() {
                           {/* Pulsing Active glow */}
                           {isActive && (
                             <motion.div
-                              className="absolute w-20 h-20 rounded-full bg-blue-500/30 dark:bg-blue-400/20 blur-md pointer-events-none"
+                              className="absolute w-20 h-20 rounded-full bg-[var(--clr-primary)]/30 dark:bg-[var(--clr-primary)]/20 blur-md pointer-events-none"
                               animate={reducedMotion ? {} : {
                                 scale: [0.9, 1.4, 0.9],
                                 opacity: [0.2, 0.7, 0.2]
@@ -3393,14 +3384,14 @@ export default function StudentDashboard() {
                             whileHover={!isLocked ? {
                               y: -6,
                               scale: 1.05,
-                              boxShadow: "0px 10px 25px rgba(59, 130, 246, 0.3)"
+                              boxShadow: "0px 10px 25px rgba(var(--clr-primary-rgb), 0.3)"
                             } : {}}
                             initial={isJustUnlocked ? { scale: 0.8 } : false}
                             transition={{ duration: 0.8, ease: "easeInOut" }}
                             className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 select-none cursor-pointer ${isCompleted
                                 ? 'bg-gradient-to-tr from-emerald-600 to-teal-400 border-b-4 border-emerald-700 text-white shadow-[0_4px_0_#047857,0_6px_12px_rgba(16,185,129,0.15)] hover:border-b-[6px] hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2'
                                 : isActive
-                                  ? 'bg-gradient-to-tr from-blue-600 to-indigo-500 border-b-[6px] border-blue-800 text-white shadow-[0_6px_0_#1E40AF,0_8px_16px_rgba(59,130,246,0.25)] hover:border-b-[8px] hover:brightness-110'
+                                  ? 'bg-gradient-to-tr from-[var(--clr-primary)] to-[var(--clr-primary-dark)] border-b-[6px] border-[var(--clr-primary-dark)] text-white shadow-[0_6px_0_var(--clr-primary-dark),0_8px_16px_rgba(var(--clr-primary-rgb),0.25)] hover:border-b-[8px] hover:brightness-110'
                                   : 'bg-slate-100 border-b-2 border-slate-300 dark:bg-slate-900 dark:border-slate-950 text-slate-400 dark:text-slate-600 cursor-not-allowed'
                               }`}
                           >
@@ -3424,11 +3415,11 @@ export default function StudentDashboard() {
                                     ? 'lg:right-[calc(100%+16px)] lg:left-auto'
                                     : 'lg:left-[calc(100%+16px)] lg:right-auto'
                                 }`
-                          } ${isActive ? 'ring-2 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : ''}`}>
+                          } ${isActive ? 'ring-2 ring-[var(--clr-primary)]/50 shadow-[0_0_20px_rgba(var(--clr-primary-rgb),0.2)]' : ''}`}>
                             <span className="text-[10px] font-black text-white block uppercase tracking-wider leading-none mb-1">{node.title}</span>
                             <span className="text-[8px] text-slate-400 font-semibold block leading-tight">{node.desc}</span>
                             {isActive && (
-                              <span className="text-[7.5px] text-blue-600 dark:text-blue-400 font-black block mt-0.5">75% Complete</span>
+                              <span className="text-[7.5px] text-[var(--clr-primary)] font-black block mt-0.5">75% Complete</span>
                             )}
                           </div>
 
@@ -4013,29 +4004,44 @@ export default function StudentDashboard() {
                         <p className="text-[10px] text-slate-400 leading-relaxed">Switch component preview accent color schema overrides.</p>
                       </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {([
-                          { id: 'blue', label: 'Sapphire', bg: 'bg-blue-500', activeClass: 'border-blue-500/50 bg-blue-500/10 text-blue-600 dark:text-blue-400 dark:bg-blue-500/10' },
-                          { id: 'emerald', label: 'Emerald', bg: 'bg-emerald-500', activeClass: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/10' },
-                          { id: 'purple', label: 'Cyberpunk', bg: 'bg-purple-500', activeClass: 'border-purple-500/50 bg-purple-500/10 text-purple-600 dark:text-purple-400 dark:bg-purple-500/10' },
-                          { id: 'amber', label: 'Amber', bg: 'bg-amber-500', activeClass: 'border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400 dark:bg-amber-500/10' },
-                          { id: 'rose', label: 'Crimson', bg: 'bg-rose-500', activeClass: 'border-rose-500/50 bg-rose-500/10 text-rose-600 dark:text-rose-400 dark:bg-rose-500/10' },
-                          { id: 'orange', label: 'Sunset', bg: 'bg-orange-500', activeClass: 'border-orange-500/50 bg-orange-500/10 text-orange-600 dark:text-orange-400 dark:bg-orange-500/10' },
-                          { id: 'teal', label: 'Teal', bg: 'bg-teal-500', activeClass: 'border-teal-500/50 bg-teal-500/10 text-teal-600 dark:text-teal-400 dark:bg-teal-500/10' },
-                          { id: 'indigo', label: 'Indigo', bg: 'bg-indigo-500', activeClass: 'border-indigo-500/50 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 dark:bg-indigo-500/10' }
+                          { id: 'blue', label: 'Sapphire', bg: 'bg-[#3B82F6]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'emerald', label: 'Emerald', bg: 'bg-[#10B981]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'purple', label: 'Cyberpunk', bg: 'bg-[#8B5CF6]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'amber', label: 'Amber', bg: 'bg-[#F59E0B]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'rose', label: 'Crimson', bg: 'bg-[#F43F5E]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'orange', label: 'Sunset', bg: 'bg-[#F97316]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'teal', label: 'Teal', bg: 'bg-[#14B8A6]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'indigo', label: 'Indigo', bg: 'bg-[#6366F1]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' }
                         ]).map((color) => (
                           <button
                             key={color.id}
                             onClick={() => handleAccentColorChange(color.id)}
                             className={`flex items-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer justify-center ${accentColor === color.id
                                 ? `${color.activeClass} shadow-md`
-                                : 'bg-transparent border-slate-200/40 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300'
+                                : 'bg-transparent border-slate-200/40 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-350'
                               }`}
                           >
                             <span className={`w-3 h-3 rounded-full ${color.bg} shrink-0`} />
                             <span className="text-[9px] font-black uppercase tracking-wider">{color.label}</span>
                           </button>
                         ))}
+
+                        {/* Custom Color Picker Swatch */}
+                        <div className={`relative flex items-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer justify-center ${accentColor === 'custom'
+                            ? 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)] shadow-md'
+                            : 'bg-transparent border-slate-200/40 dark:border-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-350'
+                          }`} title="Choose custom color">
+                          <span className="w-3 h-3 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-blue-500 shrink-0" />
+                          <span className="text-[9px] font-black uppercase tracking-wider">Custom</span>
+                          <input
+                            type="color"
+                            value={customColor}
+                            onChange={(e) => handleAccentColorChange(e.target.value)}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                        </div>
                       </div>
                     </div>
 

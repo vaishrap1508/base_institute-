@@ -7,6 +7,7 @@
   --clr-primary: #7075F4;
   --clr-primary-dark: #585CE5;
   --clr-primary-tint: #B6BBFF;
+  --clr-primary-rgb: 112, 117, 244;
 
   --clr-secondary: #4EA8DE;
   --clr-secondary-dark: #3582CA;
@@ -68,6 +69,7 @@
   --clr-text-3: #64748B;
   
   --clr-primary: #60A5FA;
+  --clr-primary-rgb: 96, 165, 250;
   --clr-secondary: #A78BFA;
 
   --clr-border: #1E293B;
