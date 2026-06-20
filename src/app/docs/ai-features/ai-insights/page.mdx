@@ -1,0 +1,90 @@
+import { Callout } from 'nextra/components'
+
+# AI Insights
+
+Learn how the system evaluates your readiness index data, parses your historical solve counts, and generates smart insights.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Advanced</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Module</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Analytics</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ Finding the AI Smart Insights panel on your profile page  
+✓ How the system aggregates solve telemetry and timeline milestones  
+✓ Identifying your core strength and bottleneck areas  
+✓ Executing recommended prep changes to raise your index  
+
+---
+
+## Why AI Insights Exist
+
+Readiness radar charts show *what* your levels are, but they don't explain *how* to raise them. **AI Smart Insights** analyze your metrics over time to extract specific strengths and action items:
+- **Strength Recognition**: Identifies topic domains where your solve speed and accuracy exceed company benchmarks.
+- **Weakness targeting**: Pinpoints subtopics causing your overall readiness index to sag.
+- **Action items**: Generates concrete study steps (e.g. *Solve 10 Easy Syllogisms to build speed*).
+
+---
+
+## Data Analysis & Generation Loop
+
+```mermaid
+graph TD
+    A[Mock Exams + Practice Attempts Logged] --> B[Radar Index Calculation]
+    B --> C[Extract: Speed=110s, Accuracy=88%, Verbal=62%]
+    C --> D[AI Engine evaluates cutoff benchmarks]
+    D --> E[Display Smart Insights: Speed bottleneck & Verbal priority]
+```
+
+---
+
+## Example Smart Insights Card
+
+Displayed on your profile overview tab:
+
+> 🧠 **AI Smart Insights**  
+> - **Core Strength**: Outstanding accuracy in Quantitative Arithmetic ($88\%$). Keep maintaining consistency.
+> - **Pacing Bottleneck**: Average solve speed on Logical Arrangements is $110$ seconds (limit: $90$ seconds). Practice Linear sequences under time pressure.
+> - **Action Plan**: Focus on your **Verbal Mastery** path. Complete 15 error-spotting solves to raise your overall index.
+
+---
+
+## AI Insights Best Practices
+
+<Callout type="info">
+  **Best Practice: Review Insights weekly**  
+  AI Smart Insights regenerate every Sunday at 00:00 IST based on your active weekly solve logs. Read the new insights card first thing on Monday morning to adjust your weekly study goals.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Data Prerequisites**  
+  The engine requires at least 20 practice solves or 1 completed mock test before it can compile custom insights. New profiles display a foundational setup prompt.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[AI Mentor](../ai-features/ai-mentor)**
+* **[AI ELI5 Guide](../ai-features/ai-eli5)**
+* **[AI Feedback](../ai-features/ai-feedback)**

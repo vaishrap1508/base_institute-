@@ -26,12 +26,12 @@ export default function ResponseMatrix({
   onRemoveOption
 }: ResponseMatrixProps) {
   return (
-    <div className="bg-white p-5 border border-slate-200/80 rounded-xl shadow-sm flex flex-col gap-4 h-full">
+    <div className="bg-white dark:bg-slate-900 p-5 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm flex flex-col gap-4 h-full">
       {/* Response Matrix Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
           Response Matrix
-          <HelpCircle className="w-3.5 h-3.5 text-slate-300 hover:text-slate-400 cursor-help" />
+          <HelpCircle className="w-3.5 h-3.5 text-slate-300 dark:text-slate-500 hover:text-slate-400 cursor-help" />
         </label>
 
         {/* Header Actions */}
@@ -40,7 +40,7 @@ export default function ResponseMatrix({
           <button
             type="button"
             onClick={onAddOption}
-            className="flex items-center gap-1 px-3 py-1 bg-blue-50 hover:bg-blue-100/80 text-blue-600 border border-blue-200 rounded-lg text-xs font-bold transition-all active:scale-97 cursor-pointer"
+            className="flex items-center gap-1 px-3 py-1 bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100/80 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-bold transition-all active:scale-97 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Option</span>
@@ -48,12 +48,12 @@ export default function ResponseMatrix({
 
           {/* Shuffle Switch */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500">Shuffle</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Shuffle</span>
             <button
               type="button"
               onClick={onToggleShuffle}
               className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 focus:outline-none relative ${
-                shuffleOptions ? 'bg-blue-600' : 'bg-slate-200'
+                shuffleOptions ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-800'
               }`}
             >
               <div
@@ -78,8 +78,8 @@ export default function ResponseMatrix({
                 onClick={() => onSetCorrectOption(option.id)}
                 className={`p-4 rounded-xl border transition-all duration-150 cursor-pointer relative group flex flex-col gap-2.5 ${
                   isCorrect
-                    ? 'bg-blue-50/50 border-blue-400 shadow-sm shadow-blue-50'
-                    : 'bg-slate-50/30 border-slate-200/80 hover:border-slate-300'
+                    ? 'bg-blue-50/50 dark:bg-blue-950/20 border-blue-400 dark:border-blue-600 shadow-sm shadow-blue-50 dark:shadow-none'
+                    : 'bg-slate-50/30 dark:bg-slate-900/30 border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                 }`}
               >
                 {/* Option Details Card Header */}
@@ -90,14 +90,14 @@ export default function ResponseMatrix({
                       className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                         isCorrect
                           ? 'border-blue-600 bg-blue-600'
-                          : 'border-slate-300 bg-white group-hover:border-slate-400'
+                          : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 group-hover:border-slate-400 dark:group-hover:border-slate-600'
                       }`}
                     >
                       {isCorrect && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                     </div>
                     <span
                       className={`text-[10px] font-bold uppercase tracking-wider ${
-                        isCorrect ? 'text-blue-700' : 'text-slate-500'
+                        isCorrect ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
                       }`}
                     >
                       Option {option.id} {isCorrect && '(Correct)'}
@@ -112,8 +112,8 @@ export default function ResponseMatrix({
                       }}
                       className={`p-1 rounded transition-colors ${
                         isCorrect
-                          ? 'hover:bg-blue-100/80 text-blue-400 hover:text-blue-700'
-                          : 'hover:bg-slate-200/60 text-slate-400 hover:text-rose-600'
+                          ? 'hover:bg-blue-100/80 dark:hover:bg-blue-950/50 text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'
+                          : 'hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-500'
                       }`}
                       title={`Remove Option ${option.id}`}
                     >
@@ -129,10 +129,10 @@ export default function ResponseMatrix({
                   onClick={(e) => e.stopPropagation()}
                   placeholder={`Enter content for Option ${option.id}...`}
                   rows={2}
-                  className={`w-full px-3 py-1.5 bg-white border rounded-lg text-sm transition-all focus:outline-none resize-none overflow-y-auto break-words leading-relaxed ${
+                  className={`w-full px-3 py-1.5 bg-white dark:bg-slate-900 border rounded-lg text-sm transition-all focus:outline-none resize-none overflow-y-auto break-words leading-relaxed ${
                     isCorrect
-                      ? 'border-blue-200 text-blue-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
-                      : 'border-slate-200 text-slate-800 hover:border-slate-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                      ? 'border-blue-200 dark:border-blue-900/40 text-blue-900 dark:text-blue-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+                      : 'border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700 focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
                   }`}
                 />
               </div>
@@ -140,10 +140,10 @@ export default function ResponseMatrix({
           })}
         </div>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50/50 border border-dashed border-slate-200 rounded-xl min-h-[180px]">
-          <Sparkles className="w-6 h-6 text-slate-300 mb-2 animate-pulse" />
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">No Choices Added</span>
-          <p className="text-[11px] text-slate-400 font-medium max-w-[240px] mt-1 leading-relaxed">
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50/50 dark:bg-slate-950/20 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl min-h-[180px]">
+          <Sparkles className="w-6 h-6 text-slate-300 dark:text-slate-700 mb-2 animate-pulse" />
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">No Choices Added</span>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium max-w-[240px] mt-1 leading-relaxed">
             Click the <strong>Add Option</strong> button in the header to start building your multiple choice options matrix.
           </p>
         </div>

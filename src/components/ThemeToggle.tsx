@@ -49,7 +49,7 @@ export default function ThemeToggle({ floating = false }: ThemeToggleProps) {
       type="button"
       className={
         floating
-          ? "w-11 h-11 rounded-full border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-650 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 select-none shrink-0"
+          ? "w-11 h-11 rounded-full border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 select-none shrink-0"
           : "w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 select-none shrink-0"
       }
       aria-label="Toggle theme"

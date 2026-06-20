@@ -81,6 +81,27 @@ export const DOMAINS_DATA: Domain[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'coding',
+    name: 'Coding & DSA',
+    subTopics: [
+      {
+        id: 'arrays',
+        name: 'Arrays & Strings',
+        concepts: [
+          { id: 'two-pointer', name: 'Two-Pointer Technique' },
+          { id: 'sliding-window', name: 'Sliding Window' }
+        ]
+      },
+      {
+        id: 'recursion',
+        name: 'Recursion',
+        concepts: [
+          { id: 'backtracking', name: 'Backtracking' }
+        ]
+      }
+    ]
   }
 ];
 
@@ -107,7 +128,9 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
   { id: 'directory', label: 'Directory', icon: 'BookOpen', href: '/admin/directory' },
   { id: 'users', label: 'Users & Roles', icon: 'Users', href: '/admin/users' },
   { id: 'analytics', label: 'Performance Analytics', icon: 'BarChart3', href: '/admin/analytics' },
+  { id: 'badges', label: 'Badge Management', icon: 'Award', href: '/admin/badges' },
   { id: 'settings', label: 'System Settings', icon: 'Settings', href: '/admin/settings' },
+  { id: 'email', label: 'Email Management', icon: 'Mail', href: '/admin/email' },
   { id: 'documentation', label: 'API Documentation', icon: 'FileCode', href: '/admin/docs' },
   { id: 'logout', label: 'Log Out', icon: 'LogOut', href: '/' }
 ];
@@ -260,5 +283,38 @@ export const SAMPLE_QUESTIONS: Question[] = [
     videoThumbnail: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600',
     status: 'Published',
     createdAt: 'Oct 05, 2023'
+  },
+  {
+    id: 'C-101',
+    domainId: 'coding',
+    subTopicId: 'arrays',
+    conceptId: 'two-pointer',
+    difficulty: 'EASY',
+    companyTags: ['Amazon', 'Google', 'Meta'],
+    shuffleOptions: false,
+    questionStem: `### Maximum Consecutive Ones
+
+Given a binary array \`nums\`, return the maximum number of consecutive \`1\`s in the array.
+
+### Constraints:
+- \`1 <= nums.length <= 10^5\`
+- \`nums[i]\` is either \`0\` or \`1\`.
+
+### Examples:
+**Example 1:**
+\`\`\`
+Input: nums = [1,1,0,1,1,1]
+Output: 3
+Explanation: The first two digits or the last three digits are consecutive 1s. The maximum number of consecutive 1s is 3.
+\`\`\`
+`,
+    hintText: 'Keep track of a running count of 1s and update the maximum count whenever you encounter a 0.',
+    options: [],
+    videoUrl: 'https://youtube.com/watch?v=dQw4w9WgXcQ',
+    videoTitle: 'MAX CONSECUTIVE ONES WALKTHROUGH',
+    videoDuration: '08:40',
+    videoThumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600',
+    status: 'Published',
+    createdAt: 'Oct 04, 2023'
   }
 ];

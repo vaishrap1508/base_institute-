@@ -18,17 +18,17 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
       : SIDEBAR_ITEMS;
 
   return (
-    <aside className="w-64 bg-slate-50 border-r border-slate-200/80 flex flex-col h-screen shrink-0">
+    <aside className="w-64 bg-slate-50 dark:bg-slate-950 border-r border-slate-200/80 dark:border-slate-900 flex flex-col h-screen shrink-0 transition-colors duration-300">
       {/* Brand Header */}
-      <div className="p-6 border-b border-slate-200/60 flex items-center gap-3">
+      <div className="p-6 border-b border-slate-200/60 dark:border-slate-900/60 flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm shadow-blue-500/20">
           <Icons.Layers className="w-5 h-5" />
         </div>
         <div className="flex flex-col">
-          <span className="font-semibold text-slate-900 tracking-tight text-[15px] leading-tight">
+          <span className="font-semibold text-slate-900 dark:text-white tracking-tight text-[15px] leading-tight">
             System Admin
           </span>
-          <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-0.5">
+          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase mt-0.5">
             Institutional Access
           </span>
         </div>
@@ -62,8 +62,8 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
               }}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group text-left ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-100/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent'
+                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-600/10 dark:text-blue-400 shadow-xs border border-blue-100/50 dark:border-blue-500/20'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900 border border-transparent'
               }`}
             >
               <div className="flex items-center gap-3">
@@ -91,7 +91,7 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
       </nav>
 
       {/* Footer Branding */}
-      <div className="p-4 border-t border-slate-200/60 text-center">
+      <div className="p-4 border-t border-slate-200/60 dark:border-slate-900/65 text-center">
         <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 font-medium">
           <Icons.ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
           <span>Secured Sandbox v2.4</span>

@@ -321,7 +321,7 @@ export default function QuestionDirectoryPage() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-100 font-sans overflow-hidden antialiased">
+    <div className="flex h-screen bg-slate-100 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
       {/* 1. Left Navigation Sidebar */}
       <Sidebar
         activeId="directory"
@@ -335,10 +335,10 @@ export default function QuestionDirectoryPage() {
 
         {/* Access control check matching Dynamic Content Creator constraints */}
         {currentRole.role !== 'admin' ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50">
-            <div className="w-full max-w-xl bg-white border border-slate-200/80 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
+            <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               {/* Lock Icon */}
-              <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 shadow-inner relative">
+              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/50 flex items-center justify-center text-rose-500 shadow-inner relative">
                 <Lock className="w-7 h-7 animate-pulse" />
                 <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white shadow">
                   !
@@ -347,37 +347,37 @@ export default function QuestionDirectoryPage() {
 
               {/* Clearance Violations Info */}
               <div className="flex flex-col gap-1.5">
-                <h2 className="text-lg font-black text-slate-800 tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
                   Secure Sandbox Sandbox v2.4
                 </p>
               </div>
 
               {/* Details table */}
-              <div className="w-full bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-slate-200/50 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                     Clearance Token Status
                   </span>
-                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 text-rose-700 uppercase tracking-wide">
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-500 uppercase tracking-wide">
                     DENIED
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Attempted User</span>
-                    <span className="text-slate-800 font-bold">{currentRole.name}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Clearance Role</span>
-                    <span className="text-slate-800 font-bold uppercase tracking-wider text-[11px] text-rose-600">
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold uppercase tracking-wider text-[11px] text-rose-600 dark:text-rose-400">
                       {currentRole.role}
                     </span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Attempted Access Route</span>
-                    <span className="text-slate-800 font-bold font-mono text-[11px]">/admin/directory</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/directory</span>
                   </div>
                 </div>
               </div>
@@ -402,20 +402,20 @@ export default function QuestionDirectoryPage() {
           <div className="flex-1 overflow-y-auto p-8 space-y-6">
 
             {/* Page Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/60 pb-5">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-800 pb-5">
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-black text-slate-900 tracking-tight">Question Directory</h1>
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wide uppercase border shadow-inner ${
+                  <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Question Directory</h1>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wide uppercase border dark:border-slate-800 shadow-inner ${
                     dbSource === 'Supabase Cloud' 
-                      ? 'bg-indigo-50 border-indigo-100 text-indigo-700' 
-                      : 'bg-amber-50 border-amber-100 text-amber-700'
+                      ? 'bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/20 dark:border-indigo-900/30 dark:text-indigo-400' 
+                      : 'bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-950/20 dark:border-amber-900/30 dark:text-amber-400'
                   }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${dbSource === 'Supabase Cloud' ? 'bg-indigo-650 animate-pulse' : 'bg-amber-500'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${dbSource === 'Supabase Cloud' ? 'bg-indigo-600 animate-pulse' : 'bg-amber-500'}`} />
                     {dbSource}
                   </span>
                 </div>
-                <p className="text-xs font-semibold text-slate-500 mt-1">
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
                   Manage, search, organize, and monitor all platform questions.
                 </p>
               </div>
@@ -426,7 +426,7 @@ export default function QuestionDirectoryPage() {
                 <button
                   onClick={handleExportCatalog}
                   disabled={filteredQuestions.length === 0}
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200/90 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-xs active:scale-98 cursor-pointer"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200/90 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-xs active:scale-98 cursor-pointer dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-200"
                 >
                   <Download className="w-4 h-4 text-slate-400" />
                   <span>Export Catalog</span>
@@ -447,60 +447,60 @@ export default function QuestionDirectoryPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
               {/* Stat 1: Total Catalog */}
-              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+              <div className="bg-white border border-slate-200/80 dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
+                <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 dark:bg-blue-950/20 dark:border-blue-900/30 flex items-center justify-center text-blue-600 shrink-0">
                   <Library className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider leading-none">
+                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Total In Directory
                   </span>
-                  <span className="text-2xl font-black text-slate-900 tracking-tight mt-1">
+                  <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
                     {stats.total}
                   </span>
                 </div>
               </div>
 
               {/* Stat 2: Published */}
-              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+              <div className="bg-white border border-slate-200/80 dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
+                <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/20 dark:border-emerald-900/30 flex items-center justify-center text-emerald-600 shrink-0">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider leading-none">
+                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Active Published
                   </span>
-                  <span className="text-2xl font-black text-emerald-700 tracking-tight mt-1">
+                  <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight mt-1">
                     {stats.published}
                   </span>
                 </div>
               </div>
 
               {/* Stat 3: Drafts */}
-              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
+              <div className="bg-white border border-slate-200/80 dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
+                <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950/20 dark:border-slate-900/30 flex items-center justify-center text-slate-500 shrink-0">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider leading-none">
+                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Incomplete Drafts
                   </span>
-                  <span className="text-2xl font-black text-slate-800 tracking-tight mt-1">
+                  <span className="text-2xl font-black text-slate-800 dark:text-slate-200 tracking-tight mt-1">
                     {stats.draft}
                   </span>
                 </div>
               </div>
 
               {/* Stat 4: Taxonomy Coverage */}
-              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shrink-0">
+              <div className="bg-white border border-slate-200/80 dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
+                <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-100 dark:bg-purple-950/20 dark:border-purple-900/30 flex items-center justify-center text-purple-600 shrink-0">
                   <Compass className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider leading-none">
+                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Taxonomy Concepts
                   </span>
-                  <span className="text-2xl font-black text-purple-700 tracking-tight mt-1">
+                  <span className="text-2xl font-black text-purple-700 dark:text-purple-400 tracking-tight mt-1">
                     {stats.conceptsCount}
                   </span>
                 </div>

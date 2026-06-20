@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Layers, 
   Mail, 
@@ -12,6 +12,7 @@ import {
   Cpu, 
   ShieldCheck, 
   ArrowRight, 
+  ArrowLeft,
   Sparkles, 
   ChevronRight,
   User,
@@ -24,10 +25,62 @@ import {
 } from 'lucide-react';
 import { USER_ROLES } from '@/lib/admin/store';
 import { createClient } from '@/utils/supabase/client';
+import { siteConfig } from '@/config/site';
+import ThemeToggle from '@/components/ThemeToggle';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  // Dynamic branding logo configuration
+  const [logoText, setLogoText] = useState(siteConfig.logoText);
+  const [logoSubtext, setLogoSubtext] = useState(siteConfig.logoSubtext);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const localData = localStorage.getItem('aptitude_landing_page_settings');
+      if (localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          if (parsed.header_logo_text) setLogoText(parsed.header_logo_text);
+          if (parsed.header_logo_subtext) setLogoSubtext(parsed.header_logo_subtext);
+        } catch (_) {}
+      }
+    }
+
+    const fetchBranding = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('landing_page_settings')
+          .select('header_logo_text, header_logo_subtext')
+          .eq('id', 'current')
+          .single();
+
+        if (data && !error) {
+          if (data.header_logo_text) setLogoText(data.header_logo_text);
+          if (data.header_logo_subtext) setLogoSubtext(data.header_logo_subtext);
+
+          if (typeof window !== 'undefined') {
+            const localData = localStorage.getItem('aptitude_landing_page_settings');
+            let parsed = {};
+            if (localData) {
+              try { parsed = JSON.parse(localData); } catch (_) {}
+            }
+            localStorage.setItem('aptitude_landing_page_settings', JSON.stringify({
+              ...parsed,
+              header_logo_text: data.header_logo_text,
+              header_logo_subtext: data.header_logo_subtext
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch branding from Supabase:", err);
+      }
+    };
+
+    fetchBranding();
+  }, [supabase]);
 
   const setCookie = (name: string, value: string, days = 30) => {
     const expires = new Date();
@@ -56,7 +109,27 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showCreateAccountSuggest, setShowCreateAccountSuggest] = useState(false);
   const [showSandboxModeSuggest, setShowSandboxModeSuggest] = useState(false);
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [resending, setResending] = useState(false);
   const [notification, setNotification] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
+
+  // Detect URL search params for verification, resets, or callback errors
+  React.useEffect(() => {
+    const verified = searchParams.get('verified');
+    const reset = searchParams.get('reset');
+    const errorParam = searchParams.get('error');
+
+    if (verified === 'true') {
+      showNotice('Email verified successfully! You can now log in.', 'success');
+      router.replace('/login');
+    } else if (reset === 'true') {
+      showNotice('Password updated successfully! Log in with your new credentials.', 'success');
+      router.replace('/login');
+    } else if (errorParam) {
+      setErrorMsg(decodeURIComponent(errorParam));
+      router.replace('/login');
+    }
+  }, [searchParams]);
 
   // Pre-seed some emails on mount so existing credentials work out of the box
   React.useEffect(() => {
@@ -77,6 +150,33 @@ export default function LoginPage() {
   const showNotice = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
     setNotification({ text, type });
     setTimeout(() => setNotification(null), 4000);
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      setErrorMsg('Please enter your email address to request a new verification link.');
+      return;
+    }
+    setResending(true);
+    setErrorMsg(null);
+    try {
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setErrorMsg(data.error || 'Failed to resend verification email.');
+      } else {
+        showNotice(data.message || 'Verification email resent successfully.', 'success');
+        setShowResendVerification(false);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'A network error occurred.');
+    } finally {
+      setResending(false);
+    }
   };
 
   // Form Fields
@@ -146,12 +246,36 @@ export default function LoginPage() {
       return;
     }
 
-    // Simulate recovery email submission with latency
-    setTimeout(() => {
-      showNotice(`A secure recovery link has been dispatched to ${email.trim()}.`, 'success');
-      setLoading(false);
-      setIsForgotPassword(false);
-    }, 1000);
+    if (isOfflineSandbox) {
+      // Simulate recovery email submission with latency
+      setTimeout(() => {
+        showNotice(`A secure recovery link has been dispatched to ${email.trim()}.`, 'success');
+        setLoading(false);
+        setIsForgotPassword(false);
+      }, 1000);
+    } else {
+      fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase() })
+      })
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) {
+            setErrorMsg(data.error || 'Password recovery request failed.');
+          } else {
+            showNotice(data.message || 'Password reset link sent successfully.', 'success');
+            setIsForgotPassword(false);
+            setEmail('');
+          }
+        })
+        .catch((err) => {
+          setErrorMsg(err.message || 'A network error occurred.');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -164,7 +288,7 @@ export default function LoginPage() {
         role: 'STUDENT',
         name: 'GOOGLE_USER',
         email: 'google.student@university.edu',
-        avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
+        avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana'
       };
       localStorage.setItem('aptitude_current_role', JSON.stringify(mockGoogleUser));
       setCookie('aptitude_mock_auth', JSON.stringify({
@@ -258,7 +382,20 @@ export default function LoginPage() {
             role: userRole
           };
           setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
-          const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
+          
+          const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
+          let registeredEmails = [];
+          try {
+            registeredEmails = JSON.parse(registeredEmailsStr);
+          } catch (_) {}
+          
+          const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
+          
+          if (isEmailAlreadyRegistered) {
+            localStorage.setItem('aptitude_onboarding_completed', 'true');
+          }
+          
+          const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true' || isEmailAlreadyRegistered;
           setCookie('aptitude_onboarding_completed', completedOnboarding ? 'true' : 'false');
 
           if (userRole === 'ADMIN') {
@@ -278,7 +415,7 @@ export default function LoginPage() {
               role: 'STUDENT',
               name,
               email: normalizedEmail,
-              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+              avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
             };
             localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
             showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
@@ -308,6 +445,9 @@ export default function LoginPage() {
 
         if (error) {
           setErrorMsg(error.message);
+          if (error.message.toLowerCase().includes('confirm') || error.message.toLowerCase().includes('verified') || error.message.toLowerCase().includes('verification')) {
+            setShowResendVerification(true);
+          }
           setLoading(false);
           return;
         }
@@ -318,12 +458,23 @@ export default function LoginPage() {
 
           const { data: profile } = await supabase
             .from('profiles')
-            .select('role')
+            .select('role, email_verified')
             .eq('id', data.user.id)
             .maybeSingle();
 
           const isSarah = data.user.email === 'sarah.c@aptitude-ai.com';
           const isMarcus = data.user.email === 'marcus.w@aptitude-ai.com';
+          const isBypassUser = isSarah || isMarcus;
+
+          // Block unverified non-bypass users from accessing
+          if (profile && !profile.email_verified && !isBypassUser) {
+            setErrorMsg('Your email address has not been verified yet.');
+            setShowResendVerification(true);
+            await supabase.auth.signOut();
+            setLoading(false);
+            return;
+          }
+
           const userRole = (profile?.role === 'ADMIN' || isSarah || isMarcus) ? 'ADMIN' : 'STUDENT';
 
           if (userRole === 'ADMIN') {
@@ -342,9 +493,25 @@ export default function LoginPage() {
               role: 'STUDENT',
               name: data.user.email?.split('@')[0].toUpperCase() || 'STUDENT',
               email: data.user.email!,
-              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
+              avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
             };
             localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
+
+            const normalizedEmail = data.user.email!.trim().toLowerCase();
+            const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
+            
+            const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
+            let registeredEmails = [];
+            try {
+              registeredEmails = JSON.parse(registeredEmailsStr);
+            } catch (_) {}
+            
+            const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
+            const localProfiles = JSON.parse(localProfilesStr);
+            const customProfile = localProfiles[normalizedEmail];
+            const isRegisteredOffline = !!customProfile;
+
+            const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
 
             const { data: onboarding } = await supabase
               .from('onboarding_profile')
@@ -352,9 +519,18 @@ export default function LoginPage() {
               .eq('user_id', data.user.id)
               .maybeSingle();
 
-            if (onboarding?.onboarding_completed) {
+            const completedOnboarding = onboarding?.onboarding_completed || isEmailAlreadyRegistered;
+
+            if (completedOnboarding) {
+              localStorage.setItem('aptitude_onboarding_completed', 'true');
+              if (!registeredEmails.includes(normalizedEmail)) {
+                registeredEmails.push(normalizedEmail);
+                localStorage.setItem('aptitude_registered_emails', JSON.stringify(registeredEmails));
+              }
+              setCookie('aptitude_onboarding_completed', 'true');
               router.push('/student/dashboard');
             } else {
+              setCookie('aptitude_onboarding_completed', 'false');
               router.push('/onboarding');
             }
           }
@@ -393,40 +569,53 @@ export default function LoginPage() {
               name,
               role: userRole
             };
-            setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
-            const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
-            setCookie('aptitude_onboarding_completed', completedOnboarding ? 'true' : 'false');
-
-            if (userRole === 'ADMIN') {
-              if (isMarcus) {
-                const editorRole = USER_ROLES.find(r => r.role === 'editor') || USER_ROLES[1];
-                localStorage.setItem('aptitude_current_role', JSON.stringify(editorRole));
-                showNotice('Logged in locally as Marcus (Editor)! Redirecting...', 'success');
-                setTimeout(() => router.push('/admin/editor'), 1000);
-              } else {
-                const adminRole = USER_ROLES.find(r => r.role === 'admin') || USER_ROLES[0];
-                localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
-                showNotice('Logged in locally as Sarah (Admin)! Redirecting...', 'success');
-                setTimeout(() => router.push('/admin/dashboard'), 1000);
-              }
-            } else {
-              const studentRole = {
-                role: 'STUDENT',
-                name,
-                email: normalizedEmail,
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
-              };
-              localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
-              showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
-              
-              setTimeout(() => {
-                if (completedOnboarding) {
-                  router.push('/student/dashboard');
-                } else {
-                  router.push('/onboarding');
-                }
-              }, 1000);
-            }
+             setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
+             
+             const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
+             let registeredEmails = [];
+             try {
+               registeredEmails = JSON.parse(registeredEmailsStr);
+             } catch (_) {}
+             
+             const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
+             
+             if (isEmailAlreadyRegistered) {
+               localStorage.setItem('aptitude_onboarding_completed', 'true');
+             }
+             
+             const completedOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true' || isEmailAlreadyRegistered;
+             setCookie('aptitude_onboarding_completed', completedOnboarding ? 'true' : 'false');
+ 
+             if (userRole === 'ADMIN') {
+               if (isMarcus) {
+                 const editorRole = USER_ROLES.find(r => r.role === 'editor') || USER_ROLES[1];
+                 localStorage.setItem('aptitude_current_role', JSON.stringify(editorRole));
+                 showNotice('Logged in locally as Marcus (Editor)! Redirecting...', 'success');
+                 setTimeout(() => router.push('/admin/editor'), 1000);
+               } else {
+                 const adminRole = USER_ROLES.find(r => r.role === 'admin') || USER_ROLES[0];
+                 localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
+                 showNotice('Logged in locally as Sarah (Admin)! Redirecting...', 'success');
+                 setTimeout(() => router.push('/admin/dashboard'), 1000);
+               }
+             } else {
+               const studentRole = {
+                 role: 'STUDENT',
+                 name,
+                 email: normalizedEmail,
+                 avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
+               };
+               localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
+               showNotice('Logged in locally (Offline Sandbox Mode)! Redirecting...', 'success');
+               
+               setTimeout(() => {
+                 if (completedOnboarding) {
+                   router.push('/student/dashboard');
+                 } else {
+                   router.push('/onboarding');
+                 }
+               }, 1000);
+             }
             return;
           } else {
             setErrorMsg('Account not found in local sandbox directory. Please register first.');
@@ -489,7 +678,7 @@ export default function LoginPage() {
           userType: '',
           name: fullName,
           email: normalizedEmail,
-          avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
+          avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana'
         };
         localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
         localStorage.removeItem('aptitude_onboarding_completed');
@@ -513,19 +702,16 @@ export default function LoginPage() {
       }
 
       try {
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim().toLowerCase(),
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-            }
-          }
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim().toLowerCase(), password, fullName })
         });
+        const data = await response.json();
 
-        if (error) {
-          setErrorMsg(error.message);
-          if (error.message.toLowerCase().includes('rate') || error.message.toLowerCase().includes('limit') || error.message.toLowerCase().includes('security') || error.message.toLowerCase().includes('unexpected_failure')) {
+        if (!response.ok) {
+          setErrorMsg(data.error || 'Registration failed.');
+          if (data.error?.toLowerCase().includes('rate') || data.error?.toLowerCase().includes('limit') || data.error?.toLowerCase().includes('security') || data.error?.toLowerCase().includes('unexpected_failure')) {
             setShowSandboxModeSuggest(true);
           }
           setLoading(false);
@@ -535,22 +721,14 @@ export default function LoginPage() {
         deleteCookie('aptitude_mock_auth');
         deleteCookie('aptitude_onboarding_completed');
 
-        const registeredUser = {
-          role: 'STUDENT',
-          userType: '',
-          name: fullName,
-          email: email.trim().toLowerCase(),
-          avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a57c6?w=150'
-        };
-        localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
-
-        if (data.session) {
-          localStorage.removeItem('aptitude_onboarding_completed');
-          router.push('/onboarding');
-        } else {
-          showNotice('Account registered! Please verify your email or sign in.', 'success');
-          setIsRegister(false);
-        }
+        showNotice(data.message || 'Account registered! Please verify your email or sign in.', 'success');
+        setIsRegister(false);
+        
+        // Clear registration fields
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setFullName('');
       } catch (err: any) {
         const isOffline = err.message?.includes('Failed to fetch') || err.message?.includes('fetch failed');
         if (isOffline) {
@@ -577,7 +755,7 @@ export default function LoginPage() {
             userType: '',
             name: fullName,
             email: normalizedEmail,
-            avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
+            avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana'
           };
           localStorage.setItem('aptitude_current_role', JSON.stringify(registeredUser));
           localStorage.removeItem('aptitude_onboarding_completed');
@@ -642,17 +820,13 @@ export default function LoginPage() {
             <Layers className="w-4.5 h-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold tracking-tight text-xs text-white">THE LUCID INTELLECTUAL</span>
-            <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">Aptitude Arena</span>
+            <span className="font-extrabold tracking-tight text-xs text-white">{logoText}</span>
+            <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">{logoSubtext}</span>
           </div>
         </Link>
 
         {/* Center Mission Statements */}
         <div className="space-y-6 z-10 my-auto">
-          <div className="inline-flex items-center gap-2 bg-blue-950/40 border border-blue-900/40 px-3 py-1 rounded-full text-[9px] font-black text-blue-400 tracking-wider uppercase">
-            <Sparkles className="w-3 h-3 text-blue-400" />
-            <span>Staging release v2.4</span>
-          </div>
           <h2 className="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight uppercase">
             Master your <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Aptitude</span> with editorial precision.
           </h2>
@@ -669,12 +843,11 @@ export default function LoginPage() {
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold text-slate-200">Adaptive Curriculum</span>
-              <span className="text-[9px] text-slate-550 font-bold leading-none mt-0.5 uppercase tracking-wide">Trusted by top-tier faculty</span>
+              <span className="text-[9px] text-slate-500 font-bold leading-none mt-0.5 uppercase tracking-wide">Trusted by top-tier faculty</span>
             </div>
           </div>
           <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
             <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-            <span>Secure</span>
           </div>
         </div>
 
@@ -686,21 +859,17 @@ export default function LoginPage() {
       <div className="lg:col-span-7 flex flex-col justify-center items-center p-6 sm:p-12 min-h-screen relative">
         
         {/* Back link to Home */}
+        {/* Back link to Home */}
         <Link 
           href="/" 
-          className="absolute top-6 left-6 sm:left-12 flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
+          className="absolute top-6 left-6 sm:left-12 flex items-center gap-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
         >
-          <span>← Back to home</span>
+          <ArrowLeft className="w-5 h-5" />
         </Link>
 
-        {/* Theme Toggle and Staging clearance indicator for user */}
-        <div className="absolute top-6 right-6 sm:right-12 flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-widest">
-              Staging Sandbox Secure
-            </span>
-          </div>
+        {/* Theme Toggle in the topmost right corner */}
+        <div className="absolute top-4 right-4 flex items-center">
+          <ThemeToggle />
         </div>
 
         {/* The Card Form container */}
@@ -714,7 +883,7 @@ export default function LoginPage() {
                 ? 'Create Account' 
                 : 'Welcome Back'}
             </h3>
-            <p className="text-xs font-semibold text-slate-400 dark:text-slate-550 leading-normal">
+            <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 leading-normal">
               {isForgotPassword 
                 ? 'Request a secure code reset pathway.' 
                 : isRegister 
@@ -747,9 +916,9 @@ export default function LoginPage() {
               </button>
 
               {/* OR divider */}
-              <div className="flex items-center gap-3 text-slate-350 dark:text-slate-750 select-none">
+              <div className="flex items-center gap-3 text-slate-300 dark:text-slate-700 select-none">
                 <div className="h-px bg-slate-200/80 dark:bg-slate-800 flex-1" />
-                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-550">OR LOGIN WITH EMAIL</span>
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500">OR LOGIN WITH EMAIL</span>
                 <div className="h-px bg-slate-200/80 dark:bg-slate-800 flex-1" />
               </div>
             </>
@@ -761,7 +930,7 @@ export default function LoginPage() {
               
               {/* Error Message */}
               {errorMsg && (
-                <div className="bg-rose-50 border border-rose-150 p-3 rounded-xl text-rose-700 text-xs font-semibold leading-relaxed animate-fadeIn flex items-center gap-2">
+                <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl text-rose-700 text-xs font-semibold leading-relaxed animate-fadeIn flex items-center gap-2">
                   <span className="shrink-0">⚠️</span>
                   <span>{errorMsg}</span>
                 </div>
@@ -769,16 +938,18 @@ export default function LoginPage() {
 
               {/* Email field */}
               <div className="space-y-1.5 animate-fadeIn">
-                <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-wide">Email Address</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Email Address</label>
+                </div>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 dark:text-slate-600" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                   <input 
                     type="email" 
                     placeholder="name@university.edu"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     style={{ textTransform: 'none' }}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium selection:bg-blue-100"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium selection:bg-blue-100"
                   />
                 </div>
                 {email && /[A-Z]/.test(email) && (
@@ -826,7 +997,7 @@ export default function LoginPage() {
               {/* Error Message */}
               {errorMsg && (
                 <div className="space-y-2">
-                  <div className="bg-rose-50 border border-rose-150 p-3 rounded-xl text-rose-700 text-xs font-semibold leading-relaxed animate-fadeIn flex items-center gap-2">
+                  <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl text-rose-700 text-xs font-semibold leading-relaxed animate-fadeIn flex items-center gap-2">
                     <span className="shrink-0">⚠️</span>
                     <span>{errorMsg}</span>
                   </div>
@@ -873,22 +1044,40 @@ export default function LoginPage() {
                       </button>
                     </div>
                   )}
+                  {showResendVerification && (
+                    <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl text-xs space-y-2.5 animate-fadeIn">
+                      <p className="font-semibold text-blue-800 font-sans">
+                        Need a new verification link?
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={resending}
+                        className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center justify-center gap-1.5 group cursor-pointer disabled:opacity-50"
+                      >
+                        <span>{resending ? 'Resending Link...' : 'Resend Verification Email'}</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Dynamic Sign-up Fields */}
               {isRegister && (
                 <div className="space-y-1.5 animate-fadeIn">
-                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Full Name</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Full Name</label>
+                  </div>
                   <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 dark:text-slate-600" />
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                     <input 
                       type="text" 
                       placeholder="Sarah Connor"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       style={{ textTransform: 'none' }}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium"
                     />
                   </div>
                 </div>
@@ -896,16 +1085,18 @@ export default function LoginPage() {
 
               {/* Email field */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-wide">Email Address</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Email Address</label>
+                </div>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 dark:text-slate-600" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                   <input 
                     type="email" 
                     placeholder="name@university.edu"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     style={{ textTransform: 'none' }}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium selection:bg-blue-100"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium selection:bg-blue-100"
                   />
                 </div>
                 {email && /[A-Z]/.test(email) && (
@@ -918,12 +1109,12 @@ export default function LoginPage() {
               {/* Password field */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-wide">Password</label>
+                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Password</label>
                   {!isRegister ? (
                     <button 
                       type="button"
                       onClick={() => { setIsForgotPassword(true); setErrorMsg(null); }}
-                      className="text-[10px] font-bold text-slate-455 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+                      className="text-[10px] font-bold text-slate-500 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
                     >
                       Forgot Password?
                     </button>
@@ -938,19 +1129,19 @@ export default function LoginPage() {
                   )}
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 dark:text-slate-600" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                   <input 
                     type={showPassword ? 'text' : 'password'} 
                     placeholder="••••••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     style={{ textTransform: 'none' }}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-mono selection:bg-blue-100"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl py-3 pl-10 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-mono selection:bg-blue-100"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-305 cursor-pointer flex items-center justify-center p-0.5 rounded"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 cursor-pointer flex items-center justify-center p-0.5 rounded"
                   >
                     {showPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   </button>
@@ -958,7 +1149,7 @@ export default function LoginPage() {
                 {isRegister && password && (
                   <div className="space-y-1 mt-1.5 animate-fadeIn">
                     <div className="flex justify-between items-center text-[9px] font-bold">
-                      <span className="text-slate-400 dark:text-slate-550 uppercase tracking-wide">Security Strength:</span>
+                      <span className="text-slate-400 dark:text-slate-500 uppercase tracking-wide">Security Strength:</span>
                       <span className={
                         getPasswordStrength(password).score <= 2 ? 'text-rose-500' :
                         getPasswordStrength(password).score <= 4 ? 'text-amber-500' : 'text-emerald-500'
@@ -976,7 +1167,7 @@ export default function LoginPage() {
                 )}
                 {isRegister && (
                   <div className="mt-2.5 space-y-2 bg-slate-50/50 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/80 rounded-xl p-3 animate-fadeIn transition-all duration-300">
-                    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-550 uppercase tracking-widest block mb-1 select-none">
+                    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1 select-none">
                       Password Requirements
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5">
@@ -993,12 +1184,12 @@ export default function LoginPage() {
                               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                           ) : (
-                            <svg className="w-3.5 h-3.5 text-rose-500 dark:text-rose-450 shrink-0 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <svg className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400 shrink-0 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                               <circle cx="12" cy="12" r="9" />
                               <path strokeLinecap="round" strokeLinejoin="round" d="M15 9l-6 6M9 9l6 6" strokeWidth="2" />
                             </svg>
                           )}
-                          <span className={rule.satisfied ? 'text-emerald-600 dark:text-emerald-450 transition-colors duration-200' : 'text-rose-500 dark:text-rose-400 transition-colors duration-200'}>
+                          <span className={rule.satisfied ? 'text-emerald-600 dark:text-emerald-400 transition-colors duration-200' : 'text-rose-500 dark:text-rose-400 transition-colors duration-200'}>
                             {rule.label}
                           </span>
                         </div>
@@ -1011,16 +1202,18 @@ export default function LoginPage() {
               {/* Confirm Password field (Only during Registration) */}
               {isRegister && (
                 <div className="space-y-1.5 animate-fadeIn">
-                  <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-555 uppercase tracking-wide">Confirm Password</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-extrabold text-slate-400 dark:text-slate-600 uppercase tracking-wide">Confirm Password</label>
+                  </div>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 dark:text-slate-600" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-600" />
                     <input 
                       type={showPassword ? 'text' : 'password'} 
                       placeholder="••••••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       style={{ textTransform: 'none' }}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-mono selection:bg-blue-100"
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl py-3 pl-10 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-mono selection:bg-blue-100"
                     />
                   </div>
 
@@ -1028,7 +1221,7 @@ export default function LoginPage() {
                     <div className={`mt-2 p-3 rounded-xl border flex items-center gap-2.5 transition-all duration-300 animate-fadeIn ${
                       password === confirmPassword 
                         ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 shadow-sm shadow-emerald-500/5' 
-                        : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-500 dark:text-rose-450 shadow-sm shadow-rose-500/5'
+                        : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40 text-rose-500 dark:text-rose-400 shadow-sm shadow-rose-500/5'
                     }`}>
                       {password === confirmPassword ? (
                         <>
@@ -1053,7 +1246,7 @@ export default function LoginPage() {
                     type="checkbox" 
                     id="keep-signed" 
                     defaultChecked
-                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-350 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 cursor-pointer"
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 cursor-pointer"
                   />
                   <label htmlFor="keep-signed" className="cursor-pointer">Keep me signed in for 30 days</label>
                 </div>
@@ -1083,7 +1276,7 @@ export default function LoginPage() {
 
           {/* Mode Switcher */}
           {!isForgotPassword && (
-            <div className="text-center text-xs font-semibold text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <div className="text-center text-xs font-semibold text-slate-500 dark:text-slate-400 pt-2.5">
               {isRegister ? (
                 <span>
                   Already have an account?{' '}
@@ -1126,5 +1319,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center p-6 text-slate-800 dark:text-slate-200">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

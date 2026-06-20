@@ -1,0 +1,96 @@
+import { Callout } from 'nextra/components'
+
+# Topic Navigation
+
+Learn how to search subtopics, filter by company recruiter tags, adjust difficulties, and jump between learning nodes.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Beginner</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Utility</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Navigation</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ How to utilize the dashboard sidebar category selector  
+✓ Navigating through domain subtopics  
+✓ Filtering question pools by company tags  
+✓ Moving between solved and pending questions  
+
+---
+
+## Anatomy of the Sidebar Navigator
+
+Our navigation panel is designed to let you drill down from general domains to specific concepts in 3 clicks:
+
+```
+[ Sidebar: Domains ] 
+     └──► [ Quant: Arithmetic ]
+               └──► [ Subtopic: Ratios ]
+                         └──► [ Concept: Inverse Speeds ]
+```
+
+### 1. Domain Hub Links
+- **Action**: Selects your primary learning space (Quant, Logical, Verbal, Coding).
+- **Display**: Shows your active progress percentage indicators.
+
+### 2. Subtopic Lists
+- **Action**: Expands specific categories (e.g. Percentages, Syllogisms).
+- **Display**: Displays completed solves vs total concept pool sizes.
+
+### 3. Concept Cards
+- **Action**: Opens the target concept detail page.
+- **Display**: Displays formula summaries and starts active practice.
+
+---
+
+## Interactive Filters & Search
+
+### 1. Recruiter Filter (Company Tags)
+- **Purpose**: Restrict practice pools to questions previously set in target exams.
+- **Tags**: TCS NQT, Infosys Logic, Wipro, Amazon, Microsoft.
+
+### 2. Difficulty Scale
+- **Easy**: Core formula exercises verifying basic parameters.
+- **Medium**: Multi-step calculations testing logical combinations.
+- **Hard**: Complex problems, data sufficiency, and tricky shortcuts.
+
+---
+
+## Navigation Best Practices
+
+<Callout type="info">
+  **Best Practice: Use the Global Keyboard Jumper**  
+  When inside the Practice Arena, use the `ArrowLeft` and `ArrowRight` keyboard shortcuts to navigate to the previous and next questions instantly.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Stale Filters**  
+  Always verify your filter criteria. If the Practice Arena says "No questions available in this domain", check if you have active filters (like a combination of `Hard` + `TCS NQT` + `Verbal`) that are too narrow for the current topic.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Concept Hub](../learning-system/concept-hub)**
+* **[Learning Paths](../learning-system/learning-paths)**
+* **[Smart Recommendations](../learning-system/smart-recommendations)**

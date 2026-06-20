@@ -811,7 +811,7 @@ export default function AdminContentCreator() {
   const activeDomainName = domains.find((d) => d.id === domainId)?.name || 'Quantitative Aptitude';
 
   return (
-    <div className="flex h-screen bg-slate-100 font-sans overflow-hidden antialiased">
+    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
       {/* 1. Left Navigation Sidebar */}
       <Sidebar
         activeId="editor"
@@ -828,8 +828,8 @@ export default function AdminContentCreator() {
           <div className="absolute top-20 right-8 z-50 animate-slideIn">
             <div className={`px-4.5 py-3.5 rounded-xl border shadow-lg flex items-center gap-3 max-w-md ${
               notification.type === 'success'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                : 'bg-blue-50 border-blue-200 text-blue-800'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/20 dark:border-emerald-900/30 dark:text-emerald-400'
+                : 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/20 dark:border-blue-900/20 dark:text-blue-400'
             }`}>
               <CheckCircle2 className={`w-5 h-5 shrink-0 ${notification.type === 'success' ? 'text-emerald-600' : 'text-blue-600'}`} />
               <span className="text-xs font-semibold tracking-tight leading-normal">
@@ -841,53 +841,53 @@ export default function AdminContentCreator() {
 
         {/* Access control check to guarantee only Admin/Editor can access the system */}
         {(currentRole.role !== 'admin' && currentRole.role !== 'editor') ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50">
-            <div className="w-full max-w-xl bg-white border border-slate-200/80 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
+            <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               {/* Pulsing Lock Icon Container */}
-              <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 shadow-inner relative">
+              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-400 shadow-inner relative">
                 <Lock className="w-7 h-7 animate-pulse" />
-                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white shadow">
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">
                   !
                 </span>
               </div>
 
               {/* Title & Subtitle */}
               <div className="flex flex-col gap-1.5">
-                <h2 className="text-lg font-black text-slate-800 tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
+                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
                   Secure Sandbox Sandbox v2.4
                 </p>
               </div>
 
               {/* Identity Token checklist */}
-              <div className="w-full bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-slate-200/50 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-900 pb-2">
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                     Assigned Clearance Token
                   </span>
-                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 text-rose-700 uppercase tracking-wide">
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 uppercase tracking-wide">
                     DENIED
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Attempted User</span>
-                    <span className="text-slate-800 font-bold">{currentRole.name}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-slate-800 dark:text-slate-100 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Assigned Email</span>
-                    <span className="text-slate-800 font-bold font-mono text-[11px]">{currentRole.email}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Assigned Email</span>
+                    <span className="text-slate-800 dark:text-slate-100 font-bold font-mono text-[11px]">{currentRole.email}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">Clearance Role</span>
-                    <span className="text-slate-800 font-bold uppercase tracking-wider text-[11px] text-rose-600">
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-slate-800 dark:text-rose-400 font-bold uppercase tracking-wider text-[11px] text-rose-600">
                       {currentRole.role}
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase">System Route</span>
-                    <span className="text-slate-800 font-bold font-mono text-[11px]">/admin/editor</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">System Route</span>
+                    <span className="text-slate-800 dark:text-slate-100 font-bold font-mono text-[11px]">/admin/editor</span>
                   </div>
                 </div>
               </div>
@@ -912,10 +912,10 @@ export default function AdminContentCreator() {
           <div className="flex-1 overflow-y-auto p-8 space-y-6">
             
             {/* Top Title Workspace Indicator */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/60 pb-5">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-900 pb-5">
               <div>
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight">Dynamic Content Creator</h1>
-                <p className="text-xs font-medium text-slate-500 mt-1">
+                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Dynamic Content Creator</h1>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">
                   Synthesize and validate mathematical stems, markdown solutions, and multi-choice response matrices.
                 </p>
               </div>
@@ -1018,7 +1018,7 @@ export default function AdminContentCreator() {
                 <Database className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-100">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-200">
                   Transaction Registry
                 </span>
                 <span className="text-lg font-black tracking-tight">Question Published Successfully</span>

@@ -72,21 +72,21 @@ export default function DomainSelectors({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white p-5 border border-slate-200/80 rounded-xl shadow-sm">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white dark:bg-slate-900 p-5 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm">
       {/* Domain Column */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
             Domain
           </label>
         </div>
         <select
           value={selectedDomainId}
           onChange={(e) => onChangeDomain(e.target.value)}
-          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {domains.map((domain) => (
-            <option key={domain.id} value={domain.id}>
+            <option key={domain.id} value={domain.id} className="dark:bg-slate-900 dark:text-slate-100">
               {domain.name}
             </option>
           ))}
@@ -101,7 +101,7 @@ export default function DomainSelectors({
                 value={newDomainName}
                 onChange={(e) => setNewDomainName(e.target.value)}
                 placeholder="New Domain..."
-                className="flex-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSaveDomain();
@@ -124,7 +124,7 @@ export default function DomainSelectors({
                   setIsAddingDomain(false);
                   setNewDomainName('');
                 }}
-                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition-all"
+                className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -133,7 +133,7 @@ export default function DomainSelectors({
             <button
               type="button"
               onClick={() => setIsAddingDomain(true)}
-              className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors py-1 px-2 rounded-md hover:bg-blue-50/50 w-fit"
+              className="flex items-center gap-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors py-1 px-2 rounded-md hover:bg-blue-50/50 dark:hover:bg-blue-900/20 w-fit"
             >
               <Plus className="w-3 h-3" />
               <span>Add Domain</span>
@@ -145,17 +145,17 @@ export default function DomainSelectors({
       {/* Sub-Topic Column */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
             Sub-Topic
           </label>
         </div>
         <select
           value={selectedSubTopicId}
           onChange={(e) => onChangeSubTopic(e.target.value)}
-          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {subTopics.map((topic) => (
-            <option key={topic.id} value={topic.id}>
+            <option key={topic.id} value={topic.id} className="dark:bg-slate-900 dark:text-slate-100">
               {topic.name}
             </option>
           ))}
@@ -171,7 +171,7 @@ export default function DomainSelectors({
                   value={newSubTopicName}
                   onChange={(e) => setNewSubTopicName(e.target.value)}
                   placeholder="New Sub-Topic..."
-                  className="flex-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveSubTopic();
@@ -194,7 +194,7 @@ export default function DomainSelectors({
                     setIsAddingSubTopic(false);
                     setNewSubTopicName('');
                   }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition-all"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -203,7 +203,7 @@ export default function DomainSelectors({
               <button
                 type="button"
                 onClick={() => setIsAddingSubTopic(true)}
-                className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors py-1 px-2 rounded-md hover:bg-blue-50/50 w-fit"
+                className="flex items-center gap-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors py-1 px-2 rounded-md hover:bg-blue-50/50 dark:hover:bg-blue-900/20 w-fit"
               >
                 <Plus className="w-3 h-3" />
                 <span>Add Sub-Topic</span>
@@ -216,17 +216,17 @@ export default function DomainSelectors({
       {/* Concept Column */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
             Concept
           </label>
         </div>
         <select
           value={selectedConceptId}
           onChange={(e) => onChangeConcept(e.target.value)}
-          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg text-sm text-slate-800 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 transition-all focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         >
           {concepts.map((concept) => (
-            <option key={concept.id} value={concept.id}>
+            <option key={concept.id} value={concept.id} className="dark:bg-slate-900 dark:text-slate-100">
               {concept.name}
             </option>
           ))}
@@ -242,7 +242,7 @@ export default function DomainSelectors({
                   value={newConceptName}
                   onChange={(e) => setNewConceptName(e.target.value)}
                   placeholder="New Concept..."
-                  className="flex-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 px-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveConcept();
@@ -265,7 +265,7 @@ export default function DomainSelectors({
                     setIsAddingConcept(false);
                     setNewConceptName('');
                   }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition-all"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -274,7 +274,7 @@ export default function DomainSelectors({
               <button
                 type="button"
                 onClick={() => setIsAddingConcept(true)}
-                className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors py-1 px-2 rounded-md hover:bg-blue-50/50 w-fit"
+                className="flex items-center gap-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors py-1 px-2 rounded-md hover:bg-blue-50/50 dark:hover:bg-blue-900/20 w-fit"
               >
                 <Plus className="w-3 h-3" />
                 <span>Add Concept</span>

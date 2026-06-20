@@ -1,0 +1,83 @@
+import { Callout } from 'nextra/components'
+
+# Leaderboards
+
+Learn how global rankings are calculated, how to filter peers by college cohort, and how to climb percentile brackets.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Intermediate</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Type</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Ranking</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ How global leaderboard placement is calculated  
+✓ Filtering lists by university and graduation batch  
+✓ The relationship between solves accuracy and rankings  
+✓ How percentile brackets map to target recruiter searches  
+
+---
+
+## Why Leaderboards Exist
+
+Peer motivation increases preparation quality. The **Global Leaderboard** displays student progress transparently, helping you compare your solving volume and consistency against other candidates:
+- **Global Rank**: Mapped by your aggregate correct solves and level metrics.
+- **Percentile Indicator**: Displays your standing (e.g. *Top 12%*) relative to the total active candidate pool.
+
+---
+
+## Leaderboard Calculation Metrics
+
+Ranking indexes are determined by:
+
+$$\text{Ranking Score} = \text{Correct Solves} \times 10 + \text{Streak Count} \times 25 + \text{Level} \times 50$$
+
+### 1. Correct Solves
+- **Weight**: Represents basic problem-solving volume.
+
+### 2. Consistency Bonus
+- **Weight**: Multiplies your active daily streak. High streaks prevent ranking drops when solve volumes are equal.
+
+### 3. Graduation Batch Filters
+Filter comparisons by graduation batch (e.g. *2027 graduates*) or specific college departments to see your rank inside your immediate target cohort.
+
+---
+
+## Leaderboard Best Practices
+
+<Callout type="info">
+  **Best Practice: Focus on Percentile brackets**  
+  Do not worry about hitting the global #1 spot. Recruiters filter candidates by brackets (e.g. *Top 10%*). Hitting the top 10% bracket is sufficient to qualify for premium recruiter selections.
+</Callout>
+
+<Callout type="warning">
+  **Warning: RLS Policy Protection**  
+  Your rank card and name are visible publicly only if your profile visibility is set to `Public` or `Friends Only`. Private accounts are anonymous on public lists.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Streaks](../progress-rankings/streaks)**
+* **[XP & Levels](../progress-rankings/xp-levels)**
+* **[Placement Readiness](../progress-rankings/placement-readiness)**

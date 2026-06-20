@@ -201,31 +201,31 @@ export default function LivePreview({
   const getDifficultyBadge = () => {
     switch (difficulty) {
       case 'EASY':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200/50';
+        return 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-900/30';
       case 'HARD':
-        return 'bg-rose-50 text-rose-700 border-rose-200/50';
+        return 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/50 dark:border-rose-900/30';
       case 'MEDIUM':
       default:
-        return 'bg-amber-50 text-amber-700 border-amber-200/50';
+        return 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/50 dark:border-amber-900/30';
     }
   };
 
   return (
-    <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm flex flex-col h-full overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm flex flex-col h-full overflow-hidden">
       {/* Header with Device Toggles */}
-      <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/20">
         <div className="flex items-center gap-2">
-          <Eye className="w-4 h-4 text-slate-500 animate-pulse" />
-          <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Live Student Preview</span>
+          <Eye className="w-4 h-4 text-slate-500 dark:text-slate-400 animate-pulse" />
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Live Student Preview</span>
         </div>
 
         {/* Device toggles */}
-        <div className="flex items-center gap-1 bg-white border border-slate-200 p-0.5 rounded-lg">
+        <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-0.5 rounded-lg">
           <button
             type="button"
             onClick={() => setDeviceLayout('desktop')}
-            className={`p-1.5 rounded transition-all ${
-              deviceLayout === 'desktop' ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'
+            className={`p-1.5 rounded transition-all cursor-pointer ${
+              deviceLayout === 'desktop' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
             title="Desktop Mode"
           >
@@ -234,8 +234,8 @@ export default function LivePreview({
           <button
             type="button"
             onClick={() => setDeviceLayout('tablet')}
-            className={`p-1.5 rounded transition-all ${
-              deviceLayout === 'tablet' ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'
+            className={`p-1.5 rounded transition-all cursor-pointer ${
+              deviceLayout === 'tablet' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
             title="Tablet Mode"
           >
@@ -244,8 +244,8 @@ export default function LivePreview({
           <button
             type="button"
             onClick={() => setDeviceLayout('mobile')}
-            className={`p-1.5 rounded transition-all ${
-              deviceLayout === 'mobile' ? 'bg-slate-100 text-slate-800' : 'text-slate-400 hover:text-slate-600'
+            className={`p-1.5 rounded transition-all cursor-pointer ${
+              deviceLayout === 'mobile' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
             title="Mobile Mode"
           >
@@ -255,19 +255,19 @@ export default function LivePreview({
       </div>
 
       {/* Interactive Sandbox body */}
-      <div className="flex-1 bg-slate-50/60 p-6 overflow-y-auto flex flex-col items-center justify-start gap-6">
+      <div className="flex-1 bg-slate-50/60 dark:bg-slate-950/40 p-6 overflow-y-auto flex flex-col items-center justify-start gap-6">
         
         {/* Device Wrapper */}
         <div className={`${getDeviceWidthClass()} transition-all duration-300 ease-in-out flex flex-col gap-5`}>
           
           {/* Main Question Card */}
-          <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm p-6 flex flex-col gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm p-6 flex flex-col gap-4">
             
             {/* Metadata Tags Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded tracking-wide uppercase">
+                  <span className="text-[10px] font-extrabold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 px-2 py-0.5 rounded tracking-wide uppercase">
                     {domainName}
                   </span>
                   <span className={`text-[10px] font-extrabold border px-2 py-0.5 rounded tracking-wide uppercase ${getDifficultyBadge()}`}>
@@ -275,12 +275,12 @@ export default function LivePreview({
                   </span>
                 </div>
                 {companyTags && companyTags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 items-center border-l border-slate-200 pl-3 ml-1">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Asked by:</span>
+                  <div className="flex flex-wrap gap-1.5 items-center border-l border-slate-200 dark:border-slate-800 pl-3 ml-1">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Asked by:</span>
                     {companyTags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[9px] font-black bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded tracking-wide font-sans transition-colors"
+                        className="text-[9px] font-black bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 px-1.5 py-0.5 rounded tracking-wide font-sans transition-colors"
                       >
                         {tag}
                       </span>
@@ -288,7 +288,7 @@ export default function LivePreview({
                   </div>
                 )}
               </div>
-              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-mono" title={`Original ID: ${questionId}`}>
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase font-mono" title={`Original ID: ${questionId}`}>
                 {(() => {
                   if (trackingId) return trackingId;
                   if (domainId && subTopicId && conceptId && questionId) {
@@ -303,13 +303,13 @@ export default function LivePreview({
             </div>
 
             {/* Question Stem Prompt (Rendered beautifully with ReactMarkdown + Katex support) */}
-            <div className="text-slate-800 text-[15px] leading-relaxed font-normal antialiased prose max-w-none prose-slate prose-headings:text-slate-900 prose-code:text-slate-700 prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-50 prose-pre:border prose-pre:border-slate-100 break-all">
+            <div className="text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed font-normal antialiased prose max-w-none prose-slate dark:prose-invert prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-code:text-slate-700 dark:prose-code:text-slate-300 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-50 dark:prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-100 dark:prose-pre:border-slate-800 break-all">
               {questionStem ? (
-                <div className="prose max-w-none prose-slate break-all">
+                <div className="prose max-w-none prose-slate dark:prose-invert break-all">
                   <SafeHtmlWithMath html={markdownToHtml(questionStem)} />
                 </div>
               ) : (
-                <p className="text-slate-400 italic font-sans">
+                <p className="text-slate-400 dark:text-slate-500 italic font-sans">
                   The formatted question text will render here as you type in the editor...
                 </p>
               )}
@@ -317,11 +317,11 @@ export default function LivePreview({
 
             {/* Hint Box (Conditional) */}
             {hintText && (
-              <div className="bg-blue-50/50 border border-blue-100/60 rounded-xl p-4 flex items-start gap-3 flex-1 min-w-0">
+              <div className="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100/60 dark:border-blue-900/30 rounded-xl p-4 flex items-start gap-3 flex-1 min-w-0">
                 <span className="text-base shrink-0 leading-none">💡</span>
                 <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                  <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Hint</span>
-                  <div className="text-xs text-blue-800 font-medium leading-relaxed prose prose-blue max-w-none break-all">
+                  <span className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Hint</span>
+                  <div className="text-xs text-blue-800 dark:text-blue-300 font-medium leading-relaxed prose prose-blue dark:prose-invert max-w-none break-all">
                     <SafeHtmlWithMath html={markdownToHtml(hintText)} />
                   </div>
                 </div>
@@ -342,10 +342,10 @@ export default function LivePreview({
                     onClick={() => setSelectedStudentChoice(option.id)}
                     className={`w-full flex items-start justify-between p-3.5 border rounded-xl text-left transition-all ${
                       !isOptionFilled
-                        ? 'opacity-40 cursor-not-allowed bg-slate-50 border-slate-200'
+                        ? 'opacity-40 cursor-not-allowed bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800'
                         : isSelected
-                        ? 'bg-blue-50 border-blue-500 text-blue-900 shadow-sm shadow-blue-50'
-                        : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50/30'
+                        ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 dark:border-blue-600 text-blue-900 dark:text-blue-300 shadow-sm shadow-blue-50 dark:shadow-none'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50/30 dark:hover:bg-slate-800/30'
                     }`}
                   >
                     <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -354,7 +354,7 @@ export default function LivePreview({
                         className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                           isSelected
                             ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/10'
-                            : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'
                         }`}
                       >
                         {option.id}
@@ -378,9 +378,9 @@ export default function LivePreview({
 
           {/* Video Walkthrough Embed Box */}
           {videoUrl && (
-            <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm p-5 flex flex-col gap-3">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Video className="w-3.5 h-3.5 text-slate-400" /> Video Walkthrough
+            <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm p-5 flex flex-col gap-3">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Video className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" /> Video Walkthrough
               </span>
 
               {/* Mock Video Container */}

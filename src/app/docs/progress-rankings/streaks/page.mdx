@@ -1,0 +1,84 @@
+import { Callout } from 'nextra/components'
+
+# Streaks
+
+Learn consistency mechanics, how to avoid streak decays, utilizing freeze shields, and establishing habit loops.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Beginner</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Metric</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Consistency</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ How learning streaks are calculated  
+✓ The 24–48 hour active active window thresholds  
+✓ Utilizing streak freeze shields to protect consistency metrics  
+✓ Reaching milestone rewards at specific streak targets  
+
+---
+
+## Why Streaks Matter
+
+Placement preparation requires long-term habit loops. Cramming 10 hours before an exam yields lower retention than studying 20 minutes daily. The **Streak System** monitors your daily activity to reward steady, incremental progress:
+- **Daily Solve**: Completing a single question in the Practice Arena sets your active status for the day.
+- **Visual Indicator**: A fire flame icon on the dashboard header displays your active streak count.
+
+---
+
+## Streak Active Windows and Calculations
+
+```
+[ Day 1: Solve Question ] ──► [ Day 2: Within 24-48 hours ] ──► [ Streak Increments ]
+                                      │
+                                      └──► [ Exceeds 48 hours ] ➔ [ Streak Decays to 0 ]
+```
+
+### 1. Streak Increment Window
+- **Rule**: If `now() - last_activity_at < 24 hours` (relative to Indian Standard Time - IST), the streak is maintained. If it exceeds 24 but is within 48 hours, it increments.
+
+### 2. Streak Freeze Shields
+Purchase freeze shields in the Shop or earn them through achievements:
+- **Automatic Trigger**: If you miss a 48-hour solving window, a freeze shield is consumed automatically to protect your streak.
+- **Limit**: You can hold a maximum of 2 freeze shields at any time.
+
+---
+
+## Consistency Best Practices
+
+<Callout type="info">
+  **Best Practice: Solve a "Casual" question on busy days**  
+  If you are busy with university tasks, solve a single **Easy** question in the Practice Arena. This takes under 60 seconds and keeps your streak alive while protecting your freeze shields.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Reset Penalties**  
+  If your streak decays to 0, your global consistency percentile index on the leaderboards drops, which recruiters use to gauge candidate discipline. Protect your streak!
+</Callout>
+
+---
+
+## Related Guides
+
+* **[XP & Levels](../progress-rankings/xp-levels)**
+* **[Badges](../progress-rankings/badges)**
+* **[Placement Readiness](../progress-rankings/placement-readiness)**

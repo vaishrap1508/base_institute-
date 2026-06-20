@@ -1,0 +1,91 @@
+import { Callout } from 'nextra/components'
+
+# Understanding Feedback
+
+Learn how the grading engine evaluates selections, triggers success events, logs correctness telemetry, and reveals solution sheets.
+
+---
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 rounded-2xl border border-slate-205 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
+  <div className="text-center">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Reading Time</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">3 min read</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Difficulty</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Beginner</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">System</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Grading</span>
+  </div>
+  <div className="text-center border-l border-slate-200 dark:border-slate-800">
+    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Last Updated</span>
+    <span className="text-sm font-black text-slate-800 dark:text-white mt-1 block">Jun 2026</span>
+  </div>
+</div>
+
+---
+
+### What You'll Learn
+
+After reading this guide, you will understand:
+✓ How choice selection triggers correctness grading  
+✓ The anatomy of correct vs incorrect feedback cards  
+✓ Visual telemetry logs generated on attempt submission  
+✓ Emitter events that drive success confetti effects  
+
+---
+
+## Grading Engine Workflow
+
+When you click "Submit", the platform evaluates your answer choice asynchronously:
+
+```mermaid
+graph TD
+    A[Student Submits Answer] --> B{Check isCorrect}
+    B -- Yes --> C[Emit Confetti + Show Success Banner + Record solve_count]
+    B -- No --> D[Show Warning Banner + Recommend Solution Tabs]
+    C --> E[Sync data to Supabase progress table]
+    D --> E
+```
+
+### 1. Success States
+- **Display**: The option box lights up in solid emerald green.
+- **Feedback**: A toast message says `Correct! 🔥`.
+- **Celebration**: An absolute canvas-overlay confetti emitter releases multi-colored particle streams.
+
+### 2. Error States
+- **Display**: The selected option turns rose red, and the correct option is highlighted in green.
+- **Feedback**: A toast message says `Not quite yet. 🎯`.
+
+---
+
+## What Happens Behind the Scenes?
+
+When you submit an attempt, the client compiles metadata and updates local/remote databases:
+- **Solve Count**: Increments if correct and not previously answered.
+- **Streak Status**: Updates last active timestamp. If the solve occurred within 24–48 hours of the previous activity, the streak counter increases.
+- **Telemetry Event**: Logs solve duration, question ID, and option ID to `user_progress` table.
+
+---
+
+## Feedback Best Practices
+
+<Callout type="info">
+  **Best Practice: Review the Video Solution immediately after an error**  
+  If you get a question wrong, do not click "Next" immediately. Spend 2 minutes reviewing the Written or Video solutions. Consuming the solution while the problem context is fresh in your working memory maximizes retention.
+</Callout>
+
+<Callout type="warning">
+  **Warning: Security Verification**  
+  Correct answer indexes are never sent in the initial question payload. Verification occurs on-submit or via secure routes to prevent inspect-element leaks.
+</Callout>
+
+---
+
+## Related Guides
+
+* **[Solving Questions](../practice-arena/solving-questions)**
+* **[Using Video Solutions](../practice-arena/using-video-solutions)**
+* **[AI ELI5 Assistant](../practice-arena/ai-assistant)**

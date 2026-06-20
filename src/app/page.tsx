@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
+import { siteConfig } from '@/config/site';
 import { 
   Layers, 
   ArrowRight, 
@@ -113,7 +114,7 @@ interface LandingPageContent {
 // DEFAULT HIGH-FIDELITY PRESETS
 // ==========================================
 const DEFAULT_CONTENT: LandingPageContent = {
-  hero_title: 'MASTER APTITUDE WITH THE KINETIC PLATFORM',
+  hero_title: `MASTER APTITUDE WITH ${siteConfig.nameUpper}`,
   hero_subtitle: 'TRUSTED BY 100K+ STUDENTS AND EMPLOYEES',
   hero_paragraph: "Experience 'No-Compiler' learning speed. A structured roadmap designed to take you from fundamentals to company-specific readiness in record time.",
   hero_btn_primary: 'Start Preparing for Free',
@@ -161,10 +162,10 @@ const DEFAULT_CONTENT: LandingPageContent = {
     { url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&auto=format&fit=crop&q=80', caption: 'Corporate Board Meeting', category: 'Corporate Ties' },
     { url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&auto=format&fit=crop&q=80', caption: 'Big Tech Conference', category: 'Placement Drives' }
   ],
-  mentor_name: 'Vaibhav Sharma',
-  mentor_designation: 'Founder & CEO, Kinetic Platform',
-  mentor_bio: "Hello, I'm Vaibhav Sharma.\nFounder and creator of Kinetic Platform.\nI built this platform to simplify aptitude, verbal ability, and placement preparation through structured learning paths and practical problem solving.\nWhether you're preparing for placements, competitive exams, or simply improving your aptitude skills, this platform is designed to guide you step by step.",
-  mentor_message: 'Remember:\nConsistency beats intensity.\nSmall daily improvements create long-term success.',
+  mentor_name: siteConfig.mentor.name,
+  mentor_designation: siteConfig.mentor.role,
+  mentor_bio: siteConfig.mentor.bio,
+  mentor_message: siteConfig.mentor.message,
   mentor_image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
   mentor_badge_1: '🏆 Founder',
   mentor_badge_2: '🎯 Placement Mentor',
@@ -184,8 +185,8 @@ const DEFAULT_CONTENT: LandingPageContent = {
   curriculum_mock_4: 'assessment',
   
   // Dynamic Logo & Global Copy Defaults
-  header_logo_text: 'KINETIC PLATFORM',
-  header_logo_subtext: 'APTITUDE AI',
+  header_logo_text: siteConfig.logoText,
+  header_logo_subtext: siteConfig.logoSubtext,
   header_btn_text: 'Join for Free',
   bento_title: 'EMPOWERING CAMPUSES',
   bento_desc: 'Interactive workshops, dynamic learning roadmaps, and campus placements engineered to accelerate talent.',
@@ -195,16 +196,10 @@ const DEFAULT_CONTENT: LandingPageContent = {
   faq_title: 'Frequently Asked Questions',
   faq_desc: 'Have questions about our syllabus, adaptive mock tests, or sandbox staging environments? Find answers below.',
   footer_badge_text: 'Operational Clearance: Sandbox Encrypted',
-  footer_copyright: '© 2026 Aptitude AI platform. All rights reserved.'
+  footer_copyright: siteConfig.copyright
 };
 
-const DEFAULT_UNIVERSITIES = [
-  'Vellore Institute of Technology',
-  'SRM University',
-  'BITS Pilani',
-  'Amity University',
-  'KIIT Bhubaneswar'
-];
+const DEFAULT_UNIVERSITIES = siteConfig.defaultUniversities;
 
 interface DemoQuestion {
   topic: string;
@@ -340,20 +335,20 @@ const SUBJECT_ICONS = [
 ];
 
 const AVATAR_URLS = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=150&auto=format&fit=crop&q=80'
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Oliver',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Aneka',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Buster',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Toby',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Bella',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Zoe',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Charlie',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Milo',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Lucy',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Leo',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Max',
+  'https://api.dicebear.com/7.x/adventurer/svg?seed=Mia'
 ];
 
 const generateRandomAptitude = () => {
@@ -552,7 +547,7 @@ const AptitudeCategoryIcon = ({ category }: { category: string }) => {
       );
     case 'placement':
       return (
-        <span className="w-4 h-4 bg-slate-855 rounded flex items-center justify-center p-0.5 shadow-md border border-slate-600 text-[8px]" title="Placement Focus">
+        <span className="w-4 h-4 bg-slate-900 rounded flex items-center justify-center p-0.5 shadow-md border border-slate-600 text-[8px]" title="Placement Focus">
           💼
         </span>
       );
@@ -605,7 +600,7 @@ export default function LandingPage() {
   const [stats, setStats] = useState<LandingStats | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'global' | 'hero' | 'mentor' | 'bento' | 'curriculum' | 'stats' | 'faqs' | 'cta'>('global');
+  const [activeTab, setActiveTab] = useState<'global' | 'hero' | 'mentor' | 'bento' | 'curriculum' | 'stats' | 'faqs' | 'cta' | 'footer'>('global');
   const [faqSearch, setFaqSearch] = useState('');
   const [openFaqId, setOpenFaqId] = useState<string | null>('faq-1');
   const [activeFaqCategory, setActiveFaqCategory] = useState('general');
@@ -1324,34 +1319,34 @@ export default function LandingPage() {
       localStorage.setItem('aptitude_landing_page_settings', JSON.stringify(updatedContent));
       showNotice("Staging Sandbox Saved (Staging Offline: Saved to Local Storage Cache).", "info");
       setIsEditorOpen(false);
-} finally {
+    } finally {
       setSavingContent(false);
     }
   };
 
   // Bento grid mockup visual render helpers
   const renderScaleTracker = () => (
-    <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-3 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
+    <div className="bg-white border border-slate-200 dark:bg-slate-950/60 dark:border-slate-900 rounded-xl p-4 mt-2 space-y-3 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-300 dark:hover:border-slate-800 transition-all duration-300">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(226,232,240,0.5)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,0.5)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
       <div className="flex items-center justify-between relative z-10">
-        <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Cohort Scale Tracker</span>
+        <span className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">Cohort Scale Tracker</span>
         <div className="flex items-center gap-1.5">
           <div className="relative flex h-2 w-2 items-center justify-center">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
           </div>
-          <span className="text-[8px] font-bold text-emerald-400 font-mono bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">Live Sync</span>
+          <span className="text-[8px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-900/30 px-1.5 py-0.5 rounded transition-colors duration-300">Live Sync</span>
         </div>
       </div>
       
       {/* Interactive Scale progress display */}
       <div className="space-y-3 flex-1 flex flex-col justify-center relative z-10">
         <div className="space-y-1">
-          <div className="flex justify-between text-[9px] font-bold text-slate-400">
+          <div className="flex justify-between text-[9px] font-bold text-slate-500 dark:text-slate-400 transition-colors duration-300">
             <span>Section A (Advanced maps)</span>
-            <span className="font-mono text-blue-400">{Math.min(98, Math.floor((cohortScale / 500) * 100))}% Done</span>
+            <span className="font-mono text-blue-600 dark:text-blue-400">{Math.min(98, Math.floor((cohortScale / 500) * 100))}% Done</span>
           </div>
-          <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
+          <div className="w-full bg-slate-100 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden relative transition-colors duration-300">
             <div 
               className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-350 ease-out relative overflow-hidden"
               style={{ width: `${Math.min(98, Math.floor((cohortScale / 500) * 100))}%` }}
@@ -1361,11 +1356,11 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="space-y-1">
-          <div className="flex justify-between text-[9px] font-bold text-slate-400">
+          <div className="flex justify-between text-[9px] font-bold text-slate-500 dark:text-slate-400 transition-colors duration-300">
             <span>Section B (Foundations)</span>
-            <span className="font-mono text-indigo-400">{Math.min(90, Math.floor((cohortScale / 500) * 80))}% Done</span>
+            <span className="font-mono text-indigo-600 dark:text-indigo-400">{Math.min(90, Math.floor((cohortScale / 500) * 80))}% Done</span>
           </div>
-          <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
+          <div className="w-full bg-slate-100 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden relative transition-colors duration-300">
             <div 
               className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-350 ease-out relative overflow-hidden"
               style={{ width: `${Math.min(90, Math.floor((cohortScale / 500) * 80))}%` }}
@@ -1384,29 +1379,29 @@ export default function LandingPage() {
           max="500" 
           value={cohortScale} 
           onChange={(e) => setCohortScale(Number(e.target.value))}
-          className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none"
+          className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500 focus:outline-none transition-colors duration-300"
         />
       </div>
 
-      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-900/60">
+      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-100 dark:border-slate-900/60 transition-colors duration-300">
         <span>Target: {cohortScale}k Cohorts</span>
-        <span className="text-blue-400 font-mono">Rate: {(cohortScale * 6).toFixed(1)}k req/s</span>
+        <span className="text-blue-600 dark:text-blue-400 font-mono">Rate: {(cohortScale * 6).toFixed(1)}k req/s</span>
       </div>
     </div>
   );
 
   const renderQuestionWorkspace = () => (
-    <div className={`bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300 ${
+    <div className={`bg-white border border-slate-200 dark:bg-slate-950/60 dark:border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-300 dark:hover:border-slate-800 transition-all duration-300 ${
       workspaceShaking ? 'animate-shake border-rose-900/60 shadow-[0_0_25px_rgba(244,63,94,0.15)]' : ''
     } ${workspaceSuccessPop ? 'border-emerald-900/60 shadow-[0_0_25px_rgba(16,185,129,0.15)]' : ''}`}>
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(226,232,240,0.5)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,0.5)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
       <div className="flex items-center justify-between relative z-10">
-        <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Question Workspace</span>
-        <span className="text-[8px] font-bold text-indigo-400 font-mono bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-900/30">Active Brainteaser</span>
+        <span className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">Question Workspace</span>
+        <span className="text-[8px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 dark:text-indigo-400 dark:bg-indigo-950/40 dark:border-indigo-900/30 px-1.5 py-0.5 rounded transition-colors duration-300">Active Brainteaser</span>
       </div>
 
       <div className="space-y-2 flex-1 flex flex-col justify-center relative z-10 text-left">
-        <div className="text-[10px] font-extrabold text-slate-300">
+        <div className="text-[10px] font-extrabold text-slate-800 dark:text-slate-300 transition-colors duration-300">
           Find the missing number: 2, 6, 12, 20, ?
         </div>
         
@@ -1422,9 +1417,9 @@ export default function LandingPage() {
                 className={`py-1 rounded text-[10px] font-black font-mono transition-all border ${
                   isSelected 
                     ? isCorrect 
-                      ? `bg-emerald-950/60 border-emerald-500 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.25)] ${workspaceSuccessPop ? 'animate-success-pop' : ''}`
-                      : 'bg-rose-950/60 border-rose-500 text-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.2)]'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                      ? `bg-emerald-50 border-emerald-500 text-emerald-700 shadow-[0_0_12px_rgba(16,185,129,0.15)] dark:bg-emerald-950/60 dark:border-emerald-500 dark:text-emerald-400 dark:shadow-[0_0_12px_rgba(16,185,129,0.25)] ${workspaceSuccessPop ? 'animate-success-pop' : ''}`
+                      : 'bg-rose-50 border-rose-500 text-rose-700 shadow-[0_0_12px_rgba(244,63,94,0.15)] dark:bg-rose-950/60 dark:border-rose-500 dark:text-rose-400 dark:shadow-[0_0_12px_rgba(244,63,94,0.2)]'
+                    : 'bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-800 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 {num}
@@ -1436,17 +1431,17 @@ export default function LandingPage() {
         {selectedWorkspaceAns !== null && (
           <div className="text-[8px] font-bold text-center transition-all animate-fadeIn">
             {selectedWorkspaceAns === 30 ? (
-              <span className="text-emerald-400 animate-pulse">✓ Correct! Logic: n*(n+1) or differences +4, +6, +8, +10.</span>
+              <span className="text-emerald-600 dark:text-emerald-400 animate-pulse transition-colors duration-300">✓ Correct! Logic: n*(n+1) or differences +4, +6, +8, +10.</span>
             ) : (
-              <span className="text-rose-400">✗ Wrong! Hint: Look at differences (+4, +6, +8...).</span>
+              <span className="text-rose-600 dark:text-rose-400 transition-colors duration-300">✗ Wrong! Hint: Look at differences (+4, +6, +8...).</span>
             )}
           </div>
         )}
       </div>
 
-      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-900/60">
+      <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-100 dark:border-slate-900/60 transition-colors duration-300">
         <span>Accuracy: {selectedWorkspaceAns === 30 ? '100%' : '84%'} avg</span>
-        <span className="text-indigo-400 font-mono">Topic: Sequences</span>
+        <span className="text-indigo-600 dark:text-indigo-400 font-mono">Topic: Sequences</span>
       </div>
     </div>
   );
@@ -1459,11 +1454,11 @@ export default function LandingPage() {
     };
 
     return (
-      <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
+      <div className="bg-white border border-slate-200 dark:bg-slate-950/60 dark:border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-300 dark:hover:border-slate-800 transition-all duration-300">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(226,232,240,0.5)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,0.5)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
         <div className="flex items-center justify-between relative z-10">
-          <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Syllabus Milestones</span>
-          <span className="text-[8px] font-bold text-purple-400 font-mono bg-purple-950/40 px-1.5 py-0.5 rounded border border-purple-900/30">Interactive Roadmap</span>
+          <span className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">Syllabus Milestones</span>
+          <span className="text-[8px] font-bold text-purple-700 bg-purple-50 border border-purple-200 dark:text-purple-400 dark:bg-purple-950/40 dark:border-purple-900/30 px-1.5 py-0.5 rounded transition-colors duration-300">Interactive Roadmap</span>
         </div>
 
         <div className="flex items-center justify-between gap-1 relative px-2 z-10">
@@ -1492,12 +1487,12 @@ export default function LandingPage() {
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-black shadow-md transition-all duration-300 border ${
                   isActive 
                     ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.6)] scale-110'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                    : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 dark:hover:text-slate-200'
                 }`}>
                   0{num}
                 </div>
                 <span className={`text-[8px] font-bold tracking-tight transition-colors duration-300 ${
-                  isActive ? 'text-indigo-400 font-black' : 'text-slate-500'
+                  isActive ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'text-slate-500'
                 }`}>
                   {labels[num - 1]}
                 </span>
@@ -1507,15 +1502,15 @@ export default function LandingPage() {
         </div>
 
         {/* Dynamic Milestone details box */}
-        <div className="bg-slate-900/40 border border-slate-900/80 rounded-lg p-2 text-left animate-fadeIn">
-          <span className="text-[7px] font-extrabold uppercase tracking-widest text-slate-500 block">Milestone Topic</span>
-          <span className="text-[10px] font-bold text-slate-200 block mt-0.5">{topics[activeMilestone as 1 | 2 | 3].title}</span>
-          <span className="text-[8px] font-semibold text-slate-400 block leading-tight mt-0.5">{topics[activeMilestone as 1 | 2 | 3].desc}</span>
+        <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-2 text-left animate-fadeIn dark:bg-slate-900/40 dark:border-slate-900/80 transition-colors duration-300">
+          <span className="text-[7px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500 block">Milestone Topic</span>
+          <span className="text-[10px] font-bold text-slate-800 dark:text-slate-200 block mt-0.5 transition-colors duration-300">{topics[activeMilestone as 1 | 2 | 3].title}</span>
+          <span className="text-[8px] font-semibold text-slate-500 dark:text-slate-400 block leading-tight mt-0.5 transition-colors duration-300">{topics[activeMilestone as 1 | 2 | 3].desc}</span>
         </div>
 
-        <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-900/60">
+        <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-100 dark:border-slate-900/60 transition-colors duration-300">
           <span>Curriculum Map: Active</span>
-          <span className="text-purple-400 font-mono">Partnerships: 156+</span>
+          <span className="text-purple-600 dark:text-purple-400 font-mono">Partnerships: 156+</span>
         </div>
       </div>
     );
@@ -1578,26 +1573,26 @@ export default function LandingPage() {
     };
 
     return (
-      <div className="bg-slate-950/60 border border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-800 transition-all duration-300">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
+      <div className="bg-white border border-slate-200 dark:bg-slate-950/60 dark:border-slate-900 rounded-xl p-4 mt-2 space-y-2.5 relative overflow-hidden shadow-inner w-full min-h-[180px] flex flex-col justify-between group/mockup hover:border-slate-300 dark:hover:border-slate-800 transition-all duration-300">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(226,232,240,0.5)_1px,transparent_1px),linear-gradient(to_bottom,rgba(226,232,240,0.5)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:16px_16px] opacity-20 pointer-events-none" />
         <div className="flex items-center justify-between relative z-10">
-          <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Goldman Sachs Mock Sandbox</span>
-          <span className="text-[8px] font-bold text-emerald-400 font-mono bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/30">Staging Mode</span>
+          <span className="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">Goldman Sachs Mock Sandbox</span>
+          <span className="text-[8px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-900/30 px-1.5 py-0.5 rounded transition-colors duration-300">Staging Mode</span>
         </div>
 
         <div className="space-y-2 flex-1 flex flex-col justify-center relative z-10">
-          <div className="flex justify-between items-center text-[10px] font-bold text-slate-350">
+          <div className="flex justify-between items-center text-[10px] font-bold text-slate-800 dark:text-slate-300 transition-colors duration-300">
             <span>Standard Mock Test</span>
             <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded border font-bold uppercase transition-all duration-300 ${
-              assessmentStatus === 'idle' ? 'bg-slate-900 text-slate-450 border-slate-800' :
-              assessmentStatus === 'running' ? 'bg-amber-950/30 text-amber-400 border-amber-900/40 animate-pulse' :
-              'bg-emerald-950/30 text-emerald-400 border-emerald-900/40 font-black animate-text-glow'
+              assessmentStatus === 'idle' ? 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800' :
+              assessmentStatus === 'running' ? 'bg-amber-50 text-amber-700 border-amber-200 animate-pulse dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/40' :
+              'bg-emerald-50 text-emerald-700 border-emerald-200 font-black animate-text-glow dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/40'
              }`}>
               {assessmentStatus}
             </span>
           </div>
 
-          <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden relative">
+          <div className="w-full bg-slate-100 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden relative transition-colors duration-300">
             <div 
               className={`h-full rounded-full transition-all duration-100 ease-out relative overflow-hidden ${
                 assessmentStatus === 'submitted' ? 'bg-gradient-to-r from-emerald-500 to-teal-400 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-gradient-to-r from-blue-500 to-indigo-500'
@@ -1607,14 +1602,14 @@ export default function LandingPage() {
           </div>
 
           {/* Mini Monospace Terminal Log */}
-          <div className="bg-black/95 border border-slate-900 rounded-lg p-2 font-mono text-[8px] leading-tight text-left min-h-[42px] flex flex-col justify-center relative overflow-hidden">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 font-mono text-[8px] leading-tight text-left min-h-[42px] flex flex-col justify-center relative overflow-hidden dark:bg-black/95 dark:border-slate-900 transition-colors duration-300">
             {getTerminalLogs().map((line, lIdx) => (
               <div key={lIdx} className="flex items-center justify-between">
-                <span className={lIdx === 0 && assessmentStatus !== 'idle' ? (assessmentStatus === 'submitted' ? 'text-emerald-400 font-bold' : 'text-blue-400 font-semibold') : 'text-slate-500'}>
+                <span className={lIdx === 0 && assessmentStatus !== 'idle' ? (assessmentStatus === 'submitted' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-blue-600 dark:text-blue-400 font-semibold') : 'text-slate-500'}>
                   {line}
                 </span>
                 {lIdx === 0 && assessmentStatus === 'running' && (
-                  <span className="w-[3px] h-[7px] bg-blue-400 animate-cursor-blink inline-block shrink-0" />
+                  <span className="w-[3px] h-[7px] bg-blue-600 dark:bg-blue-400 animate-cursor-blink inline-block shrink-0" />
                 )}
               </div>
             ))}
@@ -1626,7 +1621,7 @@ export default function LandingPage() {
               type="button"
               onClick={startAssessmentSim}
               disabled={assessmentStatus === 'running'}
-              className="w-full py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-900 text-white disabled:text-slate-500 text-[10px] font-black uppercase rounded-lg shadow-md transition-all duration-200 cursor-pointer active:scale-95 border border-transparent disabled:border-slate-800"
+              className="w-full py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-900 text-white disabled:text-slate-400 dark:disabled:text-slate-500 text-[10px] font-black uppercase rounded-lg shadow-md transition-all duration-200 cursor-pointer active:scale-95 border border-transparent disabled:border-slate-200 dark:disabled:border-slate-800"
             >
               {assessmentStatus === 'idle' ? '⚡ Execute Staging Mock' :
                assessmentStatus === 'running' ? `Running Test ${assessmentProgress}%` :
@@ -1635,9 +1630,9 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-900/60 font-sans">
+        <div className="flex items-center justify-between text-[8px] font-black tracking-widest uppercase text-slate-500 relative z-10 pt-1 border-t border-slate-100 dark:border-slate-900/60 font-sans transition-colors duration-300">
           <span>Score: {assessmentStatus === 'submitted' ? '385/400' : '0/400'}</span>
-          <span className="text-emerald-400 font-mono">Status: {assessmentStatus === 'submitted' ? 'Submitted' : 'Running'}</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-mono transition-colors duration-300">Status: {assessmentStatus === 'submitted' ? 'Submitted' : 'Running'}</span>
         </div>
       </div>
     );
@@ -1756,7 +1751,7 @@ export default function LandingPage() {
           {/* Theme Toggle Button (Icon-Only Circular Button) */}
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-650 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none"
             title="Toggle theme"
             suppressHydrationWarning
           >
@@ -1790,16 +1785,16 @@ export default function LandingPage() {
 
 
           {/* Heading */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight">
-            {content.hero_title.split('KINETIC PLATFORM')[0]}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight">
+            {content.hero_title.split(siteConfig.nameUpper)[0]}
             <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent drop-shadow-sm">
-              KINETIC PLATFORM
+              {siteConfig.nameUpper}
             </span>
-            {content.hero_title.split('KINETIC PLATFORM')[1] || ''}
+            {content.hero_title.split(siteConfig.nameUpper)[1] || ''}
           </h1>
 
           {/* Paragraph explanation */}
-          <p className="text-sm md:text-base text-slate-400 max-w-xl leading-relaxed">
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
             {content.hero_paragraph}
           </p>
 
@@ -1815,9 +1810,9 @@ export default function LandingPage() {
             <button
               suppressHydrationWarning
               onClick={() => showNotice("Platform Staging sandbox environment is active. Standard compiler demo running on visual panel.", "info")}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white font-bold text-xs rounded-xl border border-slate-800/80 transition-all duration-200"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-800/80 transition-all duration-200 cursor-pointer"
             >
-              <Play className="w-4 h-4 text-slate-500 shrink-0 fill-current" />
+              <Play className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0 fill-current" />
               <span>{content.hero_btn_secondary}</span>
             </button>
           </div>
@@ -1833,7 +1828,7 @@ export default function LandingPage() {
             {/* Outer Orbit Wrapper */}
             <div className="absolute inset-0 w-0 h-0">
               <div 
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[0.75px] border-dotted border-slate-300/10 dark:border-white/5 pointer-events-none"
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[0.75px] border-dotted border-slate-300/30 dark:border-white/5 pointer-events-none"
                 style={{
                   width: 'var(--orbit-outer-w)',
                   height: 'var(--orbit-outer-h)',
@@ -1844,7 +1839,7 @@ export default function LandingPage() {
             {/* Inner Orbit Wrapper */}
             <div className="absolute inset-0 w-0 h-0">
               <div 
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[0.75px] border-dotted border-slate-300/10 dark:border-white/5 pointer-events-none"
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[0.75px] border-dotted border-slate-300/30 dark:border-white/5 pointer-events-none"
                 style={{
                   width: 'var(--orbit-inner-w)',
                   height: 'var(--orbit-inner-h)',
@@ -1857,7 +1852,7 @@ export default function LandingPage() {
 
 
 
-          <div className="w-full rounded-2xl glassmorphism border border-slate-800/60 p-5 shadow-2xl space-y-4 relative overflow-hidden transition-all duration-500 group-hover:-translate-y-1.5 group-hover:scale-[1.01] group-hover:shadow-[0_25px_60px_rgba(37,99,235,0.15)] select-none z-10">
+          <div className="w-full rounded-2xl glassmorphism-light dark:glassmorphism border border-slate-200 dark:border-slate-800/60 p-5 shadow-2xl space-y-4 relative overflow-hidden transition-all duration-500 group-hover:-translate-y-1.5 group-hover:scale-[1.01] group-hover:shadow-[0_25px_60px_rgba(37,99,235,0.15)] select-none z-10">
             
             {/* Visual shine gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/5 to-transparent pointer-events-none" />
@@ -1866,30 +1861,30 @@ export default function LandingPage() {
             <div className="absolute inset-0 w-[50%] h-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none -skew-x-25 animate-reflection-sweep" />
 
             {/* Window bar */}
-            <div className="flex items-center justify-between border-b border-slate-900 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-600/80 animate-glow-red" />
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-600/80 animate-glow-amber" />
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600/80 animate-glow-green" />
               </div>
-              <div className="text-[9px] font-bold text-slate-600 font-mono tracking-widest uppercase">
-                kinetic-staging-v2.0
+              <div className="text-[9px] font-bold text-slate-400 dark:text-slate-600 font-mono tracking-widest uppercase">
+                {siteConfig.stagingVersion}
               </div>
             </div>
 
             {/* Active Math Problem */}
-            <div className={`bg-slate-950/80 rounded-xl p-4 border border-slate-900/60 space-y-3 transition-all duration-700 ${
+            <div className={`bg-slate-50 dark:bg-slate-950/80 rounded-xl p-4 border border-slate-200 dark:border-slate-900/60 space-y-3 transition-all duration-700 ${
               solverPhase === 'loading' ? 'opacity-40 scale-[0.99] blur-[0.5px]' : 'opacity-100 scale-100'
             }`}>
               <div className="flex items-center justify-between">
-                <span className="text-[9px] font-black px-2 py-0.5 rounded bg-blue-950/60 text-blue-400 border border-blue-900/40 tracking-wider">
+                <span className="text-[9px] font-black px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-900/40 tracking-wider">
                   {DEMO_QUESTIONS[activeQuestionIdx].topic}
                 </span>
                 <span className="text-[9px] font-bold text-slate-500 font-mono">
                   ID: {DEMO_QUESTIONS[activeQuestionIdx].id}
                 </span>
               </div>
-              <p className="text-[11px] font-semibold leading-relaxed text-slate-300 min-h-[50px]">
+              <p className="text-[11px] font-semibold leading-relaxed text-slate-700 dark:text-slate-300 min-h-[50px]">
                 {DEMO_QUESTIONS[activeQuestionIdx].question}
               </p>
             </div>
@@ -1898,39 +1893,39 @@ export default function LandingPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Dynamic Equation input</span>
-                <span className="text-[8px] font-bold text-blue-500/80 font-mono bg-blue-950/20 px-1.5 py-0.5 rounded">LaTeX Mode</span>
+                <span className="text-[8px] font-bold text-blue-600 bg-blue-50 dark:text-blue-500/80 dark:bg-blue-950/20 px-1.5 py-0.5 rounded">LaTeX Mode</span>
               </div>
-              <div className="bg-slate-950 rounded-xl p-4 border border-slate-900 font-mono text-[11px] text-blue-400 space-y-2 min-h-[92px]">
+              <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-200 dark:border-slate-900 font-mono text-[11px] text-blue-600 dark:text-blue-400 space-y-2 min-h-[92px]">
                 {/* Row 1 */}
                 <div className={`flex gap-3 transition-all duration-300 ${solverPhase !== 'loading' ? 'opacity-100' : 'opacity-20'}`}>
-                  <span className="text-slate-700 select-none w-3 text-right">1</span>
-                  <div className="flex-1 text-slate-300 font-medium" style={{ textTransform: 'none' }}>
+                  <span className="text-slate-400 dark:text-slate-700 select-none w-3 text-right">1</span>
+                  <div className="flex-1 text-slate-700 dark:text-slate-300 font-medium" style={{ textTransform: 'none' }}>
                     {typedLines[0]}
                     {solverPhase === 'typing_1' && (
-                      <span className="text-blue-500 font-black animate-cursor-blink ml-[1px]">|</span>
+                      <span className="text-blue-600 dark:text-blue-500 font-black animate-cursor-blink ml-[1px]">|</span>
                     )}
                   </div>
                 </div>
                 {/* Row 2 */}
                 <div className={`flex gap-3 transition-all duration-300 ${solverPhase !== 'loading' && solverPhase !== 'typing_1' ? 'opacity-100' : 'opacity-20'}`}>
-                  <span className="text-slate-700 select-none w-3 text-right">2</span>
-                  <div className="flex-1 text-slate-300 font-medium" style={{ textTransform: 'none' }}>
+                  <span className="text-slate-400 dark:text-slate-700 select-none w-3 text-right">2</span>
+                  <div className="flex-1 text-slate-700 dark:text-slate-300 font-medium" style={{ textTransform: 'none' }}>
                     {typedLines[1]}
                     {solverPhase === 'typing_2' && (
-                      <span className="text-blue-500 font-black animate-cursor-blink ml-[1px]">|</span>
+                      <span className="text-blue-600 dark:text-blue-500 font-black animate-cursor-blink ml-[1px]">|</span>
                     )}
                   </div>
                 </div>
                 {/* Row 3 */}
                 <div className={`flex gap-3 transition-all duration-300 ${solverPhase === 'typing_3' || solverPhase === 'solved' ? 'opacity-100' : 'opacity-20'}`}>
-                  <span className="text-slate-700 select-none w-3 text-right">3</span>
-                  <div className="flex-1 text-slate-300 font-medium" style={{ textTransform: 'none' }}>
+                  <span className="text-slate-400 dark:text-slate-700 select-none w-3 text-right">3</span>
+                  <div className="flex-1 text-slate-700 dark:text-slate-300 font-medium" style={{ textTransform: 'none' }}>
                     {typedLines[2]}
                     {solverPhase === 'typing_3' && (
-                      <span className="text-blue-500 font-black animate-cursor-blink ml-[1px]">|</span>
+                      <span className="text-blue-600 dark:text-blue-500 font-black animate-cursor-blink ml-[1px]">|</span>
                     )}
                     {solverPhase === 'solved' && (
-                      <span className="text-emerald-400 font-black animate-cursor-blink ml-[1px]">|</span>
+                      <span className="text-emerald-500 dark:text-emerald-400 font-black animate-cursor-blink ml-[1px]">|</span>
                     )}
                   </div>
                 </div>
@@ -1938,10 +1933,10 @@ export default function LandingPage() {
             </div>
 
             {/* Real-time Math outcome render */}
-            <div className={`transition-all duration-700 bg-slate-950/60 rounded-xl border p-4 text-center space-y-2 relative overflow-hidden h-[175px] ${
+            <div className={`transition-all duration-700 bg-slate-50/60 dark:bg-slate-950/60 rounded-xl border p-4 text-center space-y-2 relative overflow-hidden h-[175px] ${
               solverPhase === 'solved' 
-                ? 'border-emerald-500/25 bg-emerald-950/5 shadow-lg shadow-emerald-500/5' 
-                : 'border-slate-900/60'
+                ? 'border-emerald-500/25 bg-emerald-50/50 dark:bg-emerald-950/5 shadow-lg shadow-emerald-500/5' 
+                : 'border-slate-200 dark:border-slate-900/60'
             }`}>
               <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest block text-left">
                 Live Student Render Preview
@@ -1952,10 +1947,10 @@ export default function LandingPage() {
                     ? 'scale-100 opacity-100' 
                     : 'scale-95 opacity-30 blur-[0.5px] pointer-events-none'
                 }`}>
-                  <div className={`text-[12px] font-black text-white px-4 py-2 bg-slate-900/90 border rounded-xl shadow-md transition-all duration-700 ${
+                  <div className={`text-[12px] font-black text-slate-800 dark:text-white px-4 py-2 bg-white dark:bg-slate-900/90 border rounded-xl shadow-md transition-all duration-700 ${
                     solverPhase === 'solved'
-                      ? 'border-emerald-500/30 shadow-emerald-500/5 bg-slate-900'
-                      : 'border-slate-800'
+                      ? 'border-emerald-500/30 dark:border-emerald-500/30 shadow-emerald-500/5 bg-white dark:bg-slate-900'
+                      : 'border-slate-200 dark:border-slate-800'
                   }`}>
                     {DEMO_QUESTIONS[activeQuestionIdx].resultPreview}
                   </div>
@@ -1969,7 +1964,7 @@ export default function LandingPage() {
                   <div className={`transition-all duration-[800ms] ease-out overflow-hidden w-full ${
                     solverPhase === 'solved' ? 'max-h-[80px] opacity-100 mt-2' : 'max-h-0 opacity-0'
                   }`}>
-                    <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-2.5 text-center text-[10px] font-black text-emerald-400 shadow-inner tracking-wide uppercase">
+                    <div className="bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-500/20 rounded-xl p-2.5 text-center text-[10px] font-black text-emerald-700 dark:text-emerald-400 shadow-inner tracking-wide uppercase">
                       ✅ {DEMO_QUESTIONS[activeQuestionIdx].answerCard}
                     </div>
                   </div>
@@ -1990,21 +1985,21 @@ export default function LandingPage() {
             </div>
 
             {/* Live Data Elements */}
-            <div className="border-t border-slate-900 pt-4 grid grid-cols-3 gap-2 text-center select-none">
+            <div className="border-t border-slate-100 dark:border-slate-900 pt-4 grid grid-cols-3 gap-2 text-center select-none">
               <div className="space-y-1">
-                <span className="text-[14px] font-black text-slate-100 tracking-tight block">
+                <span className="text-[14px] font-black text-slate-800 dark:text-slate-100 tracking-tight block">
                   {questionsCount.toLocaleString()}
                 </span>
                 <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider block">Questions</span>
               </div>
-              <div className="space-y-1 border-l border-slate-900">
-                <span className="text-[14px] font-black text-blue-400 tracking-tight block">
+              <div className="space-y-1 border-l border-slate-100 dark:border-l border-slate-900">
+                <span className="text-[14px] font-black text-blue-600 dark:text-blue-400 tracking-tight block">
                   {companiesCount}
                 </span>
                 <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider block">Company Tags</span>
               </div>
-              <div className="space-y-1 border-l border-slate-900">
-                <span className="text-[14px] font-black text-indigo-400 tracking-tight block">
+              <div className="space-y-1 border-l border-slate-100 dark:border-l border-slate-900">
+                <span className="text-[14px] font-black text-indigo-600 dark:text-indigo-400 tracking-tight block">
                   {studentsCount}K
                 </span>
                 <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider block">Students</span>
@@ -2025,7 +2020,7 @@ export default function LandingPage() {
             >
               {badge1Content && (
                 <div 
-                  className={`w-max flex items-center gap-2 glassmorphism px-3.5 py-1.5 rounded-full border border-slate-800/90 shadow-md select-none transition-all duration-500 group-hover:border-blue-500/40 group-hover:shadow-[0_0_20px_rgba(37,99,235,0.2)] pointer-events-auto cursor-pointer ${
+                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-900/90 shadow-md select-none transition-all duration-500 group-hover:border-blue-500/40 group-hover:shadow-[0_0_20px_rgba(37,99,235,0.2)] pointer-events-auto cursor-pointer ${
                     badge1Fade ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'
                   }`}
                   style={{ transition: 'opacity 0.3s ease-out, transform 0.3s ease-out, filter 0.3s ease-out' }}
@@ -2047,7 +2042,7 @@ export default function LandingPage() {
             >
               {badge2Content && (
                 <div 
-                  className={`w-max flex items-center gap-2 glassmorphism px-3.5 py-1.5 rounded-full border border-slate-800/90 shadow-md select-none transition-all duration-500 group-hover:border-indigo-500/40 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] pointer-events-auto cursor-pointer ${
+                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-900/90 shadow-md select-none transition-all duration-500 group-hover:border-indigo-500/40 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] pointer-events-auto cursor-pointer ${
                     badge2Fade ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'
                   }`}
                   style={{ transition: 'opacity 0.3s ease-out, transform 0.3s ease-out, filter 0.3s ease-out' }}
@@ -2069,7 +2064,7 @@ export default function LandingPage() {
             >
               {badge3Content && (
                 <div 
-                  className={`w-max flex items-center gap-2 glassmorphism px-3.5 py-1.5 rounded-full border border-slate-800/90 shadow-md select-none transition-all duration-500 group-hover:border-emerald-500/40 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] pointer-events-auto cursor-pointer ${
+                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-900/90 shadow-md select-none transition-all duration-500 group-hover:border-emerald-500/40 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] pointer-events-auto cursor-pointer ${
                     badge3Fade ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'
                   }`}
                   style={{ transition: 'opacity 0.3s ease-out, transform 0.3s ease-out, filter 0.3s ease-out' }}
@@ -2091,7 +2086,7 @@ export default function LandingPage() {
             >
               {badge4Content && (
                 <div 
-                  className={`w-max flex items-center gap-2 glassmorphism px-3.5 py-1.5 rounded-full border border-slate-800/90 shadow-md select-none transition-all duration-500 group-hover:border-amber-500/40 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] pointer-events-auto cursor-pointer ${
+                  className={`w-max flex items-center gap-2 glassmorphism-light dark:glassmorphism px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-900/90 shadow-md select-none transition-all duration-500 group-hover:border-amber-500/40 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] pointer-events-auto cursor-pointer ${
                     badge4Fade ? 'opacity-0 scale-95 blur-[2px]' : 'opacity-100 scale-100 blur-0'
                   }`}
                   style={{ transition: 'opacity 0.3s ease-out, transform 0.3s ease-out, filter 0.3s ease-out' }}
@@ -2112,16 +2107,16 @@ export default function LandingPage() {
       {/* ==========================================
           EMPOWERING CAMPUSES - BENTO GRID & DUAL MARQUEE
           ========================================== */}
-      <section id="empowering-campuses" className="relative w-full py-20 px-6 sm:px-12 bg-slate-950/50">
+      <section id="empowering-campuses" className="relative w-full py-20 px-6 sm:px-12 bg-white dark:bg-slate-950/50">
         
         <div className="max-w-7xl mx-auto space-y-12">
           
           {/* Section title */}
           <div className="text-center space-y-2 max-w-xl mx-auto">
-            <h2 className="text-3xl font-black text-white tracking-tight uppercase">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
               {content.bento_title}
             </h2>
-            <p className="text-xs font-semibold text-slate-500">
+            <p className="text-xs font-semibold text-slate-600 dark:text-slate-500">
               {content.bento_desc}
             </p>
           </div>
@@ -2135,7 +2130,7 @@ export default function LandingPage() {
                 {[...content.marquee_images_row1, ...content.marquee_images_row1].map((img, idx) => (
                   <div 
                     key={`r1-${idx}`} 
-                    className="relative w-[300px] h-[360px] rounded-xl overflow-hidden shrink-0 border border-slate-800/80 group shine-hover cursor-pointer"
+                    className="relative w-[300px] h-[360px] rounded-xl overflow-hidden shrink-0 border border-slate-200 dark:border-slate-800/80 group shine-hover cursor-pointer"
                   >
                     <img 
                       src={img.url} 
@@ -2156,7 +2151,7 @@ export default function LandingPage() {
                 {[...content.marquee_images_row2, ...content.marquee_images_row2].map((img, idx) => (
                   <div 
                     key={`r2-${idx}`} 
-                    className="relative w-[300px] h-[360px] rounded-xl overflow-hidden shrink-0 border border-slate-800/80 group shine-hover cursor-pointer"
+                    className="relative w-[300px] h-[360px] rounded-xl overflow-hidden shrink-0 border border-slate-200 dark:border-slate-800/80 group shine-hover cursor-pointer"
                   >
                     <img 
                       src={img.url} 
@@ -2172,8 +2167,8 @@ export default function LandingPage() {
             </div>
 
             {/* Fade gradients to mask marquee edges */}
-            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent pointer-events-none z-10" />
-            <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-slate-950 via-slate-950/40 to-transparent pointer-events-none z-10" />
+            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white via-white/40 to-transparent dark:from-slate-950 dark:via-slate-950/40 dark:to-transparent pointer-events-none z-10" />
+            <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white via-white/40 to-transparent dark:from-slate-950 dark:via-slate-950/40 dark:to-transparent pointer-events-none z-10" />
           </div>
 
 
@@ -2183,7 +2178,7 @@ export default function LandingPage() {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={tiltStyle}
-            className="relative w-full rounded-3xl overflow-hidden border border-slate-800/80 bg-slate-950/80 shadow-2xl py-16 px-6 sm:px-12 flex flex-col items-center justify-center text-center group/livecount min-h-[380px] mt-6 transition-all duration-300 [transform-style:preserve-3d] select-none"
+            className="relative w-full rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800/80 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-white dark:from-slate-950/80 dark:via-transparent dark:to-slate-950/80 shadow-2xl py-16 px-6 sm:px-12 flex flex-col items-center justify-center text-center group/livecount min-h-[380px] mt-6 transition-all duration-300 [transform-style:preserve-3d] select-none"
           >
             
             {/* Background Video */}
@@ -2194,12 +2189,12 @@ export default function LandingPage() {
                 muted
                 playsInline
                 poster="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1600&auto=format&fit=crop&q=80"
-                className="w-full h-full object-cover opacity-[0.35] transition-all duration-1000 group-hover/livecount:scale-[1.03]"
+                className="w-full h-full object-cover opacity-[0.12] dark:opacity-[0.35] transition-all duration-1000 group-hover/livecount:scale-[1.03]"
               >
                 <source src="/live_count_bg.mp4" type="video/mp4" />
               </video>
               {/* Dark overlay gradient to ensure text readability */}
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/20 to-slate-950/80" />
+              <div className="absolute inset-0 bg-gradient-to-b from-white/85 via-white/40 to-white/85 dark:from-slate-950/80 dark:via-slate-950/20 dark:to-slate-950/80" />
             </div>
 
             {/* Glowing Accent Orbs */}
@@ -2219,17 +2214,17 @@ export default function LandingPage() {
               </div>
 
               {/* Title */}
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight uppercase drop-shadow-sm dark:drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
                 Engineers learning on our platform
               </h3>
 
               {/* Description */}
-              <p className="text-xs sm:text-sm text-slate-200 max-w-lg leading-relaxed font-semibold drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-200 max-w-lg leading-relaxed font-semibold dark:drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
                 From YouTube to LinkedIn, our global community keeps growing every day. We are the go-to place for engineers preparing for their placement exams.
               </p>
 
               {/* Social Channels / Achievements */}
-              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 pt-6 border-t border-slate-900/60 w-full max-w-lg">
+              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 pt-6 border-t border-slate-200 dark:border-slate-900/60 w-full max-w-lg">
                 
                 {/* YouTube Badge */}
                 <div className="flex items-center gap-3 select-none transition-all duration-350 hover:scale-[1.04] cursor-pointer group/yt">
@@ -2237,13 +2232,13 @@ export default function LandingPage() {
                     <YouTubeIcon />
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-xs sm:text-sm font-black text-white leading-tight drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">100k+ subscribers</span>
-                    <span className="text-[10px] font-semibold text-slate-300 tracking-wide drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">@aptitude_arena</span>
+                    <span className="text-xs sm:text-sm font-black text-slate-800 dark:text-white leading-tight dark:drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">100k+ subscribers</span>
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-300 tracking-wide dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">@aptitude_arena</span>
                   </div>
                 </div>
 
                 {/* Vertical Divider */}
-                <div className="hidden sm:block h-8 w-[1px] bg-slate-900" />
+                <div className="hidden sm:block h-8 w-[1px] bg-slate-200 dark:bg-slate-900" />
 
                 {/* LinkedIn Badge */}
                 <div className="flex items-center gap-3 select-none transition-all duration-350 hover:scale-[1.04] cursor-pointer group/li">
@@ -2251,8 +2246,8 @@ export default function LandingPage() {
                     <LinkedInIcon />
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-xs sm:text-sm font-black text-white leading-tight drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">100k+ followers</span>
-                    <span className="text-[10px] font-semibold text-slate-300 tracking-wide drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Aptitude Arena</span>
+                    <span className="text-xs sm:text-sm font-black text-slate-800 dark:text-white leading-tight dark:drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">100k+ followers</span>
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-300 tracking-wide dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Aptitude Arena</span>
                   </div>
                 </div>
 
@@ -2273,7 +2268,7 @@ export default function LandingPage() {
       {/* ==========================================
           CURRICULUM (INTERACTIVE ROADMAP & BENTO DETAILS)
           ========================================== */}
-      <section id="curriculum" className="relative w-full py-28 px-6 sm:px-12 bg-slate-950 overflow-hidden">
+      <section id="curriculum" className="relative w-full py-28 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950 overflow-hidden">
         
         {/* Soft background ambient gradient lights */}
         <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
@@ -2293,10 +2288,10 @@ export default function LandingPage() {
               visibleItems['curriculum-title'] ? 'reveal-visible' : ''
             }`}
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight uppercase">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
               {content.curriculum_title}
             </h2>
-            <p className="text-xs sm:text-sm font-semibold text-slate-400 max-w-lg mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
               {content.curriculum_desc}
             </p>
           </div>
@@ -2307,7 +2302,7 @@ export default function LandingPage() {
             {/* LEFT COLUMN: Animated Vertical Connector Timeline Rail (Desktop only) */}
             <div className="hidden lg:flex lg:col-span-1 flex-col items-center justify-between relative py-12 select-none h-full min-h-[900px]">
               {/* Central flow path rail */}
-              <div className="absolute top-0 bottom-0 left-1/2 w-[2px] bg-slate-900/60 -translate-x-1/2 z-0" />
+              <div className="absolute top-0 bottom-0 left-1/2 w-[2px] bg-slate-200 dark:bg-slate-900/60 -translate-x-1/2 z-0" />
               <svg className="absolute top-0 bottom-0 left-1/2 w-[6px] h-full bg-transparent -translate-x-1/2 z-10 overflow-visible pointer-events-none">
                 {/* Glowing progress line matching active phase */}
                 <line 
@@ -2357,20 +2352,20 @@ export default function LandingPage() {
               {[0, 1, 2, 3].map((idx) => {
                 const isActive = activeCurriculumPhase === idx;
                 const nodeColors = [
-                  'border-blue-500 text-blue-400 bg-blue-950 shadow-[0_0_15px_rgba(59,130,246,0.5)]',
-                  'border-indigo-500 text-indigo-400 bg-indigo-950 shadow-[0_0_15px_rgba(99,102,241,0.5)]',
-                  'border-purple-500 text-purple-400 bg-purple-950 shadow-[0_0_15px_rgba(168,85,247,0.5)]',
-                  'border-emerald-500 text-emerald-400 bg-emerald-950 shadow-[0_0_15px_rgba(16,185,129,0.5)]'
+                  'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 shadow-[0_0_15px_rgba(59,130,246,0.2)] dark:shadow-[0_0_15px_rgba(59,130,246,0.5)]',
+                  'border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 shadow-[0_0_15px_rgba(99,102,241,0.2)] dark:shadow-[0_0_15px_rgba(99,102,241,0.5)]',
+                  'border-purple-500 text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950 shadow-[0_0_15px_rgba(168,85,247,0.2)] dark:shadow-[0_0_15px_rgba(168,85,247,0.5)]',
+                  'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 shadow-[0_0_15px_rgba(16,185,129,0.2)] dark:shadow-[0_0_15px_rgba(16,185,129,0.5)]'
                 ];
                 return (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setActiveCurriculumPhase(idx)}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-[10px] font-black z-20 relative transition-all duration-300 ${
+                    className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-[10px] font-black z-20 relative transition-all duration-300 cursor-pointer ${
                       isActive 
                         ? nodeColors[idx] + ' scale-125' 
-                        : 'border-slate-800 text-slate-500 bg-slate-950 hover:border-slate-700 hover:text-slate-300'
+                        : 'border-slate-200 text-slate-500 bg-white hover:border-slate-300 hover:text-slate-700 dark:border-slate-800 dark:text-slate-500 dark:bg-slate-950 dark:hover:border-slate-700 dark:hover:text-slate-300'
                     }`}
                   >
                     0{idx + 1}
@@ -2390,9 +2385,9 @@ export default function LandingPage() {
                   desc: content.curriculum_desc_1,
                   mock: content.curriculum_mock_1,
                   icon: Users,
-                  color: 'hover:border-blue-500/20 hover:shadow-[0_20px_50px_rgba(59,130,246,0.08)] bg-transparent hover:bg-blue-950/5',
+                  color: 'hover:border-blue-500/20 hover:shadow-[0_20px_50px_rgba(59,130,246,0.08)] bg-transparent hover:bg-blue-50/20 dark:hover:bg-blue-950/5',
                   glow: 'bg-blue-600/5',
-                  accentColor: 'text-blue-400',
+                  accentColor: 'text-blue-600 dark:text-blue-400',
                   syllabus: [
                     'Cohort Management & Staging Directories',
                     'Real-Time Speed Benchmark Metrics',
@@ -2405,9 +2400,9 @@ export default function LandingPage() {
                   desc: content.curriculum_desc_2,
                   mock: content.curriculum_mock_2,
                   icon: Layers,
-                  color: 'hover:border-indigo-500/20 hover:shadow-[0_20px_50px_rgba(99,102,241,0.08)] bg-transparent hover:bg-indigo-950/5',
+                  color: 'hover:border-indigo-500/20 hover:shadow-[0_20px_50px_rgba(99,102,241,0.08)] bg-transparent hover:bg-indigo-50/20 dark:hover:bg-indigo-950/5',
                   glow: 'bg-indigo-600/5',
-                  accentColor: 'text-indigo-400',
+                  accentColor: 'text-indigo-600 dark:text-indigo-400',
                   syllabus: [
                     'Quantitative Aptitude & Number Logic',
                     'Verbal Comprehension & Grammar Diagnostics',
@@ -2420,9 +2415,9 @@ export default function LandingPage() {
                   desc: content.curriculum_desc_3,
                   mock: content.curriculum_mock_3,
                   icon: Code2,
-                  color: 'hover:border-purple-500/20 hover:shadow-[0_20px_50px_rgba(168,85,247,0.08)] bg-transparent hover:bg-purple-950/5',
+                  color: 'hover:border-purple-500/20 hover:shadow-[0_20px_50px_rgba(168,85,247,0.08)] bg-transparent hover:bg-purple-50/20 dark:hover:bg-purple-950/5',
                   glow: 'bg-purple-600/5',
-                  accentColor: 'text-purple-400',
+                  accentColor: 'text-purple-600 dark:text-purple-400',
                   syllabus: [
                     'Core Services placement curriculum mapping',
                     'Fintech System Architectures & Mock interviews',
@@ -2435,9 +2430,9 @@ export default function LandingPage() {
                   desc: content.curriculum_desc_4,
                   mock: content.curriculum_mock_4,
                   icon: Trophy,
-                  color: 'hover:border-emerald-500/20 hover:shadow-[0_20px_50px_rgba(16,185,129,0.08)] bg-transparent hover:bg-emerald-950/5',
+                  color: 'hover:border-emerald-500/20 hover:shadow-[0_20px_50px_rgba(16,185,129,0.08)] bg-transparent hover:bg-emerald-50/20 dark:hover:bg-emerald-950/5',
                   glow: 'bg-emerald-600/5',
-                  accentColor: 'text-emerald-400',
+                  accentColor: 'text-emerald-600 dark:text-emerald-400',
                   syllabus: [
                     'Adaptive timing mock tests under pressure',
                     'Goldman Sachs, TCS, Accenture company mocks',
@@ -2474,11 +2469,8 @@ export default function LandingPage() {
                           : 'opacity-25 blur-[12px] scale-[0.98] pointer-events-none select-none'
                       } ${
                         isSelected 
-                          ? idx === 0 ? 'border-blue-500/35 bg-blue-950/10 ring-1 ring-blue-500/20 shadow-[0_20px_50px_rgba(59,130,246,0.12)]' :
-                            idx === 1 ? 'border-indigo-500/35 bg-indigo-950/10 ring-1 ring-indigo-500/20 shadow-[0_20px_50px_rgba(99,102,241,0.12)]' :
-                            idx === 2 ? 'border-purple-500/35 bg-purple-950/10 ring-1 ring-purple-500/20 shadow-[0_20px_50px_rgba(168,85,247,0.12)]' :
-                            'border-emerald-500/35 bg-emerald-950/10 ring-1 ring-emerald-500/20 shadow-[0_20px_50px_rgba(16,185,129,0.12)]'
-                          : `border-slate-900/60 bg-transparent ${card.color}`
+                          ? `curriculum-card-active-${idx}`
+                          : `border-slate-200 dark:border-slate-900/60 bg-transparent curriculum-card-hover-${idx}`
                       }`}
                       style={{
                         perspective: '1200px'
@@ -2509,7 +2501,7 @@ export default function LandingPage() {
                       {/* Content Section (Left side in card flex) */}
                       <div className="flex-1 space-y-4 z-10 relative text-left">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl bg-slate-900 border border-slate-850 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:bg-slate-950 ${card.accentColor}`}>
+                          <div className={`w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-md dark:shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:bg-slate-50 dark:group-hover:bg-slate-950 ${card.accentColor}`}>
                             <CardIcon className={`w-5 h-5 ${
                               idx === 0 ? 'group-hover:animate-pulse-slow' :
                               idx === 1 ? 'group-hover:animate-bounce-subtle' :
@@ -2523,7 +2515,7 @@ export default function LandingPage() {
                           <h3 className={`text-lg sm:text-xl font-black tracking-tight transition-colors duration-300 group-hover:${card.accentColor}`}>
                             {card.title}
                           </h3>
-                          <p className="text-xs text-slate-400 leading-relaxed max-w-xl">
+                          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl">
                             {card.desc}
                           </p>
                         </div>
@@ -2532,8 +2524,9 @@ export default function LandingPage() {
                         <div className="pt-2">
                           <button
                             type="button"
+                            suppressHydrationWarning
                             onClick={() => setExpandedCardIdx(isExpanded ? null : idx)}
-                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-white transition-colors cursor-pointer group/btn animate-pulse-glow"
+                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer group/btn animate-pulse-glow"
                           >
                             <span>{isExpanded ? 'Hide Details' : 'Expand Syllabus Details'}</span>
                             <span className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'group-hover/btn:translate-y-0.5'}`}>▼</span>
@@ -2544,9 +2537,9 @@ export default function LandingPage() {
                         <div className={`transition-all duration-500 ease-in-out overflow-hidden ${
                           isExpanded ? 'max-h-[300px] opacity-100 mt-4' : 'max-h-0 opacity-0'
                         }`}>
-                          <div className="bg-slate-950/60 border border-slate-900/60 rounded-2xl p-4 space-y-3">
-                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 block">Syllabus Overview</span>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-350">
+                          <div className="bg-slate-100/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900/60 rounded-2xl p-4 space-y-3">
+                            <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-500 block">Syllabus Overview</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                               {card.syllabus.map((item, key) => (
                                 <div 
                                   key={key} 
@@ -2581,13 +2574,9 @@ export default function LandingPage() {
           </div>
 
         </div>
-
       </section>
 
-      {/* ==========================================
-          MEET YOUR MENTOR SECTION
-          ========================================== */}
-      <section id="coach" className="relative w-full py-24 px-6 sm:px-12 bg-slate-950 overflow-hidden">
+      <section id="coach" className="relative w-full py-24 px-6 sm:px-12 bg-white dark:bg-slate-950 overflow-hidden">
         {/* Glowing visual backdrop */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
         <div className="absolute top-1/3 right-10 w-[300px] h-[300px] rounded-full bg-indigo-600/5 blur-[100px] pointer-events-none" />
@@ -2599,9 +2588,10 @@ export default function LandingPage() {
             
 
 
+
             {/* Main Title Heading & Mentor Identity info */}
             <div className="space-y-2.5">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-[1.15] tracking-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-[1.15] tracking-tight">
                 {content.mentor_heading.includes('Platform Owner') ? (
                   <>
                     {content.mentor_heading.split('Platform Owner')[0]}
@@ -2613,29 +2603,29 @@ export default function LandingPage() {
                 )}
               </h2>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-xs pt-1">
-                <span className="font-extrabold text-slate-100 uppercase tracking-widest text-sm">{content.mentor_name}</span>
-                <span className="hidden sm:inline text-slate-700">•</span>
-                <span className="font-bold text-blue-400 uppercase tracking-wider">{content.mentor_designation}</span>
+                <span className="font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-widest text-sm">{content.mentor_name}</span>
+                <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">{content.mentor_designation}</span>
               </div>
             </div>
 
             {/* Paragraph Biography (CMS Dynamic Multi-line Support) */}
-            <div className="text-slate-400 text-sm md:text-base leading-relaxed space-y-4 font-medium">
+            <div className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed space-y-4 font-medium">
               {content.mentor_bio.split('\n').map((paragraph, idx) => (
                 <p key={idx}>{paragraph}</p>
               ))}
             </div>
 
             {/* Personal Quote Message Box */}
-            <div className="relative mt-2 p-5 rounded-2xl border border-slate-900 bg-slate-900/30 backdrop-blur-md overflow-hidden">
+            <div className="relative mt-2 p-5 rounded-2xl border border-slate-200 bg-slate-50/50 dark:border-slate-900 dark:bg-slate-900/30 backdrop-blur-md overflow-hidden">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-500 to-indigo-500" />
-              <Quote className="absolute right-4 top-4 w-12 h-12 text-slate-800/20 rotate-180 pointer-events-none" />
-              <div className="text-xs sm:text-sm font-semibold italic text-slate-200 leading-relaxed whitespace-pre-line">
+              <Quote className="absolute right-4 top-4 w-12 h-12 text-slate-300 dark:text-slate-800/20 rotate-180 pointer-events-none" />
+              <div className="text-xs sm:text-sm font-semibold italic text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line">
                 {content.mentor_message}
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
-                <span className="text-[10px] font-black tracking-widest uppercase text-slate-500">Live Guidance Channel</span>
+                <span className="text-[10px] font-black tracking-widest uppercase text-slate-500 dark:text-slate-500">Live Guidance Channel</span>
               </div>
             </div>
 
@@ -2657,42 +2647,42 @@ export default function LandingPage() {
               />
               
               {/* Left blending gradient overlay mask */}
-              <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent pointer-events-none z-10" />
+              <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent pointer-events-none z-10" />
 
               {/* Bottom blending gradient overlay mask to fade bottom edge */}
-              <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-slate-950 to-transparent pointer-events-none z-10" />
+              <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-white to-transparent dark:from-slate-950 dark:to-transparent pointer-events-none z-10" />
 
               {/* Floating Achievement Badges (CMS Dynamic and editable) stacked on the Left side */}
               
               {/* Badge 1 (Top-Left) */}
               {content.mentor_badge_1 && (
-                <div className="absolute top-[8%] left-[-15px] sm:left-[-35px] bg-slate-900/85 backdrop-blur-md border border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-1 hover:border-slate-700/80 transition-all cursor-default z-20">
+                <div className="absolute top-[8%] left-[-15px] sm:left-[-35px] bg-white/90 dark:bg-slate-900/85 backdrop-blur-md border border-slate-200 dark:border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-1 hover:border-slate-300 dark:hover:border-slate-700/80 transition-all cursor-default z-20">
                   <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  <span className="text-[10px] font-extrabold text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_1}</span>
+                  <span className="text-[10px] font-extrabold text-slate-800 dark:text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_1}</span>
                 </div>
               )}
 
               {/* Badge 2 (Upper Middle-Left) */}
               {content.mentor_badge_2 && (
-                <div className="absolute top-[33%] left-[-25px] sm:left-[-55px] bg-slate-900/85 backdrop-blur-md border border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-2 hover:border-slate-700/80 transition-all cursor-default z-20">
-                  <Target className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                  <span className="text-[10px] font-extrabold text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_2}</span>
+                <div className="absolute top-[33%] left-[-25px] sm:left-[-55px] bg-white/90 dark:bg-slate-900/85 backdrop-blur-md border border-slate-200 dark:border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-2 hover:border-slate-300 dark:hover:border-slate-700/80 transition-all cursor-default z-20">
+                  <Target className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span className="text-[10px] font-extrabold text-slate-800 dark:text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_2}</span>
                 </div>
               )}
 
               {/* Badge 3 (Lower Middle-Left) */}
               {content.mentor_badge_3 && (
-                <div className="absolute top-[58%] left-[-15px] sm:left-[-35px] bg-slate-900/85 backdrop-blur-md border border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-3 hover:border-slate-700/80 transition-all cursor-default z-20">
-                  <BookOpen className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                  <span className="text-[10px] font-extrabold text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_3}</span>
+                <div className="absolute top-[58%] left-[-15px] sm:left-[-35px] bg-white/90 dark:bg-slate-900/85 backdrop-blur-md border border-slate-200 dark:border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-3 hover:border-slate-300 dark:hover:border-slate-700/80 transition-all cursor-default z-20">
+                  <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="text-[10px] font-extrabold text-slate-800 dark:text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_3}</span>
                 </div>
               )}
 
               {/* Badge 4 (Bottom-Left) */}
               {content.mentor_badge_4 && (
-                <div className="absolute top-[83%] left-[-20px] sm:left-[-45px] bg-slate-900/85 backdrop-blur-md border border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-4 hover:border-slate-700/80 transition-all cursor-default z-20">
-                  <Award className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                  <span className="text-[10px] font-extrabold text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_4}</span>
+                <div className="absolute top-[83%] left-[-20px] sm:left-[-45px] bg-white/90 dark:bg-slate-900/85 backdrop-blur-md border border-slate-200 dark:border-slate-800/80 shadow-xl px-3 py-2 rounded-xl flex items-center gap-1.5 animate-float-badge-4 hover:border-slate-300 dark:hover:border-slate-700/80 transition-all cursor-default z-20">
+                  <Award className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                  <span className="text-[10px] font-extrabold text-slate-800 dark:text-slate-200 tracking-tight whitespace-nowrap">{content.mentor_badge_4}</span>
                 </div>
               )}
             </div>
@@ -2705,14 +2695,14 @@ export default function LandingPage() {
       {/* ==========================================
           FREQUENTLY ASKED QUESTIONS (FAQ)
           ========================================== */}
-      <section id="faq" className="relative w-full py-24 px-6 sm:px-12 bg-slate-950">
+      <section id="faq" className="relative w-full py-24 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950">
         
         <div className="max-w-7xl mx-auto space-y-12">
           
           {/* Header */}
-          <div className="text-center lg:text-left space-y-3 border-b border-slate-900 pb-8 relative">
+          <div className="text-center lg:text-left space-y-3 border-b border-slate-200 dark:border-slate-900 pb-8 relative">
             <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-blue-600/5 blur-[35px] pointer-events-none" />
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight uppercase">{content.faq_title}</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase">{content.faq_title}</h2>
             <p className="text-xs sm:text-sm font-semibold text-slate-500 max-w-xl">
               {content.faq_desc}
             </p>
@@ -2724,9 +2714,9 @@ export default function LandingPage() {
             <div className="lg:col-span-4 space-y-6">
               
               {/* Category Command Center Card */}
-              <div className="bg-slate-900/40 border border-slate-900 rounded-2xl p-5 space-y-4 shadow-xl">
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-900 rounded-2xl p-5 space-y-4 shadow-xl">
                 <div className="space-y-1">
-                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-200">Category Navigator</h3>
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Category Navigator</h3>
                   <p className="text-[10px] text-slate-500 font-semibold leading-normal">
                     Filter questions by topic area
                   </p>
@@ -2734,10 +2724,10 @@ export default function LandingPage() {
                 
                 <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 scrollbar-none select-none">
                   {[
-                    { id: 'general', name: 'General & Platform', icon: Cpu, color: 'text-blue-400', glow: 'from-blue-500 to-indigo-500' },
-                    { id: 'curriculum', name: 'Course & Curriculum', icon: BookOpen, color: 'text-indigo-400', glow: 'from-indigo-500 to-purple-500' },
-                    { id: 'sync', name: 'Campus Sync & Tests', icon: Users, color: 'text-purple-400', glow: 'from-purple-500 to-pink-500' },
-                    { id: 'support', name: 'Account & Support', icon: Settings, color: 'text-amber-400', glow: 'from-amber-500 to-orange-500' }
+                    { id: 'general', name: 'General & Platform', icon: Cpu, color: 'text-blue-600 dark:text-blue-400', glow: 'from-blue-500 to-indigo-500' },
+                    { id: 'curriculum', name: 'Course & Curriculum', icon: BookOpen, color: 'text-indigo-600 dark:text-indigo-400', glow: 'from-indigo-500 to-purple-500' },
+                    { id: 'sync', name: 'Campus Sync & Tests', icon: Users, color: 'text-purple-600 dark:text-purple-400', glow: 'from-purple-500 to-pink-500' },
+                    { id: 'support', name: 'Account & Support', icon: Settings, color: 'text-amber-600 dark:text-amber-400', glow: 'from-amber-500 to-orange-500' }
                   ].map((cat) => {
                     const isActive = activeFaqCategory === cat.id;
                     const IconComponent = cat.icon;
@@ -2752,21 +2742,21 @@ export default function LandingPage() {
                         }}
                         className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl text-xs font-bold transition-all duration-300 text-left cursor-pointer shrink-0 border w-full group/cat ${
                           isActive 
-                            ? 'bg-slate-900 border-slate-800 text-white shadow-lg shadow-blue-500/5 relative overflow-hidden font-black scale-[1.02]' 
-                            : 'bg-slate-950/40 border-slate-900/40 text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+                            ? 'bg-slate-100 border-slate-300 text-slate-900 shadow-md relative overflow-hidden font-black scale-[1.02] dark:bg-slate-900 dark:border-slate-800 dark:text-white' 
+                            : 'bg-transparent border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:bg-slate-950/40 dark:border-slate-900/40 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/40'
                         }`}
                       >
                         {isActive && (
                           <div className={`absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b ${cat.glow}`} />
                         )}
                         <div className="flex items-center gap-2.5">
-                          <IconComponent className={`w-4 h-4 shrink-0 transition-transform group-hover/cat:scale-110 ${isActive ? cat.color : 'text-slate-500'}`} />
+                          <IconComponent className={`w-4 h-4 shrink-0 transition-transform group-hover/cat:scale-110 ${isActive ? cat.color : 'text-slate-400 dark:text-slate-500'}`} />
                           <span>{cat.name}</span>
                         </div>
                         <span className={`px-2 py-0.5 text-[9px] font-bold font-mono rounded-full border transition-all ${
                           isActive 
-                            ? 'bg-blue-950/40 border-blue-900/30 text-blue-400' 
-                            : 'bg-slate-950/80 border-slate-900/60 text-slate-500 group-hover/cat:border-slate-800 group-hover/cat:text-slate-300'
+                            ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-950/40 dark:border-blue-900/30 dark:text-blue-400' 
+                            : 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-slate-950/80 dark:border-slate-900/60 dark:text-slate-500 dark:group-hover/cat:border-slate-800 dark:group-hover/cat:text-slate-300'
                         }`}>
                           {categoryCount}
                         </span>
@@ -2777,29 +2767,28 @@ export default function LandingPage() {
               </div>
 
               {/* Futuristic Interactive Assistance Card */}
-              <div className="bg-gradient-to-br from-blue-950/20 via-indigo-950/10 to-slate-900/40 border border-slate-900 rounded-2xl p-5 space-y-4 relative overflow-hidden group/help shadow-lg select-none">
+              <div className="bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-slate-100/50 dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-slate-900/40 border border-slate-200 dark:border-slate-900 rounded-2xl p-5 space-y-4 relative overflow-hidden group/help shadow-lg select-none">
                 <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-32 h-32 rounded-full bg-blue-600/5 blur-[40px] pointer-events-none" />
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-blue-950/60 border border-blue-900/40 flex items-center justify-center text-blue-400 group-hover/help:scale-105 transition-all duration-300">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 dark:bg-blue-950/60 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover/help:scale-105 transition-all duration-300">
                     <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-xs font-black text-slate-200">Still have questions?</span>
+                    <span className="text-xs font-black text-slate-800 dark:text-slate-200">Still have questions?</span>
                     <span className="text-[9px] text-slate-500 font-extrabold uppercase tracking-wide">1-on-1 Helpdesk</span>
                   </div>
                 </div>
-                <p className="text-[10px] text-slate-400 leading-relaxed font-semibold text-left">
+                <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-relaxed font-semibold text-left">
                   Can't find the answers you're looking for? Reach out to our placement support cell for customized guidance.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => showNotice("Support ticketing queue loading... Connect with an agent at support@aptitudearena.com", "info")}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase rounded-lg shadow-md cursor-pointer transition-all duration-200 active:scale-95 border border-transparent"
+                <a
+                  href="mailto:support@aptitudearena.com"
+                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase rounded-lg shadow-md cursor-pointer transition-all duration-200 active:scale-95 border border-transparent block text-center"
                 >
-                  Open Support Ticket
-                </button>
+                  Mail Us
+                </a>
               </div>
 
             </div>
@@ -2810,24 +2799,24 @@ export default function LandingPage() {
               {/* Sleek Search bar + suggestions */}
               <div className="space-y-3">
                 <div className="relative w-full">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input 
                     type="text" 
                     placeholder="Search questions across all categories..."
                     value={faqSearch}
                     onChange={(e) => setFaqSearch(e.target.value)}
-                    className="w-full bg-slate-900/60 border border-slate-900 hover:border-slate-850 focus:border-blue-600 rounded-xl py-3.5 pl-11 pr-24 text-xs text-slate-200 focus:outline-none transition-colors placeholder:text-slate-600 font-medium"
+                    className="w-full bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-900 hover:border-slate-300 dark:hover:border-slate-800 focus:border-blue-600 rounded-xl py-3.5 pl-11 pr-24 text-xs text-slate-800 dark:text-slate-200 focus:outline-none transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium"
                   />
                   <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     {faqSearch && (
                       <button 
                         onClick={() => setFaqSearch('')}
-                        className="text-slate-505 hover:text-slate-350 text-[10px] font-bold uppercase tracking-wider"
+                        className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
                       >
                         Clear
                       </button>
                     )}
-                    <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-950 border border-slate-900 text-[8px] font-mono font-bold text-slate-600 uppercase tracking-widest">
+                    <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 text-[8px] font-mono font-bold text-slate-500 dark:text-slate-600 uppercase tracking-widest">
                       {filteredFaqs.length} Result{filteredFaqs.length !== 1 ? 's' : ''}
                     </span>
                   </div>
@@ -2835,13 +2824,13 @@ export default function LandingPage() {
 
                 {/* Search Suggestions */}
                 <div className="flex flex-wrap items-center gap-2 pt-1 text-[10px] font-bold text-slate-500 select-none">
-                  <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-600">Quick filter:</span>
+                  <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-600">Quick filter:</span>
                   {['Technology', 'Roadmap', 'Proctoring', 'Reports', 'Pricing'].map((tag) => (
                     <button
                       key={tag}
                       type="button"
                       onClick={() => setFaqSearch(tag)}
-                      className="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-900 hover:border-slate-800 text-slate-400 hover:text-slate-200 transition-all cursor-pointer text-[10px] font-semibold"
+                      className="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-900 dark:bg-slate-900 dark:border-slate-900 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all cursor-pointer text-[10px] font-semibold"
                     >
                       #{tag}
                     </button>
@@ -2861,8 +2850,8 @@ export default function LandingPage() {
                         key={faq.id} 
                         className={`rounded-2xl border transition-all duration-500 overflow-hidden relative ${
                           isOpen 
-                            ? 'bg-slate-900/60 shadow-xl' 
-                            : 'bg-slate-900/20 border-slate-900/60 hover:border-slate-850 hover:bg-slate-900/40'
+                            ? 'bg-white dark:bg-slate-900/60 shadow-xl border-slate-200 dark:border-slate-900' 
+                            : 'bg-white/80 dark:bg-slate-900/20 border-slate-200 dark:border-slate-900/60 hover:border-slate-300 dark:hover:border-slate-800 hover:bg-white dark:hover:bg-slate-900/40'
                         }`}
                         style={{
                           borderColor: isOpen ? `${catDetails.color}35` : '',
@@ -2881,17 +2870,17 @@ export default function LandingPage() {
 
                         <button
                           onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
-                          className="w-full text-left px-6 py-4.5 flex items-center justify-between font-extrabold text-xs sm:text-sm text-slate-200 hover:text-white group/faq-btn select-none"
+                          className="w-full text-left px-6 py-4.5 flex items-center justify-between font-extrabold text-xs sm:text-sm text-slate-800 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white group/faq-btn select-none cursor-pointer"
                         >
                           <span className="pr-6 leading-tight">{faq.question}</span>
                           <div className="flex items-center gap-3 shrink-0">
                             {faq.tag && (
-                              <span className="hidden sm:inline-block text-[8px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-950/60 border border-slate-800/45 text-slate-400 tracking-wider">
+                              <span className="hidden sm:inline-block text-[8px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-500 dark:bg-slate-950/60 dark:border-slate-800/45 dark:text-slate-400 tracking-wider">
                                 #{faq.tag}
                               </span>
                             )}
-                            <div className={`p-1 rounded-md bg-slate-950/65 border border-slate-900 transition-all duration-300 ${
-                              isOpen ? 'rotate-180 border-slate-800' : 'group-hover/faq-btn:border-slate-800'
+                            <div className={`p-1 rounded-md bg-slate-100 border border-slate-200 text-slate-500 dark:bg-slate-950/65 dark:border-slate-900 transition-all duration-300 ${
+                              isOpen ? 'rotate-180 border-slate-800' : 'group-hover/faq-btn:border-slate-300'
                             }`}
                             style={{
                               borderColor: isOpen ? `${catDetails.color}40` : '',
@@ -2909,17 +2898,17 @@ export default function LandingPage() {
                             opacity: isOpen ? 1 : 0
                           }}
                         >
-                          <div className="px-6 pb-5 text-xs text-slate-400 leading-relaxed border-t border-slate-900/50 pt-4.5 font-medium space-y-4">
-                            <p className="whitespace-pre-line text-slate-350">{faq.answer}</p>
+                          <div className="px-6 pb-5 text-xs text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-900/50 pt-4.5 font-medium space-y-4">
+                            <p className="whitespace-pre-line text-slate-700 dark:text-slate-300">{faq.answer}</p>
                             
                             {/* Helpful vote component (Focus Point #3) */}
-                            <div className="flex flex-wrap items-center justify-between gap-4 pt-3.5 border-t border-slate-900/50 select-none">
+                            <div className="flex flex-wrap items-center justify-between gap-4 pt-3.5 border-t border-slate-100 dark:border-slate-900/50 select-none">
                               <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">
                                 Was this information helpful?
                               </span>
                               <div className="flex items-center gap-2">
                                 {hasVoted ? (
-                                  <div className="text-[10px] font-bold text-emerald-400 flex items-center gap-1 bg-emerald-950/20 border border-emerald-900/30 px-3 py-1 rounded-lg animate-scaleUp">
+                                  <div className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg animate-scaleUp dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/30">
                                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -2930,7 +2919,7 @@ export default function LandingPage() {
                                     <button
                                       type="button"
                                       onClick={() => setHelpfulVotes(prev => ({ ...prev, [faq.id]: 'yes' }))}
-                                      className="flex items-center gap-1.5 px-3 py-1 bg-slate-950 border border-slate-850 hover:border-slate-800 text-[10px] font-black text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-900 transition-colors cursor-pointer"
+                                      className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 hover:border-slate-300 text-[10px] font-black text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
                                     >
                                       <span>Yes</span>
                                       <span>👍</span>
@@ -2938,7 +2927,7 @@ export default function LandingPage() {
                                     <button
                                       type="button"
                                       onClick={() => setHelpfulVotes(prev => ({ ...prev, [faq.id]: 'no' }))}
-                                      className="flex items-center gap-1.5 px-3 py-1 bg-slate-950 border border-slate-850 hover:border-slate-800 text-[10px] font-black text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-900 transition-colors cursor-pointer"
+                                      className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 hover:border-slate-300 text-[10px] font-black text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
                                     >
                                       <span>No</span>
                                       <span>👎</span>
@@ -2954,7 +2943,7 @@ export default function LandingPage() {
                     );
                   })
                 ) : (
-                  <div className="text-center py-10 bg-slate-900/20 border border-dashed border-slate-900 rounded-xl text-xs text-slate-500 font-bold uppercase tracking-wider animate-fadeIn">
+                  <div className="text-center py-10 bg-white dark:bg-slate-900/20 border border-dashed border-slate-200 dark:border-slate-900 rounded-xl text-xs text-slate-500 font-bold uppercase tracking-wider animate-fadeIn">
                     No matching answers found. Try clearing your search filter.
                   </div>
                 )}
@@ -2971,49 +2960,36 @@ export default function LandingPage() {
       {/* ==========================================
           CALL TO ACTION (CTA) SECTION
           ========================================== */}
-      <section className="relative w-full border-t border-slate-900 py-16 px-6 sm:px-12 bg-slate-950/50">
+      <section className="relative w-full py-20 px-6 sm:px-12 bg-white dark:bg-slate-950 overflow-hidden">
+        {/* Soft flowy decorative background meshes */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-blue-500/5 dark:bg-blue-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-[400px] h-[200px] rounded-full bg-indigo-500/5 dark:bg-indigo-500/10 blur-[100px] pointer-events-none" />
         
-        <div className="max-w-4xl mx-auto">
-          
-          <div className="bg-gradient-to-br from-blue-900/30 via-indigo-950/20 to-slate-900/60 border border-slate-800 rounded-3xl p-8 sm:p-12 text-center space-y-6 relative overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08),transparent_50%)] pointer-events-none" />
-            
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
-              {content.cta_title}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto leading-relaxed font-medium">
-              {content.cta_subtitle}
-            </p>
+        <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight uppercase font-heading">
+            {content.cta_title}
+          </h2>
+          <p className="text-sm sm:text-base text-slate-650 dark:text-slate-400 max-w-xl mx-auto leading-relaxed font-medium">
+            {content.cta_subtitle}
+          </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3.5 max-w-md mx-auto">
-              <Link 
-                href="/login"
-                className="w-full sm:flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg hover:shadow-blue-500/25 transition-all"
-              >
-                {content.cta_btn_primary}
-              </Link>
-              <button 
-                onClick={() => showNotice("Connecting to support sandbox queue...", "info")}
-                className="w-full sm:flex-1 py-3 px-6 bg-slate-900 hover:bg-slate-850 text-slate-300 font-bold text-xs border border-slate-800 rounded-xl transition-all"
-              >
-                {content.cta_btn_secondary}
-              </button>
-            </div>
-
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 max-w-md mx-auto">
+            <Link 
+              href="/login"
+              className="w-full sm:flex-1 py-3.5 px-8 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-98 transition-all duration-300 text-center uppercase tracking-wider"
+            >
+              {content.cta_btn_primary}
+            </Link>
+            <button 
+              onClick={() => showNotice("Connecting to support sandbox queue...", "info")}
+              className="w-full sm:flex-1 py-3.5 px-8 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs border border-slate-200 dark:border-slate-800 rounded-2xl hover:scale-[1.02] active:scale-98 transition-all duration-300 cursor-pointer uppercase tracking-wider"
+            >
+              {content.cta_btn_secondary}
+            </button>
           </div>
         </div>
       </section>
 
-             {/* ==========================================
-          FOOTER
-          ========================================== */}
-      <footer className="border-t border-slate-200 dark:border-slate-900/60 pt-10 pb-52 w-[90%] md:w-[80%] max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-600 gap-4 bg-transparent">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-500" />
-          <span>{content.footer_badge_text}</span>
-        </div>
-        <span>{content.footer_copyright}</span>
-      </footer>
 
       {/* ==========================================
           VISUAL IN-PAGE ADMIN EDITOR WIDGET
@@ -3049,7 +3025,7 @@ export default function LandingPage() {
                 </div>
                 <button 
                   onClick={() => setIsEditorOpen(false)}
-                  className="p-1 rounded-md hover:bg-slate-850 text-slate-400 hover:text-slate-200 cursor-pointer"
+                  className="p-1 rounded-md hover:bg-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -3061,15 +3037,15 @@ export default function LandingPage() {
               </div>
 
               {/* Tabs selector */}
-              <div className="flex border-b border-slate-800 text-[10px] font-bold overflow-x-auto scrollbar-none whitespace-nowrap">
-                {(['global', 'hero', 'mentor', 'bento', 'curriculum', 'stats', 'faqs', 'cta'] as const).map((tab) => (
+              <div className="flex flex-wrap gap-1.5 border-b border-slate-800 pb-4 text-[10px] font-bold">
+                {(['global', 'hero', 'mentor', 'bento', 'curriculum', 'stats', 'faqs', 'cta', 'footer'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-3 py-2.5 text-center border-b-2 uppercase tracking-wide cursor-pointer transition-colors ${
+                    className={`px-3 py-1.5 rounded-lg uppercase tracking-wider cursor-pointer transition-all duration-200 border text-[9px] sm:text-[10px] font-extrabold ${
                       activeTab === tab 
-                        ? 'border-blue-500 text-blue-400' 
-                        : 'border-transparent text-slate-500 hover:text-slate-300'
+                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20 scale-[1.03]' 
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900'
                     }`}
                   >
                     {tab}
@@ -3109,7 +3085,13 @@ export default function LandingPage() {
                     />
                   </div>
 
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pt-3 pb-1.5">Footer Settings</span>
+                </div>
+              )}
+
+              {/* TAB 8: FOOTER CONFIG */}
+              {activeTab === 'footer' && (
+                <div className="space-y-4 pt-2">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1.5">Footer Settings</span>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase">Footer Badge clearance text</label>
                     <input 
@@ -3242,7 +3224,7 @@ export default function LandingPage() {
                     />
                   </div>
                   <div className="space-y-3 pt-2">
-                    <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-850 pb-1">Floating Badge Names</span>
+                    <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1">Floating Badge Names</span>
                     <div className="grid grid-cols-2 gap-2 text-[10px]">
                       <div className="space-y-1">
                         <label className="text-slate-500 font-bold">Badge 1</label>
@@ -3311,7 +3293,7 @@ export default function LandingPage() {
                   <div className="space-y-4">
                     <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1.5">Row 1 Marquee Photos (Left-To-Right)</span>
                     {content.marquee_images_row1.map((img, idx) => (
-                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-850 space-y-2">
+                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
                         <div className="grid grid-cols-2 gap-2 text-[10px]">
                           <div className="space-y-1">
                             <label className="text-slate-500 font-bold">Category</label>
@@ -3361,7 +3343,7 @@ export default function LandingPage() {
                   <div className="space-y-4">
                     <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1.5">Row 2 Marquee Photos (Right-To-Left)</span>
                     {content.marquee_images_row2.map((img, idx) => (
-                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-850 space-y-2">
+                      <div key={idx} className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
                         <div className="grid grid-cols-2 gap-2 text-[10px]">
                           <div className="space-y-1">
                             <label className="text-slate-500 font-bold">Category</label>
@@ -3437,7 +3419,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Card 1 Config */}
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <span className="text-[10px] font-extrabold text-blue-400 uppercase block border-b border-slate-900 pb-1.5">Card 1 (Mass Impact Grid cell)</span>
                     <div className="space-y-2">
                       <div className="space-y-1">
@@ -3476,7 +3458,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Card 2 Config */}
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <span className="text-[10px] font-extrabold text-indigo-400 uppercase block border-b border-slate-900 pb-1.5">Card 2 (Student Interactions Grid cell)</span>
                     <div className="space-y-2">
                       <div className="space-y-1">
@@ -3515,7 +3497,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Card 3 Config */}
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <span className="text-[10px] font-extrabold text-purple-400 uppercase block border-b border-slate-900 pb-1.5">Card 3 (Live Workshops Grid cell)</span>
                     <div className="space-y-2">
                       <div className="space-y-1">
@@ -3554,7 +3536,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Card 4 Config */}
-                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+                  <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                     <span className="text-[10px] font-extrabold text-emerald-400 uppercase block border-b border-slate-900 pb-1.5">Card 4 (Mock Assessments Grid cell)</span>
                     <div className="space-y-2">
                       <div className="space-y-1">
@@ -3618,19 +3600,19 @@ export default function LandingPage() {
                     <div className="space-y-3.5 text-xs">
                       <span className="text-[10px] font-extrabold text-slate-400 uppercase block">Active Cache values</span>
                       <div className="grid grid-cols-2 gap-3.5 font-bold font-mono">
-                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-850">
+                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                           <span className="text-[9px] text-slate-500 block uppercase">Students (Raw + Offset)</span>
                           <span className="text-white mt-1 block">{stats.active_students}</span>
                         </div>
-                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-850">
+                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                           <span className="text-[9px] text-slate-500 block uppercase">Questions (Raw + Offset)</span>
                           <span className="text-white mt-1 block">{stats.question_pool}</span>
                         </div>
-                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-850">
+                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                           <span className="text-[9px] text-slate-500 block uppercase">Companies (Raw + Offset)</span>
                           <span className="text-white mt-1 block">{stats.company_tags}</span>
                         </div>
-                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-850">
+                        <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                           <span className="text-[9px] text-slate-500 block uppercase">Colleges (Raw + Offset)</span>
                           <span className="text-white mt-1 block">{stats.college_partnerships}</span>
                         </div>
@@ -3676,7 +3658,7 @@ export default function LandingPage() {
                         });
                         setOpenFaqId(newId);
                       }}
-                      className="px-2.5 py-1 bg-slate-950 hover:bg-slate-850 text-[10px] font-black text-blue-400 rounded border border-slate-800 flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1 bg-slate-950 hover:bg-slate-800 text-[10px] font-black text-blue-400 rounded border border-slate-800 flex items-center gap-1 cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>ADD ITEM</span>
@@ -3685,7 +3667,7 @@ export default function LandingPage() {
 
                   <div className="space-y-3">
                     {content.faq_items.map((item, index) => (
-                      <div key={item.id} className="bg-slate-950 p-3.5 rounded-xl border border-slate-850 space-y-3 relative">
+                      <div key={item.id} className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-3 relative">
                         <button
                           onClick={() => {
                             const list = content.faq_items.filter((f) => f.id !== item.id);
@@ -3779,7 +3761,7 @@ export default function LandingPage() {
             <div className="border-t border-slate-800 pt-4 flex gap-3">
               <button
                 onClick={() => setIsEditorOpen(false)}
-                className="flex-1 py-3 px-4 bg-slate-850 hover:bg-slate-800 text-slate-300 font-bold text-xs rounded-xl border border-slate-800 transition-colors cursor-pointer"
+                className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-800 text-slate-300 font-bold text-xs rounded-xl border border-slate-800 transition-colors cursor-pointer"
               >
                 Cancel
               </button>

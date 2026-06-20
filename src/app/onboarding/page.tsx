@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -18,11 +18,16 @@ import {
   ShieldCheck,
   Check,
   Info,
-  ChevronDown
+  ChevronDown,
+  Shield,
+  Briefcase
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
+import { siteConfig } from '@/config/site';
 import { INDIAN_STATES, INDIAN_COLLEGES } from '@/data/indianColleges';
+import ThemeToggle from '@/components/ThemeToggle';
 
 // Option lists
 const ALL_COUNTRIES = [
@@ -224,9 +229,55 @@ export default function OnboardingPage() {
   const router = useRouter();
   const authSupabase = createAuthClient();
 
-  // ==========================================
-  // onboarding states
-  // ==========================================
+  // Dynamic branding logo configuration
+  const [logoText, setLogoText] = useState(siteConfig.logoText);
+  const [logoSubtext, setLogoSubtext] = useState(siteConfig.logoSubtext);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const localData = localStorage.getItem('aptitude_landing_page_settings');
+      if (localData) {
+        try {
+          const parsed = JSON.parse(localData);
+          if (parsed.header_logo_text) setLogoText(parsed.header_logo_text);
+          if (parsed.header_logo_subtext) setLogoSubtext(parsed.header_logo_subtext);
+        } catch (_) {}
+      }
+    }
+
+    const fetchBranding = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('landing_page_settings')
+          .select('header_logo_text, header_logo_subtext')
+          .eq('id', 'current')
+          .single();
+
+        if (data && !error) {
+          if (data.header_logo_text) setLogoText(data.header_logo_text);
+          if (data.header_logo_subtext) setLogoSubtext(data.header_logo_subtext);
+
+          if (typeof window !== 'undefined') {
+            const localData = localStorage.getItem('aptitude_landing_page_settings');
+            let parsed = {};
+            if (localData) {
+              try { parsed = JSON.parse(localData); } catch (_) {}
+            }
+            localStorage.setItem('aptitude_landing_page_settings', JSON.stringify({
+              ...parsed,
+              header_logo_text: data.header_logo_text,
+              header_logo_subtext: data.header_logo_subtext
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to fetch branding from Supabase:", err);
+      }
+    };
+
+    fetchBranding();
+  }, []);
+
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState<any | null>(null);
@@ -245,6 +296,112 @@ export default function OnboardingPage() {
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
   const [collegeSearch, setCollegeSearch] = useState('');
   const [collegeDropdownOpen, setCollegeDropdownOpen] = useState(false);
+
+  const [stateHighlightIndex, setStateHighlightIndex] = useState(-1);
+  const [isTypingState, setIsTypingState] = useState(false);
+  const stateContainerRef = useRef<HTMLDivElement>(null);
+
+  const stepsConfig = useMemo(() => [
+    { id: 1, label: 'Profile', icon: User, title: 'Choose your username', desc: 'This will be your unique identity across the platform.' },
+    { 
+      id: 2, 
+      label: userType === 'other' ? 'Professional' : 'Academic', 
+      icon: userType === 'other' ? Briefcase : GraduationCap, 
+      title: userType === 'other' ? 'Professional Details' : 'Education Information', 
+      desc: userType === 'other' ? 'Add professional details to personalize your career journey.' : 'Add academic records to qualify for corresponding placement templates.' 
+    },
+    { id: 3, label: 'Goal', icon: Target, title: 'What is your primary goal?', desc: 'Select the target destination of your analytical preparations.' },
+    { id: 4, label: 'Timeline', icon: Calendar, title: 'When do you want to achieve your goal?', desc: 'This aligns chronological milestone metrics in your planner.' },
+    { id: 5, label: 'Commit', icon: Clock, title: 'How much time can you dedicate each week?', desc: 'We calibrate streak milestones and questions quotas accordingly.' },
+    { id: 6, label: 'Preference', icon: BookOpen, title: 'How do you prefer to learn?', desc: 'Select your pedagogical preference for practicing aptitude.' }
+  ], [userType]);
+
+  // Sync scroll on highlight index change
+  useEffect(() => {
+    if (stateDropdownOpen && stateContainerRef.current && stateHighlightIndex >= 0) {
+      const activeEl = stateContainerRef.current.querySelector(`[data-index="${stateHighlightIndex}"]`) as HTMLElement;
+      if (activeEl) {
+        const container = stateContainerRef.current;
+        const activeTop = activeEl.offsetTop;
+        const activeBottom = activeTop + activeEl.offsetHeight;
+        const containerTop = container.scrollTop;
+        const containerBottom = containerTop + container.clientHeight;
+
+        if (activeTop < containerTop) {
+          container.scrollTop = activeTop;
+        } else if (activeBottom > containerBottom) {
+          container.scrollTop = activeBottom - container.clientHeight;
+        }
+      }
+    }
+  }, [stateHighlightIndex, stateDropdownOpen]);
+
+  const selectState = (st: string) => {
+    setState(st);
+    setStateSearch(st);
+    setStateDropdownOpen(false);
+    setIsTypingState(false);
+    setStateHighlightIndex(-1);
+  };
+
+  const handleStateKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!stateDropdownOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        setStateDropdownOpen(true);
+        setIsTypingState(false);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setStateHighlightIndex(prev => {
+          const nextIdx = prev + 1;
+          if (nextIdx < filteredStates.length) {
+            return nextIdx;
+          }
+          return prev;
+        });
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setStateHighlightIndex(prev => {
+          const nextIdx = prev - 1;
+          if (nextIdx >= 0) {
+            return nextIdx;
+          }
+          return -1;
+        });
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (stateHighlightIndex >= 0 && stateHighlightIndex < filteredStates.length) {
+          selectState(filteredStates[stateHighlightIndex]);
+        } else if (filteredStates.length > 0) {
+          selectState(filteredStates[0]);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setStateDropdownOpen(false);
+        setStateSearch(state);
+        setIsTypingState(false);
+        setStateHighlightIndex(-1);
+        break;
+      case 'Tab':
+        if (stateHighlightIndex >= 0 && stateHighlightIndex < filteredStates.length) {
+          selectState(filteredStates[stateHighlightIndex]);
+        } else {
+          setStateSearch(state);
+          setStateDropdownOpen(false);
+          setIsTypingState(false);
+        }
+        break;
+      default:
+        break;
+    }
+  };
 
   // Dynamic colleges dataset
   const [allColleges, setAllColleges] = useState<any[]>(INDIAN_COLLEGES);
@@ -310,9 +467,9 @@ export default function OnboardingPage() {
   // Filtered lists for autocomplete suggestions
   const filteredStates = useMemo(() => {
     const query = stateSearch.toLowerCase().trim();
-    if (!query || query === state.toLowerCase().trim()) return indianStates;
+    if (!query || !isTypingState) return indianStates;
     return indianStates.filter(s => s.toLowerCase().includes(query));
-  }, [state, stateSearch, indianStates]);
+  }, [stateSearch, isTypingState, indianStates]);
 
   const filteredColleges = useMemo(() => {
     if (!state) return []; // College dropdown should be empty when no state is selected!
@@ -461,12 +618,16 @@ export default function OnboardingPage() {
       return;
     }
 
-    if (currentStep === 6 && learningPreferences.length === 0) {
-      setValidationError('Please select at least one learning preference.');
+    if (currentStep === 6) {
+      if (learningPreferences.length === 0) {
+        setValidationError('Please select at least one learning preference.');
+        return;
+      }
+      handleOnboardingComplete();
       return;
     }
 
-    setCurrentStep(prev => Math.min(prev + 1, 7));
+    setCurrentStep(prev => Math.min(prev + 1, 6));
   };
 
   const handleBackStep = () => {
@@ -518,6 +679,7 @@ export default function OnboardingPage() {
       target_timeline: targetTimeline,
       weekly_commitment: weeklyCommitment,
       learning_preference: learningPreferences.join(', '),
+      avatar: 'initial',
       onboarding_completed: true
     };
 
@@ -541,696 +703,814 @@ export default function OnboardingPage() {
       localStorage.setItem('aptitude_current_role', JSON.stringify(updatedUser));
     }
 
-    // Attempt Supabase writes
-    try {
-      const { data: { session } } = await authSupabase.auth.getSession();
-      let userId = session?.user?.id;
+    // Attempt Supabase writes in the background to prevent blocking the UI
+    (async () => {
+      try {
+        const { data: { session } } = await authSupabase.auth.getSession();
+        let userId = session?.user?.id;
 
-      if (!userId && userProfile?.email) {
-        const { data: profileObj } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', userProfile.email)
-          .maybeSingle();
-        if (profileObj) userId = profileObj.id;
-      }
+        if (!userId && userProfile?.email) {
+          const { data: profileObj } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('email', userProfile.email)
+            .maybeSingle();
+          if (profileObj) userId = profileObj.id;
+        }
 
-      if (userId) {
-        // Try upserting with state first
-        const { error } = await supabase
-          .from('onboarding_profile')
-          .upsert({
-            user_id: userId,
-            ...completedProfile,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id' });
-
-        if (error) {
-          console.warn('Supabase onboarding profile upsert with state failed, retrying without state column...', error.message);
-          
-          // Fallback without state
-          const { state: _, ...completedProfileWithoutState } = completedProfile;
-          const { error: fallbackError } = await supabase
+        if (userId) {
+          // Try upserting with state first
+          const { error } = await supabase
             .from('onboarding_profile')
             .upsert({
               user_id: userId,
-              ...completedProfileWithoutState,
+              ...completedProfile,
               updated_at: new Date().toISOString()
             }, { onConflict: 'user_id' });
 
-          if (fallbackError) {
-            console.warn('Supabase onboarding fallback upsert failed:', fallbackError.message);
+          if (error) {
+            console.warn('Supabase onboarding profile upsert with state failed, retrying without state column...', error.message);
+            
+            // Fallback without state
+            const { state: _, ...completedProfileWithoutState } = completedProfile;
+            const { error: fallbackError } = await supabase
+              .from('onboarding_profile')
+              .upsert({
+                user_id: userId,
+                ...completedProfileWithoutState,
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'user_id' });
+
+            if (fallbackError) {
+              console.warn('Supabase onboarding fallback upsert failed:', fallbackError.message);
+            }
           }
         }
+      } catch (err) {
+        console.warn('Graceful database write fallback triggered:', err);
       }
-    } catch (err) {
-      console.warn('Graceful database write fallback triggered:', err);
-    }
+    })();
 
-    setTimeout(() => {
-      setLoading(false);
-      showNotice('Personalized paths compiled successfully!', 'success');
-      router.push('/student/dashboard');
-    }, 1200);
+    // Perform redirect instantly
+    setLoading(false);
+    showNotice('Personalized paths compiled successfully!', 'success');
+    router.push('/student/dashboard');
   };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col justify-between font-sans selection:bg-blue-600 selection:text-white relative overflow-x-hidden antialiased transition-colors duration-300">
       
-      {/* Decorative grids matching the content creator theme */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none opacity-35 dark:opacity-15 animate-fadeIn" />
+      {/* SaaS background grid & glows */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_at_center,white_30%,transparent_100%)] pointer-events-none opacity-20 dark:opacity-10" />
+      
+      {/* Ambient glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/10 dark:bg-blue-600/10 blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-500/10 dark:bg-indigo-600/10 blur-[120px] pointer-events-none -z-10" />
+      
+      {/* Floating ambient elements (particles) */}
+      <motion.div 
+        animate={{ y: [0, -12, 0], x: [0, 5, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-1/4 left-10 w-2 h-2 rounded-full bg-blue-500/30 blur-xs pointer-events-none -z-10" 
+      />
+      <motion.div 
+        animate={{ y: [0, -18, 0], x: [0, -6, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        className="absolute top-1/3 right-12 w-3 h-3 rounded-full bg-purple-500/20 blur-xs pointer-events-none -z-10" 
+      />
+      <motion.div 
+        animate={{ y: [0, -14, 0], x: [0, 4, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+        className="absolute bottom-1/4 left-16 w-2.5 h-2.5 rounded-full bg-indigo-500/25 blur-xs pointer-events-none -z-10" 
+      />
 
       {/* System notices */}
-      {notification && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl border shadow-2xl transition-all duration-300 transform translate-y-0 max-w-sm animate-scaleUp ${
-          notification.type === 'success' 
-            ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-205 border-emerald-200 dark:border-emerald-900' 
-            : notification.type === 'error'
-            ? 'bg-rose-50 dark:bg-rose-950 text-rose-800 dark:text-rose-205 border-rose-200 dark:border-rose-900'
-            : 'bg-blue-50 dark:bg-blue-950 text-blue-800 dark:text-blue-205 border-blue-200 dark:border-blue-900'
-        }`}>
-          <div className="p-1 rounded-md bg-white/50 shrink-0">
-            {notification.type === 'success' ? <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
-          </div>
-          <span className="text-xs font-bold leading-normal">{notification.text}</span>
-        </div>
-      )}
+      <AnimatePresence>
+        {notification && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl max-w-sm ${
+              notification.type === 'success' 
+                ? 'bg-emerald-50/90 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-200 border-emerald-200/80 dark:border-emerald-900/50 backdrop-blur-md' 
+                : notification.type === 'error'
+                ? 'bg-rose-50/90 dark:bg-rose-950/90 text-rose-800 dark:text-rose-200 border-rose-200/80 dark:border-rose-900/50 backdrop-blur-md'
+                : 'bg-blue-50/90 dark:bg-blue-950/90 text-blue-800 dark:text-blue-200 border-blue-200/80 dark:border-blue-900/50 backdrop-blur-md'
+            }`}
+          >
+            <div className="p-1 rounded-lg bg-white/50 dark:bg-white/10 shrink-0">
+              {notification.type === 'success' ? (
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              ) : (
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              )}
+            </div>
+            <span className="text-xs font-semibold leading-normal">{notification.text}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Light-palette Brand Header */}
-      <header className="sticky top-0 z-40 w-full bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800/80 px-6 sm:px-12 py-4 flex items-center justify-between shadow-xs transition-colors duration-300">
+      {/* Glassmorphic Navbar */}
+      <header className="sticky top-0 z-40 w-full h-[76px] backdrop-blur-md bg-white/70 dark:bg-slate-950/70 border-b border-slate-200/50 dark:border-slate-800/50 px-6 sm:px-12 flex items-center justify-between transition-colors duration-300">
         <Link href="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+          <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(37,99,235,0.25)]">
             <Layers className="w-4.5 h-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold tracking-tight text-xs text-slate-900 dark:text-white">THE LUCID INTELLECTUAL</span>
-            <span className="text-[8px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">Aptitude & Verbal Studio</span>
+            <span className="font-extrabold tracking-tight text-xs text-slate-900 dark:text-white">{logoText}</span>
+            <span className="text-[8px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">{logoSubtext}</span>
           </div>
         </Link>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              SECURE ONBOARDING HUD
-            </span>
-          </div>
+          <ThemeToggle />
         </div>
       </header>
 
-      {/* Stepper Wizard Main Content */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-6 py-10 flex flex-col justify-center items-center gap-6 z-10">
+      {/* Wizard Main Content */}
+      <main className="flex-1 w-full mx-auto px-4 py-8 flex flex-col justify-center items-center gap-2 z-10">
         
-        {/* Horizontal HUD Stepper (Light theme) */}
+        {/* Hero Section */}
         {currentStep <= 6 && (
-          <div className="w-full bg-white dark:bg-slate-900 border border-slate-200/85 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-xs select-none text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider transition-colors duration-300">
-            {[1, 2, 3, 4, 5, 6].map((num) => {
-              const isActive = num === currentStep;
-              const isCompleted = num < currentStep;
-              return (
-                <React.Fragment key={num}>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center border text-[9.5px] transition-all duration-300 ${
-                      isCompleted 
-                        ? 'border-blue-600 bg-blue-600 text-white font-black shadow-xs'
-                        : isActive 
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 font-extrabold scale-105 shadow-inner' 
-                        : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-550'
-                    }`}>
-                      {num}
-                    </span>
-                    <span className={`hidden md:inline font-bold text-[9px] ${isActive ? 'text-slate-805 dark:text-slate-100' : isCompleted ? 'text-blue-650 dark:text-blue-400' : 'text-slate-400 dark:text-slate-550'}`}>
-                      {num === 1 ? 'Profile' : num === 2 ? (userType === 'other' ? 'Professional' : 'Academic') : num === 3 ? 'Goal' : num === 4 ? 'Timeline' : num === 5 ? 'Commit' : 'Preference'}
-                    </span>
-                  </div>
-                  {num < 6 && <div className={`h-[1px] flex-1 mx-2 transition-colors duration-300 ${num < currentStep ? 'bg-blue-300 dark:bg-blue-800' : 'bg-slate-200 dark:bg-slate-800'}`} />}
-                </React.Fragment>
-              );
-            })}
+          <div className="relative text-center max-w-2xl mx-auto mb-6 mt-2">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-12 bg-blue-500/10 dark:bg-blue-600/10 blur-2xl rounded-full -z-10 pointer-events-none" />
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-slate-950 via-slate-800 to-slate-950 dark:from-white dark:via-slate-200 dark:to-white">
+              Let's personalize your journey
+            </h1>
+            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-4 font-medium leading-relaxed">
+              Tell us a little about yourself so we can tailor the experience to your goals.
+            </p>
+            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/40 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/40 text-[10px] font-bold text-slate-500 dark:text-slate-400 backdrop-blur-sm shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-500 animate-pulse" />
+              <span>Step {currentStep} of 6</span>
+              <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+              <span>Estimated time: {
+                currentStep === 1 ? '2–3 mins' :
+                currentStep === 2 ? '2 mins' :
+                currentStep === 3 ? '1.5 mins' :
+                currentStep === 4 ? '1 min' :
+                currentStep === 5 ? '30 secs' : '10 secs'
+              }</span>
+            </div>
           </div>
         )}
 
-        {/* Wizard Panel Card (Light Palette) */}
-        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl rounded-3xl p-6 sm:p-8 min-h-[460px] flex flex-col justify-between gap-6 relative overflow-hidden transition-all duration-300">
+        {/* Horizontal Stepper */}
+        {currentStep <= 6 && (
+          <div className="w-full max-w-[750px] bg-white/50 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-4 shadow-sm select-none text-[10px] uppercase tracking-wider mb-8">
+            <div className="flex items-center justify-between relative">
+              {stepsConfig.map((s, index) => {
+                const StepIcon = s.icon;
+                const isActive = s.id === currentStep;
+                const isCompleted = s.id < currentStep;
+                
+                return (
+                  <React.Fragment key={s.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (s.id < currentStep) {
+                          setValidationError(null);
+                          setCurrentStep(s.id);
+                        }
+                      }}
+                      disabled={!isCompleted && s.id !== currentStep}
+                      className={`flex flex-col items-center gap-1.5 relative z-10 focus:outline-none transition-all duration-300 group ${
+                        isCompleted ? 'cursor-pointer' : 'cursor-default'
+                      }`}
+                    >
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center border text-[10px] transition-all duration-300 relative ${
+                        isCompleted 
+                          ? 'border-blue-600 bg-blue-600 text-white font-black shadow-sm'
+                          : isActive 
+                          ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold scale-110 shadow-[0_0_15px_rgba(37,99,235,0.25)]' 
+                          : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-slate-400 dark:text-slate-500'
+                      }`}>
+                        {isCompleted ? (
+                          <Check className="w-4 h-4 stroke-[3.5]" />
+                        ) : (
+                          <StepIcon className="w-4 h-4" />
+                        )}
+                        {isActive && (
+                          <span className="absolute inset-0 rounded-full border border-blue-600/30 animate-ping pointer-events-none" />
+                        )}
+                      </div>
+                      <span className={`hidden md:inline font-bold text-[9px] transition-colors ${
+                        isActive 
+                          ? 'text-blue-600 dark:text-blue-400' 
+                          : isCompleted 
+                          ? 'text-slate-700 dark:text-slate-300' 
+                          : 'text-slate-500 dark:text-slate-500'
+                      }`}>
+                        {s.label}
+                      </span>
+                    </button>
+                    {index < stepsConfig.length - 1 && (
+                      <div className="h-[2px] flex-1 mx-2 relative bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div 
+                          className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500 ease-out"
+                          style={{ width: isCompleted ? '100%' : isActive ? '50%' : '0%' }}
+                        />
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Wizard Panel Card */}
+        <div className="w-full max-w-[950px] bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.25)] rounded-[24px] p-6 sm:p-8 min-h-[480px] flex flex-col justify-between gap-6 relative overflow-hidden transition-all duration-300">
           
+          {/* Card Header Section */}
+          <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/50 pb-5">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200/50 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 relative shrink-0 shadow-sm">
+                {React.createElement(stepsConfig[currentStep - 1]?.icon || User, { className: "w-5.5 h-5.5" })}
+                <div className="absolute inset-0 rounded-xl bg-blue-500/10 blur-md -z-10 animate-pulse" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight truncate">
+                  {stepsConfig[currentStep - 1]?.title}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-tight mt-1 truncate">
+                  {stepsConfig[currentStep - 1]?.desc}
+                </p>
+              </div>
+            </div>
+            
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/40 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 select-none">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>Secure & Private</span>
+            </div>
+          </div>
+
           {/* Validation Banner */}
           {validationError && (
-            <div className="bg-rose-50 dark:bg-rose-950/80 border border-rose-150 dark:border-rose-900 p-3 rounded-xl text-rose-700 dark:text-rose-300 text-xs font-semibold leading-relaxed animate-fadeIn">
-              ⚠️ {validationError}
+            <div className="bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200/40 dark:border-rose-900/40 p-3.5 rounded-2xl text-rose-700 dark:text-rose-300 text-xs font-semibold leading-relaxed flex items-center gap-2.5 animate-fadeIn">
+              <Info className="w-4 h-4 text-rose-500 shrink-0" />
+              <span>{validationError}</span>
             </div>
           )}
 
-          {/* ==========================================
-              STEP 1: BASIC PROFILE
-              ========================================== */}
-          {currentStep === 1 && (
-            <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
-              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">Choose Your Username</h3>
-                <p className="text-xs text-slate-450 font-medium">Please choose a unique username to personalize your aptitude tracking experience.</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className={`space-y-1.5 transition-transform duration-300 ${shakeField ? 'animate-shake' : ''}`}>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wide">Username *</label>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455" />
-                    <input 
-                      type="text" 
-                      placeholder="e.g. sriram_neppalli"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                      style={{ textTransform: 'none' }}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-xs text-slate-805 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-all font-mono"
-                    />
-                  </div>
-                  {username && isUsernameTakenOrSimilar(username).taken && (
-                    <div className="space-y-2 mt-2.5 animate-fadeIn">
-                      <span className="text-[10px] text-rose-500 font-bold block">
-                        ⚠️ {isUsernameTakenOrSimilar(username).reason}
-                      </span>
-                      <div className="text-[10px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wider select-none pt-1">
-                        Try one of these suggestions:
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-0.5 select-none">
-                        {generateUsernameSuggestions(username).map((suggestion) => (
-                          <button
-                            key={suggestion}
-                            type="button"
-                            onClick={() => setUsername(suggestion)}
-                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/20 dark:hover:bg-blue-950/40 border border-blue-200/50 dark:border-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-bold transition-all cursor-pointer active:scale-95"
-                          >
-                            {suggestion}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <span className="text-[9px] text-slate-455 block leading-normal mt-1">This is how you will be identified in progress and performance leaderboard tracking.</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ==========================================
-              STEP 2: EDUCATION DETAILS OR PROFESSIONAL DETAILS
-              ========================================== */}
-          {currentStep === 2 && (
-            <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
-              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">Education Information</h3>
-                <p className="text-xs text-slate-450 font-medium">Add academic records to qualify for corresponding placement templates.</p>
-              </div>
-
-              {/* User Type selector */}
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wide">I am a...</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setUserType('student')}
-                    className={`p-4 rounded-2xl border-2 text-left cursor-pointer transition-all flex flex-col gap-2 relative ${
-                      userType === 'student'
-                        ? 'border-blue-600 bg-blue-50/50 text-slate-900 dark:bg-blue-950/20 dark:text-blue-400 shadow-sm font-black'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-400'
-                    }`}
-                  >
-                    <span className="text-xl">🎓</span>
-                    <span className="text-xs font-bold tracking-tight">Student</span>
-                    <span className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium leading-none">High school or college student</span>
-                    {userType === 'student' && (
-                      <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-white animate-scaleUp">
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUserType('other');
-                      setCollege('');
-                      setDegree('');
-                      setBranch('');
-                      setGraduationYear('');
-                    }}
-                    className={`p-4 rounded-2xl border-2 text-left cursor-pointer transition-all flex flex-col gap-2 relative ${
-                      userType === 'other'
-                        ? 'border-blue-600 bg-blue-50/50 text-slate-900 dark:bg-blue-950/20 dark:text-blue-400 shadow-sm font-black'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-600 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-400'
-                    }`}
-                  >
-                    <span className="text-2xl">💼</span>
-                    <span className="text-xs font-bold tracking-tight">Other</span>
-                    <span className="text-[9.5px] text-slate-400 dark:text-slate-550 font-medium leading-none">Professional or job seeker</span>
-                    {userType === 'other' && (
-                      <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-white animate-scaleUp">
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Conditional Education Fields */}
-              <div 
-                className={`grid grid-cols-1 sm:grid-cols-2 gap-4 transition-all duration-500 ease-in-out origin-top ${
-                  userType === 'student' 
-                    ? 'max-h-[600px] opacity-100 scale-y-100 pointer-events-auto mt-4' 
-                    : 'max-h-0 opacity-0 scale-y-0 pointer-events-none overflow-hidden'
-                }`}
+          {/* Animated content frame */}
+          <div className="flex-1 flex flex-col justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="w-full"
               >
-                {/* State Autocomplete Selector */}
-                <div className="space-y-1.5 relative">
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wide">State *</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search state/UT, e.g. Telangana"
-                      value={stateSearch}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setStateSearch(val);
-                        setState(val);
-                        setStateDropdownOpen(true);
-                      }}
-                      onFocus={() => setStateDropdownOpen(true)}
-                      onBlur={() => {
-                        // Allow click to execute before closing
-                        setTimeout(() => setStateDropdownOpen(false), 200);
-                      }}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3.5 pr-10 text-xs text-slate-850 dark:text-slate-105 focus:outline-none focus:border-blue-600 transition-all font-semibold"
-                    />
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 pointer-events-none" />
-                    
-                    {stateDropdownOpen && filteredStates.length > 0 && (
-                      <div className="absolute left-0 right-0 mt-1.5 max-h-48 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-30 py-1.5 scrollbar-thin scrollbar-thumb-slate-300">
-                        {filteredStates.map((st) => (
-                          <button
-                            key={st}
-                            type="button"
-                            onMouseDown={() => {
-                              setState(st);
-                              setStateSearch(st);
-                              setStateDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                          >
-                            {st}
-                          </button>
-                        ))}
+                {/* ==========================================
+                    STEP 1: BASIC PROFILE
+                    ========================================== */}
+                {currentStep === 1 && (
+                  <div className="space-y-4 max-w-xl mx-auto py-4">
+                    <div className={`space-y-2.5 transition-transform duration-300 ${shakeField ? 'animate-shake' : ''}`}>
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Username *</label>
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                        <input 
+                          type="text" 
+                          placeholder="e.g. sriram_neppalli"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                          style={{ textTransform: 'none' }}
+                          className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3.5 pl-12 pr-12 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-mono placeholder-slate-400"
+                        />
+                        {username && (
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                            {isUsernameTakenOrSimilar(username).taken ? (
+                              <Info className="w-5 h-5 text-rose-500 shrink-0" />
+                            ) : username.length >= 3 ? (
+                              <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                            ) : (
+                              <Info className="w-5 h-5 text-amber-500 shrink-0" />
+                            )}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Graduation Year Selector */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wide">Graduation Year *</label>
-                  <div className="relative">
-                    <select
-                      value={graduationYear}
-                      onChange={(e) => setGraduationYear(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3.5 pr-10 text-xs text-slate-850 dark:text-slate-105 focus:outline-none focus:border-blue-600 transition-all font-semibold appearance-none cursor-pointer"
-                    >
-                      {['2024', '2025', '2026', '2027', '2028', '2029', '2030'].map((yr) => (
-                        <option key={yr} value={yr} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
-                          {yr}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* College Autocomplete Selector */}
-                <div className="space-y-1.5 sm:col-span-2 relative">
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wide">College / University *</label>
-                  <div className="relative">
-                    <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-455 z-10 pointer-events-none" />
-                    <input
-                      type="text"
-                      disabled={!state}
-                      placeholder={!state ? "Select a state first" : "Search college, e.g. CBIT"}
-                      value={collegeSearch}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setCollegeSearch(val);
-                        setCollege(val);
-                        setCollegeDropdownOpen(true);
-                      }}
-                      onFocus={() => setCollegeDropdownOpen(true)}
-                      onBlur={() => {
-                        // Allow click to execute before closing
-                        setTimeout(() => setCollegeDropdownOpen(false), 200);
-                      }}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 pl-10 pr-10 text-xs text-slate-850 dark:text-slate-105 focus:outline-none focus:border-blue-600 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                    {loadingColleges ? (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border border-blue-600 border-t-transparent rounded-full animate-spin pointer-events-none" />
-                    ) : (
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 pointer-events-none" />
-                    )}
-
-                    {collegeDropdownOpen && filteredColleges.length > 0 && (
-                      <div className="absolute left-0 right-0 mt-1.5 max-h-60 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-30 py-1.5 scrollbar-thin scrollbar-thumb-slate-300">
-                        {filteredColleges.map((clg) => (
-                          <button
-                            key={clg}
-                            type="button"
-                            onMouseDown={() => {
-                              setCollege(clg);
-                              setCollegeSearch(clg);
-                              setCollegeDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
-                          >
-                            {clg}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Degree Selector */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wide">Degree *</label>
-                  <div className="relative">
-                    <select
-                      value={degree}
-                      onChange={(e) => setDegree(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3.5 pr-10 text-xs text-slate-850 dark:text-slate-105 focus:outline-none focus:border-blue-600 transition-all font-semibold appearance-none cursor-pointer"
-                    >
-                      {Object.keys(DEGREE_BRANCH_DATA).map((deg) => (
-                        <option key={deg} value={deg} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
-                          {deg}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Branch Selector */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wide">Branch / Department *</label>
-                  <div className="relative">
-                    <select
-                      value={branch}
-                      onChange={(e) => setBranch(e.target.value)}
-                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3.5 pr-10 text-xs text-slate-850 dark:text-slate-105 focus:outline-none focus:border-blue-600 transition-all font-semibold appearance-none cursor-pointer"
-                    >
-                      {DEGREE_BRANCH_DATA[degree] && DEGREE_BRANCH_DATA[degree].map((br) => (
-                        <option key={br} value={br} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
-                          {br}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-455 pointer-events-none" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ==========================================
-              STEP 3: LEARNING GOAL
-              ========================================== */}
-          {currentStep === 3 && (
-            <div className="space-y-5 flex-1 flex flex-col justify-center animate-scaleUp">
-              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">What is your primary goal?</h3>
-                <p className="text-xs text-slate-455 font-medium">Select the target destination of your analytical preparations.</p>
-              </div>
-
-              {/* Selectable goal cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[220px] overflow-y-auto pr-1.5 custom-scrollbar">
-                {goalOptions.map((g) => {
-                  const isSelected = primaryGoals.includes(g.label);
-                  return (
-                    <button
-                      key={g.id}
-                      onClick={() => {
-                        setPrimaryGoals(prev => 
-                          prev.includes(g.label)
-                            ? prev.filter(x => x !== g.label)
-                            : [...prev, g.label]
-                        );
-                      }}
-                      className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-3 relative ${
-                        isSelected 
-                          ? 'border-blue-600 bg-blue-50/50 text-slate-905 dark:bg-blue-950/20 dark:text-blue-400 shadow-sm font-black' 
-                          : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50 text-slate-705 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
-                      }`}
-                    >
-                      <div className={`p-1.5 rounded-lg shrink-0 ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'}`}>
-                        <Target className="w-4 h-4" />
-                      </div>
-                      <div className="flex flex-col min-w-0 pr-4">
-                        <span className="text-[11.5px] font-bold tracking-tight">{g.label}</span>
-                        <span className="text-[9.5px] text-slate-450 dark:text-slate-500 leading-normal mt-0.5 font-medium">{g.desc}</span>
-                      </div>
-                      {isSelected && (
-                        <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                          <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      
+                      {username && isUsernameTakenOrSimilar(username).taken && (
+                        <div className="space-y-2 mt-3 animate-fadeIn">
+                          <span className="text-xs text-rose-500 font-bold block">
+                            ⚠️ {isUsernameTakenOrSimilar(username).reason}
+                          </span>
+                          <div className="text-[10px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wider select-none pt-1">
+                            Try one of these suggestions:
+                          </div>
+                          <div className="flex flex-wrap gap-2 pt-0.5 select-none">
+                            {generateUsernameSuggestions(username).map((suggestion) => (
+                              <button
+                                key={suggestion}
+                                type="button"
+                                onClick={() => setUsername(suggestion)}
+                                className="px-3.5 py-2 bg-blue-50/50 hover:bg-blue-100 dark:bg-blue-950/10 dark:hover:bg-blue-950/30 border border-blue-200/50 dark:border-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95"
+                              >
+                                {suggestion}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       )}
-                    </button>
-                  );
-                })}
-              </div>
+                      
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block leading-normal mt-1.5 font-medium">
+                        This is how you will be identified in progress and performance tracking.
+                      </span>
+                    </div>
+                  </div>
+                )}
 
-              {primaryGoals.includes('Others') && (
-                <div className="space-y-1.5 animate-fadeIn">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wide">
-                    Specify your custom goal (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Preparing for a unique corporate assessment"
-                    value={customGoal}
-                    onChange={(e) => setCustomGoal(e.target.value)}
-                    style={{ textTransform: 'none' }}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-3.5 text-xs text-slate-805 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-all font-semibold"
-                  />
-                </div>
-              )}
-            </div>
-          )}
+                {/* ==========================================
+                    STEP 2: EDUCATION DETAILS OR PROFESSIONAL DETAILS
+                    ========================================== */}
+                {currentStep === 2 && (
+                  <div className="space-y-6 py-2">
+                    {/* User Type selector */}
+                    <div className="space-y-3 max-w-xl mx-auto">
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block">I am a...</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <button
+                          type="button"
+                          onClick={() => setUserType('student')}
+                          className={`p-5 rounded-2xl border-2 text-left cursor-pointer transition-all duration-300 flex flex-col gap-3 relative hover:-translate-y-0.5 ${
+                            userType === 'student'
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.06)]'
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900/60 dark:text-slate-300'
+                          }`}
+                        >
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base ${
+                            userType === 'student' ? 'bg-blue-100 dark:bg-blue-950/50 text-blue-600' : 'bg-slate-100 dark:bg-slate-900 text-slate-500'
+                          }`}>
+                            🎓
+                          </div>
+                          <div>
+                            <span className="text-sm font-extrabold tracking-tight block">Student</span>
+                            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium leading-snug block mt-0.5">High school or college student</span>
+                          </div>
+                          {userType === 'student' && (
+                            <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white animate-scaleUp shadow-sm">
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            </div>
+                          )}
+                        </button>
 
-          {/* ==========================================
-              STEP 4: TARGET TIMELINE
-              ========================================== */}
-          {currentStep === 4 && (
-            <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
-              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">When do you want to achieve your goal?</h3>
-                <p className="text-xs text-slate-450 font-medium">This aligns chronological milestone metrics in your planner.</p>
-              </div>
-
-              <div className="space-y-2.5">
-                {timelineOptions.map((time) => {
-                  const isSelected = targetTimeline === time;
-                  return (
-                    <button
-                      key={time}
-                      onClick={() => setTargetTimeline(time)}
-                      style={{ textTransform: 'none' }}
-                      className={`w-full p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between font-bold text-xs ${
-                        isSelected 
-                          ? 'border-blue-600 bg-blue-50/40 text-slate-905 dark:bg-blue-950/20 dark:text-blue-400 shadow-2xs' 
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-650 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Calendar className={`w-4.5 h-4.5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                        <span>{time}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserType('other');
+                            setCollege('');
+                            setDegree('');
+                            setBranch('');
+                            setGraduationYear('');
+                          }}
+                          className={`p-5 rounded-2xl border-2 text-left cursor-pointer transition-all duration-300 flex flex-col gap-3 relative hover:-translate-y-0.5 ${
+                            userType === 'other'
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.06)]'
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900/60 dark:text-slate-300'
+                          }`}
+                        >
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-base ${
+                            userType === 'other' ? 'bg-blue-100 dark:bg-blue-950/50 text-blue-600' : 'bg-slate-100 dark:bg-slate-900 text-slate-500'
+                          }`}>
+                            💼
+                          </div>
+                          <div>
+                            <span className="text-sm font-extrabold tracking-tight block">Other</span>
+                            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium leading-snug block mt-0.5">Professional or job seeker</span>
+                          </div>
+                          {userType === 'other' && (
+                            <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white animate-scaleUp shadow-sm">
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            </div>
+                          )}
+                        </button>
                       </div>
-                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? 'border-blue-600 bg-blue-600 text-white dark:border-blue-500' : 'border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-900'}`}>
-                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-blue-400" />}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+                    </div>
 
-          {/* ==========================================
-              STEP 5: WEEKLY COMMITMENT
-              ========================================== */}
-          {currentStep === 5 && (
-            <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
-              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">How much time can you dedicate each week?</h3>
-                <p className="text-xs text-slate-450 font-medium">We calibrate streak milestones and questions quotas accordingly.</p>
-              </div>
+                    {/* Conditional Education Fields */}
+                    {userType === 'student' && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        transition={{ duration: 0.35, ease: 'easeOut' }}
+                        className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6 border-t border-slate-100 dark:border-slate-800/40 pt-6"
+                      >
+                        {/* State Selector */}
+                        <div className="space-y-1.5 relative">
+                          <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">State *</label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder="Search state/UT, e.g. Telangana"
+                              value={stateSearch}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setStateSearch(val);
+                                setIsTypingState(true);
+                                setStateDropdownOpen(true);
+                                setStateHighlightIndex(-1);
+                              }}
+                              onFocus={(e) => {
+                                e.target.select();
+                                setStateDropdownOpen(true);
+                                setIsTypingState(false);
+                                setStateHighlightIndex(-1);
+                              }}
+                              onBlur={() => {
+                                setTimeout(() => {
+                                  setStateDropdownOpen(false);
+                                  setStateSearch(state);
+                                  setIsTypingState(false);
+                                  setStateHighlightIndex(-1);
+                                }, 200);
+                              }}
+                              onKeyDown={handleStateKeyDown}
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold"
+                            />
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            
+                            <div 
+                              ref={stateContainerRef}
+                              className={`absolute left-0 right-0 mt-2 max-h-48 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-30 py-1.5 transition-all duration-200 origin-top ${
+                                stateDropdownOpen 
+                                  ? 'opacity-100 scale-y-100 pointer-events-auto' 
+                                  : 'opacity-0 scale-y-95 pointer-events-none'
+                              }`}
+                            >
+                              {filteredStates.length > 0 ? (
+                                filteredStates.map((st, idx) => (
+                                  <button
+                                    key={st}
+                                    type="button"
+                                    data-index={idx}
+                                    onMouseDown={() => {
+                                      selectState(st);
+                                    }}
+                                    onMouseEnter={() => setStateHighlightIndex(idx)}
+                                    className={`w-full text-left px-4 py-2 text-xs font-semibold transition-colors ${
+                                      idx === stateHighlightIndex
+                                        ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400'
+                                        : 'text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-600 dark:hover:text-blue-400'
+                                    }`}
+                                  >
+                                    {st}
+                                  </button>
+                                ))
+                              ) : (
+                                <div className="px-4 py-3 text-xs font-semibold text-slate-400 dark:text-slate-500 text-center select-none">
+                                  No states found
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
 
-              <div className="space-y-2.5">
-                {commitmentOptions.map((commit) => {
-                  const isSelected = weeklyCommitment === commit;
-                  return (
-                    <button
-                      key={commit}
-                      onClick={() => setWeeklyCommitment(commit)}
-                      style={{ textTransform: 'none' }}
-                      className={`w-full p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between font-bold text-xs ${
-                        isSelected 
-                          ? 'border-blue-600 bg-blue-50/40 text-slate-905 dark:bg-blue-950/20 dark:text-blue-400 shadow-2xs' 
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-650 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Clock className={`w-4.5 h-4.5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                        <span>{commit}</span>
-                      </div>
-                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? 'border-blue-600 bg-blue-600 text-white dark:border-blue-500' : 'border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-900'}`}>
-                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-blue-400" />}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+                        {/* Graduation Year */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Graduation Year *</label>
+                          <div className="relative">
+                            <select
+                              value={graduationYear}
+                              onChange={(e) => setGraduationYear(e.target.value)}
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
+                            >
+                              {['2024', '2025', '2026', '2027', '2028', '2029', '2030'].map((yr) => (
+                                <option key={yr} value={yr} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+                                  {yr}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                          </div>
+                        </div>
 
-          {/* ==========================================
-              STEP 6: LEARNING PREFERENCE
-              ========================================== */}
-          {currentStep === 6 && (
-            <div className="space-y-6 flex-1 flex flex-col justify-center animate-scaleUp">
-              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black tracking-tight text-slate-900 uppercase">How do you prefer to learn?</h3>
-                <p className="text-xs text-slate-455 font-medium">Select your pedagogical preference for practicing aptitude.</p>
-              </div>
+                        {/* College Selector */}
+                        <div className="space-y-1.5 sm:col-span-2 relative">
+                          <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">College / University *</label>
+                          <div className="relative">
+                            <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 z-10 pointer-events-none" />
+                            <input
+                              type="text"
+                              disabled={!state}
+                              placeholder={!state ? "Select a state first" : "Search college, e.g. CBIT"}
+                              value={collegeSearch}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setCollegeSearch(val);
+                                setCollege(val);
+                                setCollegeDropdownOpen(true);
+                              }}
+                              onFocus={() => setCollegeDropdownOpen(true)}
+                              onBlur={() => {
+                                setTimeout(() => setCollegeDropdownOpen(false), 200);
+                              }}
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-11 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                            />
+                            {loadingColleges ? (
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border border-blue-600 border-t-transparent rounded-full animate-spin pointer-events-none" />
+                            ) : (
+                              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            )}
 
-              <div className="space-y-2.5">
-                {preferenceOptions.map((pref) => {
-                  const isSelected = learningPreferences.includes(pref);
-                  return (
-                    <button
-                      key={pref}
-                      onClick={() => {
-                        setLearningPreferences(prev => 
-                          prev.includes(pref)
-                            ? prev.filter(x => x !== pref)
-                            : [...prev, pref]
+                            {collegeDropdownOpen && filteredColleges.length > 0 && (
+                              <div className="absolute left-0 right-0 mt-2 max-h-60 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-30 py-1.5 scrollbar-thin">
+                                {filteredColleges.map((clg) => (
+                                  <button
+                                    key={clg}
+                                    type="button"
+                                    onMouseDown={() => {
+                                      setCollege(clg);
+                                      setCollegeSearch(clg);
+                                      setCollegeDropdownOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate"
+                                  >
+                                    {clg}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Degree Selector */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Degree *</label>
+                          <div className="relative">
+                            <select
+                              value={degree}
+                              onChange={(e) => setDegree(e.target.value)}
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
+                            >
+                              {Object.keys(DEGREE_BRANCH_DATA).map((deg) => (
+                                <option key={deg} value={deg} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+                                  {deg}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                          </div>
+                        </div>
+
+                        {/* Branch Selector */}
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Branch / Department *</label>
+                          <div className="relative">
+                            <select
+                              value={branch}
+                              onChange={(e) => setBranch(e.target.value)}
+                              className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 pr-10 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold appearance-none cursor-pointer"
+                            >
+                              {DEGREE_BRANCH_DATA[degree] && DEGREE_BRANCH_DATA[degree].map((br) => (
+                                <option key={br} value={br} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+                                  {br}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                )}
+
+                {/* ==========================================
+                    STEP 3: LEARNING GOAL
+                    ========================================== */}
+                {currentStep === 3 && (
+                  <div className="space-y-5 py-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[280px] overflow-y-auto pr-1.5 custom-scrollbar">
+                      {goalOptions.map((g) => {
+                        const isSelected = primaryGoals.includes(g.label);
+                        return (
+                          <button
+                            key={g.id}
+                            onClick={() => {
+                              setPrimaryGoals(prev => 
+                                prev.includes(g.label)
+                                  ? prev.filter(x => x !== g.label)
+                                  : [...prev, g.label]
+                              );
+                            }}
+                            className={`p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex items-start gap-4 relative hover:-translate-y-0.5 ${
+                              isSelected 
+                                ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
+                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
+                            }`}
+                          >
+                            <div className={`p-2 rounded-xl shrink-0 ${isSelected ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'}`}>
+                              <Target className="w-4.5 h-4.5" />
+                            </div>
+                            <div className="flex flex-col min-w-0 pr-5">
+                              <span className="text-xs font-bold tracking-tight text-slate-900 dark:text-white">{g.label}</span>
+                              <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal mt-1 font-medium">{g.desc}</span>
+                            </div>
+                            {isSelected && (
+                              <div className="absolute top-4 right-4 w-4 h-4 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white animate-scaleUp shadow-xs">
+                                <Check className="w-2.5 h-2.5 stroke-[3.5]" />
+                              </div>
+                            )}
+                          </button>
                         );
-                      }}
-                      style={{ textTransform: 'none' }}
-                      className={`w-full p-3 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between font-bold text-xs ${
-                        isSelected 
-                          ? 'border-blue-600 bg-blue-50/40 text-slate-905 dark:bg-blue-950/20 dark:text-blue-400 shadow-2xs font-black' 
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-655 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <BookOpen className={`w-4.5 h-4.5 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                        <span>{pref}</span>
-                      </div>
-                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? 'border-blue-600 bg-blue-600 text-white dark:border-blue-500' : 'border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-900'}`}>
-                        {isSelected && <Check className="w-2.5 h-2.5 stroke-[3] text-white" />}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                      })}
+                    </div>
+
+                    {primaryGoals.includes('Others') && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-1.5 max-w-xl mx-auto border-t border-slate-100 dark:border-slate-800/40 pt-4"
+                      >
+                        <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                          Specify your custom goal (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Preparing for a unique corporate assessment"
+                          value={customGoal}
+                          onChange={(e) => setCustomGoal(e.target.value)}
+                          style={{ textTransform: 'none' }}
+                          className="w-full bg-slate-50/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl py-3 px-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-500/5 transition-all font-semibold"
+                        />
+                      </motion.div>
+                    )}
+                  </div>
+                )}
+
+                {/* ==========================================
+                    STEP 4: TARGET TIMELINE
+                    ========================================== */}
+                {currentStep === 4 && (
+                  <div className="space-y-3 max-w-xl mx-auto py-2">
+                    {timelineOptions.map((time) => {
+                      const isSelected = targetTimeline === time;
+                      return (
+                        <button
+                          key={time}
+                          onClick={() => setTargetTimeline(time)}
+                          style={{ textTransform: 'none' }}
+                          className={`w-full p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex items-center justify-between font-bold text-xs ${
+                            isSelected 
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <Calendar className={`w-5 h-5 transition-colors duration-300 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                            <span className="text-slate-900 dark:text-white font-bold">{time}</span>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-blue-600 bg-blue-600 text-white dark:border-blue-500' : 'border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-900'}`}>
+                            {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* ==========================================
+                    STEP 5: WEEKLY COMMITMENT
+                    ========================================== */}
+                {currentStep === 5 && (
+                  <div className="space-y-3 max-w-xl mx-auto py-2">
+                    {commitmentOptions.map((commit) => {
+                      const isSelected = weeklyCommitment === commit;
+                      return (
+                        <button
+                          key={commit}
+                          onClick={() => setWeeklyCommitment(commit)}
+                          style={{ textTransform: 'none' }}
+                          className={`w-full p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex items-center justify-between font-bold text-xs ${
+                            isSelected 
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-500 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <Clock className={`w-5 h-5 transition-colors duration-300 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                            <span className="text-slate-900 dark:text-white font-bold">{commit}</span>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-blue-600 bg-blue-600 text-white dark:border-blue-500' : 'border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-900'}`}>
+                            {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* ==========================================
+                    STEP 6: LEARNING PREFERENCE
+                    ========================================== */}
+                {currentStep === 6 && (
+                  <div className="space-y-3 max-w-xl mx-auto py-2">
+                    {preferenceOptions.map((pref) => {
+                      const isSelected = learningPreferences.includes(pref);
+                      return (
+                        <button
+                          key={pref}
+                          onClick={() => {
+                            setLearningPreferences(prev => 
+                              prev.includes(pref)
+                                ? prev.filter(x => x !== pref)
+                                : [...prev, pref]
+                            );
+                          }}
+                          style={{ textTransform: 'none' }}
+                          className={`w-full p-4 rounded-2xl border text-left cursor-pointer transition-all duration-300 flex items-center justify-between font-bold text-xs ${
+                            isSelected 
+                              ? 'border-blue-600 bg-blue-50/20 text-slate-900 dark:bg-blue-950/10 dark:text-blue-400 dark:border-blue-500/80 shadow-[0_0_15px_rgba(37,99,235,0.06)]' 
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900 dark:text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3.5">
+                            <BookOpen className={`w-5 h-5 transition-colors duration-300 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                            <span className="text-slate-900 dark:text-white font-bold">{pref}</span>
+                          </div>
+                          <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${isSelected ? 'border-blue-600 bg-blue-600 text-white dark:border-blue-500' : 'border-slate-300 bg-white dark:border-slate-800 dark:bg-slate-900'}`}>
+                            {isSelected && <Check className="w-3.5 h-3.5 stroke-[3.5]" />}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Stepper Buttons Panel (Card Footer) */}
+          <div className="border-t border-slate-200/50 dark:border-slate-800/50 pt-5 flex flex-row items-center justify-between gap-4">
+            {/* Left section: Secure shield */}
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold shrink-0">
+              <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-600 shrink-0" />
+              <span className="text-[10px] uppercase tracking-wider hidden md:inline leading-none">
+                Data Fully Encrypted
+              </span>
             </div>
-          )}
 
-          {/* ==========================================
-              STEP 7: COMPLETION SCREEN
-              ========================================== */}
-          {currentStep === 7 && (
-            <div className="space-y-6 flex-1 flex flex-col justify-center items-center text-center animate-scaleUp">
-              <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 flex items-center justify-center text-blue-600 shadow-inner animate-pulse">
-                <CheckCircle2 className="w-10 h-10" />
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">You're All Set, {username}!</h3>
-                <p className="text-xs text-slate-450 font-semibold uppercase tracking-wider">Aptitude & Verbal Analytics generated</p>
-              </div>
-
-              <div className="max-w-md bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-805 rounded-2xl p-5 space-y-3.5 text-xs text-left leading-normal text-slate-655 dark:text-slate-300 font-medium">
-                <span className="text-[10px] font-black text-blue-650 dark:text-blue-400 uppercase tracking-widest block border-b border-slate-200 dark:border-slate-800 pb-1.5 mb-2 select-none">Personalized Study Path Details</span>
-                <p>
-                  Based on your goals (<strong className="text-slate-800 dark:text-slate-100">{primaryGoals.map(g => g === 'Others' && customGoal.trim() ? `Others (${customGoal.trim()})` : g).join(', ')}</strong>) and weekly commitment (<strong className="text-slate-800 dark:text-slate-100">{weeklyCommitment}</strong>), we have configured a dynamic, adaptive curriculum targeting core quantitative models and verbal comprehension matrices.
-                </p>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-505 font-bold uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span>Staging Database seed synced</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Stepper Buttons Panel */}
-          <div className="border-t border-slate-100 pt-5 flex justify-between items-center select-none">
-            {/* Back button */}
-            {currentStep > 1 ? (
-              <button
-                onClick={handleBackStep}
-                disabled={loading}
-                className="py-2.5 px-5 bg-transparent hover:bg-slate-50 disabled:opacity-30 disabled:hover:bg-transparent text-slate-505 font-bold text-xs rounded-xl border border-slate-200 transition-colors cursor-pointer select-none"
-              >
-                Back
-              </button>
-            ) : (
-              <div className="w-[60px]" />
-            )}
-
-            {/* Step indicators */}
-            {currentStep <= 6 ? (
-              <span className="text-[10px] font-black text-slate-400 tracking-wider">
+            {/* Center section: Pagination indicators */}
+            <div className="flex flex-col items-center gap-1.5 select-none shrink-0">
+              <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 tracking-wider">
                 STEP {currentStep} OF 6
               </span>
-            ) : (
-              <div className="flex items-center gap-1 text-[9px] font-black text-blue-700 tracking-wider uppercase bg-blue-50 border border-blue-100/50 px-2 py-0.5 rounded">
-                <Sparkles className="w-3 h-3 text-blue-650" />
-                <span>Calibrations verified</span>
+              <div className="flex items-center gap-1.5">
+                {[1, 2, 3, 4, 5, 6].map((num) => (
+                  <div 
+                    key={num}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      num === currentStep 
+                        ? 'w-4.5 bg-blue-600 dark:bg-blue-500' 
+                        : num < currentStep 
+                        ? 'w-1.5 bg-blue-400 dark:bg-blue-800' 
+                        : 'w-1.5 bg-slate-200 dark:bg-slate-800'
+                    }`}
+                  />
+                ))}
               </div>
-            )}
+            </div>
 
-            {/* Next / Complete button */}
-            {currentStep < 7 ? (
+            {/* Right section: CTA buttons */}
+            <div className="flex items-center gap-3 shrink-0">
+              {currentStep > 1 && (
+                <button
+                  onClick={handleBackStep}
+                  disabled={loading}
+                  className="h-[52px] px-5 bg-transparent hover:bg-slate-100/50 dark:hover:bg-slate-800/30 disabled:opacity-30 text-slate-500 dark:text-slate-400 font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-800 transition-colors cursor-pointer select-none active:scale-95"
+                >
+                  Back
+                </button>
+              )}
+
               <button
                 onClick={handleNextStep}
-                disabled={isContinueDisabled()}
+                disabled={isContinueDisabled() || loading}
                 style={{ textTransform: 'none' }}
-                className={`py-2.5 px-5 font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all select-none active:scale-98 ${
-                  isContinueDisabled()
-                    ? 'bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed shadow-none'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
+                className={`h-[52px] px-6 font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2.5 transition-all select-none active:scale-95 duration-200 ${
+                  (isContinueDisabled() || loading)
+                    ? 'bg-slate-100 text-slate-400 dark:bg-slate-800/40 dark:text-slate-600 cursor-not-allowed shadow-none border border-slate-200/50 dark:border-slate-800/30'
+                    : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-500/20 shadow-lg hover:shadow-xl hover:translate-y-[-1px] cursor-pointer'
                 }`}
               >
-                <span>Continue</span>
-                <ArrowRight className="w-4 h-4 shrink-0" />
+                <span>{loading ? 'Bootstrapping...' : (currentStep === 6 ? 'Complete Onboarding →' : 'Continue →')}</span>
+                {loading && (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+                )}
               </button>
-            ) : (
-              <button
-                onClick={handleOnboardingComplete}
-                disabled={loading}
-                className="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer select-none animate-pulse hover:animate-none active:scale-98"
-              >
-                <span>{loading ? 'Bootstrapping...' : 'Go to Dashboard'}</span>
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-              </button>
-            )}
+            </div>
           </div>
 
         </div>
 
       </main>
 
-      {/* Footer bar */}
-      <footer className="border-t border-slate-200 py-6 px-6 sm:px-12 bg-white flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-450 gap-4">
-        <div className="flex items-center gap-1.5 font-semibold">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>Operational Security: SSL Sandboxed</span>
-        </div>
-        <span className="font-medium">© 2026 Aptitude AI Platform. All rights reserved.</span>
-      </footer>
 
     </div>
   );

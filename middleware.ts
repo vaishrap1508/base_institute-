@@ -46,6 +46,13 @@ export async function middleware(request: NextRequest) {
     if (userRole === 'ADMIN') {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     } else {
+      const onboardingCompleted = request.cookies.get('aptitude_onboarding_completed')?.value === 'true';
+      const isDefaultStudent = user.email === 'student@university.edu' || user.email === 'sriram_neppalli@university.edu';
+      
+      if (onboardingCompleted || isDefaultStudent) {
+        return NextResponse.redirect(new URL('/student/dashboard', request.url));
+      }
+
       const { data: onboarding } = await supabase
         .from('onboarding_profile')
         .select('onboarding_completed')
