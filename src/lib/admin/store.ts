@@ -81,6 +81,27 @@ export const DOMAINS_DATA: Domain[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'coding',
+    name: 'Coding & DSA',
+    subTopics: [
+      {
+        id: 'arrays',
+        name: 'Arrays & Strings',
+        concepts: [
+          { id: 'two-pointer', name: 'Two-Pointer Technique' },
+          { id: 'sliding-window', name: 'Sliding Window' }
+        ]
+      },
+      {
+        id: 'recursion',
+        name: 'Recursion',
+        concepts: [
+          { id: 'backtracking', name: 'Backtracking' }
+        ]
+      }
+    ]
   }
 ];
 
@@ -264,138 +285,36 @@ export const SAMPLE_QUESTIONS: Question[] = [
     createdAt: 'Oct 05, 2023'
   },
   {
-    id: 'arrays-linear-search',
-    domainId: 'arrays',
-    subTopicId: 'fundamentals',
-    conceptId: 'linear-search',
+    id: 'C-101',
+    domainId: 'coding',
+    subTopicId: 'arrays',
+    conceptId: 'two-pointer',
     difficulty: 'EASY',
-    companyTags: ['TCS', 'Wipro'],
-    shuffleOptions: true,
-    questionStem: `Linear Search
+    companyTags: ['Amazon', 'Google', 'Meta'],
+    shuffleOptions: false,
+    questionStem: `### Maximum Consecutive Ones
 
-Given an array \`arr\` of size \`N\` and an integer \`x\`, find the index of element \`x\` in the array. Return -1 if not found.
+Given a binary array \`nums\`, return the maximum number of consecutive \`1\`s in the array.
 
-### Step-by-Step Solution:
-1. Iterate through the array from index 0 to N-1.
-2. Compare each element with \`x\`.
-3. If \`arr[i] == x\`, return \`i\`.
-4. If loop completes, return -1.`,
-    hintText: 'Use a simple for loop to iterate through each index.',
-    options: [
-      { id: 'A', text: 'Time: O(N), Space: O(1)', isCorrect: true, metadata: '75.00%' },
-      { id: 'B', text: 'Time: O(log N), Space: O(1)', isCorrect: false, metadata: '15.00%' },
-      { id: 'C', text: 'Time: O(N), Space: O(N)', isCorrect: false, metadata: '8.00%' },
-      { id: 'D', text: 'Time: O(N^2), Space: O(1)', isCorrect: false, metadata: '2.00%' }
-    ],
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    videoTitle: 'Linear Search Algorithm Walkthrough',
-    videoDuration: '04:20',
+### Constraints:
+- \`1 <= nums.length <= 10^5\`
+- \`nums[i]\` is either \`0\` or \`1\`.
+
+### Examples:
+**Example 1:**
+\`\`\`
+Input: nums = [1,1,0,1,1,1]
+Output: 3
+Explanation: The first two digits or the last three digits are consecutive 1s. The maximum number of consecutive 1s is 3.
+\`\`\`
+`,
+    hintText: 'Keep track of a running count of 1s and update the maximum count whenever you encounter a 0.',
+    options: [],
+    videoUrl: 'https://youtube.com/watch?v=dQw4w9WgXcQ',
+    videoTitle: 'MAX CONSECUTIVE ONES WALKTHROUGH',
+    videoDuration: '08:40',
     videoThumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600',
     status: 'Published',
-    createdAt: 'Today'
-  },
-  {
-    id: 'arrays-largest',
-    domainId: 'arrays',
-    subTopicId: 'fundamentals',
-    conceptId: 'largest-element',
-    difficulty: 'EASY',
-    companyTags: ['Infosys', 'Accenture'],
-    shuffleOptions: true,
-    questionStem: `Largest Element
-
-Find the largest element in an array of size \`N\`.
-
-### Step-by-Step Solution:
-1. Initialize \`max\` with the first element \`arr[0]\`.
-2. Loop through the array from index 1 to N-1.
-3. If \`arr[i] > max\`, update \`max = arr[i]\`.
-4. Return \`max\`.`,
-    hintText: 'Keep track of the maximum element seen so far.',
-    options: [
-      { id: 'A', text: 'Initialize max = arr[0] and iterate', isCorrect: true, metadata: '85.00%' },
-      { id: 'B', text: 'Sort the array and return arr[0]', isCorrect: false, metadata: '10.00%' },
-      { id: 'C', text: 'Iterate and use two variables', isCorrect: false, metadata: '4.00%' },
-      { id: 'D', text: 'None of the above', isCorrect: false, metadata: '1.00%' }
-    ],
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    videoTitle: 'Find Largest Element in Array',
-    videoDuration: '03:15',
-    videoThumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600',
-    status: 'Published',
-    createdAt: 'Today'
-  },
-  {
-    id: 'arrays-second-largest',
-    domainId: 'arrays',
-    subTopicId: 'fundamentals',
-    conceptId: 'second-largest',
-    difficulty: 'MEDIUM',
-    companyTags: ['Google', 'Amazon'],
-    shuffleOptions: true,
-    questionStem: `Second Largest Element
-
-Find the second largest element in an array of size \`N\` without sorting.
-
-### Step-by-Step Solution:
-1. Keep track of \`largest\` and \`secondLargest\` elements.
-2. Initialize both with \`-infinity\`.
-3. If \`arr[i] > largest\`, update \`secondLargest = largest\` and \`largest = arr[i]\`.
-4. Else if \`arr[i] > secondLargest\` and \`arr[i] != largest\`, update \`secondLargest = arr[i]\`.`,
-    hintText: 'Update the second largest only when the current element is strictly between largest and second largest.',
-    options: [
-      { id: 'A', text: 'Update second largest alongside largest', isCorrect: true, metadata: '65.00%' },
-      { id: 'B', text: 'Sort the array and return second index', isCorrect: false, metadata: '20.00%' },
-      { id: 'C', text: 'Find maximum twice', isCorrect: false, metadata: '12.00%' },
-      { id: 'D', text: 'None of the above', isCorrect: false, metadata: '3.00%' }
-    ],
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    videoTitle: 'Second Largest Element in O(N)',
-    videoDuration: '06:40',
-    videoThumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600',
-    status: 'Published',
-    createdAt: 'Today'
-  },
-  {
-    id: 'arrays-consec-ones',
-    domainId: 'arrays',
-    subTopicId: 'fundamentals',
-    conceptId: 'consecutive-ones',
-    difficulty: 'EASY',
-    companyTags: ['Google', 'Yahoo'],
-    shuffleOptions: true,
-    questionStem: `Maximum Consecutive Ones
-
-Given a binary array \`nums\`, return the maximum number of consecutive 1's in the array.
-
-### Example 1:
-- **Input**: nums = [1,1,0,1,1,1]
-- **Output**: 3
-- **Explanation**: The first two digits or the last three digits are consecutive 1s. The maximum number of consecutive 1s is 3.
-
-### Example 2:
-- **Input**: nums = [1,0,1,1,0,1]
-- **Output**: 2
-
-### Step-by-Step Solution:
-1. Initialize \`count = 0\` and \`maxCount = 0\`.
-2. Iterate through the binary array \`nums\`:
-   - If \`nums[i] == 1\`, increment \`count\` and update \`maxCount = max(maxCount, count)\`.
-   - If \`nums[i] == 0\`, reset \`count = 0\`.
-3. Return \`maxCount\`.`,
-    hintText: 'Use a single pointer to scan the array, incrementing a counter on 1 and resetting on 0.',
-    options: [
-      { id: 'A', text: 'Initialize a counter and reset on 0', isCorrect: true, metadata: '80.00%' },
-      { id: 'B', text: 'Sort the array and count elements', isCorrect: false, metadata: '10.00%' },
-      { id: 'C', text: 'Use a nested loop for every subsegment', isCorrect: false, metadata: '8.00%' },
-      { id: 'D', text: 'Use a hash map to count occurrences', isCorrect: false, metadata: '2.00%' }
-    ],
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    videoTitle: 'Maximum Consecutive Ones Solution',
-    videoDuration: '05:30',
-    videoThumbnail: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600',
-    status: 'Published',
-    createdAt: 'Today'
+    createdAt: 'Oct 04, 2023'
   }
 ];
-
