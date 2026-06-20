@@ -62,6 +62,7 @@ import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import PracticeArena from '@/components/PracticeArena';
 import PlacementProfile from '@/components/PlacementProfile';
 import DomainsTab from '@/components/DomainsTab';
+import ConceptHubTab from '@/components/ConceptHubTab';
 
 const getYouTubeId = (url: string): string | null => {
   if (!url) return null;
@@ -1038,7 +1039,7 @@ export default function StudentDashboard() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
-      if (tabParam && ['dashboard', 'domains', 'learning', 'practice', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges'].includes(tabParam)) {
+      if (tabParam && ['dashboard', 'domains', 'conceptHub', 'learning', 'practice', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges'].includes(tabParam)) {
         setActiveSidebarTab(tabParam as any);
       }
     }
@@ -1063,7 +1064,7 @@ export default function StudentDashboard() {
   const [solvedCount, setSolvedCount] = useState(12);
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'conceptHub' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
 
   // Concept-Hub Practice Arena Redesign States
@@ -2259,7 +2260,7 @@ export default function StudentDashboard() {
   }, [solvedCount]);
 
   interface SidebarTab {
-    id: 'dashboard' | 'domains' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
+    id: 'dashboard' | 'domains' | 'conceptHub' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
     label: string;
     icon: any;
     action: 'tab' | 'nav';
@@ -2270,6 +2271,7 @@ export default function StudentDashboard() {
   const sidebarTabs: SidebarTab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Compass, action: 'tab' },
     { id: 'domains', label: 'Domains', icon: Layers, action: 'tab' },
+    { id: 'conceptHub', label: 'Concept Hub', icon: GraduationCap, action: 'tab' },
     { id: 'learning', label: 'Learning Roadmap', icon: BookOpen, action: 'tab' },
     { id: 'practice', label: 'Practice Arena', icon: BookOpenCheck, action: 'tab' },
     { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
@@ -2364,6 +2366,8 @@ export default function StudentDashboard() {
                 <>Welcome back, {profile.username.split(' ')[0]} 👋</>
               ) : activeSidebarTab === 'domains' ? (
                 <>Learning Domains 🌐</>
+              ) : activeSidebarTab === 'conceptHub' ? (
+                <>Concept Hub 🎓</>
               ) : activeSidebarTab === 'learning' ? (
                 <>Learning Roadmap 🗺️</>
               ) : activeSidebarTab === 'practice' ? (
@@ -2387,6 +2391,8 @@ export default function StudentDashboard() {
                 'Here is your activities overview for today.'
               ) : activeSidebarTab === 'domains' ? (
                 'Select a syllabus domain to view lessons and progress.'
+              ) : activeSidebarTab === 'conceptHub' ? (
+                'Review formulas, cheat sheets, and examples across syllabus domains.'
               ) : activeSidebarTab === 'learning' ? (
                 'Personalized step-by-step preparation path.'
               ) : activeSidebarTab === 'practice' ? (
@@ -2953,6 +2959,25 @@ export default function StudentDashboard() {
               className="w-full"
             >
               <DomainsTab searchQuery={searchQuery} />
+            </motion.div>
+          )}
+
+          {activeSidebarTab === 'conceptHub' && (
+            <motion.div
+              key="conceptHub"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full"
+            >
+              <ConceptHubTab 
+                searchQuery={searchQuery}
+                setActiveSidebarTab={setActiveSidebarTab}
+                setSelectedDomain={setSelectedDomain}
+                setActiveQuestion={setActiveQuestion}
+              />
             </motion.div>
           )}
 
@@ -4302,7 +4327,7 @@ export default function StudentDashboard() {
 
                       {/* Badge Name & Desc */}
                       <div className="space-y-3">
-                        <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight font-heading leading-tight animate-pulse-glow">
+                        <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight font-heading leading-tight">
                           {selectedBadge.name}
                         </h3>
                         <p className="text-sm sm:text-base text-slate-400 font-semibold leading-relaxed italic">
@@ -4341,14 +4366,8 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Footer Buttons */}
-                    <div className="max-w-xl md:mx-auto w-full mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row gap-4">
-                      <button
-                        onClick={() => setSelectedBadge(null)}
-                        className="flex-1 bg-slate-800 hover:bg-slate-800 border border-slate-700 text-white font-extrabold text-[11px] uppercase tracking-widest py-4 px-6 rounded-2xl transition-all active:scale-95 cursor-pointer"
-                      >
-                        Close Details
-                      </button>
-                      {!isSelectedUnlocked && (
+                    {!isSelectedUnlocked && (
+                      <div className="max-w-xl md:mx-auto w-full mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row gap-4">
                         <button
                           onClick={() => {
                             setSelectedBadge(null);
@@ -4358,8 +4377,8 @@ export default function StudentDashboard() {
                         >
                           Start Learning
                         </button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Right Column (Badge Image) - Order-1 on mobile, Order-2 on desktop */}
@@ -4395,17 +4414,7 @@ export default function StudentDashboard() {
                       )}
                     </div>
 
-                    <div className="mt-8 text-center relative z-10">
-                      {isSelectedUnlocked ? (
-                        <span className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 px-5 py-2 rounded-full text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                          <Check className="w-3.5 h-3.5 stroke-[3]" /> Unlocked Card
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-2 bg-slate-950 border border-slate-800 px-5 py-2 rounded-full text-slate-500 text-[10px] font-black uppercase tracking-widest">
-                          <Lock className="w-3.5 h-3.5" /> Lock Status
-                        </span>
-                      )}
-                    </div>
+                    {/* Lock Status / Unlocked Card pill badge removed */}
                   </div>
                 </div>
               </div>
