@@ -260,7 +260,7 @@ export default function DomainDetailPage() {
         <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: Compass, route: '/student/dashboard?tab=dashboard' },
-            { id: 'domains', label: 'Domains', icon: Layers, route: '/student/domains' },
+            { id: 'domains', label: 'Domains', icon: Layers, route: '/student/dashboard?tab=domains' },
             { id: 'learning', label: 'Learning Roadmap', route: '/student/dashboard?tab=learning', icon: BookOpen },
             { id: 'practice', label: 'Practice Arena', route: '/student/dashboard?tab=practice', icon: BookOpenCheck },
             { id: 'mockTests', label: 'Mock Tests', route: '/student/dashboard?tab=mockTests', icon: Award },
@@ -365,28 +365,6 @@ export default function DomainDetailPage() {
                 {currentRole.role === 'admin' || currentRole.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'}
               </div>
             )}
-
-            {/* User profile button */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => router.push('/student/dashboard?tab=profile')}
-                title="User Profile"
-                className="w-10 h-10 rounded-full bg-slate-850 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative"
-              >
-                {profile.avatar && profile.avatar !== 'initial' ? (
-                  <img
-                    src={profile.avatar}
-                    alt="User Avatar"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <User className="w-5 h-5" />
-                )}
-
-                {/* Red dot notification badge */}
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
-              </button>
-            </div>
           </div>
         </header>
 
@@ -396,7 +374,7 @@ export default function DomainDetailPage() {
             {/* Header Utilities / Breadcrumbs Row */}
             <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-900 pb-4 select-none">
               <button
-                onClick={() => router.push('/student/domains')}
+                onClick={() => router.push('/student/dashboard?tab=domains')}
                 className="group flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />

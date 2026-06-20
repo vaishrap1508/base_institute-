@@ -61,6 +61,7 @@ import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import PracticeArena from '@/components/PracticeArena';
 import PlacementProfile from '@/components/PlacementProfile';
+import DomainsTab from '@/components/DomainsTab';
 
 const getYouTubeId = (url: string): string | null => {
   if (!url) return null;
@@ -988,6 +989,17 @@ const CanvasCelebration = ({ confettiStyle }: { confettiStyle: 'confetti' | 'fir
   );
 };
 
+const tabVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+};
+
+const tabTransition = {
+  duration: 0.5,
+  ease: [0.34, 1.56, 0.64, 1] as const,
+};
+
 export default function StudentDashboard() {
   const router = useRouter();
   const authSupabase = createAuthClient();
@@ -1026,7 +1038,7 @@ export default function StudentDashboard() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
-      if (tabParam && ['dashboard', 'learning', 'practice', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings'].includes(tabParam)) {
+      if (tabParam && ['dashboard', 'domains', 'learning', 'practice', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges'].includes(tabParam)) {
         setActiveSidebarTab(tabParam as any);
       }
     }
@@ -1051,7 +1063,7 @@ export default function StudentDashboard() {
   const [solvedCount, setSolvedCount] = useState(12);
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
 
   // Concept-Hub Practice Arena Redesign States
@@ -2246,6 +2258,26 @@ export default function StudentDashboard() {
     return Math.min(15, 8 + (solvedCount - 12));
   }, [solvedCount]);
 
+  interface SidebarTab {
+    id: 'dashboard' | 'domains' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
+    label: string;
+    icon: any;
+    action: 'tab' | 'nav';
+    route?: string;
+    subAction?: () => void;
+  }
+
+  const sidebarTabs: SidebarTab[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: Compass, action: 'tab' },
+    { id: 'domains', label: 'Domains', icon: Layers, action: 'tab' },
+    { id: 'learning', label: 'Learning Roadmap', icon: BookOpen, action: 'tab' },
+    { id: 'practice', label: 'Practice Arena', icon: BookOpenCheck, action: 'tab' },
+    { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
+    { id: 'careerHub', label: 'Career Hub', icon: Briefcase, action: 'tab', subAction: () => setSelectedOpportunityType('All') },
+    { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
+    { id: 'badges', label: 'Badges & Achievements', icon: Sparkles, action: 'tab' }
+  ];
+
   return (
     <div className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
 
@@ -2262,16 +2294,7 @@ export default function StudentDashboard() {
 
         {/* Sidebar Tabs */}
         <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: Compass, action: 'tab' },
-            { id: 'domains', label: 'Domains', icon: Layers, action: 'nav', route: '/student/domains' },
-            { id: 'learning', label: 'Learning Roadmap', icon: BookOpen, action: 'tab' },
-            { id: 'practice', label: 'Practice Arena', icon: BookOpenCheck, action: 'tab' },
-            { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
-            { id: 'careerHub', label: 'Career Hub', icon: Briefcase, action: 'tab', subAction: () => setSelectedOpportunityType('All') },
-            { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
-            { id: 'badges', label: 'Badges & Achievements', icon: Sparkles, action: 'tab' }
-          ].map((tab) => {
+          {sidebarTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeSidebarTab === tab.id;
             return (
@@ -2339,6 +2362,8 @@ export default function StudentDashboard() {
             <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
               {activeSidebarTab === 'dashboard' ? (
                 <>Welcome back, {profile.username.split(' ')[0]} 👋</>
+              ) : activeSidebarTab === 'domains' ? (
+                <>Learning Domains 🌐</>
               ) : activeSidebarTab === 'learning' ? (
                 <>Learning Roadmap 🗺️</>
               ) : activeSidebarTab === 'practice' ? (
@@ -2357,9 +2382,11 @@ export default function StudentDashboard() {
                 <>Settings Hub ⚙️</>
               )}
             </h1>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider mt-0.5">
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
               {activeSidebarTab === 'dashboard' ? (
                 'Here is your activities overview for today.'
+              ) : activeSidebarTab === 'domains' ? (
+                'Select a syllabus domain to view lessons and progress.'
               ) : activeSidebarTab === 'learning' ? (
                 'Personalized step-by-step preparation path.'
               ) : activeSidebarTab === 'practice' ? (
@@ -2381,6 +2408,16 @@ export default function StudentDashboard() {
           </div>
 
           <div className="flex items-center gap-5">
+
+            {/* Daily Streak Badge */}
+            {activeSidebarTab === 'domains' && (
+              <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0 animate-fadeIn">
+                <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
+                  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
+                  {streak}
+                </span>
+              </div>
+            )}
 
             {/* Search Input Box */}
             <div className="relative hidden md:block">
@@ -2446,26 +2483,28 @@ export default function StudentDashboard() {
             )}
 
             {/* User profile button (No dropdown, redirects directly to profile tab) */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => setActiveSidebarTab('profile')}
-                title="User Profile"
-                className="w-10 h-10 rounded-full bg-slate-850 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative"
-              >
-                {profile.avatar && profile.avatar !== 'initial' ? (
-                  <img
-                    src={profile.avatar}
-                    alt="User Avatar"
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <User className="w-5 h-5" />
-                )}
+            {activeSidebarTab === 'dashboard' && (
+              <div className="relative shrink-0">
+                <button
+                  onClick={() => setActiveSidebarTab('profile')}
+                  title="User Profile"
+                  className="w-10 h-10 rounded-full bg-slate-850 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative"
+                >
+                  {profile.avatar && profile.avatar !== 'initial' ? (
+                    <img
+                      src={profile.avatar}
+                      alt="User Avatar"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
 
-                {/* Red dot notification badge */}
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
-              </button>
-            </div>
+                  {/* Red dot notification badge */}
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
+                </button>
+              </div>
+            )}
 
           </div>
         </header>
@@ -2478,8 +2517,17 @@ export default function StudentDashboard() {
           {/* ====================================================================
               1. TAB: DASHBOARD (Duolingo Redesign Layout)
               ==================================================================== */}
-          {activeSidebarTab === 'dashboard' && (
-            <div className="w-full space-y-8 animate-fadeIn text-slate-800 dark:text-slate-200">
+          <AnimatePresence mode="wait">
+            {activeSidebarTab === 'dashboard' && (
+              <motion.div
+                key="dashboard"
+                variants={tabVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={tabTransition}
+                className="w-full space-y-8 text-slate-800 dark:text-slate-200"
+              >
 
               {/* Admin Banner Alert */}
               {currentRole?.role === 'admin' && (
@@ -2891,11 +2939,33 @@ export default function StudentDashboard() {
 
               </div>
 
-            </div>
+            </motion.div>
+          )}
+
+          {activeSidebarTab === 'domains' && (
+            <motion.div
+              key="domains"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full"
+            >
+              <DomainsTab searchQuery={searchQuery} />
+            </motion.div>
           )}
 
           {activeSidebarTab === 'learning' && (
-            <div className="w-full relative py-12 px-4 sm:px-8 rounded-[2.5rem] bg-[#0A0F1C] border border-[#1E293B] shadow-2xl transition-all duration-300">
+            <motion.div
+              key="learning"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full relative py-12 px-4 sm:px-8 rounded-[2.5rem] bg-[#0A0F1C] border border-[#1E293B] shadow-2xl transition-all duration-300"
+            >
 
               {/* Ambient Background Particles and Orbs */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -2931,7 +3001,7 @@ export default function StudentDashboard() {
               {/* Stats Panel Widget (Circular Progress Ring & XP Counter) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8 relative z-10">
                 {/* Progress Ring Card */}
-                <div className="bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-4 flex items-center gap-4 shadow-sm backdrop-blur-md">
+                <div className="p-4 flex items-center gap-4 justify-center">
                   <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90">
                       <circle
@@ -2969,7 +3039,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* XP Counter Card */}
-                <div className="bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-4 flex items-center gap-4 shadow-sm backdrop-blur-md">
+                <div className="p-4 flex items-center gap-4 justify-center">
                   <div className="w-11 h-11 rounded-xl bg-amber-500/10 dark:bg-amber-400/5 flex items-center justify-center shrink-0 border border-amber-500/20">
                     <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />
                   </div>
@@ -2982,13 +3052,12 @@ export default function StudentDashboard() {
                 </div>
 
                 {/* Streak Card */}
-                <div className="bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl p-4 flex items-center gap-4 shadow-sm backdrop-blur-md">
-                  <div className="w-11 h-11 rounded-xl bg-orange-500/10 dark:bg-orange-400/5 flex items-center justify-center shrink-0 border border-orange-500/20">
-                    <span className="text-xl">🔥</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Daily Streak</span>
-                    <span className="text-sm font-black text-slate-800 dark:text-white mt-0.5 block">{streak} Days Active</span>
+                <div className="p-4 flex items-center justify-center">
+                  <div className="flex items-center gap-2 select-none shrink-0">
+                    <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 flex items-center gap-2 leading-none">
+                      <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
+                      {streak}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -3246,6 +3315,7 @@ export default function StudentDashboard() {
                       const isJustUnlocked = justUnlockedNodeId === node.id;
 
                       const zElevation = isActive ? 35 : isCompleted ? 20 : 5;
+                      const cardPlacement = index === 2 || index === 4 || index === 6 ? 'top' : (index % 4 === 1 || index === 8) ? 'right' : 'left';
 
                       return (
                         <div
@@ -3275,25 +3345,7 @@ export default function StudentDashboard() {
                             />
                           )}
 
-                          {/* Active floating indicator badge with rocket */}
-                          {isActive && (
-                            <motion.div
-                              className="absolute -top-12 z-20 pointer-events-none flex flex-col items-center"
-                              animate={reducedMotion ? {} : {
-                                y: [-4, 4, -4]
-                              }}
-                              transition={{
-                                duration: 3,
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                              }}
-                            >
-                              <div className="bg-gradient-to-tr from-amber-500 to-orange-700 p-1.5 rounded-full shadow-lg border border-amber-300">
-                                <Rocket className="w-3.5 h-3.5 text-white" />
-                              </div>
-                              <div className="w-2 h-2 bg-orange-600 rotate-45 -mt-1 shadow-md border-r border-b border-amber-300/30" />
-                            </motion.div>
-                          )}
+
 
                           {/* Circular 3D Lesson Node */}
                           <motion.button
@@ -3339,7 +3391,15 @@ export default function StudentDashboard() {
                           </motion.button>
 
                           {/* Minimalist Dark Info Card matching Screenshot */}
-                          <div className={`mt-3 flex flex-col items-center bg-[#0B1221] px-4 py-2.5 rounded-xl border border-[#1E293B] shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all text-center min-w-[140px] max-w-[160px] pointer-events-none ${isActive ? 'ring-2 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : ''}`}>
+                          <div className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center bg-[#0B1221] px-4 py-2.5 rounded-xl border border-[#1E293B] shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all text-center min-w-[140px] max-w-[160px] pointer-events-none ${
+                            cardPlacement === 'top'
+                              ? 'bottom-[calc(100%+12px)] lg:bottom-[calc(100%+16px)]'
+                              : `top-[calc(100%+12px)] lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 ${
+                                  cardPlacement === 'left'
+                                    ? 'lg:right-[calc(100%+16px)] lg:left-auto'
+                                    : 'lg:left-[calc(100%+16px)] lg:right-auto'
+                                }`
+                          } ${isActive ? 'ring-2 ring-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : ''}`}>
                             <span className="text-[10px] font-black text-white block uppercase tracking-wider leading-none mb-1">{node.title}</span>
                             <span className="text-[8px] text-slate-400 font-semibold block leading-tight">{node.desc}</span>
                             {isActive && (
@@ -3379,35 +3439,53 @@ export default function StudentDashboard() {
                 );
               })()}
 
-            </div>
+            </motion.div>
           )}
 
           {/* ====================================================================
               3. TAB: PRACTICE ARENA (Curated Hub redesign layout)
               ==================================================================== */}
           {activeSidebarTab === 'practice' && (
-            <PracticeArena
-              questions={questions}
-              activeQuestion={activeQuestion}
-              setActiveQuestion={setActiveQuestion}
-              bookmarks={bookmarks}
-              toggleBookmark={toggleBookmark}
-              submittedAnswers={submittedAnswers}
-              setSubmittedAnswers={setSubmittedAnswers}
-              selectedAnswers={selectedAnswers}
-              setSelectedAnswers={setSelectedAnswers}
-              solvedCount={solvedCount}
-              setSolvedCount={setSolvedCount}
-              streak={streak}
-              setStreak={setStreak}
-            />
+            <motion.div
+              key="practice"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full"
+            >
+              <PracticeArena
+                questions={questions}
+                activeQuestion={activeQuestion}
+                setActiveQuestion={setActiveQuestion}
+                bookmarks={bookmarks}
+                toggleBookmark={toggleBookmark}
+                submittedAnswers={submittedAnswers}
+                setSubmittedAnswers={setSubmittedAnswers}
+                selectedAnswers={selectedAnswers}
+                setSelectedAnswers={setSelectedAnswers}
+                solvedCount={solvedCount}
+                setSolvedCount={setSolvedCount}
+                streak={streak}
+                setStreak={setStreak}
+              />
+            </motion.div>
           )}
 
           {/* ====================================================================
               4. TAB: MOCK TESTS (Assessments center)
               ==================================================================== */}
           {activeSidebarTab === 'mockTests' && (
-            <div className="w-full space-y-8 animate-fadeIn">
+            <motion.div
+              key="mockTests"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full space-y-8"
+            >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold text-slate-500 dark:text-slate-400">Available Mock Assessments</span>
                 <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 px-3 py-1 rounded-full uppercase">3 scheduled tests</span>
@@ -3463,14 +3541,22 @@ export default function StudentDashboard() {
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* ====================================================================
               5. TAB: CAREER HUB (Dedicated page with sub-filters)
               ==================================================================== */}
           {activeSidebarTab === 'careerHub' && (
-            <div className="w-full space-y-8 animate-fadeIn">
+            <motion.div
+              key="careerHub"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full space-y-8"
+            >
 
 
 
@@ -3604,14 +3690,22 @@ export default function StudentDashboard() {
                   })}
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* ====================================================================
               6. TAB: LEADERBOARD (College/Global/Friends)
               ==================================================================== */}
           {activeSidebarTab === 'leaderboards' && (
-            <div className="w-full space-y-6 animate-fadeIn">
+            <motion.div
+              key="leaderboards"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full space-y-6"
+            >
 
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
@@ -3673,27 +3767,45 @@ export default function StudentDashboard() {
                 ))}
               </div>
 
-            </div>
+            </motion.div>
           )}
 
           {/* ====================================================================
               7. TAB: PROFILE (Editable settings form)
               ==================================================================== */}
           {activeSidebarTab === 'profile' && (
-            <PlacementProfile
-              profile={profile}
-              setProfile={setProfile}
-              handleProfileSave={handleProfileSave}
-              saveSuccess={saveSuccess}
-              setSaveSuccess={setSaveSuccess}
-            />
+            <motion.div
+              key="profile"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full"
+            >
+              <PlacementProfile
+                profile={profile}
+                setProfile={setProfile}
+                handleProfileSave={handleProfileSave}
+                saveSuccess={saveSuccess}
+                setSaveSuccess={setSaveSuccess}
+              />
+            </motion.div>
           )}
 
           {/* ====================================================================
               7.5. TAB: ACHIEVEMENTS & BADGES
               ==================================================================== */}
           {activeSidebarTab === 'badges' && (
-            <div className="space-y-8 animate-fadeIn text-slate-800 dark:text-slate-200">
+            <motion.div
+              key="badges"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full space-y-8 text-slate-800 dark:text-slate-200"
+            >
               <div className="space-y-6">
                 {/* Badges Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -3715,14 +3827,22 @@ export default function StudentDashboard() {
                   })}
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* ====================================================================
               8. TAB: SETTINGS (Theme configuration & credentials)
               ==================================================================== */}
           {activeSidebarTab === 'settings' && (
-            <div className="w-full space-y-8 animate-fadeIn text-slate-800 dark:text-slate-200">
+            <motion.div
+              key="settings"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full space-y-8 text-slate-800 dark:text-slate-200"
+            >
 
 
 
@@ -4058,8 +4178,9 @@ export default function StudentDashboard() {
 
               </div>
 
-            </div>
+            </motion.div>
           )}
+        </AnimatePresence>
 
 
 
