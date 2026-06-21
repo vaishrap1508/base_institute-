@@ -47,6 +47,7 @@ export default function RootLayout({
 
                 var savedColor = localStorage.getItem('aptitude_custom_brand_color');
                 if (savedColor) {
+                  document.documentElement.classList.add('custom-color-active');
                   document.documentElement.style.setProperty('--clr-primary', savedColor);
                   var adjustColorBrightness = function(hex, percent) {
                     var color = hex.startsWith('#') ? hex.slice(1) : hex;
@@ -69,6 +70,8 @@ export default function RootLayout({
                   var g = parseInt(cleanColor.substring(2, 4), 16);
                   var b = parseInt(cleanColor.substring(4, 6), 16);
                   document.documentElement.style.setProperty('--clr-primary-rgb', r + ',' + g + ',' + b);
+                } else {
+                  document.documentElement.classList.remove('custom-color-active');
                 }
               } catch (_) {}
             `,

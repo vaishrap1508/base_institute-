@@ -55,6 +55,10 @@ interface PlacementProfileProps {
   handleProfileSave: (e: React.FormEvent) => void;
   saveSuccess: boolean;
   setSaveSuccess: (val: boolean) => void;
+  customColor: string;
+  changeCustomColor: (color: string) => void;
+  themeMode: 'light' | 'dark' | 'system';
+  handleThemeChange: (mode: 'light' | 'dark' | 'system') => void;
 }
 
 export default function PlacementProfile({
@@ -62,7 +66,11 @@ export default function PlacementProfile({
   setProfile,
   handleProfileSave,
   saveSuccess,
-  setSaveSuccess
+  setSaveSuccess,
+  customColor,
+  changeCustomColor,
+  themeMode,
+  handleThemeChange
 }: PlacementProfileProps) {
 
   // Modals & Drawers States
@@ -84,10 +92,6 @@ export default function PlacementProfile({
   const [customToast, setCustomToast] = useState<string | null>(null);
   const [rankCardType, setRankCardType] = useState<'LinkedIn' | 'WhatsApp' | 'Instagram' | 'Placement Resume'>('LinkedIn');
 
-  // Theme presets & theme mode
-  const [customColor, setCustomColor] = useState<string>('#3B82F6');
-  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('dark');
-
   // Active tooltip coordinate mapping for SVG components
   const [activeRadarTooltip, setActiveRadarTooltip] = useState<{ x: number; y: number; label: string; val: number } | null>(null);
   const [activeHeatmapTooltip, setActiveHeatmapTooltip] = useState<{ 
@@ -100,97 +104,16 @@ export default function PlacementProfile({
     timeSpent: string;
   } | null>(null);
 
-  // Darken/lighten color brightness helper
-  const adjustColorBrightness = (hex: string, percent: number): string => {
-    let color = hex.startsWith('#') ? hex.slice(1) : hex;
-    
-    // Parse hex values
-    let r = parseInt(color.substring(0, 2), 16);
-    let g = parseInt(color.substring(2, 4), 16);
-    let b = parseInt(color.substring(4, 6), 16);
-
-    // Apply percent adjustment
-    r = Math.max(0, Math.min(255, r + Math.round(2.55 * percent)));
-    g = Math.max(0, Math.min(255, g + Math.round(2.55 * percent)));
-    b = Math.max(0, Math.min(255, b + Math.round(2.55 * percent)));
-
-    // Format back to hex
-    const rHex = r.toString(16).padStart(2, '0');
-    const gHex = g.toString(16).padStart(2, '0');
-    const bHex = b.toString(16).padStart(2, '0');
-
-    return `#${rHex}${gHex}${bHex}`;
-  };
-
-  const applyBrandColor = (color: string) => {
-    if (typeof window === 'undefined') return;
-    const root = document.documentElement;
-    root.style.setProperty('--clr-primary', color);
-    root.style.setProperty('--clr-primary-dark', adjustColorBrightness(color, -15));
-    root.style.setProperty('--clr-primary-tint', color + '20'); // 12% opacity in hex
-
-    // Parse and set rgb
-    const cleanColor = color.startsWith('#') ? color.slice(1) : color;
-    const r = parseInt(cleanColor.substring(0, 2), 16);
-    const g = parseInt(cleanColor.substring(2, 4), 16);
-    const b = parseInt(cleanColor.substring(4, 6), 16);
-    root.style.setProperty('--clr-primary-rgb', `${r}, ${g}, ${b}`);
-  };
-
-  // Load custom visual overrides from local storage
-  useEffect(() => {
+  const changeCustomColorLocal = (color: string) => {
+    changeCustomColor(color);
     if (typeof window !== 'undefined') {
-      const savedColor = localStorage.getItem('aptitude_custom_brand_color');
-      if (savedColor) {
-        setCustomColor(savedColor);
-        applyBrandColor(savedColor);
+      if (color === 'default') {
+        setCustomToast(`Default layout theme restored! 🎨`);
       } else {
-        applyBrandColor('#3B82F6');
-      }
-
-      const storedTheme = localStorage.getItem('theme');
-      if (storedTheme === 'light' || storedTheme === 'dark') {
-        setThemeMode(storedTheme);
-      } else {
-        setThemeMode('system');
+        setCustomToast(`Theme color updated successfully! 🎨`);
       }
     }
-  }, []);
-
-  const changeCustomColor = (color: string) => {
-    setCustomColor(color);
-    applyBrandColor(color);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('aptitude_custom_brand_color', color);
-    }
-    setCustomToast(`Theme color updated successfully! 🎨`);
     setTimeout(() => setCustomToast(null), 2000);
-  };
-
-  const handleThemeChange = (mode: 'light' | 'dark' | 'system') => {
-    setThemeMode(mode);
-    if (typeof window !== 'undefined') {
-      document.documentElement.classList.add('theme-transitioning');
-      if (mode === 'system') {
-        localStorage.removeItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (systemPrefersDark) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      } else {
-        localStorage.setItem('theme', mode);
-        if (mode === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      }
-      setTimeout(() => {
-        document.documentElement.classList.remove('theme-transitioning');
-      }, 500);
-    }
   };
 
   // Generate username handle from student name
@@ -562,7 +485,7 @@ export default function PlacementProfile({
               <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">COLOR PALETTE</span>
               <div className="flex items-center gap-2 flex-wrap">
                 {[
-                  { name: 'Blue', hex: '#3B82F6', bg: 'bg-[#3B82F6] border-blue-300' },
+                  { name: 'Default', hex: 'default', bg: 'bg-gradient-to-tr from-blue-500 via-purple-500 to-emerald-500 border-slate-350 dark:border-slate-700' },
                   { name: 'Indigo', hex: '#6366F1', bg: 'bg-[#6366F1] border-indigo-300' },
                   { name: 'Purple', hex: '#8B5CF6', bg: 'bg-[#8B5CF6] border-purple-300' },
                   { name: 'Rose', hex: '#F43F5E', bg: 'bg-[#F43F5E] border-rose-300' },
@@ -571,7 +494,7 @@ export default function PlacementProfile({
                 ].map((preset) => (
                   <button
                     key={preset.name}
-                    onClick={() => changeCustomColor(preset.hex)}
+                    onClick={() => changeCustomColorLocal(preset.hex)}
                     className={`w-6.5 h-6.5 rounded-full cursor-pointer transition-all border ${preset.bg} ${customColor === preset.hex ? 'scale-120 ring-2 ring-white/40 shadow-md' : 'opacity-75 hover:opacity-100'}`}
                     title={preset.name}
                   />
@@ -583,7 +506,7 @@ export default function PlacementProfile({
                   <input
                     type="color"
                     value={customColor}
-                    onChange={(e) => changeCustomColor(e.target.value)}
+                    onChange={(e) => changeCustomColorLocal(e.target.value)}
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                   />
                 </div>
@@ -817,11 +740,12 @@ export default function PlacementProfile({
 
               {(() => {
                 const pointsStr = radarPoints.map(pt => `${pt.x},${pt.y}`).join(' ');
+                const radarColor = customColor === 'default' ? '#7075F4' : customColor;
                 return (
                   <polygon
                     points={pointsStr}
-                    fill="rgba(59,130,246,0.18)"
-                    stroke="#3B82F6"
+                    fill={customColor === 'default' ? 'rgba(112, 117, 244, 0.18)' : `${customColor}2e`}
+                    stroke={radarColor}
                     strokeWidth="2.5"
                     className="transition-all duration-300"
                   />
@@ -834,7 +758,7 @@ export default function PlacementProfile({
                     cx={pt.x}
                     cy={pt.y}
                     r="4.5"
-                    fill="#3B82F6"
+                    fill={customColor === 'default' ? '#7075F4' : customColor}
                     stroke="#030712"
                     strokeWidth="2"
                     className="cursor-pointer hover:r-6 transition-all"

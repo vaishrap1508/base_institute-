@@ -256,6 +256,15 @@ const adjustColorBrightness = (hex: string, percent: number): string => {
 const applyBrandColor = (color: string) => {
   if (typeof window === 'undefined') return;
   const root = document.documentElement;
+  if (color === 'default') {
+    root.classList.remove('custom-color-active');
+    root.style.removeProperty('--clr-primary');
+    root.style.removeProperty('--clr-primary-dark');
+    root.style.removeProperty('--clr-primary-tint');
+    root.style.removeProperty('--clr-primary-rgb');
+    return;
+  }
+  root.classList.add('custom-color-active');
   root.style.setProperty('--clr-primary', color);
   root.style.setProperty('--clr-primary-dark', adjustColorBrightness(color, -15));
   root.style.setProperty('--clr-primary-tint', color + '20'); // 12% opacity in hex
@@ -289,7 +298,7 @@ const getHexColor = (colorId: string) => {
     case 'teal': return '#14B8A6';
     case 'indigo': return '#6366F1';
     case 'blue':
-    default: return '#3B82F6';
+    default: return '#7075F4';
   }
 };
 
@@ -1019,6 +1028,7 @@ export default function StudentDashboard() {
     document.documentElement.classList.add('theme-transitioning');
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
+    setThemeMode(nextTheme);
     if (nextTheme === 'dark') {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -1407,10 +1417,13 @@ export default function StudentDashboard() {
   const [tiltEnabled, setTiltEnabled] = useState<boolean>(true);
   const [confettiStyle, setConfettiStyle] = useState<'confetti' | 'fireworks' | 'none'>('confetti');
   const [soundWaveActive, setSoundWaveActive] = useState<boolean>(false);
-  const [accentColor, setAccentColor] = useState<string>('blue');
-  const [customColor, setCustomColor] = useState<string>('#3B82F6');
+  const [accentColor, setAccentColor] = useState<string>('default');
+  const [customColor, setCustomColor] = useState<string>('default');
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('dark');
   const [layoutDensity, setLayoutDensity] = useState<'compact' | 'normal' | 'spacious'>('normal');
   const [celebrationActive, setCelebrationActive] = useState<boolean>(false);
+
+  const isCustomActive = customColor !== 'default';
 
   // Time Tracker State (Reference 1 style)
   const [timeTrackerSeconds, setTimeTrackerSeconds] = useState<number>(5048); // Start at 01:24:08 (5048 seconds)
@@ -1770,7 +1783,15 @@ export default function StudentDashboard() {
   };
 
   const handleAccentColorChange = (color: string) => {
-    if (color.startsWith('#')) {
+    if (color === 'default') {
+      setAccentColor('default');
+      setCustomColor('default');
+      applyBrandColor('default');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('aptitude_accent_color');
+        localStorage.removeItem('aptitude_custom_brand_color');
+      }
+    } else if (color.startsWith('#')) {
       setCustomColor(color);
       applyBrandColor(color);
       setAccentColor('custom');
@@ -1783,6 +1804,40 @@ export default function StudentDashboard() {
       applyBrandColor(presetHex);
       localStorage.setItem('aptitude_accent_color', color);
       localStorage.setItem('aptitude_custom_brand_color', presetHex);
+    }
+  };
+
+  const changeCustomColor = (color: string) => {
+    handleAccentColorChange(color);
+  };
+
+  const handleThemeChange = (mode: 'light' | 'dark' | 'system') => {
+    setThemeMode(mode);
+    if (typeof window !== 'undefined') {
+      document.documentElement.classList.add('theme-transitioning');
+      if (mode === 'system') {
+        localStorage.removeItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (systemPrefersDark) {
+          document.documentElement.classList.add('dark');
+          setTheme('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          setTheme('light');
+        }
+      } else {
+        localStorage.setItem('theme', mode);
+        if (mode === 'dark') {
+          document.documentElement.classList.add('dark');
+          setTheme('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          setTheme('light');
+        }
+      }
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 500);
     }
   };
 
@@ -1832,14 +1887,26 @@ export default function StudentDashboard() {
     if (savedConfettiStyle) setConfettiStyle(savedConfettiStyle as any);
 
     const savedAccentColor = localStorage.getItem('aptitude_accent_color');
-    if (savedAccentColor) setAccentColor(savedAccentColor);
+    if (savedAccentColor) {
+      setAccentColor(savedAccentColor);
+    } else {
+      setAccentColor('default');
+    }
 
     const savedCustomColor = localStorage.getItem('aptitude_custom_brand_color');
     if (savedCustomColor) {
       setCustomColor(savedCustomColor);
       applyBrandColor(savedCustomColor);
     } else {
-      applyBrandColor('#3B82F6');
+      setCustomColor('default');
+      applyBrandColor('default');
+    }
+
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+      setThemeMode(storedTheme);
+    } else {
+      setThemeMode('system');
     }
 
     const savedDensity = localStorage.getItem('aptitude_layout_density');
@@ -2568,7 +2635,10 @@ export default function StudentDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                       {/* Card 1: Quant Aptitude */}
-                      <div className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group">
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                        : "bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                      }>
                         <div className="flex justify-between items-start gap-4">
                           <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
                             Quant Aptitude
@@ -2591,7 +2661,10 @@ export default function StudentDashboard() {
                               setActiveSidebarTab('practice');
                               setSelectedDomain('quant');
                             }}
-                            className="px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            className={isCustomActive
+                              ? "px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                              : "px-4 py-2 bg-[#1E4E5D] hover:bg-[#153A45] text-white dark:bg-[#38BDF8] dark:hover:bg-[#0EA5E9] dark:text-[#0B303E] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            }
                           >
                             Continue Last Topic
                           </button>
@@ -2599,7 +2672,10 @@ export default function StudentDashboard() {
                       </div>
 
                       {/* Card 2: Logical Reasoning */}
-                      <div className="bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group">
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                        : "bg-[#FDF2F8] dark:bg-[#3B1229]/20 border border-[#FBCFE8] dark:border-[#652047]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                      }>
                         <div className="flex justify-between items-start gap-4">
                           <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
                             Logical Reasoning
@@ -2621,7 +2697,10 @@ export default function StudentDashboard() {
                               setActiveSidebarTab('practice');
                               setSelectedDomain('logical');
                             }}
-                            className="px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            className={isCustomActive
+                              ? "px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                              : "px-4 py-2 bg-[#9D174D] hover:bg-[#7A0F39] text-white dark:bg-[#F472B6] dark:hover:bg-[#F059A1] dark:text-[#3B1229] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            }
                           >
                             Continue Last Topic
                           </button>
@@ -2638,34 +2717,52 @@ export default function StudentDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
                       {/* Completed Stat */}
-                      <div className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                      }>
                         <div className="space-y-1 text-left">
                           <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Completed</span>
-                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">{solvedCount} Modules</span>
+                          <span className={isCustomActive ? "text-xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-xl font-black text-[#065F46] dark:text-[#34D399] font-mono leading-none"}>{solvedCount} Modules</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/20 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
+                        <div className={isCustomActive
+                          ? "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/20 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#C7E9E1] dark:border-[#205D4F]/30 flex items-center justify-center text-[#065F46] dark:text-[#34D399] -rotate-45 group-hover:scale-105 transition-transform"
+                        }>
                           <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>
 
                       {/* Your Streak Stat */}
-                      <div className="bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#FEF3C7] dark:bg-[#3D2C08]/20 border border-[#FDE68A] dark:border-[#6B4E0E]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                      }>
                         <div className="space-y-1 text-left">
                           <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Your Streak</span>
-                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">{streak} Days</span>
+                          <span className={isCustomActive ? "text-xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-xl font-black text-[#92400E] dark:text-[#FBBF24] font-mono leading-none"}>{streak} Days</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/15 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
+                        <div className={isCustomActive
+                          ? "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/15 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#FDE68A] dark:border-[#6B4E0E]/20 flex items-center justify-center text-[#92400E] dark:text-[#FBBF24] -rotate-45 group-hover:scale-105 transition-transform"
+                        }>
                           <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>
 
                       {/* Active Stat */}
-                      <div className="bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#F3E8FF] dark:bg-[#2A154D]/20 border border-[#E9D5FF] dark:border-[#53289E]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                      }>
                         <div className="space-y-1 text-left">
                           <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Level</span>
-                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">Lvl 12 (#14)</span>
+                          <span className={isCustomActive ? "text-xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-xl font-black text-[#6B21A8] dark:text-[#C084FC] font-mono leading-none"}>Lvl 12 (#14)</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/10 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
+                        <div className={isCustomActive
+                          ? "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/10 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#E9D5FF] dark:border-[#53289E]/20 flex items-center justify-center text-[#6B21A8] dark:text-[#C084FC] -rotate-45 group-hover:scale-105 transition-transform"
+                        }>
                           <ChevronRight className="w-4 h-4" />
                         </div>
                       </div>
@@ -2673,10 +2770,16 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Large Yellow Active concept banner (Reference 2 style) */}
-                    <div className="bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out">
+                    <div className={isCustomActive
+                      ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out"
+                      : "bg-[#FFFBEB] dark:bg-[#251E0E]/40 border border-[#FEF3C7] dark:border-[#4B3B18]/30 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out"
+                    }>
                       <div className="space-y-3 text-left flex-1 w-full">
                         <div className="flex items-center gap-2">
-                          <span className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/10 border border-[var(--clr-primary)]/20 text-[var(--clr-primary)] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                          <span className={isCustomActive
+                            ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/10 border border-[var(--clr-primary)]/20 text-[var(--clr-primary)] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md"
+                            : "bg-amber-100 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md"
+                          }>
                             Active Track Unit
                           </span>
                           <span className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold">QUANT APTITUDE</span>
@@ -2693,7 +2796,7 @@ export default function StudentDashboard() {
                           </div>
                           <div className="w-full bg-slate-200/60 dark:bg-slate-850 h-2.5 rounded-full overflow-hidden">
                             <div
-                              className="bg-[var(--clr-primary)] h-full rounded-full transition-all duration-500"
+                              className={isCustomActive ? "bg-[var(--clr-primary)] h-full rounded-full transition-all duration-500" : "bg-amber-500 h-full rounded-full transition-all duration-500"}
                               style={{ width: `${(challengeCompletedCount / 15) * 100}%` }}
                             />
                           </div>
@@ -2705,7 +2808,10 @@ export default function StudentDashboard() {
                         onClick={() => {
                           setActiveSidebarTab('learning');
                         }}
-                        className="w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
+                        className={isCustomActive
+                          ? "w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
+                          : "w-12 h-12 rounded-full bg-amber-500 text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
+                        }
                       >
                         <ChevronRight className="w-6 h-6 text-white -rotate-45" />
                       </button>
@@ -2949,7 +3055,7 @@ export default function StudentDashboard() {
               transition={tabTransition}
               className="w-full"
             >
-              <DomainsTab searchQuery={searchQuery} />
+              <DomainsTab searchQuery={searchQuery} customColor={customColor} />
             </motion.div>
           )}
 
@@ -2968,6 +3074,7 @@ export default function StudentDashboard() {
                 setActiveSidebarTab={setActiveSidebarTab}
                 setSelectedDomain={setSelectedDomain}
                 setActiveQuestion={setActiveQuestion}
+                customColor={customColor}
               />
             </motion.div>
           )}
@@ -3805,6 +3912,10 @@ export default function StudentDashboard() {
                 handleProfileSave={handleProfileSave}
                 saveSuccess={saveSuccess}
                 setSaveSuccess={setSaveSuccess}
+                customColor={customColor}
+                changeCustomColor={changeCustomColor}
+                themeMode={themeMode}
+                handleThemeChange={handleThemeChange}
               />
             </motion.div>
           )}
@@ -4006,7 +4117,7 @@ export default function StudentDashboard() {
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {([
-                          { id: 'blue', label: 'Sapphire', bg: 'bg-[#3B82F6]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'default', label: 'Default', bg: 'bg-gradient-to-tr from-[#3B82F6] via-[#8B5CF6] to-[#10B981]', activeClass: 'border-slate-300 dark:border-slate-700' },
                           { id: 'emerald', label: 'Emerald', bg: 'bg-[#10B981]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
                           { id: 'purple', label: 'Cyberpunk', bg: 'bg-[#8B5CF6]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
                           { id: 'amber', label: 'Amber', bg: 'bg-[#F59E0B]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },

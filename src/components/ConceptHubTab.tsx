@@ -521,22 +521,66 @@ interface ConceptHubTabProps {
   setActiveSidebarTab: (tab: 'dashboard' | 'domains' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges') => void;
   setSelectedDomain: (domain: string) => void;
   setActiveQuestion?: (question: any) => void;
+  customColor?: string;
 }
 
 export default function ConceptHubTab({ 
   searchQuery, 
   setActiveSidebarTab, 
   setSelectedDomain, 
-  setActiveQuestion 
+  setActiveQuestion,
+  customColor = 'default'
 }: ConceptHubTabProps) {
+  
+  const isCustomActive = customColor !== 'default';
+
+  const domainsWithColors = useMemo(() => {
+    return DOMAINS_CONCEPTS.map(domain => {
+      if (isCustomActive) {
+        return {
+          ...domain,
+          color: 'var(--clr-primary)',
+          bgGlow: 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]',
+          btnColor: 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]',
+        };
+      } else {
+        const defaults: Record<string, { color: string; bgGlow: string; btnColor: string }> = {
+          quant: {
+            color: '#3B82F6',
+            bgGlow: 'hover:shadow-[0_20px_40px_rgba(59,130,246,0.08)] hover:border-blue-200/80 dark:hover:border-blue-900/60 dark:hover:shadow-[0_20px_40px_rgba(59,130,246,0.12)]',
+            btnColor: 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 dark:bg-blue-500 dark:hover:bg-blue-400',
+          },
+          logical: {
+            color: '#8B5CF6',
+            bgGlow: 'hover:shadow-[0_20px_40px_rgba(139,92,246,0.08)] hover:border-purple-200/80 dark:hover:border-purple-900/60 dark:hover:shadow-[0_20px_40px_rgba(139,92,246,0.12)]',
+            btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20 dark:bg-purple-500 dark:hover:bg-purple-400',
+          },
+          verbal: {
+            color: '#10B981',
+            bgGlow: 'hover:shadow-[0_20px_40px_rgba(16,185,129,0.08)] hover:border-emerald-200/80 dark:hover:border-emerald-900/60 dark:hover:shadow-[0_20px_40px_rgba(16,185,129,0.12)]',
+            btnColor: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 dark:bg-emerald-500 dark:hover:bg-emerald-400',
+          },
+          coding: {
+            color: '#F97316',
+            bgGlow: 'hover:shadow-[0_20px_40px_rgba(249,115,22,0.08)] hover:border-orange-200/80 dark:hover:border-orange-900/60 dark:hover:shadow-[0_20px_40px_rgba(249,115,22,0.12)]',
+            btnColor: 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20 dark:bg-orange-500 dark:hover:bg-orange-400',
+          }
+        };
+        return {
+          ...domain,
+          ...(defaults[domain.id] || defaults.quant)
+        };
+      }
+    });
+  }, [isCustomActive]);
   
   const [activeDomainId, setActiveDomainId] = useState<string>('quant');
   const [selectedConcept, setSelectedConcept] = useState<Concept | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(false);
 
   const activeDomain = useMemo(() => {
-    return DOMAINS_CONCEPTS.find(d => d.id === activeDomainId) || DOMAINS_CONCEPTS[0];
-  }, [activeDomainId]);
+    return domainsWithColors.find(d => d.id === activeDomainId) || domainsWithColors[0];
+  }, [activeDomainId, domainsWithColors]);
 
   // Search filter logic
   const filteredSubTopics = useMemo(() => {
@@ -559,7 +603,7 @@ export default function ConceptHubTab({
     <div className="w-full space-y-6 text-slate-800 dark:text-slate-200 animate-fadeIn">
       {/* 2. Top Domain Tabs */}
       <div className="flex bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-900 overflow-x-auto scrollbar-none whitespace-nowrap gap-1">
-        {DOMAINS_CONCEPTS.map((d) => (
+        {domainsWithColors.map((d) => (
           <button
             key={d.id}
             onClick={() => {
@@ -790,7 +834,7 @@ export default function ConceptHubTab({
                   {/* Section 1: Concept summary list */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-[var(--clr-primary)]" />
+                      <Sparkles className="w-5 h-5" style={{ color: activeDomain.color }} />
                       Core Cheatsheet Points
                     </h4>
                     <ul className="space-y-3">
@@ -809,7 +853,7 @@ export default function ConceptHubTab({
                   {selectedConcept.formulas.length > 0 && (
                     <div className="space-y-4">
                       <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                        <Calculator className="w-5 h-5 text-[var(--clr-primary)]" />
+                        <Calculator className="w-5 h-5" style={{ color: activeDomain.color }} />
                         Key Rules & Formulas
                       </h4>
                       <div className="space-y-4">
@@ -822,7 +866,7 @@ export default function ConceptHubTab({
                               {formula.label}
                             </span>
                             {/* Pseudo LaTeX styled equation block */}
-                            <div className="bg-white dark:bg-slate-950 px-4 py-3 rounded-xl border border-slate-200/40 dark:border-slate-900/80 font-mono text-xs text-center select-all font-semibold overflow-x-auto text-[var(--clr-primary)] dark:text-[var(--clr-primary)]">
+                            <div className="bg-white dark:bg-slate-950 px-4 py-3 rounded-xl border border-slate-200/40 dark:border-slate-900/80 font-mono text-xs text-center select-all font-semibold overflow-x-auto" style={{ color: activeDomain.color }}>
                               {formula.equation}
                             </div>
                           </div>
