@@ -224,6 +224,48 @@ const MOCK_BADGES_DATA = [
   { id: 'gs_not_stopping', name: 'Not Stopping', level: 1, description: 'Awarded after completing 10 learning activities.', image_url: '/badges/stage1/09.png', category: 'getting_started' }
 ];
 
+const LEADERBOARD_PERIOD_DATA = {
+  weekly: {
+    podium: [
+      { rank: 1, name: 'Elena Rodriguez', xp: '28,120', accuracy: '98%', streak: '42d', avatarSeed: 'Elena' },
+      { rank: 2, name: 'Marcus Chen', xp: '24,850', accuracy: '94%', streak: '18d', avatarSeed: 'Marcus' },
+      { rank: 3, name: 'Julian Thorne', xp: '21,400', accuracy: '91%', streak: '12d', avatarSeed: 'Julian' }
+    ],
+    list: [
+      { rank: '#04', name: 'Sarah Jenkins', xp: '19,820', accuracy: '89%', streak: '9d', avatarSeed: 'Sarah' },
+      { rank: '#05', name: 'David Miller', xp: '18,150', accuracy: '87%', streak: '14d', avatarSeed: 'David' },
+      { rank: '#1,284', name: 'You', xp: '4,920', accuracy: '82%', streak: '5d', isSelf: true },
+      { rank: '#1,285', name: 'Leo Vance', xp: '4,890', accuracy: '79%', streak: '2d', avatarSeed: 'Leo' }
+    ]
+  },
+  monthly: {
+    podium: [
+      { rank: 1, name: 'Rohan Sharma', xp: '98,400', accuracy: '95%', streak: '60d', avatarSeed: 'Rohan' },
+      { rank: 2, name: 'Elena Rodriguez', xp: '92,120', accuracy: '97%', streak: '45d', avatarSeed: 'Elena' },
+      { rank: 3, name: 'Marcus Chen', xp: '88,500', accuracy: '93%', streak: '22d', avatarSeed: 'Marcus' }
+    ],
+    list: [
+      { rank: '#04', name: 'Kunal Kapoor', xp: '84,200', accuracy: '90%', streak: '15d', avatarSeed: 'Kunal' },
+      { rank: '#05', name: 'Ananya Roy', xp: '79,800', accuracy: '88%', streak: '30d', avatarSeed: 'Ananya' },
+      { rank: '#1,052', name: 'You', xp: '18,450', accuracy: '84%', streak: '12d', isSelf: true },
+      { rank: '#1,053', name: 'Sriram Neppalli', xp: '17,900', accuracy: '86%', streak: '8d', avatarSeed: 'Sriram' }
+    ]
+  },
+  global: {
+    podium: [
+      { rank: 1, name: 'Sriram Neppalli', xp: '245,000', accuracy: '96%', streak: '150d', avatarSeed: 'Sriram' },
+      { rank: 2, name: 'Rohan Sharma', xp: '210,000', accuracy: '94%', streak: '90d', avatarSeed: 'Rohan' },
+      { rank: 3, name: 'Elena Rodriguez', xp: '195,000', accuracy: '97%', streak: '85d', avatarSeed: 'Elena' }
+    ],
+    list: [
+      { rank: '#04', name: 'Aditya Sen', xp: '180,400', accuracy: '92%', streak: '40d', avatarSeed: 'Aditya' },
+      { rank: '#05', name: 'Marcus Chen', xp: '174,200', accuracy: '93%', streak: '25d', avatarSeed: 'Marcus' },
+      { rank: '#984', name: 'You', xp: '45,920', accuracy: '86%', streak: '15d', isSelf: true },
+      { rank: '#985', name: 'Kunal Kapoor', xp: '42,500', accuracy: '89%', streak: '18d', avatarSeed: 'Kunal' }
+    ]
+  }
+};
+
 const getCategoryEmoji = (cat: string) => {
   switch (cat) {
     case 'getting_started': return '🚀';
@@ -980,6 +1022,74 @@ const tabTransition = {
   ease: [0.34, 1.56, 0.64, 1] as const,
 };
 
+const podiumContainerVariants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.08
+    }
+  }
+};
+
+const podiumCardVariants = {
+  initial: { opacity: 0, y: 35, scale: 0.96 },
+  animate: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 14
+    }
+  }
+};
+
+const tableContainerVariants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.04
+    }
+  }
+};
+
+const tableRowVariants = {
+  initial: { opacity: 0, x: -15 },
+  animate: { 
+    opacity: 1, 
+    x: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 90,
+      damping: 15
+    }
+  }
+};
+
+const rightSidebarVariants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.06
+    }
+  }
+};
+
+const rightCardVariants = {
+  initial: { opacity: 0, x: 20, scale: 0.97 },
+  animate: { 
+    opacity: 1, 
+    x: 0, 
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 110,
+      damping: 15
+    }
+  }
+};
+
 export default function StudentDashboard() {
   const router = useRouter();
   const authSupabase = createAuthClient();
@@ -1478,6 +1588,7 @@ export default function StudentDashboard() {
 
   // Leaderboard state
   const [activeLeaderboardTab, setActiveLeaderboardTab] = useState<'global' | 'friends'>('global');
+  const [activeLeaderboardPeriod, setActiveLeaderboardPeriod] = useState<'weekly' | 'monthly' | 'global'>('weekly');
 
   // Interactive Quiz state
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
@@ -2488,10 +2599,10 @@ export default function StudentDashboard() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search something..."
+                placeholder={activeSidebarTab === 'leaderboards' ? "Search topics, questions, or concepts..." : "Search something..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2 w-60 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                className="pl-9 pr-4 py-2 w-60 md:w-80 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
               />
             </div>
 
@@ -2538,37 +2649,42 @@ export default function StudentDashboard() {
               </button>
             </div>
 
-            {/* User profile popup menu trigger */}
-            {/* User role badge */}
-            {currentRole && (
-              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 select-none mr-2">
-                {currentRole.role === 'admin' || currentRole.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'}
-              </div>
-            )}
 
-            {/* User profile button (No dropdown, redirects directly to profile tab) */}
-            {activeSidebarTab === 'dashboard' && (
-              <div className="relative shrink-0">
-                <button
-                  onClick={() => setActiveSidebarTab('profile')}
-                  title="User Profile"
-                  className="w-10 h-10 rounded-full bg-slate-850 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative"
-                >
-                  {profile.avatar && profile.avatar !== 'initial' ? (
-                    <img
-                      src={profile.avatar}
-                      alt="User Avatar"
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <User className="w-5 h-5" />
-                  )}
 
-                  {/* Red dot notification badge */}
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
-                </button>
+            {/* Notification Bell */}
+            <button
+              onClick={() => alert("No new notifications")}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-slate-450 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 hover:scale-105 transition-all cursor-pointer relative shrink-0"
+              title="Notifications"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
+            </button>
+
+            {/* Dynamic User Profile info and Avatar */}
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="hidden sm:flex flex-col items-end text-right select-none">
+                <span className="text-xs font-black text-slate-800 dark:text-white leading-none">{profile.username}</span>
+                <span className="text-[9px] font-black text-amber-500 dark:text-amber-400 mt-1 uppercase font-mono tracking-wider">
+                  {animatedXp >= 8000 ? 'GOLD TIER' : animatedXp >= 2000 ? 'SILVER TIER' : 'BRONZE TIER'}
+                </span>
               </div>
-            )}
+              <button
+                onClick={() => setActiveSidebarTab('profile')}
+                title="User Profile"
+                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-350 transition-all cursor-pointer relative overflow-hidden"
+              >
+                {profile.avatar && profile.avatar !== 'initial' ? (
+                  <img
+                    src={profile.avatar}
+                    alt="User Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-5 h-5" />
+                )}
+              </button>
+            </div>
 
           </div>
         </header>
@@ -3817,7 +3933,7 @@ export default function StudentDashboard() {
           )}
 
           {/* ====================================================================
-              6. TAB: LEADERBOARD (College/Global/Friends)
+              5. TAB: LEADERBOARDS
               ==================================================================== */}
           {activeSidebarTab === 'leaderboards' && (
             <motion.div
@@ -3827,69 +3943,413 @@ export default function StudentDashboard() {
               animate="animate"
               exit="exit"
               transition={tabTransition}
-              className="w-full space-y-6"
+              className="w-full text-left"
             >
-
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                  <h1 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Active Rankings</h1>
-                </div>
-
-                {/* Leaderboard sub-tabs */}
-                <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900">
-                  {['global', 'friends'].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveLeaderboardTab(tab as any)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${activeLeaderboardTab === tab
-                          ? 'bg-blue-600 text-white'
-                          : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Left Columns (8 of 12) - Main Podium & Rankings List */}
+                <div className="lg:col-span-8 space-y-6">
+                  
+                  {/* Period Sub-tabs Selector */}
+                  <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900 w-fit">
+                    {(['weekly', 'monthly', 'global'] as const).map((period) => (
+                      <button
+                        key={period}
+                        onClick={() => setActiveLeaderboardPeriod(period)}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${
+                          activeLeaderboardPeriod === period
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/10'
+                            : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                      >
+                        {period}
+                      </button>
+                    ))}
+                  </div>
 
-              {/* Leaderboard lists */}
-              <div className="space-y-3">
-                {[
-                  { rank: 1, name: 'Sriram Neppalli', xp: '18,920 XP', progress: '94%', self: false },
-                  { rank: 2, name: 'Aditya Sen', xp: '16,400 XP', progress: '88%', self: false },
-                  { rank: 3, name: 'Rohan Sharma', xp: '14,200 XP', progress: '85%', self: false },
-                  { rank: 4, name: 'Ananya Roy', xp: '13,900 XP', progress: '82%', self: false },
-                  { rank: 5, name: 'Kunal Kapoor', xp: '13,500 XP', progress: '80%', self: false },
-                  { rank: 14, name: 'Vaishnavi Raparthy (You)', xp: '12,450 XP', progress: '72%', self: true }
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${item.self
-                        ? 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-900/10 dark:border-blue-950 dark:text-blue-400 shadow-sm'
-                        : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 dark:bg-slate-950/20 dark:border-slate-900/60 dark:hover:bg-slate-900/40 dark:text-slate-300'
-                      }`}
+                  {/* Podium Section (Rank 2, 1, 3) */}
+                  <motion.div 
+                    variants={podiumContainerVariants}
+                    initial="initial"
+                    animate="animate"
+                    className="grid grid-cols-3 gap-4 items-end pt-6"
                   >
-                    <div className="flex items-center gap-4">
-                      <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-xs ${item.rank === 1 ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' :
-                          item.rank === 2 ? 'bg-slate-200 text-slate-700 dark:bg-slate-400/20 dark:text-slate-400' :
-                            item.rank === 3 ? 'bg-amber-50 text-amber-900 dark:bg-amber-700/20 dark:text-amber-700' :
-                              'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'
-                        }`}>
-                        {item.rank}
+                    
+                    {/* Rank 2 */}
+                    <motion.div 
+                      variants={podiumCardVariants}
+                      className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-4 text-center flex flex-col items-center relative shadow-xs min-h-[220px] hover:-translate-y-1 hover:shadow-md transition-all duration-300 group/podium2"
+                    >
+                      <span className="absolute -top-3.5 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-slate-900 dark:text-slate-400 border border-slate-200 dark:border-slate-850 font-mono">
+                        Rank 2
                       </span>
-                      <span className="text-sm font-bold text-slate-900 dark:text-white">{item.name}</span>
+                      <div className="relative w-16 h-16 rounded-full border-2 border-slate-350 dark:border-slate-700 p-0.5 mt-2 transition-transform duration-300 group-hover/podium2:scale-105">
+                        <img
+                          src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].avatarSeed}`}
+                          alt={LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].name}
+                          className="w-full h-full rounded-full object-cover bg-slate-50 dark:bg-slate-950"
+                        />
+                      </div>
+                      <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-3 truncate w-full">
+                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].name}
+                      </span>
+                      <span className="text-[11px] font-black text-emerald-500 font-mono mt-0.5">
+                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].xp} XP
+                      </span>
+                      <div className="grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t border-slate-105 dark:border-slate-900/60 text-[10px]">
+                        <div>
+                          <div className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[8px]">ACC.</div>
+                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].accuracy}</div>
+                        </div>
+                        <div>
+                          <div className="text-slate-400 dark:text-slate-505 font-bold uppercase text-[8px]">STREAK</div>
+                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].streak}</div>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Rank 1 - Center Elevated & Glowing */}
+                    <motion.div 
+                      variants={podiumCardVariants}
+                      className="bg-white dark:bg-slate-900/60 border border-purple-200 dark:border-purple-900/40 rounded-3xl p-5 text-center flex flex-col items-center relative shadow-lg shadow-purple-500/5 dark:shadow-purple-950/30 min-h-[250px] scale-[1.05] z-10 hover:-translate-y-1.5 transition-all duration-300 group/podium1"
+                    >
+                      {/* Floating sparkles graphics */}
+                      <div className="absolute top-2.5 left-2.5 text-xs opacity-50 select-none animate-pulse">✨</div>
+                      <div className="absolute top-4 right-3 text-[9px] opacity-40 select-none animate-bounce delay-100">⭐</div>
+                      <div className="absolute bottom-6 left-3 text-[9px] opacity-40 select-none animate-bounce">⭐</div>
+                      <div className="absolute bottom-3 right-4.5 text-xs opacity-50 select-none animate-pulse">✨</div>
+                      
+                      {/* Purple background glow */}
+                      <div className="absolute -inset-1 rounded-[28px] bg-gradient-to-tr from-purple-600 via-indigo-650 to-pink-500 opacity-[0.06] blur-xl group-hover/podium1:opacity-15 transition duration-500 pointer-events-none" />
+
+                      <span className="absolute -top-3.5 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-purple-600 via-pink-550 to-indigo-600 text-white border border-purple-400/20 font-mono shadow-[0_0_12px_rgba(147,51,234,0.3)]">
+                        Rank 1
+                      </span>
+                      
+                      <div className="relative mt-2">
+                        {/* Rotating dynamic color halo */}
+                        <span className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 animate-[spin_8s_linear_infinite] opacity-65 blur-xs group-hover/podium1:opacity-85" />
+                        <div className="relative w-20 h-20 rounded-full border-2 border-purple-400 dark:border-purple-450 p-0.5 bg-slate-900 dark:bg-slate-950 overflow-hidden">
+                          <img
+                            src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].avatarSeed}`}
+                            alt={LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].name}
+                            className="w-full h-full rounded-full object-cover bg-slate-50 dark:bg-slate-950"
+                          />
+                        </div>
+                      </div>
+
+                      <span className="text-xs sm:text-base font-black text-slate-900 dark:text-white mt-3 truncate w-full">
+                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].name}
+                      </span>
+                      <span className="text-xs sm:text-sm font-black text-purple-650 dark:text-purple-400 font-mono mt-0.5">
+                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].xp} XP
+                      </span>
+                      <div className="grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t border-purple-100 dark:border-purple-950/30 text-[10px]">
+                        <div>
+                          <div className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[8px]">ACC.</div>
+                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].accuracy}</div>
+                        </div>
+                        <div>
+                          <div className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[8px]">STREAK</div>
+                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].streak}</div>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Rank 3 */}
+                    <motion.div 
+                      variants={podiumCardVariants}
+                      className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-4 text-center flex flex-col items-center relative shadow-xs min-h-[220px] hover:-translate-y-1 hover:shadow-md transition-all duration-300 group/podium3"
+                    >
+                      <span className="absolute -top-3.5 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-orange-50 text-orange-850 dark:bg-orange-950/20 dark:text-orange-400 border border-orange-200/50 dark:border-orange-900/30 font-mono">
+                        Rank 3
+                      </span>
+                      <div className="relative w-16 h-16 rounded-full border-2 border-orange-350 dark:border-orange-800/50 p-0.5 mt-2 transition-transform duration-300 group-hover/podium3:scale-105">
+                        <img
+                          src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].avatarSeed}`}
+                          alt={LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].name}
+                          className="w-full h-full rounded-full object-cover bg-slate-50 dark:bg-slate-950"
+                        />
+                      </div>
+                      <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-3 truncate w-full">
+                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].name}
+                      </span>
+                      <span className="text-[11px] font-black text-orange-650 dark:text-orange-400 font-mono mt-0.5">
+                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].xp} XP
+                      </span>
+                      <div className="grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t border-slate-105 dark:border-slate-900/60 text-[10px]">
+                        <div>
+                          <div className="text-slate-400 dark:text-slate-505 font-bold uppercase text-[8px]">ACC.</div>
+                          <div className="font-extrabold text-slate-805 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].accuracy}</div>
+                        </div>
+                        <div>
+                          <div className="text-slate-400 dark:text-slate-505 font-bold uppercase text-[8px]">STREAK</div>
+                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].streak}</div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Rankings Table */}
+                  <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 shadow-xs overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-left min-w-[500px]">
+                        <thead>
+                          <tr className="border-b border-slate-100 dark:border-slate-900/60 text-[10px] text-slate-450 dark:text-slate-500 uppercase font-black font-mono">
+                            <th className="py-3.5 px-4 w-20">Rank</th>
+                            <th className="py-3.5 px-4">Name</th>
+                            <th className="py-3.5 px-4 text-center">XP Score</th>
+                            <th className="py-3.5 px-4 text-center">Accuracy</th>
+                            <th className="py-3.5 px-4 text-center">Streak</th>
+                          </tr>
+                        </thead>
+                        <motion.tbody 
+                          variants={tableContainerVariants}
+                          initial="initial"
+                          animate="animate"
+                          className="divide-y divide-slate-100/50 dark:divide-slate-900/30 text-xs"
+                        >
+                          {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].list.map((row, idx) => {
+                            if (row.isSelf) {
+                              return (
+                                <motion.tr 
+                                  key={idx} 
+                                  variants={tableRowVariants}
+                                  className="bg-purple-500/5 border border-purple-500/25 dark:bg-purple-950/10 dark:border-purple-900/30 text-purple-900 dark:text-purple-300 font-extrabold relative shadow-inner"
+                                >
+                                  <td className="py-4 px-4 font-mono font-black text-purple-600 dark:text-purple-400">
+                                    {row.rank}
+                                  </td>
+                                  <td className="py-4 px-4 flex items-center gap-3">
+                                    <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/45 flex items-center justify-center border border-purple-200 dark:border-purple-800 shrink-0 overflow-hidden relative">
+                                      {profile.avatar && profile.avatar !== 'initial' ? (
+                                        <img src={profile.avatar} alt="You" className="w-full h-full object-cover" />
+                                      ) : (
+                                        <User className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                      )}
+                                      <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-slate-950" />
+                                    </div>
+                                    <span className="font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                      {profile.username}
+                                      <span className="text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+                                        YOU
+                                      </span>
+                                    </span>
+                                  </td>
+                                  <td className="py-4 px-4 text-center font-mono font-black text-purple-600 dark:text-purple-400">
+                                    {animatedXp > 0 ? animatedXp.toLocaleString() : row.xp}
+                                  </td>
+                                  <td className="py-4 px-4 text-center font-mono font-black text-emerald-505">
+                                    {row.accuracy}
+                                  </td>
+                                  <td className="py-4 px-4 text-center font-mono font-black text-purple-500">
+                                    {streak}d
+                                  </td>
+                                </motion.tr>
+                              );
+                            }
+                            
+                            return (
+                              <motion.tr 
+                                key={idx} 
+                                variants={tableRowVariants}
+                                className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors"
+                              >
+                                <td className="py-4 px-4 font-mono font-bold text-slate-450 dark:text-slate-500">
+                                  {row.rank}
+                                </td>
+                                <td className="py-4 px-4 font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-3">
+                                  <div className="w-7 h-7 rounded-full bg-slate-105 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 overflow-hidden">
+                                    <img
+                                      src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${row.avatarSeed}`}
+                                      alt={row.name}
+                                      className="w-full h-full object-cover bg-slate-50 dark:bg-slate-950"
+                                    />
+                                  </div>
+                                  {row.name}
+                                </td>
+                                <td className="py-4 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-350">
+                                  {row.xp}
+                                </td>
+                                <td className="py-4 px-4 text-center font-mono font-extrabold text-emerald-500">
+                                  {row.accuracy}
+                                </td>
+                                <td className="py-4 px-4 text-center font-mono font-bold text-slate-500">
+                                  {row.streak}
+                                </td>
+                              </motion.tr>
+                            );
+                          })}
+                        </motion.tbody>
+                      </table>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs">
-                      <span className="text-slate-500 font-semibold font-mono">{item.xp}</span>
-                      <span className="font-mono font-black text-blue-600 dark:text-blue-400">{item.progress}</span>
+                    <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-900/60 text-center">
+                      <button className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer tracking-wider">
+                        View More Rankings
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
 
+                {/* Right Column (4 of 12) - Sidebar statistics */}
+                <motion.div 
+                  variants={rightSidebarVariants}
+                  initial="initial"
+                  animate="animate"
+                  className="lg:col-span-4 space-y-6"
+                >
+                  
+                  {/* Current Standing Card */}
+                  <motion.div 
+                    variants={rightCardVariants}
+                    className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-5 shadow-xs text-left relative overflow-hidden group/standing hover:border-slate-300 dark:hover:border-slate-750 transition-all duration-300"
+                  >
+                    <div className="absolute -right-6 -bottom-6 w-16 h-16 bg-emerald-500/5 rounded-full blur-xl pointer-events-none group-hover/standing:bg-emerald-500/10 transition-colors" />
+                    <div>
+                      <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-505 font-mono block">
+                        Current Standing
+                      </span>
+                      <div className="flex items-center gap-2.5 mt-1.5">
+                        <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
+                          {activeLeaderboardPeriod === 'weekly' ? '#1,284' : activeLeaderboardPeriod === 'monthly' ? '#1,052' : '#984'}
+                        </span>
+                        <span className="flex items-center gap-1.5 text-xs font-black text-emerald-600 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-lg border border-emerald-250/50 dark:border-emerald-900/20 font-mono">
+                          <span className="relative flex h-1.5 w-1.5 shrink-0">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                          </span>
+                          ▲ 12
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed mt-2.5">
+                        Top 15% of all active learners globally. Keep pushing!
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Personal Metrics Card */}
+                  <motion.div 
+                    variants={rightCardVariants}
+                    className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-5 shadow-xs text-left"
+                  >
+                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 font-mono block">
+                      Personal Metrics
+                    </span>
+                    
+                    <div className="space-y-3 mt-3">
+                      {/* Metric 1 - Experience */}
+                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/60 group/metric1">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/20 group-hover/metric1:scale-110 transition-transform">
+                            <Trophy className="w-4 h-4" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-650 dark:text-slate-300">Experience</span>
+                        </div>
+                        <span className="text-xs font-black text-slate-900 dark:text-white font-mono">
+                          {animatedXp > 0 ? animatedXp.toLocaleString() : "4,920"} XP
+                        </span>
+                      </div>
+
+                      {/* Metric 2 - Accuracy */}
+                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/60 group/metric2">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/20 group-hover/metric2:scale-110 transition-transform">
+                            <Target className="w-4 h-4" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-650 dark:text-slate-300">Accuracy</span>
+                        </div>
+                        <span className="text-xs font-black text-slate-900 dark:text-white font-mono">
+                          82%
+                        </span>
+                      </div>
+
+                      {/* Metric 3 - Streak */}
+                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/60 group/metric3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-650 dark:text-orange-400 flex items-center justify-center border border-orange-200/20 group-hover/metric3:scale-110 transition-transform">
+                            <Flame className="w-4 h-4 animate-[pulse_1.5s_infinite]" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-650 dark:text-slate-300">Streak</span>
+                        </div>
+                        <span className="text-xs font-black text-slate-900 dark:text-white font-mono">
+                          {streak} Days
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Tier promotion Card */}
+                  <motion.div 
+                    variants={rightCardVariants}
+                    className="bg-gradient-to-br from-indigo-950/70 via-purple-950/50 to-slate-950 border border-indigo-900/50 rounded-3xl p-5 shadow-xs text-left relative overflow-hidden space-y-4 group/promocard"
+                  >
+                    {/* Glowing effect behind promotion card */}
+                    <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-purple-500/15 rounded-full blur-xl pointer-events-none group-hover/promocard:scale-110 transition-transform" />
+                    
+                    <div className="absolute right-4 top-4 w-7 h-7 rounded-lg bg-indigo-500/15 border border-indigo-500/35 flex items-center justify-center text-xs group-hover/promocard:rotate-12 transition-transform duration-300">
+                      🏆
+                    </div>
+                    
+                    <div className="space-y-1.5 max-w-[85%]">
+                      <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                        Keep it up, {profile.username.split(' ')[0]}!
+                      </h4>
+                      <p className="text-[10px] text-indigo-200 leading-relaxed font-semibold">
+                        You're in the <span className="text-white font-black">top 5%</span> this week! 1,200 more XP to reach the next tier.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => alert("Keep leveling up to advance tier standing!")}
+                      className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer text-center active:scale-98"
+                    >
+                      View Progress Detail
+                    </button>
+                  </motion.div>
+
+                  {/* Friends Activity Card */}
+                  <motion.div 
+                    variants={rightCardVariants}
+                    className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-5 shadow-xs space-y-4 text-left"
+                  >
+                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 font-mono block">
+                      Friends Activity
+                    </span>
+                    
+                    <div className="space-y-4 mt-3">
+                      {/* Friend 1 */}
+                      <div className="flex gap-3 text-left group/friend1">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center font-mono font-black text-[9px] text-slate-655 dark:text-slate-350 shrink-0 relative">
+                          ST
+                          <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-slate-950 animate-pulse" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-[11px] text-slate-700 dark:text-slate-300 font-semibold leading-snug">
+                            <span className="font-extrabold text-slate-900 dark:text-white transition-colors duration-250 group-hover/friend1:text-blue-500">S. Taylor</span> just climbed 5 spots
+                          </p>
+                          <span className="text-[9px] text-slate-405 font-medium block">2 mins ago</span>
+                        </div>
+                      </div>
+
+                      {/* Friend 2 */}
+                      <div className="flex gap-3 text-left group/friend2">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center font-mono font-black text-[9px] text-slate-655 dark:text-slate-350 shrink-0 relative">
+                          JW
+                          <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-slate-950" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-[11px] text-slate-700 dark:text-slate-300 font-semibold leading-snug">
+                            <span className="font-extrabold text-slate-900 dark:text-white transition-colors duration-250 group-hover/friend2:text-purple-500">J. Wu</span> earned 500 XP in <span className="font-extrabold text-slate-900 dark:text-white">'Logic'</span>
+                          </p>
+                          <span className="text-[9px] text-slate-405 font-medium block">1 hour ago</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                </motion.div>
+              </div>
             </motion.div>
           )}
 

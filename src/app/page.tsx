@@ -1619,6 +1619,7 @@ export default function LandingPage() {
           <div className="pt-0.5">
             <button
               type="button"
+              suppressHydrationWarning
               onClick={startAssessmentSim}
               disabled={assessmentStatus === 'running'}
               className="w-full py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-900 text-white disabled:text-slate-400 dark:disabled:text-slate-500 text-[10px] font-black uppercase rounded-lg shadow-md transition-all duration-200 cursor-pointer active:scale-95 border border-transparent disabled:border-slate-200 dark:disabled:border-slate-800"
