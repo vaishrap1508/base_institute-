@@ -81,7 +81,7 @@ export default function DocsPage() {
                   </div>
                   <div className="flex flex-col col-span-2">
                     <span className="text-[10px] text-slate-400 dark:text-slate-600 font-semibold uppercase">Attempted Access Route</span>
-                    <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/documentation</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/docs</span>
                   </div>
                 </div>
               </div>

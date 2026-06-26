@@ -1016,7 +1016,7 @@ export default function PlacementProfile({
                 key={item.id}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-3 transition-all relative overflow-hidden group ${
                   item.unlocked
-                    ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-850 hover:border-blue-500/50'
+                    ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800 hover:border-blue-500/55'
                     : 'bg-slate-100/30 dark:bg-slate-950/5 border-slate-200/40 dark:border-slate-900 opacity-60'
                 }`}
               >
@@ -1707,7 +1707,7 @@ export default function PlacementProfile({
                     key={item.id}
                     className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all relative overflow-hidden group ${
                       item.unlocked
-                        ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-855 hover:border-blue-500/50'
+                        ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800 hover:border-blue-500/55'
                         : 'bg-slate-100/30 dark:bg-slate-950/5 border-slate-200/40 dark:border-slate-900 opacity-60'
                     }`}
                   >
@@ -1717,7 +1717,7 @@ export default function PlacementProfile({
 
                     <div className="flex-1 space-y-1 text-left min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h5 className="text-[10.5px] font-black uppercase text-slate-850 dark:text-white tracking-wide truncate">
+                        <h5 className="text-[10.5px] font-black uppercase text-slate-800 dark:text-white tracking-wide truncate">
                           {item.title}
                         </h5>
                         <span className={`text-[7.5px] font-extrabold px-1.5 py-0.2 rounded border font-mono uppercase shrink-0 ${getRarityStyle(item.rarity)}`}>
@@ -1734,7 +1734,7 @@ export default function PlacementProfile({
                           <span>Progress</span>
                           <span>{item.currentProgress} / {item.targetProgress}</span>
                         </div>
-                        <div className="w-full bg-slate-200/50 dark:bg-slate-955 h-1 rounded-full overflow-hidden border border-slate-200/10 dark:border-slate-900">
+                        <div className="w-full bg-slate-200/50 dark:bg-slate-900 h-1 rounded-full overflow-hidden border border-slate-200/10 dark:border-slate-900">
                           <div className={`h-full rounded-full ${item.unlocked ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${(item.currentProgress / item.targetProgress) * 100}%` }} />
                         </div>
                       </div>
