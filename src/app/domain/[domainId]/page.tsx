@@ -35,7 +35,13 @@ import {
   List,
   Bell,
   Sun,
-  Moon
+  Moon,
+  LayoutGrid,
+  GraduationCap,
+  Clock,
+  Pause,
+  GripVertical,
+  RotateCcw
 } from 'lucide-react';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { motion } from 'framer-motion';
@@ -94,6 +100,89 @@ export default function DomainDetailPage() {
 
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Custom brand color support
+  const [customColor, setCustomColor] = useState<string>('default');
+  const isCustomActive = customColor !== 'default';
+
+  const applyBrandColor = (color: string) => {
+    if (color === 'default') {
+      document.documentElement.style.removeProperty('--clr-primary');
+      document.documentElement.style.removeProperty('--clr-primary-rgb');
+      document.documentElement.style.removeProperty('--clr-primary-dark');
+    } else {
+      document.documentElement.style.setProperty('--clr-primary', color);
+      document.documentElement.style.setProperty('--clr-primary-dark', color);
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      document.documentElement.style.setProperty('--clr-primary-rgb', `${r}, ${g}, ${b}`);
+    }
+  };
+
+  // Time Tracker stopwatch support
+  const [timeTrackerSeconds, setTimeTrackerSeconds] = useState<number>(5048);
+  const [timeTrackerIsRunning, setTimeTrackerIsRunning] = useState<boolean>(false);
+  const [timerCollapsed, setTimerCollapsed] = useState<boolean>(false);
+  const mainContainerRef = useRef<HTMLDivElement>(null);
+
+  const formatTimeTracker = (secondsCount: number) => {
+    const hrs = Math.floor(secondsCount / 3600).toString().padStart(2, '0');
+    const mins = Math.floor((secondsCount % 3600) / 60).toString().padStart(2, '0');
+    const secs = (secondsCount % 60).toString().padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+  };
+
+  // Sync stopwatch to localStorage
+  useEffect(() => {
+    let interval = null;
+    if (timeTrackerIsRunning) {
+      interval = setInterval(() => {
+        setTimeTrackerSeconds((prev) => {
+          const nextVal = prev + 1;
+          localStorage.setItem('aptitude_stopwatch_seconds', nextVal.toString());
+          localStorage.setItem('aptitude_stopwatch_last_time', Date.now().toString());
+          return nextVal;
+        });
+      }, 1000);
+    } else {
+      if (interval) clearInterval(interval);
+    }
+    localStorage.setItem('aptitude_stopwatch_running', timeTrackerIsRunning ? 'true' : 'false');
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timeTrackerIsRunning]);
+
+  // Load stopwatch and brand color state from localStorage on mount
+  useEffect(() => {
+    // 1. Sync stopwatch
+    const savedSeconds = localStorage.getItem('aptitude_stopwatch_seconds');
+    const savedRunning = localStorage.getItem('aptitude_stopwatch_running');
+    const savedLastTime = localStorage.getItem('aptitude_stopwatch_last_time');
+
+    let initialSeconds = 5048;
+    if (savedSeconds) {
+      initialSeconds = parseInt(savedSeconds, 10);
+    }
+
+    if (savedRunning === 'true' && savedLastTime) {
+      const elapsedMs = Date.now() - parseInt(savedLastTime, 10);
+      const elapsedSec = Math.floor(elapsedMs / 1000);
+      setTimeTrackerSeconds(initialSeconds + Math.max(0, elapsedSec));
+      setTimeTrackerIsRunning(true);
+    } else {
+      setTimeTrackerSeconds(initialSeconds);
+      setTimeTrackerIsRunning(savedRunning === 'true');
+    }
+
+    // 2. Sync brand color
+    const savedCustomColor = localStorage.getItem('aptitude_custom_brand_color');
+    if (savedCustomColor && savedCustomColor !== 'default') {
+      setCustomColor(savedCustomColor);
+      applyBrandColor(savedCustomColor);
+    }
+  }, []);
 
   // Dark/Light Theme Switcher State
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -254,23 +343,28 @@ export default function DomainDetailPage() {
   );
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
+    <div ref={mainContainerRef} className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
       {/* Background radial gradient meshes */}
       <div className="absolute top-0 right-0 w-[550px] h-[550px] rounded-full bg-blue-500/3 dark:bg-blue-500/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full bg-purple-500/3 dark:bg-purple-500/5 blur-[140px] pointer-events-none" />
 
       {/* 1. Left Navigation Sidebar (Reference 2 style) */}
       <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
-        {/* Top Logo Button */}
-        <div className="w-12 h-12 rounded-full bg-[#111827] dark:bg-white text-white dark:text-[#111827] flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title={siteConfig.name} onClick={() => router.push('/student/dashboard')}>
+        {/* Top Logo Button / Dashboard Trigger */}
+        <button
+          onClick={() => router.push('/student/dashboard?tab=dashboard')}
+          className="w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-all duration-300 border-0 outline-none"
+          title="Dashboard"
+          type="button"
+        >
           <Layers className="w-5 h-5" />
-        </div>
+        </button>
 
         {/* Sidebar Tabs */}
         <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
           {[
-            { id: 'dashboard', label: 'Dashboard', icon: Compass, route: '/student/dashboard?tab=dashboard' },
-            { id: 'domains', label: 'Domains', icon: Layers, route: '/student/dashboard?tab=domains' },
+            { id: 'domains', label: 'Domains', icon: LayoutGrid, route: '/student/dashboard?tab=domains' },
+            { id: 'conceptHub', label: 'Concept Hub', route: '/student/dashboard?tab=conceptHub', icon: GraduationCap },
             { id: 'learning', label: 'Learning Roadmap', route: '/student/dashboard?tab=learning', icon: BookOpen },
             { id: 'practice', label: 'Practice Arena', route: '/student/dashboard?tab=practice', icon: BookOpenCheck },
             { id: 'mockTests', label: 'Mock Tests', route: '/student/dashboard?tab=mockTests', icon: Award },
@@ -289,14 +383,14 @@ export default function DomainDetailPage() {
                 title={tab.label}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all cursor-pointer relative group/sidebar-btn ${
                   isActive
-                    ? 'text-white dark:text-slate-950 shadow-md scale-105 z-10 font-bold'
+                    ? 'text-white shadow-md scale-105 z-10 font-bold'
                     : 'text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 hover:scale-105 z-10'
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeSidebarGlow"
-                    className="absolute inset-0 bg-[#111827] dark:bg-white rounded-full z-0 shadow-[0_0_15px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+                    className="absolute inset-0 bg-[var(--clr-primary)] rounded-full z-0 shadow-[0_0_15px_rgba(var(--clr-primary-rgb),0.3)]"
                     transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                   />
                 )}
@@ -409,7 +503,7 @@ export default function DomainDetailPage() {
               {/* Dynamic Hero Section */}
               <div className="group bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[24px] p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-[0_15px_30px_rgba(59,130,246,0.02)] transition-all duration-300">
                 <div className="space-y-3 flex-1">
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-wider">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--clr-primary)]/10 text-[var(--clr-primary)] text-[10px] font-black uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5 animate-pulse" />
                     <span>Learning Journey Detail</span>
                   </div>
@@ -422,7 +516,7 @@ export default function DomainDetailPage() {
 
                   <div className="pt-2 flex flex-wrap gap-4 text-xs font-mono font-extrabold text-slate-500 dark:text-slate-400 select-none">
                     <div className="flex items-center gap-1.5">
-                      <BookOpenCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <BookOpenCheck className="w-4 h-4 text-[var(--clr-primary)]" />
                       <span>{progress?.solvedCount} / {progress?.totalCount} Problems Solved</span>
                     </div>
                     <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 self-center" />
@@ -479,8 +573,8 @@ export default function DomainDetailPage() {
               {/* Analytics summary rows */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 select-none">
                 {/* 1. Accuracy Card */}
-                <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-2xl p-5 flex items-center gap-4 hover:border-blue-200 dark:hover:border-blue-900 transition-all duration-300">
-                  <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-2xl p-5 flex items-center gap-4 hover:border-[var(--clr-primary)]/40 transition-all duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-[var(--clr-primary)]/10 flex items-center justify-center text-[var(--clr-primary)] shrink-0">
                     <TrendingUp className="w-6 h-6" />
                   </div>
                   <div className="space-y-0.5">
@@ -627,7 +721,7 @@ export default function DomainDetailPage() {
                           {/* 3. Plot Accuracy Polygon */}
                           <polygon
                             points={getRadarCoordinates(radarData, 'accuracy')}
-                            className="fill-blue-500/10 stroke-blue-600 dark:stroke-blue-400 transition-all duration-700"
+                            className="fill-[var(--clr-primary)]/10 stroke-[var(--clr-primary)] transition-all duration-700"
                             strokeWidth="2.5"
                           />
 
@@ -661,7 +755,7 @@ export default function DomainDetailPage() {
                                   cx={ax}
                                   cy={ay}
                                   r="4"
-                                  className="fill-blue-550 dark:fill-blue-400 stroke-white dark:stroke-slate-950 transition-all"
+                                  className="fill-[var(--clr-primary)] stroke-white dark:stroke-slate-950 transition-all"
                                   strokeWidth="1.5"
                                 />
                                 <circle
@@ -686,7 +780,7 @@ export default function DomainDetailPage() {
                   {/* Chart Legends */}
                   <div className="flex items-center justify-center gap-6 border-t border-slate-100 dark:border-slate-900/60 pt-4 text-[9.5px] font-extrabold uppercase tracking-widest select-none">
                     <div className="flex items-center gap-2">
-                      <span className="w-3.5 h-3 bg-blue-500/20 border border-blue-600 dark:border-blue-400 rounded-sm" />
+                       <span className="w-3.5 h-3 bg-[var(--clr-primary)]/20 border border-[var(--clr-primary)] rounded-sm" />
                       <span className="text-slate-700 dark:text-slate-400">Accuracy (%)</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -700,12 +794,12 @@ export default function DomainDetailPage() {
                 <div className="lg:col-span-2 flex flex-col gap-6">
                   {/* Continue Learning card */}
                   {continueLearning && (
-                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-blue-200 dark:hover:border-blue-900 transition-all duration-300">
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-[var(--clr-primary)]/40 transition-all duration-300">
                       <div className="space-y-1 select-none">
                         <span className="text-[7.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">
                           Up Next Checklist
                         </span>
-                        <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
+                        <span className="text-xs font-black text-[var(--clr-primary)] uppercase tracking-wider block">
                           Recommended Topic
                         </span>
                       </div>
@@ -723,7 +817,7 @@ export default function DomainDetailPage() {
                           </div>
                           <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-900 overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-600"
+                              className="h-full rounded-full bg-[var(--clr-primary)]"
                               style={{ width: `${continueLearning.progress}%` }}
                             />
                           </div>
@@ -734,8 +828,8 @@ export default function DomainDetailPage() {
                       </div>
 
                       <button
-                        onClick={() => router.push(`/student/dashboard?tab=learning&concept=${continueLearning.topicId}`)}
-                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-wider active:scale-[0.98] transition-all cursor-pointer shadow-md shadow-blue-500/15"
+                        onClick={() => router.push('/student/dashboard?tab=conceptHub')}
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--clr-primary)] hover:opacity-90 text-white font-black text-[10px] uppercase tracking-wider active:scale-[0.98] transition-all cursor-pointer shadow-md shadow-[var(--clr-primary)]/15"
                       >
                         <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
                         <span>Resume Lesson</span>
@@ -767,7 +861,7 @@ export default function DomainDetailPage() {
                                 ? 'bg-amber-50/50 border-amber-100 dark:bg-amber-950/10 dark:border-amber-900/30 text-amber-800 dark:text-amber-400'
                                 : isSuccess
                                 ? 'bg-emerald-50/50 border-emerald-100 dark:bg-emerald-950/10 dark:border-emerald-900/30 text-emerald-800 dark:text-emerald-400'
-                                : 'bg-blue-50/40 border-blue-100 dark:bg-blue-950/10 dark:border-blue-900/20 text-blue-800 dark:text-blue-400'
+                                : 'bg-[var(--clr-primary)]/10 border-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)]/10 dark:border-[var(--clr-primary)]/20 text-[var(--clr-primary)]'
                             }`}
                           >
                             <span className="shrink-0 mt-0.5">
@@ -776,7 +870,7 @@ export default function DomainDetailPage() {
                               ) : isSuccess ? (
                                 <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-500" />
                               ) : (
-                                <Info className="w-4 h-4 text-blue-600 dark:text-blue-500" />
+                                <Info className="w-4 h-4 text-[var(--clr-primary)]" />
                               )}
                             </span>
                             <span className="text-[11px] font-medium leading-relaxed">
@@ -828,7 +922,7 @@ export default function DomainDetailPage() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Filter concepts..."
-                      className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-xl pl-9 pr-3 py-2 text-[11px] font-bold placeholder-slate-400 dark:placeholder-slate-550 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500 transition-all"
+                      className="w-full bg-white dark:bg-slate-900/10 border border-slate-200/80 dark:border-slate-900/50 rounded-xl pl-9 pr-3 py-2 text-[11px] font-bold placeholder-slate-400 dark:placeholder-slate-550 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-[var(--clr-primary)] transition-all"
                     />
                   </div>
                 </div>
@@ -847,7 +941,7 @@ export default function DomainDetailPage() {
                             isCompleted
                               ? 'hover:border-emerald-200 dark:hover:border-emerald-900/60'
                               : isInProgress
-                              ? 'hover:border-blue-200 dark:hover:border-blue-900/60'
+                              ? 'hover:border-[var(--clr-primary)]/40'
                               : 'opacity-85 hover:border-slate-300 dark:hover:border-slate-800'
                           }`}
                         >
@@ -871,7 +965,7 @@ export default function DomainDetailPage() {
                                   <span>Completed</span>
                                 </span>
                               ) : isInProgress ? (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 text-[9px] font-black uppercase tracking-wider border border-blue-100/50 dark:border-blue-900/30">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--clr-primary)]/10 text-[var(--clr-primary)] text-[9px] font-black uppercase tracking-wider border border-[var(--clr-primary)]/20">
                                   <Loader2 className="w-3 h-3 animate-spin" />
                                   <span>Active</span>
                                 </span>
@@ -892,7 +986,7 @@ export default function DomainDetailPage() {
                                   isCompleted
                                     ? 'bg-emerald-500'
                                     : isInProgress
-                                    ? 'bg-blue-600'
+                                    ? 'bg-[var(--clr-primary)]'
                                     : 'bg-slate-300 dark:bg-slate-800'
                                 }`}
                                 style={{ width: `${topic.progress}%` }}
@@ -920,7 +1014,7 @@ export default function DomainDetailPage() {
                                 className={`flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer ${
                                   isCompleted
                                     ? 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700'
-                                    : 'text-blue-600 dark:text-blue-400 hover:text-blue-700'
+                                    : 'text-[var(--clr-primary)] hover:opacity-85'
                                 }`}
                               >
                                 <span>{isCompleted ? 'Review Topic' : 'Start Topic'}</span>
@@ -951,6 +1045,95 @@ export default function DomainDetailPage() {
         </div>
       </main>
       </div>
+
+      {/* Floating Time Tracker */}
+      <motion.div
+        drag
+        dragMomentum={false}
+        dragElastic={0}
+        dragConstraints={mainContainerRef}
+        initial={{ opacity: 0, scale: 0.9, y: 50 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="fixed bottom-6 right-6 z-50 flex items-center bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-xl border border-slate-700/40 dark:border-slate-800/40 text-white shadow-2xl select-none"
+        style={{ borderRadius: '9999px' }}
+      >
+        {timerCollapsed ? (
+          // Collapsed state: simple round icon
+          <button
+            onClick={() => setTimerCollapsed(false)}
+            className="w-12 h-12 flex items-center justify-center relative rounded-full hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none"
+            title="Expand Time Tracker"
+            type="button"
+          >
+            <Clock className="w-5 h-5 text-white" />
+            <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full border border-slate-900 dark:border-slate-950 ${
+              timeTrackerIsRunning ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+            }`} />
+          </button>
+        ) : (
+          // Expanded state: pill container
+          <div className="flex items-center gap-2.5 px-3.5 py-2.5">
+            {/* Drag Handle */}
+            <div className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-350 p-0.5 transition-colors">
+              <GripVertical className="w-3.5 h-3.5" />
+            </div>
+
+            {/* Status Dot */}
+            <span className={`w-2 h-2 rounded-full ${
+              timeTrackerIsRunning ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+            }`} />
+
+            {/* Time Readout */}
+            <div className="flex flex-col text-left">
+              <span className="font-mono text-xs font-black tracking-tight leading-none text-white">
+                {formatTimeTracker(timeTrackerSeconds)}
+              </span>
+              <span className="text-[7.5px] text-slate-400 uppercase font-black tracking-wider mt-0.5 leading-none">
+                {timeTrackerIsRunning ? "Studying" : "Paused"}
+              </span>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center gap-1.5 ml-1 border-l border-slate-700/50 pl-2">
+              <button
+                onClick={() => setTimeTrackerIsRunning(!timeTrackerIsRunning)}
+                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+                  timeTrackerIsRunning
+                    ? "bg-rose-600 hover:bg-rose-500 text-white"
+                    : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                }`}
+                title={timeTrackerIsRunning ? "Pause Session" : "Start Study"}
+                type="button"
+              >
+                {timeTrackerIsRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+              </button>
+
+              <button
+                onClick={() => {
+                  setTimeTrackerIsRunning(false);
+                  setTimeTrackerSeconds(0);
+                }}
+                className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer text-slate-300 hover:text-white"
+                title="Reset Session"
+                type="button"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </button>
+
+              {/* Collapse Button */}
+              <button
+                onClick={() => setTimerCollapsed(true)}
+                className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer text-slate-400 hover:text-white"
+                title="Minimize"
+                type="button"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </motion.div>
+
     </div>
   );
 }
