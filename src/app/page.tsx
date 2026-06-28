@@ -2110,7 +2110,7 @@ export default function LandingPage() {
       {/* ==========================================
           EMPOWERING CAMPUSES - BENTO GRID & DUAL MARQUEE
           ========================================== */}
-      <section id="empowering-campuses" className="relative w-full py-20 px-6 sm:px-12 bg-white dark:bg-slate-950/50">
+      <section id="empowering-campuses" className="relative w-full py-24 px-6 sm:px-12 bg-white dark:bg-slate-950/50 scroll-mt-24">
         
         <div className="max-w-7xl mx-auto space-y-12">
           
@@ -2271,7 +2271,7 @@ export default function LandingPage() {
       {/* ==========================================
           CURRICULUM (INTERACTIVE ROADMAP & BENTO DETAILS)
           ========================================== */}
-      <section id="curriculum" className="relative w-full py-28 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950 overflow-hidden">
+      <section id="curriculum" className="relative w-full py-24 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950 overflow-hidden scroll-mt-24">
         
         {/* Soft background ambient gradient lights */}
         <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
@@ -2580,7 +2580,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="coach" className="relative w-full py-24 px-6 sm:px-12 bg-white dark:bg-slate-950 overflow-hidden">
+      <section id="coach" className="relative w-full py-24 px-6 sm:px-12 bg-white dark:bg-slate-950 overflow-hidden scroll-mt-24">
         {/* Glowing visual backdrop */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
         <div className="absolute top-1/3 right-10 w-[300px] h-[300px] rounded-full bg-indigo-600/5 blur-[100px] pointer-events-none" />
@@ -2699,7 +2699,7 @@ export default function LandingPage() {
       {/* ==========================================
           FREQUENTLY ASKED QUESTIONS (FAQ)
           ========================================== */}
-      <section id="faq" className="relative w-full py-24 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950">
+      <section id="faq" className="relative w-full py-24 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950 scroll-mt-24">
         
         <div className="max-w-7xl mx-auto space-y-12">
           
@@ -2999,6 +2999,31 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ==========================================
+          FOOTER SECTION
+          ========================================== */}
+      <footer className="w-full py-12 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-900/60 select-none">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white shadow-md">
+              <Layers className="w-4.5 h-4.5" />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-extrabold tracking-tight text-xs text-slate-800 dark:text-slate-200">{content.header_logo_text}</span>
+              <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">{content.header_logo_subtext}</span>
+            </div>
+          </div>
+          <div className="text-center md:text-right space-y-1.5">
+            <span className="text-[9px] font-black px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-350 dark:border-slate-800 tracking-wider">
+              {content.footer_badge_text}
+            </span>
+            <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-2">
+              {content.footer_copyright}
+            </p>
+          </div>
+        </div>
+      </footer>
 
 
       {/* ==========================================

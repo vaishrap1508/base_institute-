@@ -228,7 +228,7 @@ export default function DomainsTab({ searchQuery, customColor = 'default' }: Dom
                   <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white tracking-tight leading-none uppercase font-heading transition-colors duration-300">
                     {d.title}
                   </h2>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
                       {d.subtitle}
                     </p>

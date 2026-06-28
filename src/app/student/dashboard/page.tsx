@@ -2222,19 +2222,46 @@ export default function StudentDashboard() {
           });
           setQuestions(mapped);
         } else {
-          // Local storage fallback
+          // Local storage fallback with self-healing auto-merge
           const stored = localStorage.getItem('aptitude_questions');
           if (stored) {
-            setQuestions(JSON.parse(stored));
+            try {
+              const parsed = JSON.parse(stored);
+              const parsedIds = new Set(parsed.map((q: any) => q.id));
+              const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+              if (missing.length > 0) {
+                const merged = [...parsed, ...missing];
+                localStorage.setItem('aptitude_questions', JSON.stringify(merged));
+                setQuestions(merged);
+              } else {
+                setQuestions(parsed);
+              }
+            } catch (e) {
+              setQuestions(SAMPLE_QUESTIONS);
+            }
           } else {
             setQuestions(SAMPLE_QUESTIONS);
+            localStorage.setItem('aptitude_questions', JSON.stringify(SAMPLE_QUESTIONS));
           }
         }
       } catch (err) {
         console.warn('Student Dashboard Supabase Sync error:', err);
         const stored = localStorage.getItem('aptitude_questions');
         if (stored) {
-          setQuestions(JSON.parse(stored));
+          try {
+            const parsed = JSON.parse(stored);
+            const parsedIds = new Set(parsed.map((q: any) => q.id));
+            const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+            if (missing.length > 0) {
+              const merged = [...parsed, ...missing];
+              localStorage.setItem('aptitude_questions', JSON.stringify(merged));
+              setQuestions(merged);
+            } else {
+              setQuestions(parsed);
+            }
+          } catch (e) {
+            setQuestions(SAMPLE_QUESTIONS);
+          }
         } else {
           setQuestions(SAMPLE_QUESTIONS);
         }
@@ -2584,7 +2611,10 @@ export default function StudentDashboard() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-30">
 
         {/* Top Header (Reference 2 style) */}
-        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
+        <header className={activeSidebarTab === 'practice'
+          ? "mx-6 mt-6 mb-2 rounded-[24px] border border-slate-200/80 dark:border-white/[0.08] bg-white/75 dark:bg-slate-950/75 backdrop-blur-[20px] shadow-lg dark:shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] px-8 py-3.5 flex items-center justify-between transition-all duration-300 shrink-0 select-none"
+          : "h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none"
+        }>
           <div className="flex flex-col items-start text-left">
             <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
               {activeSidebarTab === 'dashboard' ? (
@@ -2705,8 +2735,6 @@ export default function StudentDashboard() {
               </button>
             </div>
 
-
-
             {/* Notification Bell */}
             <button
               onClick={() => alert("No new notifications")}
@@ -2740,8 +2768,11 @@ export default function StudentDashboard() {
         </header>
 
         {/* Scrollable Panel Area */}
-        <div ref={scrollablePanelRef} className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
-          }`}>
+        <div ref={scrollablePanelRef} className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${
+          activeSidebarTab === 'practice'
+            ? (layoutDensity === 'compact' ? 'px-4 pb-4 pt-0' : layoutDensity === 'spacious' ? 'px-10 pb-10 pt-0' : 'px-6 sm:px-8 pb-6 sm:pb-8 pt-0')
+            : (layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8')
+        }`}>
 
 
           {/* ====================================================================
@@ -2936,10 +2967,13 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Large Yellow Active concept banner (Reference 2 style) */}
-                    <div className={isCustomActive
-                      ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out"
-                      : "bg-[#FFFBEB] dark:bg-[#251E0E]/40 border border-[#FEF3C7] dark:border-[#4B3B18]/30 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out"
-                    }>
+                    <div 
+                      className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out cursor-pointer"
+                        : "bg-[#FFFBEB] dark:bg-[#251E0E]/40 border border-[#FEF3C7] dark:border-[#4B3B18]/30 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out cursor-pointer"
+                      }
+                      onClick={() => setActiveSidebarTab('conceptHub')}
+                    >
                       <div className="space-y-3 text-left flex-1 w-full">
                         <div className="flex items-center gap-2">
                           <span className={isCustomActive
@@ -2971,8 +3005,9 @@ export default function StudentDashboard() {
 
                       {/* Large diagonal arrow button */}
                       <button
-                        onClick={() => {
-                          setActiveSidebarTab('learning');
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveSidebarTab('conceptHub');
                         }}
                         className={isCustomActive
                           ? "w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"

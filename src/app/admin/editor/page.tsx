@@ -224,7 +224,15 @@ export default function AdminContentCreator() {
       const stored = localStorage.getItem('aptitude_questions');
       if (stored) {
         try {
-          currentQuestions = JSON.parse(stored);
+          const parsed = JSON.parse(stored);
+          const parsedIds = new Set(parsed.map((q: any) => q.id));
+          const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+          if (missing.length > 0) {
+            currentQuestions = [...parsed, ...missing];
+            localStorage.setItem('aptitude_questions', JSON.stringify(currentQuestions));
+          } else {
+            currentQuestions = parsed;
+          }
           setQuestionsList(currentQuestions);
         } catch (e) {
           console.warn('Failed to parse questions from localStorage', e);
