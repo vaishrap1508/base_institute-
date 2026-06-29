@@ -53,7 +53,9 @@ import {
   FileText,
   Send,
   Video,
-  Plus
+  Plus,
+  GripVertical,
+  LayoutGrid
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
@@ -1500,27 +1502,39 @@ export default function StudentDashboard() {
     return Array.from(days);
   }, [earnedBadgesHistory, currentYear, currentMonth]);
 
+  // Compute badges earned on each day of the current month
+  const badgesByDay: Record<number, Array<{ badge: any; count: number }>> = useMemo(() => {
+    const map: Record<number, Array<{ badge: any; count: number }>> = {};
+    for (let d = 1; d <= 31; d++) {
+      map[d] = [];
+    }
+
+    earnedBadgesHistory.forEach(item => {
+      if (!item.earned_at) return;
+      const dateObj = new Date(item.earned_at);
+      if (dateObj.getFullYear() === currentYear && dateObj.getMonth() === currentMonth) {
+        const dayNum = dateObj.getDate();
+        const badgeDetail = badges.find(b => b.id === item.badge_id) || MOCK_BADGES_DATA.find(b => b.id === item.badge_id);
+        if (badgeDetail) {
+          const existing = map[dayNum]?.find(x => x.badge.id === badgeDetail.id);
+          if (existing) {
+            existing.count += 1;
+          } else {
+            if (!map[dayNum]) {
+              map[dayNum] = [];
+            }
+            map[dayNum].push({ badge: badgeDetail, count: 1 });
+          }
+        }
+      }
+    });
+    return map;
+  }, [earnedBadgesHistory, badges, currentYear, currentMonth]);
+
   // Compute badges earned on selected calendar day with multipliers for duplicate earnings
   const badgesEarnedOnSelectedDay: Array<{ badge: any; count: number }> = useMemo(() => {
-    const dayHistory = earnedBadgesHistory.filter(item => {
-      if (!item.earned_at) return false;
-      const d = new Date(item.earned_at);
-      return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === selectedCalendarDay;
-    });
-
-    const badgeCounts: Record<string, number> = {};
-    dayHistory.forEach(item => {
-      badgeCounts[item.badge_id] = (badgeCounts[item.badge_id] || 0) + 1;
-    });
-
-    return Object.entries(badgeCounts).map(([badgeId, count]: [string, number]) => {
-      const badgeDetail = badges.find(b => b.id === badgeId) || MOCK_BADGES_DATA.find(b => b.id === badgeId);
-      return {
-        badge: badgeDetail,
-        count
-      };
-    }).filter((item): item is { badge: any; count: number } => item.badge !== undefined);
-  }, [earnedBadgesHistory, selectedCalendarDay, badges, currentYear, currentMonth]);
+    return badgesByDay[selectedCalendarDay] || [];
+  }, [badgesByDay, selectedCalendarDay]);
 
   // Custom Settings States
   const [dailyXpGoal, setDailyXpGoal] = useState<number>(100);
@@ -1538,20 +1552,51 @@ export default function StudentDashboard() {
   // Time Tracker State (Reference 1 style)
   const [timeTrackerSeconds, setTimeTrackerSeconds] = useState<number>(5048); // Start at 01:24:08 (5048 seconds)
   const [timeTrackerIsRunning, setTimeTrackerIsRunning] = useState<boolean>(false);
+  const [timerCollapsed, setTimerCollapsed] = useState<boolean>(false);
+  const mainContainerRef = useRef<HTMLDivElement>(null);
 
+  // Sync stopwatch to localStorage
   useEffect(() => {
     let interval = null;
     if (timeTrackerIsRunning) {
       interval = setInterval(() => {
-        setTimeTrackerSeconds((prev) => prev + 1);
+        setTimeTrackerSeconds((prev) => {
+          const nextVal = prev + 1;
+          localStorage.setItem('aptitude_stopwatch_seconds', nextVal.toString());
+          localStorage.setItem('aptitude_stopwatch_last_time', Date.now().toString());
+          return nextVal;
+        });
       }, 1000);
     } else {
       if (interval) clearInterval(interval);
     }
+    localStorage.setItem('aptitude_stopwatch_running', timeTrackerIsRunning ? 'true' : 'false');
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [timeTrackerIsRunning]);
+
+  // Load stopwatch state from localStorage on mount
+  useEffect(() => {
+    const savedSeconds = localStorage.getItem('aptitude_stopwatch_seconds');
+    const savedRunning = localStorage.getItem('aptitude_stopwatch_running');
+    const savedLastTime = localStorage.getItem('aptitude_stopwatch_last_time');
+
+    let initialSeconds = 5048;
+    if (savedSeconds) {
+      initialSeconds = parseInt(savedSeconds, 10);
+    }
+
+    if (savedRunning === 'true' && savedLastTime) {
+      const elapsedMs = Date.now() - parseInt(savedLastTime, 10);
+      const elapsedSec = Math.floor(elapsedMs / 1000);
+      setTimeTrackerSeconds(initialSeconds + Math.max(0, elapsedSec));
+      setTimeTrackerIsRunning(true);
+    } else {
+      setTimeTrackerSeconds(initialSeconds);
+      setTimeTrackerIsRunning(savedRunning === 'true');
+    }
+  }, []);
 
   // Listen for Escape key to close badge modal
   useEffect(() => {
@@ -2465,8 +2510,7 @@ export default function StudentDashboard() {
   }
 
   const sidebarTabs: SidebarTab[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: Compass, action: 'tab' },
-    { id: 'domains', label: 'Domains', icon: Layers, action: 'tab' },
+    { id: 'domains', label: 'Domains', icon: LayoutGrid, action: 'tab' },
     { id: 'conceptHub', label: 'Concept Hub', icon: GraduationCap, action: 'tab' },
     { id: 'learning', label: 'Learning Roadmap', icon: BookOpen, action: 'tab' },
     { id: 'practice', label: 'Practice Arena', icon: BookOpenCheck, action: 'tab' },
@@ -2477,7 +2521,7 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
+    <div ref={mainContainerRef} className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
 
       {/* Glow Backdrops */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[var(--clr-primary)]/5 blur-[120px] pointer-events-none" />
@@ -2485,10 +2529,22 @@ export default function StudentDashboard() {
 
       {/* 1. Left Navigation Sidebar (Reference 2 style) */}
       <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
-        {/* Top Logo Button */}
-        <div className="w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title={siteConfig.name}>
-          <Layers className="w-5 h-5" />
-        </div>
+        {/* Top Logo Button / Dashboard Trigger */}
+        <button
+          onClick={() => setActiveSidebarTab('dashboard')}
+          className={`w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-all duration-300 relative group/logo border-0 outline-none`}
+          title="Dashboard"
+          type="button"
+        >
+          {activeSidebarTab === 'dashboard' && (
+            <motion.div
+              layoutId="activeLogoGlow"
+              className="absolute -inset-1 rounded-full border-2 border-[var(--clr-primary)] opacity-40 blur-xs"
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            />
+          )}
+          <Layers className="w-5 h-5 relative z-10" />
+        </button>
 
         {/* Sidebar Tabs */}
         <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
@@ -2689,9 +2745,7 @@ export default function StudentDashboard() {
               <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
             </button>
 
-            {/* Dynamic User Profile info and Avatar */}
             <div className="flex items-center gap-3 shrink-0">
-
               <button
                 onClick={() => setActiveSidebarTab('profile')}
                 title="User Profile"
@@ -2776,14 +2830,14 @@ export default function StudentDashboard() {
                     {/* Horizontal/Grid Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                      {/* Card 1: Quant Aptitude */}
+                      {/* Card 1: Quantitative Aptitude */}
                       <div className={isCustomActive
                         ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
                         : "bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
                       }>
                         <div className="flex justify-between items-start gap-4">
                           <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
-                            Quant Aptitude
+                            Quantitative<br />Aptitude
                           </h3>
                           {/* Diagonal Arrow button */}
                           <button
@@ -2820,7 +2874,7 @@ export default function StudentDashboard() {
                       }>
                         <div className="flex justify-between items-start gap-4">
                           <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
-                            Logical Reasoning
+                            Logical<br />Reasoning
                           </h3>
                           <button
                             onClick={() => {
@@ -2927,7 +2981,7 @@ export default function StudentDashboard() {
                           }>
                             Active Track Unit
                           </span>
-                          <span className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold">QUANT APTITUDE</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold">QUANTITATIVE APTITUDE</span>
                         </div>
                         <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase leading-snug">
                           Percentages → Profit & Loss
@@ -2993,7 +3047,7 @@ export default function StudentDashboard() {
                       <div className="grid grid-cols-7 gap-y-2.5 gap-x-1 text-center text-xs font-bold text-slate-700 dark:text-slate-400">
                         {/* Padding days */}
                         {[...Array(paddingDays)].map((_, i) => (
-                          <div key={`pad-${i}`} className="w-7 h-7" />
+                          <div key={`pad-${i}`} className="w-8 h-8" />
                         ))}
                         {/* Actual days */}
                         {[...Array(daysInMonth)].map((_, i) => {
@@ -3004,7 +3058,7 @@ export default function StudentDashboard() {
                           const isToday = dateNum === todayDay;
                           const isSelected = selectedCalendarDay === dateNum;
 
-                          let dateStyles = "w-7 h-7 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
+                          let dateStyles = "w-8 h-8 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
 
                           if (isToday) {
                             dateStyles += "bg-[#111827] dark:bg-white text-white dark:text-slate-900 font-black shadow-sm ";
@@ -3018,119 +3072,46 @@ export default function StudentDashboard() {
                             dateStyles += "ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-900 ";
                           }
 
+                          const dayBadges = badgesByDay[dateNum] || [];
+                          const totalBadgeCount = dayBadges.reduce((acc, item) => acc + item.count, 0);
+
                           return (
                             <button
                               key={dateNum}
                               onClick={() => setSelectedCalendarDay(dateNum)}
-                              className="relative focus:outline-none"
+                              className="relative focus:outline-none w-8 h-8 mx-auto flex items-center justify-center"
                               type="button"
                             >
                               <span className={dateStyles}>{dateNum}</span>
-                              {isStreakDay && (
+                              {isStreakDay && dayBadges.length === 0 && (
                                 <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-500" />
+                              )}
+                              {dayBadges.length > 0 && (
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedBadge(dayBadges[0].badge);
+                                  }}
+                                  title={`${dayBadges.map(db => `${db.badge.name}${db.count > 1 ? ` (x${db.count})` : ''}`).join(', ')}`}
+                                  className="absolute -bottom-1.5 -right-1.5 flex items-center justify-center bg-blue-600/90 hover:bg-blue-700/90 dark:bg-blue-500/90 dark:hover:bg-blue-600/90 text-white rounded-full px-1 min-w-[20px] h-5 shadow-md border border-white/20 dark:border-slate-900/40 leading-none select-none cursor-pointer z-10 transition-all duration-200 hover:scale-110 active:scale-95"
+                                >
+                                  {dayBadges[0].badge.image_url ? (
+                                    <TransparentBadgeImage src={dayBadges[0].badge.image_url} alt="" className="w-3.5 h-3.5 object-contain rounded-full" />
+                                  ) : (
+                                    <span className="text-[9px]">{getCategoryEmoji(dayBadges[0].badge.category)}</span>
+                                  )}
+                                  {totalBadgeCount > 1 && (
+                                    <span className="ml-0.5 font-bold text-[7.5px] leading-none pr-0.5">x{totalBadgeCount}</span>
+                                  )}
+                                </div>
                               )}
                             </button>
                           );
-                        })}
-                      </div>
+                     </div>
+                   </div>
 
 
-                    </div>
-                  </div>
-
-                  {/* 2. Time Tracker Stopwatch widget (Reference 1 style) */}
-                  <div className={`transition-all duration-500 text-white border rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between h-48 group ${
-                    timeTrackerIsRunning
-                      ? "bg-[#0B3A27] dark:bg-[#062418] border-[#0A3322] dark:border-[#041B12]"
-                      : "bg-[#4A1515] dark:bg-[#2D0B0B] border-[#441212] dark:border-[#250707]"
-                  }`}>
-                    {/* Visual pattern overlay */}
-                    <div className={`absolute inset-0 transition-opacity duration-500 pointer-events-none ${
-                      timeTrackerIsRunning
-                        ? "bg-[radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.15),transparent_60%)]"
-                        : "bg-[radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.15),transparent_60%)]"
-                    }`} />
-
-                    <div className="flex items-center justify-between relative z-10">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                          timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
-                        }`} />
-                        <span className={`text-[10px] font-black uppercase tracking-widest font-mono transition-colors duration-500 ${
-                          timeTrackerIsRunning ? "text-[#A7F3D0]" : "text-[#FECACA]"
-                        }`}>Time Tracker</span>
-                      </div>
-                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-colors duration-500 ${
-                        timeTrackerIsRunning ? "bg-[#065F46] text-emerald-200" : "bg-[#991B1B] text-rose-200"
-                      }`}>
-                        {timeTrackerIsRunning ? "Active" : "Paused"}
-                      </span>
-                    </div>
-
-                    <div className="text-center py-2 relative z-10">
-                      <span className="text-3xl font-black font-mono tracking-tight leading-none text-white block">
-                        {formatTimeTracker(timeTrackerSeconds)}
-                      </span>
-                      <span className={`text-[9px] font-semibold mt-1.5 block uppercase tracking-wider transition-colors duration-500 ${
-                        timeTrackerIsRunning ? "text-[#A7F3D0]/60" : "text-[#FECACA]/60"
-                      }`}>
-                        {timeTrackerIsRunning ? "Active Study Session duration" : "Paused Study Session duration"}
-                      </span>
-                    </div>
-
-                    <div className={`flex justify-center gap-4 relative z-10 pt-3 border-t transition-colors duration-500 ${
-                      timeTrackerIsRunning ? "border-[#092B1D]/80" : "border-[#3D0F0F]/80"
-                    }`}>
-
-                      {/* Play Button */}
-                      <button
-                        onClick={() => setTimeTrackerIsRunning(true)}
-                        disabled={timeTrackerIsRunning}
-                        title="Start Study"
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          timeTrackerIsRunning
-                            ? "bg-[#061E14] text-emerald-800/40 border border-[#082419] cursor-not-allowed"
-                            : "bg-emerald-600 hover:bg-emerald-500 text-white"
-                        }`}
-                        type="button"
-                      >
-                        <Play className="w-4 h-4 fill-current" />
-                      </button>
-
-                      {/* Pause Button */}
-                      <button
-                        onClick={() => setTimeTrackerIsRunning(false)}
-                        disabled={!timeTrackerIsRunning}
-                        title="Pause Session"
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          !timeTrackerIsRunning
-                            ? "bg-[#2D1212] text-rose-900/30 border border-[#3D1414] cursor-not-allowed"
-                            : "bg-rose-800 hover:bg-rose-700 text-white"
-                        }`}
-                        type="button"
-                      >
-                        <Pause className="w-4 h-4" />
-                      </button>
-
-                      {/* Reset Button */}
-                      <button
-                        onClick={() => {
-                          setTimeTrackerIsRunning(false);
-                          setTimeTrackerSeconds(0);
-                        }}
-                        title="Reset Session"
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          timeTrackerIsRunning
-                            ? "bg-[#092B1D] hover:bg-[#061E14] text-[#A7F3D0] border border-[#082419]"
-                            : "bg-[#3D1414] hover:bg-[#2D1010] text-[#FECACA] border border-[#4A1818]"
-                        }`}
-                        type="button"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                      </button>
-
-                    </div>
-                  </div>
+                  {/* Space filler after calendar since Time Tracker is now floating */}
 
                 </div>
 
@@ -3936,7 +3917,9 @@ export default function StudentDashboard() {
                         onClick={() => setActiveLeaderboardPeriod(period)}
                         className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${
                           activeLeaderboardPeriod === period
-                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/10'
+                            ? isCustomActive
+                              ? 'bg-[var(--clr-primary)] text-white shadow-md shadow-[var(--clr-primary)]/10'
+                              : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/10'
                             : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
                       >
@@ -3963,7 +3946,7 @@ export default function StudentDashboard() {
                       </span>
                       <div className="relative w-16 h-16 rounded-full border-2 border-slate-350 dark:border-slate-700 p-0.5 mt-2 transition-transform duration-300 group-hover/podium2:scale-105">
                         <img
-                          src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].avatarSeed}`}
+                           src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].avatarSeed}`}
                           alt={LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].name}
                           className="w-full h-full rounded-full object-cover bg-slate-50 dark:bg-slate-950"
                         />
@@ -3976,7 +3959,7 @@ export default function StudentDashboard() {
                       </span>
                       <div className="grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t border-slate-105 dark:border-slate-900/60 text-[10px]">
                         <div>
-                          <div className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[8px]">ACC.</div>
+                          <div className="text-slate-400 dark:text-slate-505 font-bold uppercase text-[8px]">ACC.</div>
                           <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].accuracy}</div>
                         </div>
                         <div>
@@ -3989,7 +3972,11 @@ export default function StudentDashboard() {
                     {/* Rank 1 - Center Elevated & Glowing */}
                     <motion.div 
                       variants={podiumCardVariants}
-                      className="bg-white dark:bg-slate-900/60 border border-purple-200 dark:border-purple-900/40 rounded-3xl p-5 text-center flex flex-col items-center relative shadow-lg shadow-purple-500/5 dark:shadow-purple-950/30 min-h-[250px] scale-[1.05] z-10 hover:-translate-y-1.5 transition-all duration-300 group/podium1"
+                      className={`bg-white dark:bg-slate-900/60 rounded-3xl p-5 text-center flex flex-col items-center relative shadow-lg min-h-[250px] scale-[1.05] z-10 hover:-translate-y-1.5 transition-all duration-300 group/podium1 ${
+                        isCustomActive
+                          ? 'border border-[var(--clr-primary)]/40 shadow-[var(--clr-primary)]/5 dark:shadow-[var(--clr-primary)]/30'
+                          : 'border border-purple-200 dark:border-purple-900/40 shadow-purple-500/5 dark:shadow-purple-950/30'
+                      }`}
                     >
                       {/* Floating sparkles graphics */}
                       <div className="absolute top-2.5 left-2.5 text-xs opacity-50 select-none animate-pulse">✨</div>
@@ -3998,16 +3985,32 @@ export default function StudentDashboard() {
                       <div className="absolute bottom-3 right-4.5 text-xs opacity-50 select-none animate-pulse">✨</div>
                       
                       {/* Purple background glow */}
-                      <div className="absolute -inset-1 rounded-[28px] bg-gradient-to-tr from-purple-600 via-indigo-650 to-pink-500 opacity-[0.06] blur-xl group-hover/podium1:opacity-15 transition duration-500 pointer-events-none" />
+                      <div className={`absolute -inset-1 rounded-[28px] opacity-[0.06] blur-xl group-hover/podium1:opacity-15 transition duration-500 pointer-events-none ${
+                        isCustomActive
+                          ? 'bg-[var(--clr-primary)]'
+                          : 'bg-gradient-to-tr from-purple-600 via-indigo-650 to-pink-500'
+                      }`} />
 
-                      <span className="absolute -top-3.5 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-purple-600 via-pink-550 to-indigo-600 text-white border border-purple-400/20 font-mono shadow-[0_0_12px_rgba(147,51,234,0.3)]">
+                      <span className={`absolute -top-3.5 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider font-mono ${
+                        isCustomActive
+                          ? 'bg-[var(--clr-primary)] text-white border border-[var(--clr-primary)]/20 shadow-[0_0_12px_rgba(var(--clr-primary-rgb),0.3)]'
+                          : 'bg-gradient-to-r from-purple-600 via-pink-550 to-indigo-600 text-white border border-purple-400/20 shadow-[0_0_12px_rgba(147,51,234,0.3)]'
+                      }`}>
                         Rank 1
                       </span>
                       
                       <div className="relative mt-2">
                         {/* Rotating dynamic color halo */}
-                        <span className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 animate-[spin_8s_linear_infinite] opacity-65 blur-xs group-hover/podium1:opacity-85" />
-                        <div className="relative w-20 h-20 rounded-full border-2 border-purple-400 dark:border-purple-450 p-0.5 bg-slate-900 dark:bg-slate-950 overflow-hidden">
+                        <span className={`absolute -inset-1.5 rounded-full animate-[spin_8s_linear_infinite] opacity-65 blur-xs group-hover/podium1:opacity-85 ${
+                          isCustomActive
+                            ? 'bg-[var(--clr-primary)]'
+                            : 'bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600'
+                        }`} />
+                        <div className={`relative w-20 h-20 rounded-full p-0.5 bg-slate-900 dark:bg-slate-950 overflow-hidden ${
+                          isCustomActive
+                            ? 'border-2 border-[var(--clr-primary)]'
+                            : 'border-2 border-purple-400 dark:border-purple-450'
+                        }`}>
                           <img
                             src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].avatarSeed}`}
                             alt={LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].name}
@@ -4019,10 +4022,18 @@ export default function StudentDashboard() {
                       <span className="text-xs sm:text-base font-black text-slate-900 dark:text-white mt-3 truncate w-full">
                         {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].name}
                       </span>
-                      <span className="text-xs sm:text-sm font-black text-purple-650 dark:text-purple-400 font-mono mt-0.5">
+                      <span className={`text-xs sm:text-sm font-black font-mono mt-0.5 ${
+                        isCustomActive
+                          ? 'text-[var(--clr-primary)]'
+                          : 'text-purple-650 dark:text-purple-400'
+                      }`}>
                         {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].xp} XP
                       </span>
-                      <div className="grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t border-purple-100 dark:border-purple-950/30 text-[10px]">
+                      <div className={`grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t text-[10px] ${
+                        isCustomActive
+                          ? 'border-[var(--clr-primary)]/20'
+                          : 'border-purple-100 dark:border-purple-950/30'
+                      }`}>
                         <div>
                           <div className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[8px]">ACC.</div>
                           <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].accuracy}</div>
@@ -4093,34 +4104,37 @@ export default function StudentDashboard() {
                                 <motion.tr 
                                   key={idx} 
                                   variants={tableRowVariants}
-                                  className="bg-purple-500/5 border border-purple-500/25 dark:bg-purple-950/10 dark:border-purple-900/30 text-purple-900 dark:text-purple-300 font-extrabold relative shadow-inner"
+                                  className={isCustomActive
+                                    ? "bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/25 dark:bg-[var(--clr-primary)]/10 dark:border-[var(--clr-primary)]/30 text-[var(--clr-primary)] font-extrabold relative shadow-inner"
+                                    : "bg-purple-500/5 border border-purple-500/25 dark:bg-purple-950/10 dark:border-purple-900/30 text-purple-900 dark:text-purple-300 font-extrabold relative shadow-inner"
+                                  }
                                 >
-                                  <td className="py-4 px-4 font-mono font-black text-purple-600 dark:text-purple-400">
+                                  <td className={isCustomActive ? "py-4 px-4 font-mono font-black text-[var(--clr-primary)]" : "py-4 px-4 font-mono font-black text-purple-600 dark:text-purple-400"}>
                                     {row.rank}
                                   </td>
                                   <td className="py-4 px-4 flex items-center gap-3">
-                                    <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/45 flex items-center justify-center border border-purple-200 dark:border-purple-800 shrink-0 overflow-hidden relative">
+                                    <div className={isCustomActive ? "w-7 h-7 rounded-full bg-[var(--clr-primary)]/10 flex items-center justify-center border border-[var(--clr-primary)]/20 shrink-0 overflow-hidden relative" : "w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/45 flex items-center justify-center border border-purple-200 dark:border-purple-800 shrink-0 overflow-hidden relative"}>
                                       {profile.avatar && profile.avatar !== 'initial' ? (
                                         <img src={profile.avatar} alt="You" className="w-full h-full object-cover" />
                                       ) : (
-                                        <User className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                        <User className={isCustomActive ? "w-4 h-4 text-[var(--clr-primary)]" : "w-4 h-4 text-purple-600 dark:text-purple-400"} />
                                       )}
                                       <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-slate-950" />
                                     </div>
                                     <span className="font-black text-slate-900 dark:text-white flex items-center gap-2">
                                       {profile.username}
-                                      <span className="text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+                                      <span className={isCustomActive ? "text-[9px] font-black uppercase tracking-wider bg-[var(--clr-primary)] text-white px-2 py-0.5 rounded-full shadow-sm animate-pulse" : "text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full shadow-sm animate-pulse"}>
                                         YOU
                                       </span>
                                     </span>
                                   </td>
-                                  <td className="py-4 px-4 text-center font-mono font-black text-purple-600 dark:text-purple-400">
+                                  <td className={isCustomActive ? "py-4 px-4 text-center font-mono font-black text-[var(--clr-primary)]" : "py-4 px-4 text-center font-mono font-black text-purple-600 dark:text-purple-400"}>
                                     {animatedXp > 0 ? animatedXp.toLocaleString() : row.xp}
                                   </td>
                                   <td className="py-4 px-4 text-center font-mono font-black text-emerald-505">
                                     {row.accuracy}
                                   </td>
-                                  <td className="py-4 px-4 text-center font-mono font-black text-purple-500">
+                                  <td className={isCustomActive ? "py-4 px-4 text-center font-mono font-black text-[var(--clr-primary)]" : "py-4 px-4 text-center font-mono font-black text-purple-500"}>
                                     {streak}d
                                   </td>
                                 </motion.tr>
@@ -4219,7 +4233,7 @@ export default function StudentDashboard() {
                       {/* Metric 1 - Experience */}
                       <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/60 group/metric1">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/20 group-hover/metric1:scale-110 transition-transform">
+                          <div className={isCustomActive ? "w-8 h-8 rounded-xl bg-[var(--clr-primary)]/10 text-[var(--clr-primary)] flex items-center justify-center border border-[var(--clr-primary)]/20 group-hover/metric1:scale-110 transition-transform" : "w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/20 group-hover/metric1:scale-110 transition-transform"}>
                             <Trophy className="w-4 h-4" />
                           </div>
                           <span className="text-xs font-bold text-slate-650 dark:text-slate-300">Experience</span>
@@ -4260,12 +4274,24 @@ export default function StudentDashboard() {
                   {/* Tier promotion Card */}
                   <motion.div 
                     variants={rightCardVariants}
-                    className="bg-gradient-to-br from-indigo-950/70 via-purple-950/50 to-slate-950 border border-indigo-900/50 rounded-3xl p-5 shadow-xs text-left relative overflow-hidden space-y-4 group/promocard"
+                    className={`border rounded-3xl p-5 shadow-xs text-left relative overflow-hidden space-y-4 group/promocard ${
+                      isCustomActive
+                        ? 'bg-gradient-to-br from-[var(--clr-primary)]/20 via-slate-950/90 to-slate-950 border-[var(--clr-primary)]/30'
+                        : 'bg-gradient-to-br from-indigo-950/70 via-purple-950/50 to-slate-950 border border-indigo-900/50'
+                    }`}
                   >
                     {/* Glowing effect behind promotion card */}
-                    <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-purple-500/15 rounded-full blur-xl pointer-events-none group-hover/promocard:scale-110 transition-transform" />
+                    <div className={`absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-xl pointer-events-none group-hover/promocard:scale-110 transition-transform ${
+                      isCustomActive
+                        ? 'bg-[var(--clr-primary)]/20'
+                        : 'bg-purple-500/15'
+                    }`} />
                     
-                    <div className="absolute right-4 top-4 w-7 h-7 rounded-lg bg-indigo-500/15 border border-indigo-500/35 flex items-center justify-center text-xs group-hover/promocard:rotate-12 transition-transform duration-300">
+                    <div className={`absolute right-4 top-4 w-7 h-7 rounded-lg flex items-center justify-center text-xs group-hover/promocard:rotate-12 transition-transform duration-300 ${
+                      isCustomActive
+                        ? 'bg-[var(--clr-primary)]/10 border border-[var(--clr-primary)]/30'
+                        : 'bg-indigo-500/15 border border-indigo-500/35'
+                    }`}>
                       🏆
                     </div>
                     
@@ -4273,14 +4299,22 @@ export default function StudentDashboard() {
                       <h4 className="text-sm font-black text-white uppercase tracking-tight">
                         Keep it up, {profile.username.split(' ')[0]}!
                       </h4>
-                      <p className="text-[10px] text-indigo-200 leading-relaxed font-semibold">
+                      <p className={`text-[10px] leading-relaxed font-semibold ${
+                        isCustomActive
+                          ? 'text-slate-300'
+                          : 'text-indigo-205'
+                      }`}>
                         You're in the <span className="text-white font-black">top 5%</span> this week! 1,200 more XP to reach the next tier.
                       </p>
                     </div>
 
                     <button
                       onClick={() => alert("Keep leveling up to advance tier standing!")}
-                      className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer text-center active:scale-98"
+                      className={`w-full py-2.5 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer text-center active:scale-98 ${
+                        isCustomActive
+                          ? 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)]'
+                          : 'bg-gradient-to-r from-purple-600 to-indigo-600'
+                      }`}
                     >
                       View Progress Detail
                     </button>
@@ -5148,6 +5182,94 @@ export default function StudentDashboard() {
 
         </div>
       </div>
+
+      {/* Floating Time Tracker */}
+      <motion.div
+        drag
+        dragMomentum={false}
+        dragElastic={0}
+        dragConstraints={mainContainerRef}
+        initial={{ opacity: 0, scale: 0.9, y: 50 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="fixed bottom-6 right-6 z-50 flex items-center bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-xl border border-slate-700/40 dark:border-slate-800/40 text-white shadow-2xl select-none"
+        style={{ borderRadius: '9999px' }}
+      >
+        {timerCollapsed ? (
+          // Collapsed state: simple round icon
+          <button
+            onClick={() => setTimerCollapsed(false)}
+            className="w-12 h-12 flex items-center justify-center relative rounded-full hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none"
+            title="Expand Time Tracker"
+            type="button"
+          >
+            <Clock className="w-5 h-5 text-white" />
+            <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full border border-slate-900 dark:border-slate-950 ${
+              timeTrackerIsRunning ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+            }`} />
+          </button>
+        ) : (
+          // Expanded state: pill container
+          <div className="flex items-center gap-2.5 px-3.5 py-2.5">
+            {/* Drag Handle */}
+            <div className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-350 p-0.5 transition-colors">
+              <GripVertical className="w-3.5 h-3.5" />
+            </div>
+
+            {/* Status Dot */}
+            <span className={`w-2 h-2 rounded-full ${
+              timeTrackerIsRunning ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+            }`} />
+
+            {/* Time Readout */}
+            <div className="flex flex-col text-left">
+              <span className="font-mono text-xs font-black tracking-tight leading-none text-white">
+                {formatTimeTracker(timeTrackerSeconds)}
+              </span>
+              <span className="text-[7.5px] text-slate-400 uppercase font-black tracking-wider mt-0.5 leading-none">
+                {timeTrackerIsRunning ? "Studying" : "Paused"}
+              </span>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center gap-1.5 ml-1 border-l border-slate-700/50 pl-2">
+              <button
+                onClick={() => setTimeTrackerIsRunning(!timeTrackerIsRunning)}
+                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+                  timeTrackerIsRunning
+                    ? "bg-rose-600 hover:bg-rose-500 text-white"
+                    : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                }`}
+                title={timeTrackerIsRunning ? "Pause Session" : "Start Study"}
+                type="button"
+              >
+                {timeTrackerIsRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+              </button>
+
+              <button
+                onClick={() => {
+                  setTimeTrackerIsRunning(false);
+                  setTimeTrackerSeconds(0);
+                }}
+                className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer text-slate-300 hover:text-white"
+                title="Reset Session"
+                type="button"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </button>
+
+              {/* Collapse Button */}
+              <button
+                onClick={() => setTimerCollapsed(true)}
+                className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer text-slate-400 hover:text-white"
+                title="Minimize"
+                type="button"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </motion.div>
 
     </div>
   );
