@@ -231,6 +231,11 @@ export default function PlacementProfile({
     return data;
   }, []);
 
+  const [selectedHeatmapCell, setSelectedHeatmapCell] = useState<any>(() => {
+    const latestActive = [...heatmapSolves].reverse().find(c => c.solves > 0);
+    return latestActive || heatmapSolves[heatmapSolves.length - 1];
+  });
+
   const handleVisibilityChange = (mode: 'public' | 'private' | 'recruiter' | 'friends') => {
     setVisibility(mode);
     setCustomToast(`Visibility updated to ${mode.toUpperCase()}! 🛡️`);
@@ -253,10 +258,6 @@ export default function PlacementProfile({
     { id: 'p2', title: 'Infosys Champion', req: 'Unlock 8 Infosys test sets', category: 'placement', icon: '🛡️', unlocked: true, rarity: 'Rare', currentProgress: 8, targetProgress: 8 },
     { id: 'p3', title: 'Amazon Tag Master', req: 'Solve 15 Amazon tagged hard items', category: 'placement', icon: '📦', unlocked: false, rarity: 'Epic', currentProgress: 11, targetProgress: 15 },
     { id: 'p4', title: 'Accenture Expert', req: 'Attain 90% accuracy in Accenture mocks', category: 'placement', icon: '💎', unlocked: false, rarity: 'Legendary', currentProgress: 86, targetProgress: 90 },
-    { id: 'c1', title: '7 Day Streak', req: 'Practice 7 days consecutively', category: 'consistency', icon: '🔥', unlocked: true, rarity: 'Common', currentProgress: 7, targetProgress: 7 },
-    { id: 'c2', title: '30 Day Streak', req: 'Practice 30 days consecutively', category: 'consistency', icon: '⚡', unlocked: true, rarity: 'Rare', currentProgress: 30, targetProgress: 30 },
-    { id: 'c3', title: '100 Day Streak', req: 'Practice 100 days consecutively', category: 'consistency', icon: '🌟', unlocked: false, rarity: 'Epic', currentProgress: 42, targetProgress: 100 },
-    { id: 'c4', title: '365 Day Warrior', req: 'Maintain consistent learning for 365 days', category: 'consistency', icon: '🎖️', unlocked: false, rarity: 'Mythic', currentProgress: 42, targetProgress: 365 },
     { id: 'l1', title: 'Arithmetic Apprentice', req: 'Solve 20 Arithmetic questions', category: 'learning', icon: '📐', unlocked: true, rarity: 'Common', currentProgress: 20, targetProgress: 20 },
     { id: 'l2', title: 'Ratio Master', req: 'Attain 100% ratios solving speed', category: 'learning', icon: '🧩', unlocked: true, rarity: 'Rare', currentProgress: 100, targetProgress: 100 },
     { id: 'l3', title: 'Geometry Ninja', req: 'Complete 30 geometry sets', category: 'learning', icon: '🎯', unlocked: false, rarity: 'Epic', currentProgress: 12, targetProgress: 30 },
@@ -302,6 +303,8 @@ export default function PlacementProfile({
   };
 
   const { frameClass, rankBorderClass, effectGlow } = getAvatarStyles();
+
+  const activeBaseColor = customColor === 'default' ? '#3B82F6' : customColor;
 
   // Save actions mapping
   const onSaveProfile = (e: React.FormEvent) => {
@@ -442,12 +445,7 @@ export default function PlacementProfile({
             >
               📝 Edit Profile
             </button>
-            <button
-              onClick={() => setShowPrivacyModal(true)}
-              className="py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-[10.5px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-350 cursor-pointer transition-colors"
-            >
-              🛡️ Visibility Settings
-            </button>
+
             <button
               onClick={() => setShowRankCardModal(true)}
               className={`py-1.5 px-3 rounded-xl text-[10.5px] font-black uppercase tracking-wider cursor-pointer transition-all ${stylePreset.accentBtn}`}
@@ -548,10 +546,9 @@ export default function PlacementProfile({
       {/* NEW SECTION: Company Matches & Weekly Performance Widget */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 select-none">
         {/* Left Card: Company Matches (7 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-6`}>
+        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-start space-y-6`}>
           <div>
             <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Best Company Matches</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Estimated placement readiness based on curriculum domains scores.</p>
           </div>
 
           <div className="space-y-3.5">
@@ -579,7 +576,6 @@ export default function PlacementProfile({
         <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-6`}>
           <div>
             <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">This Week</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Short-term prep activity and motivation landmarks.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -608,10 +604,7 @@ export default function PlacementProfile({
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-900 flex justify-between text-[8px] font-bold text-slate-500 font-mono uppercase">
-            <span>2 Mocks Completed</span>
-            <span>Streak Maintained</span>
-          </div>
+
         </div>
       </section>
 
@@ -619,7 +612,7 @@ export default function PlacementProfile({
       <section className="grid grid-cols-1 md:grid-cols-12 gap-6 select-none">
         
         {/* PRIMARY CARD 1: Placement Readiness Index */}
-        <div className={`${stylePreset.cardBg} md:col-span-4 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
+        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
           <div className="absolute top-0 right-0 w-2 h-full bg-[#10B981]" />
           <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Overall Readiness</span>
           
@@ -632,15 +625,11 @@ export default function PlacementProfile({
             <div className="w-full bg-slate-100 dark:bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-900">
               <div className="bg-[#10B981] h-full rounded-full" style={{ width: '79.6%' }} />
             </div>
-            <div className="flex justify-between text-[8px] font-bold text-slate-400 font-mono uppercase">
-              <span>Verified Index</span>
-              <span>Top Academic Match</span>
-            </div>
           </div>
         </div>
 
         {/* PRIMARY CARD 2: Global Rank */}
-        <div className={`${stylePreset.cardBg} md:col-span-4 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
+        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
           <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-purple-500 to-pink-500" />
           <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Global Ranking</span>
           
@@ -652,21 +641,6 @@ export default function PlacementProfile({
           <p className="text-[9.5px] font-semibold text-slate-400 mt-5 leading-normal block">
             Ranked out of 11,540 active students inside the placement dashboard.
           </p>
-        </div>
-
-        {/* PRIMARY CARD 3: Daily Streak */}
-        <div className={`${stylePreset.cardBg} md:col-span-4 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200 flex flex-col justify-between`}>
-          <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-amber-500 to-orange-500" />
-          
-          <div>
-            <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Daily Streak</span>
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">42 Days</span>
-              <Flame className="w-6.5 h-6.5 text-amber-500 fill-current animate-pulse" />
-            </div>
-          </div>
-          
-          <span className="text-[9.5px] font-bold text-slate-400 font-mono block mt-4">Personal Best Record: 75 Days</span>
         </div>
 
         {/* SECONDARY CARD 1: Accuracy (Smaller visual weight) */}
@@ -697,183 +671,28 @@ export default function PlacementProfile({
       {/* Main Charts & Consistency layout section */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Column: Placement Radar chart + Skill progress bars (5 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md relative overflow-hidden min-h-[360px] flex flex-col justify-between select-none`}>
-          
-          <div className="text-left space-y-0.5">
-            <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest">Placement Readiness Radar</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500">Your strengths across aptitude domains</p>
-          </div>
-
-          {/* SVG Radar Chart */}
-          <div className="relative w-full flex items-center justify-center py-4">
-            <svg width="260" height="260" className="overflow-visible">
-              {pentagons.map((pent, pIdx) => {
-                const pointsStr = pent.map(pt => `${pt.x},${pt.y}`).join(' ');
-                return (
-                  <polygon
-                    key={pIdx}
-                    points={pointsStr}
-                    fill="none"
-                    stroke="rgba(226,232,240,0.06)"
-                    strokeWidth="1"
-                  />
-                );
-              })}
-
-              {radarPoints.map((pt, idx) => {
-                const angle = (idx * 2 * Math.PI) / 5 - Math.PI / 2;
-                const endX = radarCenter + radarRadius * Math.cos(angle);
-                const endY = radarCenter + radarRadius * Math.sin(angle);
-                return (
-                  <line
-                    key={idx}
-                    x1={radarCenter}
-                    y1={radarCenter}
-                    x2={endX}
-                    y2={endY}
-                    stroke="rgba(226,232,240,0.06)"
-                    strokeWidth="1.5"
-                  />
-                );
-              })}
-
-              {(() => {
-                const pointsStr = radarPoints.map(pt => `${pt.x},${pt.y}`).join(' ');
-                const radarColor = customColor === 'default' ? '#7075F4' : customColor;
-                return (
-                  <polygon
-                    points={pointsStr}
-                    fill={customColor === 'default' ? 'rgba(112, 117, 244, 0.18)' : `${customColor}2e`}
-                    stroke={radarColor}
-                    strokeWidth="2.5"
-                    className="transition-all duration-300"
-                  />
-                );
-              })()}
-
-              {radarPoints.map((pt, idx) => (
-                <g key={idx}>
-                  <circle
-                    cx={pt.x}
-                    cy={pt.y}
-                    r="4.5"
-                    fill={customColor === 'default' ? '#7075F4' : customColor}
-                    stroke="#030712"
-                    strokeWidth="2"
-                    className="cursor-pointer hover:r-6 transition-all"
-                    onMouseEnter={(e) => {
-                      setActiveRadarTooltip({
-                        x: pt.x,
-                        y: pt.y - 12,
-                        label: pt.fullName,
-                        val: pt.val
-                      });
-                    }}
-                    onMouseLeave={() => setActiveRadarTooltip(null)}
-                  />
-                </g>
-              ))}
-
-              {radarPoints.map((pt, idx) => {
-                const angle = (idx * 2 * Math.PI) / 5 - Math.PI / 2;
-                const labelR = radarRadius + 18;
-                const labelX = radarCenter + labelR * Math.cos(angle);
-                const labelY = radarCenter + labelR * Math.sin(angle);
-
-                let textAnchor: 'start' | 'end' | 'middle' = 'middle';
-                if (Math.cos(angle) > 0.1) textAnchor = 'start';
-                if (Math.cos(angle) < -0.1) textAnchor = 'end';
-
-                return (
-                  <text
-                    key={idx}
-                    x={labelX}
-                    y={labelY + 4}
-                    fill="#94A3B8"
-                    fontSize="9.5"
-                    fontWeight="black"
-                    textAnchor={textAnchor}
-                    className="font-mono uppercase select-none"
-                  >
-                    {pt.subject} ({pt.val})
-                  </text>
-                );
-              })}
-            </svg>
-
-            {activeRadarTooltip && (
-              <div 
-                className="absolute z-20 px-2.5 py-1.5 bg-slate-900 border border-slate-800 text-white rounded-xl text-[9px] font-bold flex flex-col pointer-events-none shadow-md"
-                style={{ left: `${activeRadarTooltip.x - 40}px`, top: `${activeRadarTooltip.y - 30}px` }}
-              >
-                <span className="text-slate-400 font-semibold">{activeRadarTooltip.label}</span>
-                <span className="font-mono text-blue-400 mt-0.5 font-bold">Strength: {activeRadarTooltip.val}%</span>
-              </div>
-            )}
-          </div>
-
-          {/* Supporting Skill Bars underneath Radar */}
-          <div className="space-y-2.5 pt-4 border-t border-slate-100 dark:border-slate-900">
-            {[
-              { label: 'Quantitative Aptitude', percent: 82, color: 'bg-blue-500' },
-              { label: 'Logical Reasoning', percent: 91, color: 'bg-purple-500' },
-              { label: 'Verbal Ability', percent: 63, color: 'bg-rose-500' },
-              { label: 'Solving Speed', percent: 74, color: 'bg-amber-500' },
-              { label: 'Accuracy Rating', percent: 88, color: 'bg-emerald-500' }
-            ].map((bar) => (
-              <div key={bar.label} className="space-y-1 text-left">
-                <div className="flex justify-between items-center text-[9.5px] font-extrabold uppercase font-mono tracking-wide text-slate-500 dark:text-slate-400">
-                  <span>{bar.label}</span>
-                  <span className="text-slate-800 dark:text-white font-black">{bar.percent}%</span>
-                </div>
-                <div className="w-full bg-slate-100 dark:bg-slate-950 h-1 rounded-full overflow-hidden border border-slate-200/10 dark:border-slate-900">
-                  <div className={`h-full rounded-full ${bar.color}`} style={{ width: `${bar.percent}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-        {/* Right Column: Consistency Heatmap Grid (7 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md relative overflow-hidden select-none space-y-5`}>
+        {/* Consistency Heatmap Grid (Full width) */}
+        <div className={`${stylePreset.cardBg} lg:col-span-12 rounded-3xl p-6 backdrop-blur-md relative overflow-hidden select-none space-y-5`}>
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
             <div>
               <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest">Consistency Tracker</h4>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">365-day commitment to learning & problem solving</p>
             </div>
             
             <div className="flex items-center gap-1.5 text-[8.5px] font-bold text-slate-400 font-mono uppercase">
               <span>Less</span>
               <div className="w-2.5 h-2.5 bg-slate-100 dark:bg-slate-950 rounded-xs border border-slate-250 dark:border-slate-800" />
-              <div className="w-2.5 h-2.5 bg-blue-900/20 rounded-xs border border-blue-900/10" />
-              <div className="w-2.5 h-2.5 bg-blue-500/30 rounded-xs border border-blue-500/20" />
-              <div className="w-2.5 h-2.5 bg-blue-600 rounded-xs border border-blue-500" />
+              <div className="w-2.5 h-2.5 rounded-xs border" style={{ backgroundColor: `${activeBaseColor}20`, borderColor: `${activeBaseColor}40` }} />
+              <div className="w-2.5 h-2.5 rounded-xs border" style={{ backgroundColor: `${activeBaseColor}80`, borderColor: `${activeBaseColor}50` }} />
+              <div className="w-2.5 h-2.5 rounded-xs border" style={{ backgroundColor: activeBaseColor, borderColor: activeBaseColor }} />
               <span>More</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 text-left bg-slate-50 dark:bg-slate-950/20 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-900">
-            <div>
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Streak</span>
-              <span className="text-sm font-mono font-black text-slate-900 dark:text-white mt-1 block">42 Days 🔥</span>
-            </div>
-            <div>
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Longest Streak</span>
-              <span className="text-sm font-mono font-black text-slate-900 dark:text-white mt-1 block">75 Days</span>
-            </div>
-            <div>
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Solved Monthly</span>
-              <span className="text-sm font-mono font-black text-slate-900 dark:text-white mt-1 block">184 Sets</span>
-            </div>
-          </div>
-
           {/* Heatmap Grid */}
-          <div className="relative w-full overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent">
-            <div className="relative" style={{ width: '660px', height: '110px' }}>
-              <svg width="660" height="98" className="overflow-visible">
+          <div className="relative w-full pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent">
+            <div className="relative w-full">
+              <svg viewBox="-20 0 680 98" width="100%" className="overflow-visible">
                 {Array.from({ length: 53 }).map((_, colIdx) => {
                   return Array.from({ length: 7 }).map((_, rowIdx) => {
                     const blockIdx = colIdx * 7 + rowIdx;
@@ -897,8 +716,8 @@ export default function PlacementProfile({
 
                     // Dynamic custom color theme mapping for heatmap colors
                     if (cell.solves > 0) {
-                      color = cell.solves >= 6 ? customColor : cell.solves >= 3 ? `${customColor}80` : `${customColor}20`;
-                      border = cell.solves >= 6 ? customColor : `${customColor}40`;
+                      color = cell.solves >= 6 ? activeBaseColor : cell.solves >= 3 ? `${activeBaseColor}80` : `${activeBaseColor}20`;
+                      border = cell.solves >= 6 ? activeBaseColor : `${activeBaseColor}40`;
                     }
 
                     if (document.documentElement.classList.contains('dark') === false && cell.solves === 0) {
@@ -921,16 +740,35 @@ export default function PlacementProfile({
                         stroke={border}
                         strokeWidth="0.8"
                         className="cursor-pointer transition-all hover:stroke-blue-500/80"
+                        onClick={() => setSelectedHeatmapCell(cell)}
                         onMouseEnter={(e) => {
-                          setActiveHeatmapTooltip({
-                            x: x,
-                            y: y - 10,
-                            date: cell.dateStr,
-                            solves: cell.solves,
-                            acc: cell.accuracy,
-                            topics: cell.topics,
-                            timeSpent: cell.timeSpent
-                          });
+                          const rectEl = e.currentTarget;
+                          const rectBounds = rectEl.getBoundingClientRect();
+                          const svg = rectEl.ownerSVGElement;
+                          const container = svg?.parentElement;
+                          if (container) {
+                            const containerRect = container.getBoundingClientRect();
+                            let tooltipX = rectBounds.left - containerRect.left + (rectBounds.width / 2);
+                            
+                            // Prevent tooltip from overflowing the left or right container boundaries
+                            const halfWidth = 88; // half of min-w-44 (176px)
+                            const padding = 12;
+                            if (tooltipX < halfWidth + padding) {
+                              tooltipX = halfWidth + padding;
+                            } else if (tooltipX > containerRect.width - halfWidth - padding) {
+                              tooltipX = containerRect.width - halfWidth - padding;
+                            }
+
+                            setActiveHeatmapTooltip({
+                              x: tooltipX,
+                              y: rectBounds.top - containerRect.top,
+                              date: cell.dateStr,
+                              solves: cell.solves,
+                              acc: cell.accuracy,
+                              topics: cell.topics,
+                              timeSpent: cell.timeSpent
+                            });
+                          }
                         }}
                         onMouseLeave={() => setActiveHeatmapTooltip(null)}
                       />
@@ -957,7 +795,11 @@ export default function PlacementProfile({
               {activeHeatmapTooltip && (
                 <div 
                   className="absolute z-20 px-3 py-2 bg-slate-950/95 dark:bg-slate-900/95 border border-slate-800 text-white rounded-xl text-[10.5px] font-bold flex flex-col pointer-events-none shadow-xl min-w-44 text-left"
-                  style={{ left: `${activeHeatmapTooltip.x - 70}px`, top: `${activeHeatmapTooltip.y - 74}px` }}
+                  style={{ 
+                    left: `${activeHeatmapTooltip.x}px`, 
+                    top: `${activeHeatmapTooltip.y + 20}px`, 
+                    transform: 'translate(-50%, 0)' 
+                  }}
                 >
                   <span className="text-slate-400 font-extrabold text-[9.5px] tracking-wide block border-b border-slate-800 pb-1">{activeHeatmapTooltip.date}</span>
                   {activeHeatmapTooltip.solves > 0 ? (
@@ -986,20 +828,51 @@ export default function PlacementProfile({
             </div>
           </div>
 
+          {/* Activity Detail Info Box (below heatmap) */}
+          <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-900 rounded-2xl min-h-[85px] flex items-center justify-between text-left transition-all">
+            {selectedHeatmapCell ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4">
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono">{selectedHeatmapCell.dateStr}</span>
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-black">
+                    <span className="text-slate-900 dark:text-white uppercase">Solves: <span className="text-blue-500 font-mono">{selectedHeatmapCell.solves} Sets</span></span>
+                    <span className="text-slate-400 dark:text-slate-600">•</span>
+                    <span className="text-slate-900 dark:text-white uppercase">Accuracy: <span className="text-emerald-500 font-mono">{selectedHeatmapCell.accuracy}%</span></span>
+                    <span className="text-slate-400 dark:text-slate-600">•</span>
+                    <span className="text-slate-900 dark:text-white uppercase">Duration: <span className="text-amber-500 font-mono">{selectedHeatmapCell.timeSpent}</span></span>
+                  </div>
+                </div>
+
+                {selectedHeatmapCell.topics.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end max-w-md">
+                    {selectedHeatmapCell.topics.map((topic: string, i: number) => (
+                      <span key={i} className="text-[8.5px] font-black uppercase font-mono bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg tracking-wider">
+                        {topic}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2.5 text-slate-450 dark:text-slate-550">
+                <span className="text-xs font-semibold">Click on any grid block to view learning activity details for that day.</span>
+              </div>
+            )}
+          </div>
+
         </div>
 
       </section>
 
-      {/* LOWER SECTION: Achievements & Recent Activity */}
+      {/* LOWER SECTION: Achievements */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 select-none">
         
-        {/* Left Column: Trophy Case (7 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-5`}>
+        {/* Trophy Case (Full width) */}
+        <div className={`${stylePreset.cardBg} lg:col-span-12 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-5`}>
           
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
             <div>
               <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Placement Achievements</h4>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Top unlocked badges and locked milestones progress.</p>
             </div>
             
             <button 
@@ -1010,7 +883,7 @@ export default function PlacementProfile({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {achievements.filter((_, idx) => idx < 6).map((item) => (
               <div
                 key={item.id}
@@ -1055,96 +928,23 @@ export default function PlacementProfile({
 
         </div>
 
-        {/* Right Column: Recent Activity Feed (5 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-5`}>
-          <div>
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Recent Activity</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Real-time log of solved commits and dashboard triggers.</p>
-          </div>
-
-          <div className="space-y-3.5 pl-1.5 relative border-l border-slate-100 dark:border-slate-900 py-1">
-            {[
-              { text: "Solved Percentages #842", time: "2 hours ago", icon: "✓" },
-              { text: "Earned 30 Day Streak Achievement", time: "1 day ago", icon: "✓" },
-              { text: "Added Revision Note on Time & Work", time: "2 days ago", icon: "✓" },
-              { text: "Completed TCS Placement Mock #12", time: "3 days ago", icon: "✓" },
-              { text: "Reached Top 15% Global Ranking", time: "4 days ago", icon: "✓" },
-              { text: "Prestige Title Logic Legend unlocked", time: "5 days ago", icon: "✓" }
-            ].map((act, index) => (
-              <div key={index} className="relative pl-4 text-left leading-none">
-                {/* Check dot */}
-                <div className={`absolute -left-[10px] top-0 w-4 h-4 rounded-full border flex items-center justify-center text-[7.5px] font-black text-white ${
-                  index === 0 ? 'bg-emerald-500 border-emerald-400' : 'bg-slate-200 dark:bg-slate-800 border-slate-350 dark:border-slate-700 text-slate-400 dark:text-slate-500'
-                }`}>
-                  {act.icon}
-                </div>
-                
-                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block leading-tight">{act.text}</span>
-                <span className="text-[8.5px] text-slate-400 dark:text-slate-500 font-semibold block mt-0.5">{act.time}</span>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
       </section>
 
-      {/* PROGRESS TIMELINE & SMART INSIGHTS */}
+      {/* SMART INSIGHTS */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Column: Progress Timeline (6 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-6 rounded-3xl p-6 backdrop-blur-md text-left space-y-5 select-none`}>
-          <div>
-            <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest">Aptitude Progress Timeline</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Chronological record of prep achievements and solved landmarks.</p>
-          </div>
-
-          <div className="relative pl-6 border-l border-slate-200 dark:border-slate-800 space-y-5 py-2">
-            {[
-              { milestone: 'First Aptitude Question Solved', date: 'Oct 02, 2023', achieved: true, tag: 'START' },
-              { milestone: 'Reached Level 10 prep stage', date: 'Dec 12, 2023', achieved: true, tag: 'LEVEL' },
-              { milestone: '7-Day Streak challenge unlocked', date: 'Feb 15, 2024', achieved: true, tag: 'STREAK' },
-              { milestone: 'Entered Top 10,000 global ranking', date: 'Jun 20, 2024', achieved: true, tag: 'RANK' },
-              { milestone: 'Solved 500 total questions milestone', date: 'Nov 04, 2025', achieved: true, tag: 'SOLVE' },
-              { milestone: 'Earned Logic Legend prestige title', date: 'Jun 18, 2026', achieved: true, tag: 'PRESTIGE' }
-            ].map((step, idx) => (
-              <div key={idx} className="relative">
-                <div className="absolute -left-9 top-0.5 w-6 h-6 rounded-full flex items-center justify-center border-2 border-blue-600 bg-blue-500 text-white shadow-xs">
-                  <CheckCircle className="w-3.5 h-3.5 stroke-[3.5]" />
-                </div>
-                
-                <div className="leading-tight text-left pl-1">
-                  <div className="flex items-center gap-2">
-                    <h5 className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white">
-                      {step.milestone}
-                    </h5>
-                    <span className="text-[8px] font-black font-mono bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 px-1.5 py-0.2 rounded uppercase tracking-wider">
-                      {step.tag}
-                    </span>
-                  </div>
-                  <span className="text-[9.5px] text-slate-450 dark:text-slate-550 font-semibold block mt-0.5">
-                    Completed • {step.date}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-        {/* Right Column: AI Smart Insights (6 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-6 rounded-3xl p-6 backdrop-blur-md text-left space-y-4 select-none`}>
+        {/* AI Smart Insights (Full width) */}
+        <div className={`${stylePreset.cardBg} lg:col-span-12 rounded-3xl p-6 backdrop-blur-md text-left space-y-4 select-none`}>
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
             <div>
               <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest flex items-center gap-1.5">
                 <Cpu className={`w-4 h-4 ${stylePreset.iconColor}`} /> Smart Prep Insights
               </h4>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">AI-powered suggestions based on solves profile.</p>
             </div>
             <span className="text-[8px] font-mono font-bold text-slate-400">Agent: Antigravity</span>
           </div>
 
-          <div className="space-y-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { text: "Your Logical reasoning index is stronger than 87% of active placement students.", badge: "STRENGTH", color: "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" },
               { text: "Optimal Activity Peak: You consistently perform best with 94% accuracy between 7 PM and 10 PM.", badge: "PEAK TIME", color: "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400" },

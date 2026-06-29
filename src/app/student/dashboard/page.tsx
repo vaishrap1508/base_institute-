@@ -2691,12 +2691,7 @@ export default function StudentDashboard() {
 
             {/* Dynamic User Profile info and Avatar */}
             <div className="flex items-center gap-3 shrink-0">
-              <div className="hidden sm:flex flex-col items-end text-right select-none">
-                <span className="text-xs font-black text-slate-800 dark:text-white leading-none">{profile.username}</span>
-                <span className="text-[9px] font-black text-amber-500 dark:text-amber-400 mt-1 uppercase font-mono tracking-wider">
-                  {animatedXp >= 8000 ? 'GOLD TIER' : animatedXp >= 2000 ? 'SILVER TIER' : 'BRONZE TIER'}
-                </span>
-              </div>
+
               <button
                 onClick={() => setActiveSidebarTab('profile')}
                 title="User Profile"
@@ -2861,56 +2856,56 @@ export default function StudentDashboard() {
                   <div className="space-y-4 pt-2">
                     <h2 className="text-lg font-bold text-slate-800 dark:text-white font-heading">Learning progress</h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                       {/* Completed Stat */}
                       <div className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
-                        : "bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
                       }>
-                        <div className="space-y-1 text-left">
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Completed</span>
-                          <span className={isCustomActive ? "text-xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-xl font-black text-[#065F46] dark:text-[#34D399] font-mono leading-none"}>{solvedCount} Modules</span>
+                        <div className="space-y-1.5 text-left">
+                          <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Completed</span>
+                          <span className={isCustomActive ? "text-2xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-2xl font-black text-[#065F46] dark:text-[#34D399] font-mono leading-none"}>{solvedCount} Modules</span>
                         </div>
                         <div className={isCustomActive
-                          ? "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/20 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
-                          : "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#C7E9E1] dark:border-[#205D4F]/30 flex items-center justify-center text-[#065F46] dark:text-[#34D399] -rotate-45 group-hover:scale-105 transition-transform"
+                          ? "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/20 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[#C7E9E1] dark:border-[#205D4F]/30 flex items-center justify-center text-[#065F46] dark:text-[#34D399] -rotate-45 group-hover:scale-105 transition-transform"
                         }>
-                          <ChevronRight className="w-4 h-4" />
+                          <ChevronRight className="w-5 h-5" />
                         </div>
                       </div>
 
                       {/* Your Streak Stat */}
                       <div className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
-                        : "bg-[#FEF3C7] dark:bg-[#3D2C08]/20 border border-[#FDE68A] dark:border-[#6B4E0E]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#FEF3C7] dark:bg-[#3D2C08]/20 border border-[#FDE68A] dark:border-[#6B4E0E]/20 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
                       }>
-                        <div className="space-y-1 text-left">
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Your Streak</span>
-                          <span className={isCustomActive ? "text-xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-xl font-black text-[#92400E] dark:text-[#FBBF24] font-mono leading-none"}>{streak} Days</span>
+                        <div className="space-y-1.5 text-left">
+                          <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Your Streak</span>
+                          <span className={isCustomActive ? "text-2xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-2xl font-black text-[#92400E] dark:text-[#FBBF24] font-mono leading-none"}>{streak} Days</span>
                         </div>
                         <div className={isCustomActive
-                          ? "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/15 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
-                          : "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#FDE68A] dark:border-[#6B4E0E]/20 flex items-center justify-center text-[#92400E] dark:text-[#FBBF24] -rotate-45 group-hover:scale-105 transition-transform"
+                          ? "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/15 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[#FDE68A] dark:border-[#6B4E0E]/20 flex items-center justify-center text-[#92400E] dark:text-[#FBBF24] -rotate-45 group-hover:scale-105 transition-transform"
                         }>
-                          <ChevronRight className="w-4 h-4" />
+                          <ChevronRight className="w-5 h-5" />
                         </div>
                       </div>
 
                       {/* Active Stat */}
                       <div className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
-                        : "bg-[#F3E8FF] dark:bg-[#2A154D]/20 border border-[#E9D5FF] dark:border-[#53289E]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#F3E8FF] dark:bg-[#2A154D]/20 border border-[#E9D5FF] dark:border-[#53289E]/20 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
                       }>
-                        <div className="space-y-1 text-left">
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Level</span>
-                          <span className={isCustomActive ? "text-xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-xl font-black text-[#6B21A8] dark:text-[#C084FC] font-mono leading-none"}>Lvl 12 (#14)</span>
+                        <div className="space-y-1.5 text-left">
+                          <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Level</span>
+                          <span className={isCustomActive ? "text-2xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-2xl font-black text-[#6B21A8] dark:text-[#C084FC] font-mono leading-none"}>Lvl 12 (#14)</span>
                         </div>
                         <div className={isCustomActive
-                          ? "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/10 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
-                          : "w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[#E9D5FF] dark:border-[#53289E]/20 flex items-center justify-center text-[#6B21A8] dark:text-[#C084FC] -rotate-45 group-hover:scale-105 transition-transform"
+                          ? "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/10 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[#E9D5FF] dark:border-[#53289E]/20 flex items-center justify-center text-[#6B21A8] dark:text-[#C084FC] -rotate-45 group-hover:scale-105 transition-transform"
                         }>
-                          <ChevronRight className="w-4 h-4" />
+                          <ChevronRight className="w-5 h-5" />
                         </div>
                       </div>
 
@@ -2972,13 +2967,13 @@ export default function StudentDashboard() {
 
                 </div>
 
-                {/* Right Column (4 cols): Lesson Schedule Calendar, Opportunities & Time Tracker */}
+                {/* Right Column (4 cols): Activity Calendar, Opportunities & Time Tracker */}
                 <div className="lg:col-span-4 space-y-8">
 
-                  {/* 1. Lesson Schedule Calendar Card */}
+                  {/* 1. Activity Calendar Card */}
                   <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
                     <div className="flex items-center justify-between mb-4 pb-1 border-b border-slate-100 dark:border-slate-900/60">
-                      <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Lesson schedule</h3>
+                      <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Activity Calendar</h3>
                       <span className="text-xs font-bold text-slate-500">{monthYearName}</span>
                     </div>
 
@@ -3039,59 +3034,7 @@ export default function StudentDashboard() {
                         })}
                       </div>
 
-                      {/* Badges Earned Section */}
-                      <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-900/60">
-                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
-                          <span>Badges Earned • {selectedMonthName} {selectedCalendarDay}</span>
-                          <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-black uppercase">
-                            {badgesEarnedOnSelectedDay.reduce((acc: number, item: any) => acc + item.count, 0)} Badges
-                          </span>
-                        </div>
 
-                        {badgesEarnedOnSelectedDay.length > 0 ? (
-                          <div className="grid grid-cols-1 gap-2">
-                            {badgesEarnedOnSelectedDay.map(({ badge, count }: { badge: any; count: number }) => (
-                              <button
-                                key={badge.id}
-                                onClick={() => setSelectedBadge(badge)}
-                                className="w-full text-left bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/40 dark:hover:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between transition-all group cursor-pointer focus:outline-none"
-                                type="button"
-                              >
-                                <div className="flex items-center gap-2.5">
-                                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
-                                    {badge.image_url ? (
-                                      <img src={badge.image_url} alt={badge.name} className="w-6 h-6 object-contain" />
-                                    ) : (
-                                      <span className="text-base">{getCategoryEmoji(badge.category)}</span>
-                                    )}
-                                  </div>
-                                  <div className="leading-tight">
-                                    <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                      {badge.name}
-                                    </h4>
-                                    <p className="text-[9.5px] text-slate-400 mt-0.5 line-clamp-1">{badge.description}</p>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  {count > 1 && (
-                                    <span className="bg-blue-600 text-white dark:bg-blue-500 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                                      x{count}
-                                    </span>
-                                  )}
-                                  <span className="text-[10px] text-blue-500 dark:text-blue-400 font-extrabold group-hover:translate-x-0.5 transition-transform">
-                                    →
-                                  </span>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-5 text-center flex items-center justify-center">
-                            <span className="text-xs text-slate-400 dark:text-slate-500 italic font-medium">No badges earned on this day</span>
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
 
