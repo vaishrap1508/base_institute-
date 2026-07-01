@@ -2807,6 +2807,7 @@ export default function LandingPage() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input 
                     type="text" 
+                    suppressHydrationWarning
                     placeholder="Search questions across all categories..."
                     value={faqSearch}
                     onChange={(e) => setFaqSearch(e.target.value)}
