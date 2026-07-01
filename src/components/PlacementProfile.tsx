@@ -23,7 +23,6 @@ import {
   Activity, 
   CheckCircle,
   HelpCircle,
-  Cpu,
   Lock,
   Edit3,
   X,
@@ -1003,41 +1002,6 @@ export default function PlacementProfile({
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* SMART INSIGHTS */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* AI Smart Insights (Full width) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-12 rounded-3xl p-6 backdrop-blur-md text-left space-y-4 select-none`}>
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
-            <div>
-              <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest flex items-center gap-1.5">
-                <Cpu className={`w-4 h-4 ${stylePreset.iconColor}`} /> Smart Prep Insights
-              </h4>
-            </div>
-            <span className="text-[8px] font-mono font-bold text-slate-400">Agent: Antigravity</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { text: "Your Logical reasoning index is stronger than 87% of active placement students.", badge: "STRENGTH", color: "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" },
-              { text: "Optimal Activity Peak: You consistently perform best with 94% accuracy between 7 PM and 10 PM.", badge: "PEAK TIME", color: "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400" },
-              { text: "Improvement Target: Elevating Verbal Ability Accuracy by 8% would increase your global rank by 500+ positions.", badge: "RANK BOOSTER", color: "bg-purple-500/10 border-purple-500/20 text-purple-600 dark:text-purple-400" }
-            ].map((insight, idx) => (
-              <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/50 dark:border-slate-900 rounded-2xl flex flex-col gap-2">
-                <span className={`text-[8.5px] font-black font-mono border px-2 py-0.5 rounded-md w-max uppercase tracking-wider ${insight.color}`}>
-                  {insight.badge}
-                </span>
-                <p className="text-xs font-semibold text-slate-600 dark:text-slate-350 leading-relaxed">
-                  "{insight.text}"
-                </p>
               </div>
             ))}
           </div>
