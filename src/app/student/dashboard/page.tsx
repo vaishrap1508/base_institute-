@@ -61,10 +61,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
-import PracticeArena from '@/components/PracticeArena';
 import PlacementProfile from '@/components/PlacementProfile';
 import DomainsTab from '@/components/DomainsTab';
-import ConceptHubTab from '@/components/ConceptHubTab';
 
 const getYouTubeId = (url: string): string | null => {
   if (!url) return null;
@@ -1130,8 +1128,12 @@ export default function StudentDashboard() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
-      if (tabParam && ['dashboard', 'domains', 'conceptHub', 'learning', 'practice', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges'].includes(tabParam)) {
-        setActiveSidebarTab(tabParam as any);
+      if (tabParam) {
+        if (tabParam === 'conceptHub' || tabParam === 'practice') {
+          setActiveSidebarTab('domains');
+        } else if (['dashboard', 'domains', 'learning', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges'].includes(tabParam)) {
+          setActiveSidebarTab(tabParam as any);
+        }
       }
     }
   }, []);
@@ -1154,9 +1156,15 @@ export default function StudentDashboard() {
   };
 
   const [solvedCount, setSolvedCount] = useState(12);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Syllabus Milestone Reached! 🎓', message: 'You completed the Arithmetic & Algebra core challenges.', time: '2 hours ago', read: false },
+    { id: 2, title: 'New Badge Earned! 🎖️', message: "Prestige Badge 'Solving Streak' has been added to your credentials.", time: '1 day ago', read: false },
+    { id: 3, title: 'Weekly Performance Sync 📊', message: 'Your curriculum readiness index improved by +5.4%.', time: '3 days ago', read: true }
+  ]);
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'conceptHub' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
 
   // Concept-Hub Practice Arena Redesign States
@@ -1196,7 +1204,7 @@ export default function StudentDashboard() {
 
   // Increment practice time spent
   useEffect(() => {
-    if (activeSidebarTab !== 'practice') return;
+    if ((activeSidebarTab as string) !== 'practice') return;
     const interval = setInterval(() => {
       setPracticeTimeSpent(prev => prev + 1);
     }, 1000);
@@ -1205,7 +1213,7 @@ export default function StudentDashboard() {
 
   // Sticky video player scroll checker
   useEffect(() => {
-    if (activeSidebarTab !== 'practice' || !activeQuestion) {
+    if ((activeSidebarTab as string) !== 'practice' || !activeQuestion) {
       setIsMiniPlayerActive(false);
       return;
     }
@@ -1448,6 +1456,8 @@ export default function StudentDashboard() {
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<string[]>([]);
   const [justUnlockedBadge, setJustUnlockedBadge] = useState<any | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<any | null>(null);
+  const [dayBadgesToShow, setDayBadgesToShow] = useState<any[] | null>(null);
+  const [badgesToShowDateStr, setBadgesToShowDateStr] = useState<string>('');
   const [currentYear, setCurrentYear] = useState<number>(2026);
   const [currentMonth, setCurrentMonth] = useState<number>(5); // 0-indexed, 5 is June
   const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(9);
@@ -2501,7 +2511,7 @@ export default function StudentDashboard() {
   }, [solvedCount]);
 
   interface SidebarTab {
-    id: 'dashboard' | 'domains' | 'conceptHub' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
+    id: 'dashboard' | 'domains' | 'learning' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
     label: string;
     icon: any;
     action: 'tab' | 'nav';
@@ -2511,9 +2521,7 @@ export default function StudentDashboard() {
 
   const sidebarTabs: SidebarTab[] = [
     { id: 'domains', label: 'Domains', icon: LayoutGrid, action: 'tab' },
-    { id: 'conceptHub', label: 'Concept Hub', icon: GraduationCap, action: 'tab' },
     { id: 'learning', label: 'Learning Roadmap', icon: BookOpen, action: 'tab' },
-    { id: 'practice', label: 'Practice Arena', icon: BookOpenCheck, action: 'tab' },
     { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
     { id: 'careerHub', label: 'Career Hub', icon: Briefcase, action: 'tab', subAction: () => setSelectedOpportunityType('All') },
     { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
@@ -2611,166 +2619,210 @@ export default function StudentDashboard() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-30">
 
         {/* Top Header (Reference 2 style) */}
-        <header className={activeSidebarTab === 'practice'
-          ? "mx-6 mt-6 mb-2 rounded-[24px] border border-slate-200/80 dark:border-white/[0.08] bg-white/75 dark:bg-slate-950/75 backdrop-blur-[20px] shadow-lg dark:shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] px-8 py-3.5 flex items-center justify-between transition-all duration-300 shrink-0 select-none"
-          : "h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none"
-        }>
-          <div className="flex flex-col items-start text-left">
-            <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
-              {activeSidebarTab === 'dashboard' ? (
-                <>Welcome back, {profile.username.split(' ')[0]} 👋</>
-              ) : activeSidebarTab === 'domains' ? (
-                <>Learning Domains 🌐</>
-              ) : activeSidebarTab === 'conceptHub' ? (
-                <>Concept Hub 🎓</>
-              ) : activeSidebarTab === 'learning' ? (
-                <>Learning Roadmap 🗺️</>
-              ) : activeSidebarTab === 'practice' ? (
-                <>Practice Arena 🎯</>
-              ) : activeSidebarTab === 'mockTests' ? (
-                <>Placement Mock Arena 🏆</>
-              ) : activeSidebarTab === 'careerHub' ? (
-                <>Career Opportunity Hub 💼</>
-              ) : activeSidebarTab === 'leaderboards' ? (
-                <>Placement Leaderboard 📊</>
-              ) : activeSidebarTab === 'badges' ? (
-                <>Achievements & Credentials 🏅</>
-              ) : activeSidebarTab === 'profile' ? (
-                <>Student Credentials ⚙️</>
-              ) : (
-                <>Settings Hub ⚙️</>
-              )}
-            </h1>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
-              {activeSidebarTab === 'dashboard' ? (
-                'Here is your activities overview for today.'
-              ) : activeSidebarTab === 'domains' ? (
-                'Select a syllabus domain to view lessons and progress.'
-              ) : activeSidebarTab === 'conceptHub' ? (
-                'Review formulas, cheat sheets, and examples across syllabus domains.'
-              ) : activeSidebarTab === 'learning' ? (
-                'Personalized step-by-step preparation path.'
-              ) : activeSidebarTab === 'practice' ? (
-                'Solve categorized aptitude questions to build your skills.'
-              ) : activeSidebarTab === 'mockTests' ? (
-                'Prepare under simulated company timeline checks.'
-              ) : activeSidebarTab === 'careerHub' ? (
-                'Live portal access drives, internships, government exams, hackathons, and placement updates.'
-              ) : activeSidebarTab === 'leaderboards' ? (
-                'Compare progress, metrics, and speeds with peers globally.'
-              ) : activeSidebarTab === 'badges' ? (
-                'Celebrate preparation milestones and dynamic digital badges.'
-              ) : activeSidebarTab === 'profile' ? (
-                'Review onboarding selections and active prep goals.'
-              ) : (
-                'Configure advanced dashboard properties, themes, and animations.'
-              )}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-5">
-
-            {/* Daily Streak Badge */}
-            {activeSidebarTab === 'domains' && (
-              <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0 animate-fadeIn">
-                <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
-                  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
-                  {streak}
-                </span>
-              </div>
-            )}
-
-            {/* Search Input Box */}
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder={activeSidebarTab === 'leaderboards' ? "Search topics, questions, or concepts..." : "Search something..."}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2 w-60 md:w-80 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
-              />
-            </div>
-
-            {/* Preview/Edit Switcher */}
-            <div className="flex bg-slate-100 dark:bg-slate-900 p-0.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner mr-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const studentRole = {
-                    role: 'STUDENT',
-                    name: 'Vaishnavi Raparthy',
-                    email: 'student@aptitude-ai.com',
-                    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
-                  };
-                  localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
-                  setCurrentRole(studentRole);
-                }}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role !== 'admin'
-                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                  }`}
-              >
-                Preview
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const adminRole = {
-                    role: 'admin',
-                    name: 'SARAH CONNOR',
-                    email: 'sarah.c@aptitude-ai.com',
-                    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
-                  };
-                  localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
-                  setCurrentRole(adminRole);
-                  router.push('/admin/editor');
-                }}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role === 'admin'
-                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                  }`}
-              >
-                Edit / Admin
-              </button>
-            </div>
-
-            {/* Notification Bell */}
-            <button
-              onClick={() => alert("No new notifications")}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-slate-450 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 hover:scale-105 transition-all cursor-pointer relative shrink-0"
-              title="Notifications"
-            >
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 border border-white dark:border-slate-950" />
-            </button>
-
-            <div className="flex items-center gap-3 shrink-0">
-              <button
-                onClick={() => setActiveSidebarTab('profile')}
-                title="User Profile"
-                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-350 transition-all cursor-pointer relative overflow-hidden"
-              >
-                {profile.avatar && profile.avatar !== 'initial' ? (
-                  <img
-                    src={profile.avatar}
-                    alt="User Avatar"
-                    className="w-full h-full object-cover"
-                  />
+        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
+          <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+            <div className="flex flex-col items-start text-left">
+              <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
+                {activeSidebarTab === 'dashboard' ? (
+                  <>Welcome back, {profile.username.split(' ')[0]} 👋</>
+                ) : activeSidebarTab === 'domains' ? (
+                  <>Learning Domains 🌐</>
+                ) : activeSidebarTab === 'learning' ? (
+                  <>Learning Roadmap 🗺️</>
+                ) : activeSidebarTab === 'mockTests' ? (
+                  <>Placement Mock Arena 🏆</>
+                ) : activeSidebarTab === 'careerHub' ? (
+                  <>Career Opportunity Hub 💼</>
+                ) : activeSidebarTab === 'leaderboards' ? (
+                  <>Placement Leaderboard 📊</>
+                ) : activeSidebarTab === 'badges' ? (
+                  <>Achievements & Credentials 🏅</>
+                ) : activeSidebarTab === 'profile' ? (
+                  <>Student Credentials ⚙️</>
                 ) : (
-                  <User className="w-5 h-5" />
+                  <>Settings Hub ⚙️</>
                 )}
-              </button>
+              </h1>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
+                {activeSidebarTab === 'dashboard' ? (
+                  'Here is your activities overview for today.'
+                ) : activeSidebarTab === 'domains' ? (
+                  'Select a syllabus domain to view lessons and progress.'
+                ) : activeSidebarTab === 'learning' ? (
+                  'Personalized step-by-step preparation path.'
+                ) : activeSidebarTab === 'mockTests' ? (
+                  'Prepare under simulated company timeline checks.'
+                ) : activeSidebarTab === 'careerHub' ? (
+                  'Live portal access drives, internships, government exams, hackathons, and placement updates.'
+                ) : activeSidebarTab === 'leaderboards' ? (
+                  'Compare progress, metrics, and speeds with peers globally.'
+                ) : activeSidebarTab === 'badges' ? (
+                  'Celebrate preparation milestones and dynamic digital badges.'
+                ) : activeSidebarTab === 'profile' ? (
+                  'Review onboarding selections and active prep goals.'
+                ) : (
+                  'Configure advanced dashboard properties, themes, and animations.'
+                )}
+              </p>
             </div>
 
+            <div className="flex items-center gap-5">
+
+              {/* Daily Streak Badge */}
+              {activeSidebarTab === 'domains' && (
+                <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0 animate-fadeIn">
+                  <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
+                    <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
+                    {streak}
+                  </span>
+                </div>
+              )}
+
+              {/* Search Input Box */}
+              <div className="relative hidden md:block">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder={activeSidebarTab === 'leaderboards' ? "Search topics, questions, or concepts..." : "Search something..."}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-4 py-2 w-60 md:w-80 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                />
+              </div>
+
+              {/* Preview/Edit Switcher */}
+              <div className="flex bg-slate-100 dark:bg-slate-900 p-0.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner mr-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const studentRole = {
+                      role: 'STUDENT',
+                      name: 'Vaishnavi Raparthy',
+                      email: 'student@aptitude-ai.com',
+                      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
+                    };
+                    localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
+                    setCurrentRole(studentRole);
+                  }}
+                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role !== 'admin'
+                      ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
+                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                >
+                  Preview
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const adminRole = {
+                      role: 'admin',
+                      name: 'SARAH CONNOR',
+                      email: 'sarah.c@aptitude-ai.com',
+                      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
+                    };
+                    localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
+                    setCurrentRole(adminRole);
+                    router.push('/admin/editor');
+                  }}
+                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role === 'admin'
+                      ? 'bg-white dark:bg-slate-950 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
+                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                >
+                  Edit / Admin
+                </button>
+              </div>
+
+              {/* Notification & Avatar profile access */}
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    title="System Notifications"
+                    className={`w-10 h-10 rounded-full flex items-center justify-center bg-slate-100/50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-900 text-slate-550 dark:text-slate-400 relative hover:scale-105 active:scale-95 transition-all cursor-pointer ${showNotifications ? 'ring-2 ring-blue-500' : ''}`}
+                  >
+                    <Bell className="w-4.5 h-4.5" />
+                    {notifications.some(n => !n.read) && (
+                      <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-950" />
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {showNotifications && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-left"
+                      >
+                        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                          <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">Notifications</span>
+                          {notifications.some(n => !n.read) && (
+                            <button
+                              onClick={() => {
+                                setNotifications(notifications.map(n => ({ ...n, read: true })));
+                              }}
+                              className="text-[9px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer border-0 bg-transparent p-0"
+                            >
+                              Mark all as read
+                            </button>
+                          )}
+                        </div>
+                        <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+                          {notifications.length === 0 ? (
+                            <div className="p-6 text-center text-slate-400 dark:text-slate-500 text-[10px] font-medium">
+                              No notifications yet.
+                            </div>
+                          ) : (
+                            notifications.map((n) => (
+                              <div
+                                key={n.id}
+                                onClick={() => {
+                                  setNotifications(notifications.map(item => item.id === n.id ? { ...item, read: true } : item));
+                                }}
+                                className={`p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer text-left relative ${!n.read ? 'bg-blue-50/20 dark:bg-blue-950/10' : ''}`}
+                              >
+                                {!n.read && (
+                                  <span className="absolute top-4.5 left-2.5 w-1.5 h-1.5 bg-blue-600 dark:bg-blue-500 rounded-full" />
+                                )}
+                                <div className="pl-3.5 space-y-1">
+                                  <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 leading-tight">{n.title}</h4>
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal font-medium">{n.message}</p>
+                                  <span className="text-[8px] text-slate-450 dark:text-slate-500 font-semibold block">{n.time}</span>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <button
+                  onClick={() => setActiveSidebarTab('profile')}
+                  title="View Student Profile"
+                  className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 flex items-center justify-center bg-slate-100 dark:bg-slate-900 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  {profile.avatar && profile.avatar !== 'initial' ? (
+                    <img
+                      src={profile.avatar}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+
+            </div>
           </div>
         </header>
 
-        {/* Scrollable Panel Area */}
         <div ref={scrollablePanelRef} className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${
-          activeSidebarTab === 'practice'
-            ? (layoutDensity === 'compact' ? 'px-4 pb-4 pt-0' : layoutDensity === 'spacious' ? 'px-10 pb-10 pt-0' : 'px-6 sm:px-8 pb-6 sm:pb-8 pt-0')
-            : (layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8')
+          layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
         }`}>
 
 
@@ -2786,7 +2838,7 @@ export default function StudentDashboard() {
                 animate="animate"
                 exit="exit"
                 transition={tabTransition}
-                className="w-full space-y-8 text-slate-800 dark:text-slate-200"
+                className="w-full max-w-7xl mx-auto space-y-8 text-slate-800 dark:text-slate-200"
               >
 
               {/* Admin Banner Alert */}
@@ -2832,17 +2884,17 @@ export default function StudentDashboard() {
 
                       {/* Card 1: Quantitative Aptitude */}
                       <div className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
-                        : "bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between h-48 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                        : "bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between h-48 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
                       }>
                         <div className="flex justify-between items-start gap-4">
-                          <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
+                          <h3 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
                             Quantitative<br />Aptitude
                           </h3>
                           {/* Diagonal Arrow button */}
                           <button
                             onClick={() => {
-                              setActiveSidebarTab('practice');
+                              setActiveSidebarTab('domains');
                               setSelectedDomain('quant');
                             }}
                             className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
@@ -2854,7 +2906,7 @@ export default function StudentDashboard() {
                         <div className="flex justify-start items-end mt-auto">
                           <button
                             onClick={() => {
-                              setActiveSidebarTab('practice');
+                              setActiveSidebarTab('domains');
                               setSelectedDomain('quant');
                             }}
                             className={isCustomActive
@@ -2869,16 +2921,16 @@ export default function StudentDashboard() {
 
                       {/* Card 2: Logical Reasoning */}
                       <div className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
-                        : "bg-[#FDF2F8] dark:bg-[#3B1229]/20 border border-[#FBCFE8] dark:border-[#652047]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between h-48 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                        : "bg-[#FDF2F8] dark:bg-[#3B1229]/20 border border-[#FBCFE8] dark:border-[#652047]/20 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between h-48 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
                       }>
                         <div className="flex justify-between items-start gap-4">
-                          <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
+                          <h3 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
                             Logical<br />Reasoning
                           </h3>
                           <button
                             onClick={() => {
-                              setActiveSidebarTab('practice');
+                              setActiveSidebarTab('domains');
                               setSelectedDomain('logical');
                             }}
                             className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
@@ -2890,12 +2942,12 @@ export default function StudentDashboard() {
                         <div className="flex justify-start items-end mt-auto">
                           <button
                             onClick={() => {
-                              setActiveSidebarTab('practice');
+                              setActiveSidebarTab('domains');
                               setSelectedDomain('logical');
                             }}
                             className={isCustomActive
                               ? "px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
-                              : "px-4 py-2 bg-[#9D174D] hover:bg-[#7A0F39] text-white dark:bg-[#F472B6] dark:hover:bg-[#F059A1] dark:text-[#3B1229] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                              : "px-4 py-2 bg-[#9D174D] hover:bg-[#83103F] text-white dark:bg-[#F472B6] dark:hover:bg-[#EC4899] dark:text-[#500724] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
                             }
                           >
                             Continue Last Topic
@@ -2914,8 +2966,8 @@ export default function StudentDashboard() {
 
                       {/* Completed Stat */}
                       <div className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
-                        : "bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
                       }>
                         <div className="space-y-1.5 text-left">
                           <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Completed</span>
@@ -2931,8 +2983,8 @@ export default function StudentDashboard() {
 
                       {/* Your Streak Stat */}
                       <div className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
-                        : "bg-[#FEF3C7] dark:bg-[#3D2C08]/20 border border-[#FDE68A] dark:border-[#6B4E0E]/20 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#FEF3C7] dark:bg-[#3D2C08]/20 border border-[#FDE68A] dark:border-[#6B4E0E]/20 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
                       }>
                         <div className="space-y-1.5 text-left">
                           <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Your Streak</span>
@@ -2948,8 +3000,8 @@ export default function StudentDashboard() {
 
                       {/* Active Stat */}
                       <div className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
-                        : "bg-[#F3E8FF] dark:bg-[#2A154D]/20 border border-[#E9D5FF] dark:border-[#53289E]/20 p-7 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#F3E8FF] dark:bg-[#2A154D]/20 border border-[#E9D5FF] dark:border-[#53289E]/20 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
                       }>
                         <div className="space-y-1.5 text-left">
                           <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Level</span>
@@ -2968,10 +3020,10 @@ export default function StudentDashboard() {
                     {/* Large Yellow Active concept banner (Reference 2 style) */}
                     <div 
                       className={isCustomActive
-                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out cursor-pointer"
-                        : "bg-[#FFFBEB] dark:bg-[#251E0E]/40 border border-[#FEF3C7] dark:border-[#4B3B18]/30 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out cursor-pointer"
+                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-8 md:py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out cursor-pointer"
+                        : "bg-[#FFFBEB] dark:bg-[#251E0E]/40 border border-[#FEF3C7] dark:border-[#4B3B18]/30 rounded-3xl p-8 md:py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out cursor-pointer"
                       }
-                      onClick={() => setActiveSidebarTab('conceptHub')}
+                      onClick={() => setActiveSidebarTab('domains')}
                     >
                       <div className="space-y-3 text-left flex-1 w-full">
                         <div className="flex items-center gap-2">
@@ -2983,10 +3035,10 @@ export default function StudentDashboard() {
                           </span>
                           <span className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold">QUANTITATIVE APTITUDE</span>
                         </div>
-                        <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase leading-snug">
+                        <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase leading-snug">
                           Percentages → Profit & Loss
                         </h3>
-
+ 
                         {/* Progress Bar */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -3001,12 +3053,12 @@ export default function StudentDashboard() {
                           </div>
                         </div>
                       </div>
-
+ 
                       {/* Large diagonal arrow button */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setActiveSidebarTab('conceptHub');
+                          setActiveSidebarTab('domains');
                         }}
                         className={isCustomActive
                           ? "w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
@@ -3025,7 +3077,7 @@ export default function StudentDashboard() {
                 <div className="lg:col-span-4 space-y-8">
 
                   {/* 1. Activity Calendar Card */}
-                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
+                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-7 shadow-xs text-left">
                     <div className="flex items-center justify-between mb-4 pb-1 border-b border-slate-100 dark:border-slate-900/60">
                       <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Activity Calendar</h3>
                       <span className="text-xs font-bold text-slate-500">{monthYearName}</span>
@@ -3044,10 +3096,10 @@ export default function StudentDashboard() {
                       </div>
 
                       {/* Dates grid for current month/year */}
-                      <div className="grid grid-cols-7 gap-y-2.5 gap-x-1 text-center text-xs font-bold text-slate-700 dark:text-slate-400">
+                      <div className="grid grid-cols-7 gap-y-3.5 gap-x-2 text-center text-xs font-bold text-slate-700 dark:text-slate-400">
                         {/* Padding days */}
                         {[...Array(paddingDays)].map((_, i) => (
-                          <div key={`pad-${i}`} className="w-8 h-8" />
+                          <div key={`pad-${i}`} className="w-10 h-10" />
                         ))}
                         {/* Actual days */}
                         {[...Array(daysInMonth)].map((_, i) => {
@@ -3058,7 +3110,7 @@ export default function StudentDashboard() {
                           const isToday = dateNum === todayDay;
                           const isSelected = selectedCalendarDay === dateNum;
 
-                          let dateStyles = "w-8 h-8 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
+                          let dateStyles = "w-10 h-10 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
 
                           if (isToday) {
                             dateStyles += "bg-[#111827] dark:bg-white text-white dark:text-slate-900 font-black shadow-sm ";
@@ -3073,45 +3125,153 @@ export default function StudentDashboard() {
                           }
 
                           const dayBadges = badgesByDay[dateNum] || [];
-                          const totalBadgeCount = dayBadges.reduce((acc, item) => acc + item.count, 0);
+                          const distinctBadgeCount = dayBadges.length;
 
+                          const hasBadges = distinctBadgeCount > 0;
                           return (
                             <button
                               key={dateNum}
-                              onClick={() => setSelectedCalendarDay(dateNum)}
-                              className="relative focus:outline-none w-8 h-8 mx-auto flex items-center justify-center"
+                              suppressHydrationWarning
+                              onClick={() => {
+                                setSelectedCalendarDay(dateNum);
+                                if (hasBadges) {
+                                  setDayBadgesToShow(dayBadges);
+                                  setBadgesToShowDateStr(`${monthYearName} ${dateNum}`);
+                                }
+                              }}
+                              title={hasBadges 
+                                ? `${monthYearName} ${dateNum}: ${dayBadges.map(db => db.badge.name).join(', ')}`
+                                : `${monthYearName} ${dateNum}${isStreakDay ? ' (Practice Completed)' : ''}`
+                              }
+                              className="relative focus:outline-none w-10 h-10 mx-auto flex items-center justify-center cursor-pointer group"
                               type="button"
                             >
-                              <span className={dateStyles}>{dateNum}</span>
-                              {isStreakDay && dayBadges.length === 0 && (
-                                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-500" />
-                              )}
-                              {dayBadges.length > 0 && (
-                                <div
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedBadge(dayBadges[0].badge);
-                                  }}
-                                  title={`${dayBadges.map(db => `${db.badge.name}${db.count > 1 ? ` (x${db.count})` : ''}`).join(', ')}`}
-                                  className="absolute -bottom-1.5 -right-1.5 flex items-center justify-center bg-blue-600/90 hover:bg-blue-700/90 dark:bg-blue-500/90 dark:hover:bg-blue-600/90 text-white rounded-full px-1 min-w-[20px] h-5 shadow-md border border-white/20 dark:border-slate-900/40 leading-none select-none cursor-pointer z-10 transition-all duration-200 hover:scale-110 active:scale-95"
-                                >
-                                  {dayBadges[0].badge.image_url ? (
-                                    <TransparentBadgeImage src={dayBadges[0].badge.image_url} alt="" className="w-3.5 h-3.5 object-contain rounded-full" />
+                              <span suppressHydrationWarning className={`${dateStyles} relative overflow-hidden flex items-center justify-center`}>
+                                {hasBadges ? (
+                                  dayBadges[0].badge.image_url ? (
+                                    <TransparentBadgeImage 
+                                      src={dayBadges[0].badge.image_url} 
+                                      alt="" 
+                                      className="w-8 h-8 object-contain rounded-full" 
+                                    />
                                   ) : (
-                                    <span className="text-[9px]">{getCategoryEmoji(dayBadges[0].badge.category)}</span>
-                                  )}
-                                  {totalBadgeCount > 1 && (
-                                    <span className="ml-0.5 font-bold text-[7.5px] leading-none pr-0.5">x{totalBadgeCount}</span>
-                                  )}
-                                </div>
+                                    <span className="text-xl">{getCategoryEmoji(dayBadges[0].badge.category)}</span>
+                                  )
+                                ) : (
+                                  dateNum
+                                )}
+                              </span>
+                              {isStreakDay && !hasBadges && (
+                                <span suppressHydrationWarning className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              )}
+                              {hasBadges && distinctBadgeCount > 1 && (
+                                <span suppressHydrationWarning className="absolute -bottom-1 -right-1.5 flex items-center justify-center bg-blue-600 dark:bg-blue-500 text-white rounded-full text-[7.5px] font-black px-1.5 h-3.5 shadow-md border border-white dark:border-slate-900 select-none">
+                                  x{distinctBadgeCount}
+                                </span>
                               )}
                             </button>
                           );
-                     </div>
-                   </div>
+                        })}
+                      </div>
 
 
-                  {/* Space filler after calendar since Time Tracker is now floating */}
+
+                    </div>
+                  </div>
+
+                  {/* 2. Time Tracker Stopwatch widget (Reference 1 style) */}
+                  <div className={`transition-all duration-500 text-white border rounded-3xl p-7 shadow-lg relative overflow-hidden flex flex-col justify-between h-56 group ${
+                    timeTrackerIsRunning
+                      ? "bg-[#0B3A27] dark:bg-[#062418] border-[#0A3322] dark:border-[#041B12]"
+                      : "bg-[#4A1515] dark:bg-[#2D0B0B] border-[#441212] dark:border-[#250707]"
+                  }`}>
+                    {/* Visual pattern overlay */}
+                    <div className={`absolute inset-0 transition-opacity duration-500 pointer-events-none ${
+                      timeTrackerIsRunning
+                        ? "bg-[radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.15),transparent_60%)]"
+                        : "bg-[radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.15),transparent_60%)]"
+                    }`} />
+
+                    <div className="flex items-center justify-between relative z-10">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full transition-all duration-500 ${
+                          timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
+                        }`} />
+                        <span className={`text-[10px] font-black uppercase tracking-widest font-mono transition-colors duration-500 ${
+                          timeTrackerIsRunning ? "text-[#A7F3D0]" : "text-[#FECACA]"
+                        }`}>Time Tracker</span>
+                      </div>
+                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-colors duration-500 ${
+                        timeTrackerIsRunning ? "bg-[#065F46] text-emerald-200" : "bg-[#991B1B] text-rose-200"
+                      }`}>
+                        {timeTrackerIsRunning ? "Active" : "Paused"}
+                      </span>
+                    </div>
+
+                    <div className="text-center py-2 relative z-10">
+                      <span className="text-4xl font-black font-mono tracking-tight leading-none text-white block">
+                        {formatTimeTracker(timeTrackerSeconds)}
+                      </span>
+                      <span className={`text-[9px] font-semibold mt-1.5 block uppercase tracking-wider transition-colors duration-500 ${
+                        timeTrackerIsRunning ? "text-[#A7F3D0]/60" : "text-[#FECACA]/60"
+                      }`}>
+                        {timeTrackerIsRunning ? "Active Study Session duration" : "Paused Study Session duration"}
+                      </span>
+                    </div>
+
+                    <div className={`flex justify-center gap-4 relative z-10 pt-4 border-t transition-colors duration-500 ${
+                      timeTrackerIsRunning ? "border-[#092B1D]/80" : "border-[#3D0F0F]/80"
+                    }`}>
+
+                      {/* Play Button */}
+                      <button
+                        onClick={() => setTimeTrackerIsRunning(true)}
+                        disabled={timeTrackerIsRunning}
+                        title="Start Study"
+                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
+                          timeTrackerIsRunning
+                            ? "bg-[#061E14] text-emerald-800/40 border border-[#082419] cursor-not-allowed"
+                            : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                        }`}
+                        type="button"
+                      >
+                        <Play className="w-5 h-5 fill-current" />
+                      </button>
+
+                      {/* Pause Button */}
+                      <button
+                        onClick={() => setTimeTrackerIsRunning(false)}
+                        disabled={!timeTrackerIsRunning}
+                        title="Pause Session"
+                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
+                          !timeTrackerIsRunning
+                            ? "bg-[#2D1212] text-rose-900/30 border border-[#3D1414] cursor-not-allowed"
+                            : "bg-rose-800 hover:bg-rose-700 text-white"
+                        }`}
+                        type="button"
+                      >
+                        <Pause className="w-5 h-5" />
+                      </button>
+
+                      {/* Reset Button */}
+                      <button
+                        onClick={() => {
+                          setTimeTrackerIsRunning(false);
+                          setTimeTrackerSeconds(0);
+                        }}
+                        title="Reset Session"
+                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
+                          timeTrackerIsRunning
+                            ? "bg-[#092B1D] hover:bg-[#061E14] text-[#A7F3D0] border border-[#082419]"
+                            : "bg-[#3D1414] hover:bg-[#2D1010] text-[#FECACA] border border-[#4A1818]"
+                        }`}
+                        type="button"
+                      >
+                        <RotateCcw className="w-5 h-5" />
+                      </button>
+
+                    </div>
+                  </div>
 
                 </div>
 
@@ -3134,25 +3294,7 @@ export default function StudentDashboard() {
             </motion.div>
           )}
 
-          {activeSidebarTab === 'conceptHub' && (
-            <motion.div
-              key="conceptHub"
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={tabTransition}
-              className="w-full"
-            >
-              <ConceptHubTab 
-                searchQuery={searchQuery}
-                setActiveSidebarTab={setActiveSidebarTab}
-                setSelectedDomain={setSelectedDomain}
-                setActiveQuestion={setActiveQuestion}
-                customColor={customColor}
-              />
-            </motion.div>
-          )}
+
 
           {activeSidebarTab === 'learning' && (
             <motion.div
@@ -3162,7 +3304,7 @@ export default function StudentDashboard() {
               animate="animate"
               exit="exit"
               transition={tabTransition}
-              className="w-full relative py-12 px-4 sm:px-8 rounded-[2.5rem] bg-[#0A0F1C] border border-[#1E293B] shadow-2xl transition-all duration-300"
+              className="w-full relative py-12 px-4 sm:px-8 rounded-[2.5rem] bg-white border border-slate-200 dark:bg-[#0A0F1C] dark:border-[#1E293B] shadow-2xl transition-all duration-300"
             >
 
               {/* Ambient Background Particles and Orbs */}
@@ -3387,7 +3529,7 @@ export default function StudentDashboard() {
                           d={seg.d}
                           strokeWidth="28"
                           strokeLinecap="round"
-                          className="stroke-[#0B1221]/80 translate-y-4"
+                          className="stroke-slate-200 dark:stroke-[#0B1221]/80 translate-y-4"
                         />
                       ))}
 
@@ -3408,7 +3550,7 @@ export default function StudentDashboard() {
                           key={`base-path-${i}`}
                           d={seg.d}
                           fill="none"
-                          stroke="#1E293B"
+                          stroke={theme === 'light' ? '#CBD5E1' : '#1E293B'}
                           strokeWidth="28"
                           strokeLinecap="round"
                         />
@@ -3589,7 +3731,7 @@ export default function StudentDashboard() {
                           </motion.button>
 
                           {/* Minimalist Dark Info Card matching Screenshot */}
-                          <div className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center bg-[#0B1221] px-4 py-2.5 rounded-xl border border-[#1E293B] shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all text-center min-w-[140px] max-w-[160px] pointer-events-none ${
+                          <div className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center bg-white dark:bg-[#0B1221] px-4 py-2.5 rounded-xl border border-slate-200 dark:border-[#1E293B] shadow-lg dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all text-center min-w-[140px] max-w-[160px] pointer-events-none ${
                             cardPlacement === 'top'
                               ? 'bottom-[calc(100%+12px)] lg:bottom-[calc(100%+16px)]'
                               : `top-[calc(100%+12px)] lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 ${
@@ -3598,8 +3740,8 @@ export default function StudentDashboard() {
                                     : 'lg:left-[calc(100%+16px)] lg:right-auto'
                                 }`
                           } ${isActive ? 'ring-2 ring-[var(--clr-primary)]/50 shadow-[0_0_20px_rgba(var(--clr-primary-rgb),0.2)]' : ''}`}>
-                            <span className="text-[10px] font-black text-white block uppercase tracking-wider leading-none mb-1">{node.title}</span>
-                            <span className="text-[8px] text-slate-400 font-semibold block leading-tight">{node.desc}</span>
+                            <span className="text-[10px] font-black text-slate-800 dark:text-white block uppercase tracking-wider leading-none mb-1">{node.title}</span>
+                            <span className="text-[8px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight">{node.desc}</span>
                             {isActive && (
                               <span className="text-[7.5px] text-[var(--clr-primary)] font-black block mt-0.5">75% Complete</span>
                             )}
@@ -3607,9 +3749,9 @@ export default function StudentDashboard() {
 
                           {/* Locked node warning tooltip */}
                           {isLocked && (
-                            <div className="absolute top-16 text-center bg-slate-950 text-white p-2 rounded-xl border border-slate-800 shadow-md w-36 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
+                            <div className="absolute top-16 text-center bg-white dark:bg-slate-950 text-slate-800 dark:text-white p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-md w-36 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
                               <span className="text-[9px] font-black block uppercase tracking-wide">Locked Unit</span>
-                              <span className="text-[7.5px] text-slate-400 font-semibold block leading-tight mt-0.5">Complete previous unit to unlock</span>
+                              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight mt-0.5">Complete previous unit to unlock</span>
                             </div>
                           )}
 
@@ -3640,36 +3782,7 @@ export default function StudentDashboard() {
             </motion.div>
           )}
 
-          {/* ====================================================================
-              3. TAB: PRACTICE ARENA (Curated Hub redesign layout)
-              ==================================================================== */}
-          {activeSidebarTab === 'practice' && (
-            <motion.div
-              key="practice"
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={tabTransition}
-              className="w-full"
-            >
-              <PracticeArena
-                questions={questions}
-                activeQuestion={activeQuestion}
-                setActiveQuestion={setActiveQuestion}
-                bookmarks={bookmarks}
-                toggleBookmark={toggleBookmark}
-                submittedAnswers={submittedAnswers}
-                setSubmittedAnswers={setSubmittedAnswers}
-                selectedAnswers={selectedAnswers}
-                setSelectedAnswers={setSelectedAnswers}
-                solvedCount={solvedCount}
-                setSolvedCount={setSolvedCount}
-                streak={streak}
-                setStreak={setStreak}
-              />
-            </motion.div>
-          )}
+
 
           {/* ====================================================================
               4. TAB: MOCK TESTS (Assessments center)
@@ -5172,6 +5285,72 @@ export default function StudentDashboard() {
                       </div>
                     );
                   })()}
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
+          {/* Calendar Day Badges List Modal */}
+          <AnimatePresence>
+            {dayBadgesToShow && (
+              <div 
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+                onClick={() => setDayBadgesToShow(null)}
+              >
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0, y: 30 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.9, opacity: 0, y: 30 }}
+                  className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative space-y-4"
+                  onClick={e => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => setDayBadgesToShow(null)}
+                    className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+
+                  <div className="text-left">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">Activity Calendar</span>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white mt-1">Badges Earned</h3>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-mono uppercase">{badgesToShowDateStr}</p>
+                  </div>
+
+                  <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
+                    {dayBadgesToShow.map(({ badge, count }) => (
+                      <div
+                        key={badge.id}
+                        onClick={() => {
+                          setSelectedBadge(badge);
+                          setDayBadgesToShow(null);
+                        }}
+                        className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950/50 dark:hover:bg-slate-950 border border-slate-150 dark:border-slate-800/80 rounded-2xl cursor-pointer transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                            {badge.image_url ? (
+                              <img src={badge.image_url} alt="" className="w-6 h-6 object-contain rounded-lg" />
+                            ) : (
+                              <span className="text-lg">{getCategoryEmoji(badge.category)}</span>
+                            )}
+                          </div>
+                          <div className="text-left leading-tight">
+                            <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                              {badge.name}
+                            </h4>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 line-clamp-1">{badge.description}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-blue-500 dark:text-blue-400 font-extrabold group-hover:translate-x-0.5 transition-transform">
+                            →
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </motion.div>
               </div>
             )}

@@ -189,7 +189,8 @@ export default function PlacementProfile({
 
     for (let i = 0; i < 371; i++) {
       const dayOfWeek = date.getDay();
-      const monthLabel = date.toLocaleString('default', { month: 'short' });
+      const monthsMap = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthLabel = monthsMap[date.getMonth()];
       
       const seed = Math.random();
       let solves = 0;
@@ -504,7 +505,8 @@ export default function PlacementProfile({
                   <input
                     type="color"
                     value={customColor}
-                    onChange={(e) => changeCustomColorLocal(e.target.value)}
+                    onInput={(e: any) => changeCustomColor(e.target.value)}
+                    onChange={(e: any) => changeCustomColorLocal(e.target.value)}
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                   />
                 </div>
@@ -572,39 +574,62 @@ export default function PlacementProfile({
           </div>
         </div>
 
-        {/* Right Card: Weekly Performance Widget (5 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-6`}>
-          <div>
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">This Week</h4>
+        {/* Right Card: Weekly Performance Activity Spark Chart */}
+        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-4`}>
+          <div className="flex items-center justify-between select-none">
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Weekly Solves Activity</h4>
+            <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-505 uppercase">Streak: 14 Days 🔥</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl text-left relative overflow-hidden">
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Questions Solved</span>
-              <span className="text-2xl font-black font-mono text-slate-950 dark:text-white block mt-2">47</span>
-              <span className="text-[8.5px] font-bold text-emerald-500 font-mono block mt-1">+12% vs last week</span>
+          <div className="flex-1 flex flex-col justify-end space-y-4">
+            {/* Visual Mini Bar Chart */}
+            <div className="h-24 w-full flex items-end justify-between gap-2 px-1 select-none">
+              {[
+                { day: 'M', solves: 4, label: '4 Solves' },
+                { day: 'T', solves: 8, label: '8 Solves' },
+                { day: 'W', solves: 12, label: '12 Solves' },
+                { day: 'T', solves: 6, label: '6 Solves' },
+                { day: 'F', solves: 10, label: '10 Solves' },
+                { day: 'S', solves: 5, label: '5 Solves' },
+                { day: 'S', solves: 2, label: '2 Solves' }
+              ].map((item, idx) => {
+                const maxSolves = 12;
+                const percentage = (item.solves / maxSolves) * 100;
+                
+                return (
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group/bar relative">
+                    {/* Tooltip on hover */}
+                    <span className="absolute bottom-full mb-1 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-slate-900 text-white text-[8px] font-bold py-1 px-2 rounded-md whitespace-nowrap shadow-md z-10 pointer-events-none">
+                      {item.label}
+                    </span>
+                    {/* Bar Pillar */}
+                    <div className="w-full bg-slate-100 dark:bg-slate-950/60 rounded-t-lg overflow-hidden border border-slate-200/20 dark:border-slate-800/40 h-20 flex flex-col justify-end">
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${percentage}%` }}
+                        transition={{ duration: 0.8, delay: idx * 0.05, ease: "easeOut" }}
+                        className="w-full bg-gradient-to-t from-[var(--clr-primary)]/80 to-[var(--clr-primary)] rounded-t-md"
+                        style={{ backgroundColor: activeBaseColor }}
+                      />
+                    </div>
+                    {/* Day label */}
+                    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-505 font-mono">
+                      {item.day}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl text-left">
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Weekly Accuracy</span>
-              <span className="text-2xl font-black font-mono text-emerald-500 block mt-2">91%</span>
-              <span className="text-[8.5px] font-bold text-emerald-600 dark:text-emerald-400 font-mono block mt-1">Excellent tier</span>
-            </div>
-
-            <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl text-left">
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Rank Shift</span>
-              <span className="text-2xl font-black font-mono text-blue-500 block mt-2">+123</span>
-              <span className="text-[8.5px] font-bold text-slate-400 font-mono block mt-1">Global ranking jump</span>
-            </div>
-
-            <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl text-left">
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">XP Earned</span>
-              <span className="text-2xl font-black font-mono text-purple-400 block mt-2">640</span>
-              <span className="text-[8.5px] font-bold text-purple-600 dark:text-purple-400 font-mono block mt-1">Goal 500 XP met</span>
+            {/* Micro Stats summary footer */}
+            <div className="border-t border-slate-100 dark:border-slate-900/60 pt-3 flex items-center justify-between text-[9px] font-mono font-bold text-slate-500 select-none">
+              <span className="uppercase">Avg Solves / Day: 6.7</span>
+              <span className="text-emerald-500 uppercase flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Active Habit
+              </span>
             </div>
           </div>
-
-
         </div>
       </section>
 
@@ -616,12 +641,15 @@ export default function PlacementProfile({
           <div className="absolute top-0 right-0 w-2 h-full bg-[#10B981]" />
           <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Overall Readiness</span>
           
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">79.6%</span>
-            <span className="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Index Score</span>
+          <div className="mt-4 flex items-baseline justify-between">
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">79.6%</span>
+              <span className="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Index Score</span>
+            </div>
+            <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">▲ +2.4% this week</span>
           </div>
 
-          <div className="mt-4 space-y-1.5">
+          <div className="mt-5 space-y-1.5">
             <div className="w-full bg-slate-100 dark:bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-900">
               <div className="bg-[#10B981] h-full rounded-full" style={{ width: '79.6%' }} />
             </div>
@@ -635,7 +663,10 @@ export default function PlacementProfile({
           
           <div className="mt-4 flex items-baseline justify-between">
             <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">#1,402</span>
-            <span className="text-[9px] font-black bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider inline-block">Top 12%</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold text-blue-500 uppercase tracking-wider font-mono bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-lg">▲ +123 ranks</span>
+              <span className="text-[9px] font-black bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider inline-block">Top 12%</span>
+            </div>
           </div>
 
           <p className="text-[9.5px] font-semibold text-slate-400 mt-5 leading-normal block">
@@ -643,26 +674,37 @@ export default function PlacementProfile({
           </p>
         </div>
 
-        {/* SECONDARY CARD 1: Accuracy (Smaller visual weight) */}
-        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-2xl p-4 text-left flex items-center justify-between hover:border-slate-350 dark:hover:border-slate-700 transition-colors`}>
-          <div className="space-y-1">
-            <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Accuracy Rate</span>
-            <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">88.5%</span>
-          </div>
-          <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">+1.4% this week</span>
-        </div>
-
-        {/* SECONDARY CARD 2: Total Solved */}
-        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-2xl p-4 text-left flex items-center justify-between hover:border-slate-350 dark:hover:border-slate-700 transition-colors`}>
-          <div className="space-y-1">
-            <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Solved</span>
-            <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">1,240 <span className="text-xs text-slate-400 font-bold font-sans">/ 10k</span></span>
-          </div>
-          <div className="w-24 text-right space-y-1">
-            <div className="w-full bg-slate-100 dark:bg-slate-950 h-1 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-800">
-              <div className="bg-blue-500 h-full rounded-full" style={{ width: '12.4%' }} />
+        {/* UNIFIED SECONDARY STATS BANNER */}
+        <div className={`${stylePreset.cardBg} md:col-span-12 rounded-3xl p-5 md:p-6 backdrop-blur-md hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-200`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-900/60">
+            {/* Accuracy Rate */}
+            <div className="flex items-center justify-between text-left sm:pr-6">
+              <div className="space-y-1">
+                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Accuracy Rate</span>
+                <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">88.5%</span>
+              </div>
+              <div className="text-right space-y-1 select-none">
+                <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg inline-block">91% this week</span>
+                <span className="text-[8px] font-bold text-slate-400 font-mono block">▲ +1.4% OVERALL</span>
+              </div>
             </div>
-            <span className="text-[8px] font-bold text-slate-400 font-mono block">12.4% COMPLETE</span>
+
+            {/* Total Solved */}
+            <div className="flex items-center justify-between text-left sm:pl-6 pt-4 sm:pt-0">
+              <div className="space-y-1">
+                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Solved</span>
+                <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">1,240 <span className="text-xs text-slate-400 font-bold font-sans">/ 10k</span></span>
+              </div>
+              <div className="text-right space-y-1 select-none">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-wider font-mono bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-lg inline-block">+47 this week</span>
+                  <span className="text-[8px] font-bold text-slate-400 font-mono block">12.4% COMPLETE</span>
+                </div>
+                <div className="w-28 bg-slate-100 dark:bg-slate-955 h-1 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-800 ml-auto">
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: '12.4%' }} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -776,17 +818,56 @@ export default function PlacementProfile({
                   });
                 })}
 
-                {['M', 'W', 'F'].map((day, idx) => (
+                {/* Months labels on the top of the heatmap */}
+                {(() => {
+                  let lastPrintedCol = -10;
+                  return Array.from({ length: 53 }).map((_, colIdx) => {
+                    const cell = heatmapSolves[colIdx * 7];
+                    if (!cell) return null;
+                    
+                    // Draw month name if it's the first column or month changes
+                    const prevCell = colIdx > 0 ? heatmapSolves[(colIdx - 1) * 7] : null;
+                    const isNewMonth = !prevCell || cell.month !== prevCell.month;
+                    
+                    // Only print if month changes and it is at least 3 columns away from the last printed month
+                    if (isNewMonth && (colIdx - lastPrintedCol >= 3)) {
+                      lastPrintedCol = colIdx;
+                      return (
+                        <text
+                          key={`month-${colIdx}`}
+                          x={colIdx * 12}
+                          y="6"
+                          fill="#94A3B8"
+                          fontSize="7.5"
+                          fontWeight="black"
+                          className="font-mono select-none text-left"
+                        >
+                          {cell.month}
+                        </text>
+                      );
+                    }
+                    return null;
+                  });
+                })()}
+
+                {/* Days labels on the left of the heatmap */}
+                {[
+                  { label: 'Mon', row: 0 },
+                  { label: 'Wed', row: 2 },
+                  { label: 'Fri', row: 4 },
+                  { label: 'Sun', row: 6 }
+                ].map((item) => (
                   <text
-                    key={day}
-                    x="-12"
-                    y={idx * 24 + 31}
+                    key={item.label}
+                    x="-6"
+                    y={item.row * 12 + 19}
                     fill="#94A3B8"
                     fontSize="7.5"
                     fontWeight="black"
-                    className="font-mono select-none text-right"
+                    textAnchor="end"
+                    className="font-mono select-none"
                   >
-                    {day}
+                    {item.label}
                   </text>
                 ))}
               </svg>
