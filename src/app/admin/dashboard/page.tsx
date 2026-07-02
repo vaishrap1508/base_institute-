@@ -40,16 +40,26 @@ export default function DashboardPage() {
     };
     syncSession();
 
-    // Sync questions
+    // Sync questions with self-healing auto-merge fallback
     const storedQuestions = localStorage.getItem('aptitude_questions');
     if (storedQuestions) {
       try {
-        setQuestions(JSON.parse(storedQuestions));
+        const parsed = JSON.parse(storedQuestions);
+        const parsedIds = new Set(parsed.map((q: any) => q.id));
+        const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+        if (missing.length > 0) {
+          const merged = [...parsed, ...missing];
+          localStorage.setItem('aptitude_questions', JSON.stringify(merged));
+          setQuestions(merged);
+        } else {
+          setQuestions(parsed);
+        }
       } catch (e) {
         setQuestions(SAMPLE_QUESTIONS);
       }
     } else {
       setQuestions(SAMPLE_QUESTIONS);
+      localStorage.setItem('aptitude_questions', JSON.stringify(SAMPLE_QUESTIONS));
     }
   }, []);
 

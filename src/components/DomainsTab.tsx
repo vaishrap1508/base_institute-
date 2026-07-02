@@ -52,11 +52,14 @@ const ProgressRing = ({ progress, size = 96, strokeWidth = 9, color = '#3B82F6' 
 
 interface DomainsTabProps {
   searchQuery: string;
+  customColor?: string;
 }
 
-export default function DomainsTab({ searchQuery }: DomainsTabProps) {
+export default function DomainsTab({ searchQuery, customColor = 'default' }: DomainsTabProps) {
   const router = useRouter();
   const [clickedId, setClickedId] = useState<string | null>(null);
+
+  const isCustomActive = customColor !== 'default';
 
   // 4 Bento Domain Cards Data
   const domains = [
@@ -64,27 +67,31 @@ export default function DomainsTab({ searchQuery }: DomainsTabProps) {
       id: 'quant',
       title: 'Quantitative Aptitude',
       subtitle: 'Arithmetic, Algebra, Geometry & Mensuration',
-      accent: '#3B82F6',
+      accent: isCustomActive ? 'var(--clr-primary)' : '#3B82F6',
       progress: 75,
       topicsLeft: 3,
       solved: 124,
-      bgGlow: 'hover:shadow-[0_20px_40px_rgba(59,130,246,0.08)] hover:border-blue-200/80 dark:hover:border-blue-900/60 dark:hover:shadow-[0_20px_40px_rgba(59,130,246,0.12)]',
+      bgGlow: isCustomActive
+        ? 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]'
+        : 'hover:shadow-[0_20px_40px_rgba(59,130,246,0.08)] hover:border-blue-200/80 dark:hover:border-blue-900/60 dark:hover:shadow-[0_20px_40px_rgba(59,130,246,0.12)]',
       description: 'Master numbers, mathematical induction, profit & loss, coordinates, and fast calculations.',
-      btnColor: 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 dark:bg-blue-500 dark:hover:bg-blue-400',
+      btnColor: isCustomActive
+        ? 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]'
+        : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20 dark:bg-blue-500 dark:hover:bg-blue-400',
       icon: (
-        <svg className="w-16 h-16 text-blue-500 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="none">
+        <svg className="w-16 h-16 transition-transform duration-500 group-hover:scale-110" style={{ color: isCustomActive ? 'var(--clr-primary)' : '#3B82F6' }} viewBox="0 0 100 100" fill="none">
           <line x1="10" y1="80" x2="90" y2="80" className="stroke-slate-100 dark:stroke-slate-800 transition-colors duration-300" strokeWidth="2" strokeDasharray="3 3" />
           <line x1="20" y1="10" x2="20" y2="90" className="stroke-slate-100 dark:stroke-slate-800 transition-colors duration-300" strokeWidth="2" strokeDasharray="3 3" />
           <line x1="50" y1="10" x2="50" y2="90" className="stroke-slate-55 dark:stroke-slate-900/40 transition-colors duration-300" strokeWidth="1.5" />
           <line x1="10" y1="50" x2="90" y2="50" className="stroke-slate-55 dark:stroke-slate-900/40 transition-colors duration-300" strokeWidth="1.5" />
-          <path d="M 20 80 Q 50 15 90 35" stroke="url(#blue-grad)" strokeWidth="3.5" strokeLinecap="round" />
-          <circle cx="20" cy="80" r="4.5" fill="#3B82F6" stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
-          <circle cx="50" cy="38" r="4.5" fill="#3B82F6" stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
-          <circle cx="90" cy="35" r="6.5" fill="#3B82F6" stroke="#FFFFFF" className="dark:stroke-slate-950 animate-pulse" strokeWidth="2" />
+          <path d="M 20 80 Q 50 15 90 35" stroke="url(#quant-grad)" strokeWidth="3.5" strokeLinecap="round" />
+          <circle cx="20" cy="80" r="4.5" fill={isCustomActive ? 'var(--clr-primary)' : '#3B82F6'} stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
+          <circle cx="50" cy="38" r="4.5" fill={isCustomActive ? 'var(--clr-primary)' : '#3B82F6'} stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
+          <circle cx="90" cy="35" r="6.5" fill={isCustomActive ? 'var(--clr-primary)' : '#3B82F6'} stroke="#FFFFFF" className="dark:stroke-slate-950 animate-pulse" strokeWidth="2" />
           <defs>
-            <linearGradient id="blue-grad" x1="0" y1="1" x2="1" y2="0">
-              <stop offset="0%" stopColor="#3B82F6" />
-              <stop offset="100%" stopColor="#60A5FA" />
+            <linearGradient id="quant-grad" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0%" stopColor={isCustomActive ? 'var(--clr-primary)' : '#3B82F6'} />
+              <stop offset="100%" stopColor={isCustomActive ? 'var(--clr-primary)' : '#3B82F6'} stopOpacity={0.6} />
             </linearGradient>
           </defs>
         </svg>
@@ -94,30 +101,34 @@ export default function DomainsTab({ searchQuery }: DomainsTabProps) {
       id: 'logical',
       title: 'Logical Reasoning',
       subtitle: 'Arrangements, Syllogisms & Logic Puzzles',
-      accent: '#8B5CF6',
+      accent: isCustomActive ? 'var(--clr-primary)' : '#8B5CF6',
       progress: 40,
       topicsLeft: 6,
       solved: 68,
-      bgGlow: 'hover:shadow-[0_20px_40px_rgba(139,92,246,0.08)] hover:border-purple-200/80 dark:hover:border-purple-900/60 dark:hover:shadow-[0_20px_40px_rgba(139,92,246,0.12)]',
+      bgGlow: isCustomActive
+        ? 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]'
+        : 'hover:shadow-[0_20px_40px_rgba(139,92,246,0.08)] hover:border-purple-200/80 dark:hover:border-purple-900/60 dark:hover:shadow-[0_20px_40px_rgba(139,92,246,0.12)]',
       description: 'Strengthen spatial matrices, circular deduction paths, syllogistic patterns, and sequences.',
-      btnColor: 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20 dark:bg-purple-500 dark:hover:bg-purple-400',
+      btnColor: isCustomActive
+        ? 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]'
+        : 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20 dark:bg-purple-500 dark:hover:bg-purple-400',
       icon: (
-        <svg className="w-16 h-16 text-purple-500 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="none">
+        <svg className="w-16 h-16 transition-transform duration-500 group-hover:scale-110" style={{ color: isCustomActive ? 'var(--clr-primary)' : '#8B5CF6' }} viewBox="0 0 100 100" fill="none">
           <line x1="25" y1="30" x2="50" y2="50" className="stroke-slate-100 dark:stroke-slate-800 transition-colors duration-300" strokeWidth="2" />
           <line x1="75" y1="30" x2="50" y2="50" className="stroke-slate-100 dark:stroke-slate-800 transition-colors duration-300" strokeWidth="2" />
           <line x1="25" y1="70" x2="50" y2="50" className="stroke-slate-100 dark:stroke-slate-800 transition-colors duration-300" strokeWidth="2" />
           <line x1="75" y1="70" x2="50" y2="50" className="stroke-slate-100 dark:stroke-slate-800 transition-colors duration-300" strokeWidth="2" />
           <line x1="25" y1="30" x2="75" y2="30" className="stroke-slate-55 dark:stroke-slate-900/40 transition-colors duration-300" strokeWidth="1.5" />
           <line x1="25" y1="70" x2="75" y2="70" className="stroke-slate-55 dark:stroke-slate-900/40 transition-colors duration-300" strokeWidth="1.5" />
-          <circle cx="50" cy="50" r="9.5" fill="url(#purple-grad)" stroke="#FFFFFF" className="dark:stroke-slate-950 filter drop-shadow-[0_0_6px_rgba(139,92,246,0.4)]" strokeWidth="2" />
-          <circle cx="25" cy="30" r="5" fill="#8B5CF6" stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
-          <circle cx="75" cy="30" r="5" fill="#8B5CF6" stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
-          <circle cx="25" cy="70" r="5" fill="#8B5CF6" stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
-          <circle cx="75" cy="70" r="5" fill="#8B5CF6" stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
+          <circle cx="50" cy="50" r="9.5" fill="url(#logical-grad)" stroke="#FFFFFF" className="dark:stroke-slate-950" style={{ filter: isCustomActive ? 'drop-shadow(0 0 6px rgba(var(--clr-primary-rgb),0.4))' : 'drop-shadow(0 0 6px rgba(139,92,246,0.4))' }} strokeWidth="2" />
+          <circle cx="25" cy="30" r="5" fill={isCustomActive ? 'var(--clr-primary)' : '#8B5CF6'} stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
+          <circle cx="75" cy="30" r="5" fill={isCustomActive ? 'var(--clr-primary)' : '#8B5CF6'} stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
+          <circle cx="25" cy="70" r="5" fill={isCustomActive ? 'var(--clr-primary)' : '#8B5CF6'} stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
+          <circle cx="75" cy="70" r="5" fill={isCustomActive ? 'var(--clr-primary)' : '#8B5CF6'} stroke="#FFFFFF" className="dark:stroke-slate-950" strokeWidth="1.5" />
           <defs>
-            <linearGradient id="purple-grad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#8B5CF6" />
-              <stop offset="100%" stopColor="#A78BFA" />
+            <linearGradient id="logical-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={isCustomActive ? 'var(--clr-primary)' : '#8B5CF6'} />
+              <stop offset="100%" stopColor={isCustomActive ? 'var(--clr-primary)' : '#A78BFA'} stopOpacity={0.6} />
             </linearGradient>
           </defs>
         </svg>
@@ -127,23 +138,27 @@ export default function DomainsTab({ searchQuery }: DomainsTabProps) {
       id: 'verbal',
       title: 'Verbal Ability',
       subtitle: 'Grammar, Syntax & Reading Comprehension',
-      accent: '#10B981',
+      accent: isCustomActive ? 'var(--clr-primary)' : '#10B981',
       progress: 85,
       topicsLeft: 2,
       solved: 194,
-      bgGlow: 'hover:shadow-[0_20px_40px_rgba(16,185,129,0.08)] hover:border-emerald-200/80 dark:hover:border-emerald-900/60 dark:hover:shadow-[0_20px_40px_rgba(16,185,129,0.12)]',
+      bgGlow: isCustomActive
+        ? 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]'
+        : 'hover:shadow-[0_20px_40px_rgba(16,185,129,0.08)] hover:border-emerald-200/80 dark:hover:border-emerald-900/60 dark:hover:shadow-[0_20px_40px_rgba(16,185,129,0.12)]',
       description: 'Perfect vocabulary context, verbal modifications, textual inferences, and logic correction.',
-      btnColor: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 dark:bg-emerald-500 dark:hover:bg-emerald-400',
+      btnColor: isCustomActive
+        ? 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]'
+        : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20 dark:bg-emerald-500 dark:hover:bg-emerald-400',
       icon: (
-        <svg className="w-16 h-16 text-emerald-500 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="none">
-          <rect x="15" y="25" width="50" height="20" rx="7" className="fill-emerald-50 dark:fill-emerald-950/20" stroke="#10B981" strokeWidth="1.8" />
-          <text x="24" y="38" className="fill-emerald-800 dark:fill-emerald-300 font-extrabold" fontSize="9" fontWeight="800" fontFamily="system-ui, sans-serif" letterSpacing="0.5">SYNTAX</text>
-          <rect x="35" y="52" width="50" height="20" rx="7" fill="url(#emerald-grad)" className="stroke-white dark:stroke-slate-900 filter drop-shadow-[0_4px_8px_rgba(16,185,129,0.2)]" strokeWidth="1.5" />
+        <svg className="w-16 h-16 transition-transform duration-500 group-hover:scale-110" style={{ color: isCustomActive ? 'var(--clr-primary)' : '#10B981' }} viewBox="0 0 100 100" fill="none">
+          <rect x="15" y="25" width="50" height="20" rx="7" className={isCustomActive ? 'fill-[var(--clr-primary)]/10' : 'fill-emerald-50 dark:fill-emerald-950/20'} stroke={isCustomActive ? 'var(--clr-primary)' : '#10B981'} strokeWidth="1.8" />
+          <text x="24" y="38" className={isCustomActive ? 'fill-[var(--clr-primary)] dark:fill-[var(--clr-primary)] font-extrabold' : 'fill-emerald-800 dark:fill-emerald-300 font-extrabold'} fontSize="9" fontWeight="800" fontFamily="system-ui, sans-serif" letterSpacing="0.5">SYNTAX</text>
+          <rect x="35" y="52" width="50" height="20" rx="7" fill="url(#verbal-grad)" className="stroke-white dark:stroke-slate-900" style={{ filter: isCustomActive ? 'drop-shadow(0 4px 8px rgba(var(--clr-primary-rgb),0.2))' : 'drop-shadow(0 4px 8px rgba(16,185,129,0.2))' }} strokeWidth="1.5" />
           <text x="44" y="65" fill="#FFFFFF" fontSize="9" fontWeight="800" fontFamily="system-ui, sans-serif" letterSpacing="0.5">VERBAL</text>
           <defs>
-            <linearGradient id="emerald-grad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#10B981" />
-              <stop offset="100%" stopColor="#34D399" />
+            <linearGradient id="verbal-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={isCustomActive ? 'var(--clr-primary)' : '#10B981'} />
+              <stop offset="100%" stopColor={isCustomActive ? 'var(--clr-primary)' : '#34D399'} stopOpacity={0.6} />
             </linearGradient>
           </defs>
         </svg>
@@ -153,21 +168,25 @@ export default function DomainsTab({ searchQuery }: DomainsTabProps) {
       id: 'coding',
       title: 'Coding & DSA',
       subtitle: 'Data Structures, Algorithms & Problem Solving',
-      accent: '#F97316',
+      accent: isCustomActive ? 'var(--clr-primary)' : '#F97316',
       progress: 20,
       topicsLeft: 8,
       solved: 32,
-      bgGlow: 'hover:shadow-[0_20px_40px_rgba(249,115,22,0.08)] hover:border-orange-200/80 dark:hover:border-orange-900/60 dark:hover:shadow-[0_20px_40px_rgba(249,115,22,0.12)]',
+      bgGlow: isCustomActive
+        ? 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]'
+        : 'hover:shadow-[0_20px_40px_rgba(249,115,22,0.08)] hover:border-orange-200/80 dark:hover:border-orange-900/60 dark:hover:shadow-[0_20px_40px_rgba(249,115,22,0.12)]',
       description: 'Master binary search trees, search recursion, dynamic array branches, and sorting complexities.',
-      btnColor: 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20 dark:bg-orange-500 dark:hover:bg-orange-400',
+      btnColor: isCustomActive
+        ? 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]'
+        : 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20 dark:bg-orange-500 dark:hover:bg-orange-400',
       icon: (
-        <svg className="w-16 h-16 text-orange-500 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="none">
-          <path d="M 28 32 L 10 50 L 28 68" stroke="#F97316" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M 72 32 L 90 50 L 72 68" stroke="#F97316" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="56" y1="26" x2="44" y2="74" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
-          <circle cx="50" cy="16" r="3" fill="#F97316" />
-          <circle cx="15" cy="80" r="3" fill="#F97316" />
-          <circle cx="85" cy="80" r="3" fill="#F97316" />
+        <svg className="w-16 h-16 transition-transform duration-500 group-hover:scale-110" style={{ color: isCustomActive ? 'var(--clr-primary)' : '#F97316' }} viewBox="0 0 100 100" fill="none">
+          <path d="M 28 32 L 10 50 L 28 68" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M 72 32 L 90 50 L 72 68" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <line x1="56" y1="26" x2="44" y2="74" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="3" strokeLinecap="round" />
+          <circle cx="50" cy="16" r="3" fill={isCustomActive ? 'var(--clr-primary)' : '#F97316'} />
+          <circle cx="15" cy="80" r="3" fill={isCustomActive ? 'var(--clr-primary)' : '#F97316'} />
+          <circle cx="85" cy="80" r="3" fill={isCustomActive ? 'var(--clr-primary)' : '#F97316'} />
         </svg>
       )
     }
@@ -209,7 +228,7 @@ export default function DomainsTab({ searchQuery }: DomainsTabProps) {
                   <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white tracking-tight leading-none uppercase font-heading transition-colors duration-300">
                     {d.title}
                   </h2>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
                       {d.subtitle}
                     </p>

@@ -12,6 +12,8 @@ import {
   Plus, 
   ChevronRight, 
   ChevronLeft, 
+  ChevronDown,
+  ChevronUp,
   Flag, 
   AlertTriangle, 
   FileText, 
@@ -39,6 +41,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
 import { Question, ResponseOption } from '@/lib/admin/types';
+import { DOMAINS_DATA } from '@/lib/admin/store';
 
 // Extract YouTube ID helper
 const getYouTubeId = (url: string): string | null => {
@@ -208,6 +211,79 @@ export default function PracticeArena({
 
   // Shortcut expansion
   const [isShortcutExpanded, setIsShortcutExpanded] = useState<boolean>(false);
+
+  // Left Navigation sidebar states
+  const [isLeftSidebarExpanded, setIsLeftSidebarExpanded] = useState<boolean>(true);
+  const [expandedDomains, setExpandedDomains] = useState<Record<string, boolean>>({
+    quant: true,
+    logical: true,
+    verbal: true,
+    coding: true
+  });
+  const [expandedSubTopics, setExpandedSubTopics] = useState<Record<string, boolean>>({
+    arithmetic: true,
+    arrangements: true,
+    grammar: true,
+    arrays: true
+  });
+
+  // Right Learning Hub state (to switch between tabs)
+  const [learningHubTab, setLearningHubTab] = useState<'editorial' | 'video' | 'aiexplain'>('editorial');
+
+  // Coding workspace states
+  const [codingLanguage, setCodingLanguage] = useState<'python' | 'cpp' | 'java' | 'javascript'>('python');
+  const [codeInputValue, setCodeInputValue] = useState<string>('');
+  const [codingRunLogs, setCodingRunLogs] = useState<string[]>([]);
+  const [isCodingRunning, setIsCodingRunning] = useState<boolean>(false);
+  const [codingSubmissions, setCodingSubmissions] = useState<Array<{
+    id: string;
+    status: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error';
+    runtime: string;
+    memory: string;
+    timestamp: string;
+  }>>([]);
+
+  const [codingLeftTab, setCodingLeftTab] = useState<'description' | 'editorial' | 'discussion' | 'video'>('description');
+
+  useEffect(() => {
+    if (!activeQuestion || activeQuestion.domainId !== 'coding') return;
+    
+    let templates: Record<string, string> = {};
+    
+    if (activeQuestion.id === 'C-101') {
+      templates = {
+        python: "class Solution:\n    def findMaxConsecutiveOnes(self, nums: list[int]) -> int:\n        # Write your code here\n        count = 0\n        max_count = 0\n        for num in nums:\n            if num == 1:\n                count += 1\n                max_count = max(max_count, count)\n            else:\n                count = 0\n        return max_count\n",
+        cpp: "class Solution {\npublic:\n    int findMaxConsecutiveOnes(vector<int>& nums) {\n        // Write your code here\n        int max_count = 0, count = 0;\n        for (int num : nums) {\n            if (num == 1) {\n                count++;\n                max_count = max(max_count, count);\n            } else {\n                count = 0;\n            }\n        }\n        return max_count;\n    }\n};",
+        java: "class Solution {\n    public int findMaxConsecutiveOnes(int[] nums) {\n        // Write your code here\n        int maxCount = 0;\n        int count = 0;\n        for (int num : nums) {\n            if (num == 1) {\n                count++;\n                maxCount = Math.max(maxCount, count);\n            } else {\n                count = 0;\n            }\n        }\n        return maxCount;\n    }\n}",
+        javascript: "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findMaxConsecutiveOnes = function(nums) {\n    // Write your code here\n    let maxCount = 0;\n    let count = 0;\n    for (let num of nums) {\n        if (num === 1) {\n            count++;\n            maxCount = Math.max(maxCount, count);\n        } else {\n            count = 0;\n        }\n    }\n    return maxCount;\n};"
+      };
+    } else if (activeQuestion.id === 'C-102') {
+      templates = {
+        python: "class Solution:\n    def maxSubarraySum(self, nums: list[int], k: int) -> int:\n        # Write your code here\n        if not nums or k <= 0:\n            return 0\n        current_sum = sum(nums[:k])\n        max_sum = current_sum\n        for i in range(k, len(nums)):\n            current_sum += nums[i] - nums[i - k]\n            max_sum = max(max_sum, current_sum)\n        return max_sum\n",
+        cpp: "class Solution {\npublic:\n    int maxSubarraySum(vector<int>& nums, int k) {\n        // Write your code here\n        if (nums.empty() || k <= 0) return 0;\n        int current_sum = 0;\n        for (int i = 0; i < k; i++) current_sum += nums[i];\n        int max_sum = current_sum;\n        for (size_t i = k; i < nums.size(); i++) {\n            current_sum += nums[i] - nums[i - k];\n            max_sum = max(max_sum, current_sum);\n        }\n        return max_sum;\n    }\n};",
+        java: "class Solution {\n    public int maxSubarraySum(int[] nums, int k) {\n        // Write your code here\n        if (nums == null || nums.length == 0 || k <= 0) return 0;\n        int currentSum = 0;\n        for (int i = 0; i < k; i++) currentSum += nums[i];\n        int maxSum = currentSum;\n        for (int i = k; i < nums.length; i++) {\n            currentSum += nums[i] - nums[i - k];\n            maxSum = Math.max(maxSum, currentSum);\n        }\n        return maxSum;\n    }\n}",
+        javascript: "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxSubarraySum = function(nums, k) {\n    // Write your code here\n    if (!nums || nums.length === 0 || k <= 0) return 0;\n    let currentSum = 0;\n    for (let i = 0; i < k; i++) currentSum += nums[i];\n    let maxSum = currentSum;\n    for (let i = k; i < nums.length; i++) {\n        currentSum += nums[i] - nums[i - k];\n        maxSum = Math.max(maxSum, currentSum);\n    }\n    return maxSum;\n};"
+      };
+    } else if (activeQuestion.id === 'C-103') {
+      templates = {
+        python: "class Solution:\n    def generateParenthesis(self, n: int) -> list[str]:\n        # Write your code here\n        result = []\n        def backtrack(current, open_count, close_count):\n            if len(current) == 2 * n:\n                result.append(current)\n                return\n            if open_count < n:\n                backtrack(current + \"(\", open_count + 1, close_count)\n            if close_count < open_count:\n                backtrack(current + \")\", open_count, close_count + 1)\n        backtrack(\"\", 0, 0)\n        return result\n",
+        cpp: "class Solution {\npublic:\n    vector<string> generateParenthesis(int n) {\n        // Write your code here\n        vector<string> result;\n        backtrack(result, \"\", 0, 0, n);\n        return result;\n    }\nprivate:\n    void backtrack(vector<string>& res, string current, int open, int close, int max) {\n        if (current.length() == max * 2) {\n            res.push_back(current);\n            return;\n        }\n        if (open < max) {\n            backtrack(res, current + \"(\", open + 1, close, max);\n        }\n        if (close < open) {\n            backtrack(res, current + \")\", open, close + 1, max);\n        }\n    }\n};",
+        java: "import java.util.*;\n\nclass Solution {\n    public List<String> generateParenthesis(int n) {\n        // Write your code here\n        List<String> result = new ArrayList<>();\n        backtrack(result, \"\", 0, 0, n);\n        return result;\n    }\n    \n    private void backtrack(List<String> res, String current, int open, int close, int max) {\n        if (current.length() == max * 2) {\n            res.add(current);\n            return;\n        }\n        if (open < max) {\n            backtrack(res, current + \"(\", open + 1, close, max);\n        }\n        if (close < open) {\n            backtrack(res, current + \")\", open, close + 1, max);\n        }\n    }\n}",
+        javascript: "/**\n * @param {number} n\n * @return {string[]}\n */\nvar generateParenthesis = function(n) {\n    // Write your code here\n    const result = [];\n    const backtrack = (current, open, close) => {\n        if (current.length === 2 * n) {\n            result.push(current);\n            return;\n        }\n        if (open < n) {\n            backtrack(current + \"(\", open + 1, close);\n        }\n        if (close < open) {\n            backtrack(current + \")\", open, close + 1);\n        }\n    };\n    backtrack(\"\", 0, 0);\n    return result;\n};"
+      };
+    } else {
+      templates = {
+        python: "# Write your code here\n",
+        cpp: "// Write your code here\n",
+        java: "// Write your code here\n",
+        javascript: "// Write your code here\n"
+      };
+    }
+    
+    setCodeInputValue(templates[codingLanguage] || '');
+  }, [activeQuestion, codingLanguage]);
+
+  const isCodingQuestion = activeQuestion?.domainId === 'coding';
 
   // Local Storage Revision Meta Database
   const [revisionDB, setRevisionDB] = useState<Record<string, RevisionMeta>>({});
@@ -549,6 +625,114 @@ export default function PracticeArena({
     render();
   };
 
+  // Run simulated code
+  const handleRunCode = () => {
+    if (!activeQuestion) return;
+    setIsCodingRunning(true);
+    const fileSuffix = codingLanguage === 'python' ? 'py' : codingLanguage === 'javascript' ? 'js' : codingLanguage === 'cpp' ? 'cpp' : 'java';
+    setCodingRunLogs([`$ ${codingLanguage} solution.${fileSuffix}`, 'Compiling and analyzing syntax...', 'Running test cases...']);
+    
+    setTimeout(() => {
+      let customLogs: string[] = [];
+      if (activeQuestion.id === 'C-101') {
+        customLogs = [
+          'Test Case 1:',
+          '  Input: nums = [1, 1, 0, 1, 1, 1]',
+          '  Output: 3',
+          '  Expected: 3',
+          '  Result: PASS ✅',
+          '',
+          'All standard test cases passed successfully.'
+        ];
+      } else if (activeQuestion.id === 'C-102') {
+        customLogs = [
+          'Test Case 1:',
+          '  Input: nums = [2, 1, 5, 1, 3, 2], k = 3',
+          '  Output: 9',
+          '  Expected: 9',
+          '  Result: PASS ✅',
+          '',
+          'All standard test cases passed successfully.'
+        ];
+      } else if (activeQuestion.id === 'C-103') {
+        customLogs = [
+          'Test Case 1:',
+          '  Input: n = 3',
+          '  Output: ["((()))","(()())","(())()","()(())","()()()"]',
+          '  Expected: ["((()))","(()())","(())()","()(())","()()()"]',
+          '  Result: PASS ✅',
+          '',
+          'All standard test cases passed successfully.'
+        ];
+      } else {
+        customLogs = [
+          'Test Case 1:',
+          '  Input: standard test inputs',
+          '  Output: values match expectation',
+          '  Result: PASS ✅',
+          '',
+          'All standard test cases passed successfully.'
+        ];
+      }
+
+      setCodingRunLogs(prev => [
+        ...prev,
+        ...customLogs
+      ]);
+      setIsCodingRunning(false);
+      setToastMessage({ text: 'Code executed successfully! ✅', isSuccess: true });
+      setTimeout(() => setToastMessage(null), 2000);
+    }, 1500);
+  };
+
+  // Submit simulated code
+  const handleSubmitCode = () => {
+    if (!activeQuestion) return;
+    setIsCodingRunning(true);
+    const fileSuffix = codingLanguage === 'python' ? 'py' : codingLanguage === 'javascript' ? 'js' : codingLanguage === 'cpp' ? 'cpp' : 'java';
+    setCodingRunLogs([`$ submit --lang=${codingLanguage} solution.${fileSuffix}`, 'Compiling for submission...', 'Running on 15 hidden test cases...']);
+    
+    setTimeout(() => {
+      setIsCodingRunning(false);
+      
+      setCodingRunLogs(prev => [
+        ...prev,
+        '  Result: ACCEPTED 🎉',
+        '  15/15 cases passed.',
+        '  Runtime: 24 ms',
+        '  Memory: 14.8 MB'
+      ]);
+      
+      if (!submittedAnswers[activeQuestion.id]) {
+        const newSolved = solvedCount + 1;
+        const newStreak = streak + 1;
+        setSolvedCount(newSolved);
+        setStreak(newStreak);
+        localStorage.setItem('aptitude_solved_count', String(newSolved));
+        localStorage.setItem('aptitude_streak', String(newStreak));
+        
+        triggerConfetti();
+      }
+      
+      setSubmittedAnswers(prev => ({ ...prev, [activeQuestion.id]: true }));
+      
+      // Append to submissions history
+      setCodingSubmissions(prev => [
+        {
+          id: `SUB-${Math.floor(1000 + Math.random() * 9000)}`,
+          status: 'Accepted',
+          runtime: '24ms',
+          memory: '14.8MB',
+          timestamp: 'Just now'
+        },
+        ...prev
+      ]);
+      
+      setToastMessage({ text: 'Accepted! 15/15 test cases passed. 🎉', isSuccess: true });
+      setTimeout(() => setToastMessage(null), 2500);
+    }, 2000);
+  };
+
   // Submit Answer Action
   const handleSubmitAnswer = async () => {
     if (!selectedOptionId) return;
@@ -812,8 +996,9 @@ export default function PracticeArena({
         )}
       </AnimatePresence>
 
-      {/* Sticky Header Glass Panel */}
-      <header className="sticky top-0 z-30 w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md dark:bg-slate-950/70 dark:border-slate-900 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      {/* Sticky Header Glass Panel Container */}
+      <div className="sticky top-0 z-30 w-full bg-slate-50 dark:bg-[#030712] pt-4 pb-2 transition-colors duration-300">
+        <header className="w-full rounded-[24px] border border-slate-200/80 dark:border-white/[0.08] bg-white/75 dark:bg-slate-950/75 backdrop-blur-[20px] shadow-lg dark:shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         
         {/* Left segments: Breadcrumbs & Meta */}
         <div className="flex flex-col gap-1 text-left">
@@ -922,7 +1107,6 @@ export default function PracticeArena({
           
           {/* Solving Momentum Widget */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20 rounded-full text-xs font-bold text-orange-600 dark:text-orange-400 shadow-xs" title="Your current correct answer streak and total solved questions today">
-            <Flame className="w-3.5 h-3.5 text-orange-500 fill-current animate-pulse" />
             <span>🔥 {streak} Streak • {solvedCount} Solved</span>
           </div>
 
@@ -965,519 +1149,804 @@ export default function PracticeArena({
           </motion.button>
         </div>
 
-      </header>
+        </header>
+      </div>
 
       {/* Main Workspace Panels */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-start">
-          
-          {/* Left panel Question + options (7 columns) */}
-          <section className="lg:col-span-7 space-y-6 text-left">
-            
-            {/* Question Card */}
-            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-6 md:p-8 space-y-6 shadow-xs relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/2 to-transparent pointer-events-none" />
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-6 py-6 select-text">
+        {isCodingQuestion ? (
+          // Coding Layout (Split screen: Left Details with tabs, Right simulated compiler editor)
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+            {/* Left Column: Details tabs */}
+            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-6 md:p-8 space-y-6 shadow-xs text-left flex flex-col justify-between h-[650px]">
+              <div>
+                {/* Tabs */}
+                <div className="flex border-b border-slate-200 dark:border-slate-900 pb-0.5 justify-start gap-1.5 select-none overflow-x-auto scrollbar-none mb-4">
+                  {[
+                    { id: 'description', label: 'Description' },
+                    { id: 'editorial', label: 'Editorial' },
+                    { id: 'discussion', label: 'Discussion' },
+                    { id: 'video', label: 'Video' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setCodingLeftTab(tab.id as any)}
+                      className={`px-3 py-1.5 text-xs font-black uppercase tracking-wider relative cursor-pointer whitespace-nowrap ${
+                        codingLeftTab === tab.id 
+                          ? 'text-blue-600 dark:text-blue-400 font-extrabold'
+                          : 'text-slate-400 hover:text-slate-650 dark:text-slate-500'
+                      }`}
+                    >
+                      {tab.label}
+                      {codingLeftTab === tab.id && (
+                        <motion.div
+                          layoutId="codingLeftTabGlow"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
 
-              <div className="flex justify-between items-start gap-4">
-                <h1 className="text-xl md:text-2xl font-bold font-heading text-slate-800 dark:text-white leading-snug tracking-tight">
-                  <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[0].trim())} />
-                </h1>
-                
-                {/* Formula Sheet Trigger */}
-                <button
-                  onClick={() => setIsFormulaDrawerOpen(true)}
-                  className="px-3 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl border border-slate-205 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 dark:text-slate-400 shrink-0 cursor-pointer flex items-center gap-1.5 transition-colors select-none"
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>📖 Formula Sheet</span>
-                </button>
+                {/* Tab Panel contents */}
+                <div className="flex-1 overflow-y-auto max-h-[360px] pr-1 space-y-4">
+                  {codingLeftTab === 'description' && (
+                    <div className="space-y-4 animate-fadeIn text-xs">
+                      <div className="flex justify-between items-center select-none text-[10px] text-slate-400">
+                        <span>Coding Problem</span>
+                        <span>{activeQuestion.difficulty}</span>
+                      </div>
+                      <h2 className="text-base font-black text-slate-800 dark:text-white uppercase tracking-tight">
+                        {activeQuestion.id}. {activeQuestion.questionStem.split('###')[0].trim()}
+                      </h2>
+                      <div className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                        <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem)} />
+                      </div>
+                    </div>
+                  )}
+
+                  {codingLeftTab === 'editorial' && (
+                    <div className="space-y-4 animate-fadeIn text-xs leading-relaxed">
+                      <h3 className="text-xs font-black uppercase text-slate-800 dark:text-white">Optimal Approach</h3>
+                      <p className="text-slate-600 dark:text-slate-400 font-medium">
+                        To solve the consecutive ones problem efficiently, we can use a single pass algorithm. 
+                        We keep a running count of consecutive 1s. Whenever we see a 1, we increment the count and update our maximum count. 
+                        Whenever we see a 0, we reset the count to 0.
+                      </p>
+                      
+                      <div className="p-3.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-2xl">
+                        <strong className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-450 block mb-1">Time & Space Complexity</strong>
+                        <div className="font-semibold text-slate-500 font-mono text-[10.5px]">
+                          <div>Time Complexity: O(N)</div>
+                          <div>Space Complexity: O(1)</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {codingLeftTab === 'discussion' && (
+                    <div className="space-y-4 animate-fadeIn text-xs">
+                      <div className="flex justify-between items-center select-none">
+                        <span className="text-[10px] font-black uppercase text-slate-400">Discussion Community</span>
+                        <span className="text-[9px] font-mono text-slate-400">{commentsList.length} threads</span>
+                      </div>
+
+                      {/* Write comment input */}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={commentInput}
+                          onChange={(e) => setCommentInput(e.target.value)}
+                          placeholder="Post your doubt or alternative shortcut..."
+                          className="flex-1 px-3 py-2 text-xs border border-slate-200 dark:border-slate-850 bg-slate-50 dark:bg-slate-900/60 rounded-xl outline-none focus:border-blue-500"
+                        />
+                        <button
+                          onClick={() => {
+                            if (!commentInput.trim()) return;
+                            setCommentsList(prev => [
+                              {
+                                id: String(prev.length + 1),
+                                user: 'Aptitude Prep Student',
+                                avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
+                                comment: commentInput,
+                                time: 'Just now',
+                                likes: 0
+                              },
+                              ...prev
+                            ]);
+                            setCommentInput('');
+                          }}
+                          className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer"
+                        >
+                          Post
+                        </button>
+                      </div>
+
+                      {/* Comments feed */}
+                      <div className="space-y-3 pt-2 max-h-48 overflow-y-auto">
+                        {commentsList.map(c => (
+                          <div key={c.id} className="p-3 bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-900 rounded-2xl flex gap-3 text-left">
+                            <img src={c.avatar} className="w-7 h-7 rounded-full object-cover" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold font-mono">
+                                <span>{c.user}</span>
+                                <span>{c.time}</span>
+                              </div>
+                              <p className="text-[11px] font-medium text-slate-700 dark:text-slate-355 mt-1">{c.comment}</p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <button
+                                  onClick={() => {
+                                    setCommentsList(prev => prev.map(item => item.id === c.id ? { ...item, likes: item.likes + (item.isLiked ? -1 : 1), isLiked: !item.isLiked } : item));
+                                  }}
+                                  className={`text-[9.5px] font-black uppercase flex items-center gap-1 cursor-pointer ${
+                                    c.isLiked ? 'text-blue-550' : 'text-slate-400 hover:text-slate-600'
+                                  }`}
+                                >
+                                  👍 {c.likes}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {codingLeftTab === 'video' && (
+                    <div className="space-y-4 animate-fadeIn">
+                      <div className="relative aspect-video bg-black border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs flex flex-col items-center justify-center group">
+                        {(() => {
+                          const ytId = getYouTubeId(activeQuestion.videoUrl);
+                          if (ytId) {
+                            if (isVideoActive) {
+                              return (
+                                <iframe
+                                  id="youtube-coding-player"
+                                  width="100%"
+                                  height="100%"
+                                  src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="w-full h-full border-0 absolute inset-0"
+                                />
+                              );
+                            } else {
+                              return (
+                                <>
+                                  <img 
+                                    src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} 
+                                    alt="Video Walkthrough"
+                                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-102 transition-transform duration-350"
+                                  />
+                                  <button
+                                    onClick={() => setIsVideoActive(true)}
+                                    className="z-10 w-11 h-11 bg-blue-600/90 text-white rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform cursor-pointer"
+                                  >
+                                    <Play className="w-5 h-5 fill-current ml-0.5" />
+                                  </button>
+                                </>
+                              );
+                            }
+                          }
+                          return <span className="text-xs text-slate-500">Video explanation is loading...</span>;
+                        })()}
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold px-0.5 select-none mt-1">
+                        <span>Speaker: <strong className="text-slate-655 dark:text-slate-350">Ravi Kumar</strong></span>
+                        <span>Duration: <strong className="text-slate-655 dark:text-slate-350">{activeQuestion.videoDuration || '08 mins'}</strong></span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Pitfalls Learning Context Card */}
+              {/* Company Tags list */}
+              <div className="pt-4 border-t border-slate-200/50 dark:border-slate-900/50">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 select-none">Asked In:</span>
+                <div className="flex flex-wrap gap-1.5 select-none">
+                  {activeQuestion.companyTags.map(comp => (
+                    <span key={comp} className="text-[10px] font-black uppercase px-2 py-0.5 bg-slate-50 border border-slate-205 dark:bg-slate-900 dark:border-slate-850 text-slate-600 dark:text-slate-350 rounded-md font-mono">
+                      💼 {comp}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Code Editor workspace */}
+            <div className="bg-slate-950 border border-slate-900 rounded-3xl p-5 md:p-6 flex flex-col justify-between h-[650px] shadow-2xl relative overflow-hidden text-left">
+              <div>
+                {/* Code Editor Header */}
+                <div className="flex justify-between items-center pb-3 border-b border-slate-900/60 mb-4 select-none">
+                  <div className="flex border-b border-slate-900 pb-0.5 justify-start gap-3">
+                    <span className="text-xs font-black uppercase text-slate-200">Simulated IDE</span>
+                  </div>
+                  
+                  {/* Language Selector */}
+                  <select 
+                    value={codingLanguage} 
+                    onChange={(e) => setCodingLanguage(e.target.value as any)}
+                    className="bg-slate-900 border border-slate-800 text-slate-200 text-xs px-2.5 py-1 rounded-xl outline-none font-bold cursor-pointer"
+                  >
+                    <option value="python">Python 3</option>
+                    <option value="cpp">C++ 17</option>
+                    <option value="java">Java 11</option>
+                    <option value="javascript">JavaScript</option>
+                  </select>
+                </div>
+
+                {/* Editor Content Area */}
+                <div className="flex font-mono text-xs overflow-hidden h-[330px] border border-slate-900/50 rounded-2xl bg-slate-900/40 relative">
+                  {/* Line Numbers gutter */}
+                  <div className="w-10 bg-slate-900/80 border-r border-slate-900 text-right pr-2.5 py-4 text-slate-600 select-none">
+                    {Array.from({ length: Math.max(8, codeInputValue.split('\n').length) }).map((_, i) => (
+                      <div key={i}>{i + 1}</div>
+                    ))}
+                  </div>
+                  {/* Textarea */}
+                  <textarea
+                    value={codeInputValue}
+                    onChange={(e) => setCodeInputValue(e.target.value)}
+                    spellCheck={false}
+                    className="flex-1 bg-transparent text-slate-100 p-4 outline-none font-mono resize-none leading-relaxed h-full overflow-y-auto"
+                  />
+                </div>
+
+                {/* Terminal logs Output */}
+                {codingRunLogs.length > 0 && (
+                  <div className="mt-4 p-4 bg-slate-900 border border-slate-850 rounded-2xl font-mono text-[11px] text-slate-350 max-h-36 overflow-y-auto">
+                    <span className="text-[9px] uppercase font-black text-slate-500 block mb-1">Terminal output logs</span>
+                    {codingRunLogs.map((log, i) => (
+                      <div key={i}>{log}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Editor action buttons & submissions list drawer */}
+              <div className="pt-4 border-t border-slate-900/40 flex items-center justify-between select-none">
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleRunCode}
+                    disabled={isCodingRunning}
+                    className="px-5 py-2 bg-slate-905 hover:bg-slate-850 border border-slate-800 text-slate-200 font-bold text-xs uppercase tracking-wider rounded-xl cursor-pointer disabled:opacity-50"
+                  >
+                    Run Code
+                  </button>
+                  <button
+                    onClick={handleSubmitCode}
+                    disabled={isCodingRunning}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider rounded-xl cursor-pointer disabled:opacity-50"
+                  >
+                    Submit Answer
+                  </button>
+                </div>
+
+                {/* Show submissions counter */}
+                {codingSubmissions.length > 0 && (
+                  <div className="text-[10px] font-mono text-slate-550 font-semibold">
+                    Submissions: <strong className="text-emerald-500">{codingSubmissions.length}</strong> (All Passed)
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Aptitude Layout (3 columns: Left Navigation, Center Question workspace, Right Learning Hub)
+          <div className="flex gap-8 relative items-start select-text">
+            
+            {/* Column 1: Collapsible Left Navigation (sticky, collapsible) */}
+            {isLeftSidebarExpanded ? (
+              <aside className="w-64 shrink-0 sticky top-24 self-start max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-slate-950/20 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 shadow-xs select-none hidden lg:flex flex-col">
+                <div className="flex justify-between items-center pb-4 border-b border-slate-200/60 dark:border-slate-900/60 mb-4">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-blue-500" />
+                    <span className="text-xs font-black uppercase text-slate-700 dark:text-white tracking-widest">Topic Navigation</span>
+                  </div>
+                  <button 
+                    onClick={() => setIsLeftSidebarExpanded(false)}
+                    className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors"
+                    title="Collapse Sidebar"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-4 flex-1">
+                  {DOMAINS_DATA.map((domain) => {
+                    const isDomainExpanded = !!expandedDomains[domain.id];
+                    
+                    // Progress calculations
+                    const domainQuestions = questions.filter(q => q.domainId === domain.id);
+                    const solvedDomainQuestions = domainQuestions.filter(q => submittedAnswers[q.id]);
+                    const domainSolvedCount = solvedDomainQuestions.length;
+                    const domainTotalCount = domainQuestions.length || 1;
+                    const domainProgressPercent = Math.round((domainSolvedCount / domainTotalCount) * 100);
+
+                    return (
+                      <div key={domain.id} className="space-y-1.5">
+                        <button
+                          onClick={() => setExpandedDomains(prev => ({ ...prev, [domain.id]: !prev[domain.id] }))}
+                          className="w-full flex items-center justify-between p-2 rounded-xl text-left hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors cursor-pointer"
+                        >
+                          <span className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider truncate">
+                            {domain.name}
+                          </span>
+                          {isDomainExpanded ? <ChevronDown className="w-3.5 h-3.5 shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 shrink-0" />}
+                        </button>
+
+                        {isDomainExpanded && (
+                          <div className="pl-2.5 border-l border-slate-200 dark:border-slate-800 space-y-3 pt-1 ml-2">
+                            {/* mini progress details */}
+                            <div className="space-y-1 pr-1">
+                              <div className="flex justify-between text-[9px] font-bold text-slate-400 font-mono">
+                                <span>{domainSolvedCount}/{domainTotalCount} Solved</span>
+                                <span>{domainProgressPercent}%</span>
+                              </div>
+                              <div className="w-full h-1 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${domainProgressPercent}%` }} />
+                              </div>
+                            </div>
+
+                            {/* list of subtopics */}
+                            <div className="space-y-2">
+                              {domain.subTopics.map((subTopic) => {
+                                const isSubTopicExpanded = !!expandedSubTopics[subTopic.id];
+                                
+                                const subTopicQuestions = domainQuestions.filter(q => q.subTopicId === subTopic.id);
+                                const subSolvedCount = subTopicQuestions.filter(q => submittedAnswers[q.id]).length;
+                                const subTotalCount = subTopicQuestions.length || 1;
+
+                                return (
+                                  <div key={subTopic.id} className="space-y-1">
+                                    <button
+                                      onClick={() => setExpandedSubTopics(prev => ({ ...prev, [subTopic.id]: !prev[subTopic.id] }))}
+                                      className="w-full flex items-center justify-between p-1.5 rounded-lg text-left hover:bg-slate-50 dark:hover:bg-slate-900/40 text-[11px] font-extrabold text-slate-650 dark:text-slate-355 cursor-pointer"
+                                    >
+                                      <span className="truncate">📂 {subTopic.name}</span>
+                                      {isSubTopicExpanded ? <ChevronDown className="w-3 h-3 shrink-0" /> : <ChevronRight className="w-3 h-3 shrink-0" />}
+                                    </button>
+
+                                    {isSubTopicExpanded && (
+                                      <div className="pl-3.5 border-l border-slate-150 dark:border-slate-850 space-y-1.5 ml-1.5 pt-0.5">
+                                        {subTopic.concepts.map((concept) => {
+                                          const conceptQuestions = subTopicQuestions.filter(q => q.conceptId === concept.id);
+                                          const conceptSolved = conceptQuestions.filter(q => submittedAnswers[q.id]).length;
+                                          const isActive = activeQuestion?.conceptId === concept.id && activeQuestion?.subTopicId === subTopic.id;
+
+                                          return (
+                                            <button
+                                              key={concept.id}
+                                              onClick={() => {
+                                                const matchedQ = questions.find(q => q.conceptId === concept.id && q.subTopicId === subTopic.id);
+                                                if (matchedQ) {
+                                                  setActiveQuestion(matchedQ);
+                                                } else {
+                                                  setToastMessage({ text: `No active questions under ${concept.name}.`, isSuccess: false });
+                                                  setTimeout(() => setToastMessage(null), 2000);
+                                                }
+                                              }}
+                                              className={`w-full text-left px-2 py-1.5 rounded-md text-[10.5px] font-semibold transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
+                                                isActive
+                                                  ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-bold border-l-2 border-blue-500 pl-1.5'
+                                                  : 'text-slate-550 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-205'
+                                              }`}
+                                            >
+                                              <span className="truncate">{concept.name}</span>
+                                              {conceptSolved > 0 && <span className="text-[9px] text-emerald-500 shrink-0 font-extrabold">✓</span>}
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </aside>
+            ) : (
+              <div className="hidden lg:flex flex-col items-center sticky top-24 self-start shrink-0 select-none">
+                <button 
+                  onClick={() => setIsLeftSidebarExpanded(true)}
+                  className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full hover:bg-slate-50 dark:hover:bg-slate-850 cursor-pointer shadow-xs transition-transform"
+                  title="Expand Topic Navigation"
+                >
+                  <ChevronRight className="w-4 h-4 text-slate-500" />
+                </button>
+              </div>
+            )}
+
+            {/* Column 2: Center Question Workspace (Primary focus area) */}
+            <section className="flex-1 min-w-0 space-y-6 text-left">
+              
+              {/* Question Card */}
+              <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-6 md:p-8 space-y-6 shadow-xs relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/2 to-transparent pointer-events-none" />
+
+                <div className="flex justify-between items-start gap-4">
+                  <div className="text-xl md:text-2xl font-bold font-heading text-slate-800 dark:text-white leading-snug tracking-tight">
+                    <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[0].trim())} />
+                  </div>
+                  
+                  {/* Formula helper drawer button */}
+                  <button
+                    onClick={() => setIsFormulaDrawerOpen(true)}
+                    className="px-3 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl border border-slate-205 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 dark:text-slate-400 shrink-0 cursor-pointer flex items-center gap-1.5 transition-colors select-none"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>📖 Formula Helper</span>
+                  </button>
+                </div>
+
+                {/* Interactive MCQ Option selection */}
+                <div className="space-y-3.5 pt-2 select-none">
+                  <span className="text-[9.5px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block mb-1">Interactive options</span>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {activeQuestion.options.map((opt) => {
+                      const isOptionSelected = selectedOptionId === opt.id;
+                      const isCorrectAnswer = opt.isCorrect;
+                      const isUserChosen = selectedAnswers[activeQuestion.id] === opt.id;
+
+                      const showCorrect = isQuestionSubmitted && isCorrectAnswer;
+                      const showWrong = isQuestionSubmitted && isUserChosen && !isCorrectAnswer;
+
+                      return (
+                        <button
+                          key={opt.id}
+                          disabled={isQuestionSubmitted}
+                          onClick={() => setSelectedOptionId(opt.id)}
+                          className={`p-4.5 rounded-2xl border text-left flex items-start justify-between gap-3 text-xs transition-all duration-200 relative overflow-hidden group cursor-pointer ${
+                            showCorrect
+                              ? 'border-emerald-500 bg-emerald-50/50 dark:border-emerald-600 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                              : showWrong
+                                ? 'border-rose-500 bg-rose-50/50 dark:border-rose-600 dark:bg-rose-900/20 text-rose-900 dark:text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] animate-shake'
+                                : isOptionSelected
+                                  ? 'border-blue-600 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-900/30 text-slate-900 dark:text-white font-bold shadow-xs'
+                                  : 'border-slate-205 bg-white hover:border-blue-500/30 hover:shadow-md dark:border-slate-900 dark:bg-slate-950/40 dark:hover:border-slate-800 text-slate-750 dark:text-slate-350'
+                          }`}
+                        >
+                          <div className="flex items-start gap-2.5 min-w-0">
+                            <span className={`w-5 h-5 rounded-lg border flex items-center justify-center font-mono font-bold shrink-0 mt-0.5 text-[10.5px] ${
+                              showCorrect
+                                ? 'bg-emerald-500 text-white border-emerald-400'
+                                : showWrong
+                                  ? 'bg-rose-500 text-white border-rose-450'
+                                  : isOptionSelected
+                                    ? 'bg-blue-600 text-white border-blue-500'
+                                    : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-slate-900 dark:border-slate-800'
+                            }`}>
+                              {opt.id}
+                            </span>
+                            <span className="font-semibold text-slate-700 dark:text-slate-300 mt-1 leading-normal pr-2">
+                              {opt.text}
+                            </span>
+                          </div>
+                          
+                          {opt.metadata && isQuestionSubmitted && (
+                            <span className="font-mono text-[9px] font-bold text-slate-405 bg-slate-50 dark:bg-slate-900 px-1.5 py-0.5 rounded shrink-0">
+                              {opt.metadata}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Progressive Hint Accordions */}
+              <div className="space-y-3.5 select-none">
+                <span className="text-[9.5px] font-black uppercase tracking-widest text-slate-400 block px-1">Progressive Hints</span>
+                
+                <div className="space-y-2.5">
+                  {/* Hint 1 */}
+                  <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden bg-white dark:bg-slate-950/20">
+                    <button
+                      onClick={() => setShowHint1(!showHint1)}
+                      className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-350 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50 animate-transition"
+                    >
+                      <span>💡 Hint 1: Core Concept Clue</span>
+                      <span className="text-[10px] text-blue-500 font-black uppercase tracking-wider">{showHint1 ? '[ Hide ]' : '[ Reveal ]'}</span>
+                    </button>
+                    {showHint1 && (
+                      <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
+                        <SafeHtmlWithMath html={markdownToHtml(
+                          activeQuestion.domainId === 'quant'
+                            ? "Let the cost price of the article be $100x$. What is the initial marked selling price at a 20% profit?"
+                            : activeQuestion.domainId === 'logical'
+                              ? "Anchor a key candidate seat first (e.g. seating opposite or in fixed spots) before analyzing relative adjacencies."
+                              : "Identify the part of speech and tone of the word. Is it positive, negative, or neutral?"
+                        )} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Hint 2 */}
+                  <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden bg-white dark:bg-slate-950/20">
+                    <button
+                      onClick={() => setShowHint2(!showHint2)}
+                      className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-350 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50"
+                    >
+                      <span>💡 Hint 2: Equation / Steps Setup</span>
+                      <span className="text-[10px] text-blue-500 font-black uppercase tracking-wider">{showHint2 ? '[ Hide ]' : '[ Reveal ]'}</span>
+                    </button>
+                    {showHint2 && (
+                      <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
+                        <SafeHtmlWithMath html={markdownToHtml(
+                          activeQuestion.domainId === 'quant'
+                            ? "If the cost price falls by 20%, the new cost price becomes $80x$. The markup profit is 25% on this new CP."
+                            : activeQuestion.domainId === 'logical'
+                              ? "Check the direction everyone is facing. Facing inward means clockwise is right and anti-clockwise is left."
+                              : "Look for sentence prefix roots. 'Pro-' usually means forward, high-production, or positive."
+                        )} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Hint 3 */}
+                  <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden bg-white dark:bg-slate-950/20">
+                    <button
+                      onClick={() => setShowHint3(!showHint3)}
+                      className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-350 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-900/50"
+                    >
+                      <span>💡 Hint 3: Step-by-Step Solve Shortcut</span>
+                      <span className="text-[10px] text-blue-500 font-black uppercase tracking-wider">{showHint3 ? '[ Hide ]' : '[ Reveal ]'}</span>
+                    </button>
+                    {showHint3 && (
+                      <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
+                        <SafeHtmlWithMath html={markdownToHtml(
+                          activeQuestion.domainId === 'quant'
+                            ? "New SP = $80x \\times 1.25 = 100x$. The difference between the original SP ($120x$) and new SP ($100x$) is $20x$, which corresponds to $10$. Solve for $x$!"
+                            : activeQuestion.domainId === 'logical'
+                              ? "Draw the circular grid and eliminate candidates that violate the immediate neighbor bounds."
+                              : "Eliminate options representing scarcity or passivity. Prolific implies high output rate."
+                        )} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Personal Shortcut Card (collapsible, displays below question options if notes exist) */}
+              {activeMeta.notes && (
+                <div className="p-5 bg-amber-500/5 dark:bg-amber-950/10 border border-amber-500/15 dark:border-amber-900/35 rounded-3xl relative overflow-hidden text-left shadow-2xs">
+                  {!isShortcutExpanded ? (
+                    <button 
+                      onClick={() => setIsShortcutExpanded(true)}
+                      className="w-full flex items-center justify-between text-xs font-black uppercase text-amber-600 dark:text-amber-405 tracking-wider cursor-pointer select-none"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Sparkle className="w-4 h-4 fill-current animate-pulse text-amber-550" />
+                        <span>💡 Personal Notes Available</span>
+                      </div>
+                      <span className="text-[10px] hover:underline">[ Click to Expand ]</span>
+                    </button>
+                  ) : (
+                    <div className="flex gap-3">
+                      <div className="w-10 h-10 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center shrink-0">
+                        <Sparkle className="w-5 h-5 fill-current" />
+                      </div>
+                      
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex justify-between items-center select-none">
+                          <span className="text-xs font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider">💡 My Shortcut</span>
+                          <button 
+                            onClick={() => setIsShortcutExpanded(false)}
+                            className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 hover:text-slate-655 dark:hover:text-slate-300 cursor-pointer"
+                          >
+                            [ Collapse ]
+                          </button>
+                        </div>
+
+                        <p className="text-xs font-semibold text-slate-705 dark:text-slate-350 leading-relaxed italic pr-4">
+                          <SafeHtmlWithMath html={markdownToHtml(activeMeta.notes)} />
+                        </p>
+
+                        <div className="pt-2 border-t border-amber-500/10 mt-2 flex justify-between items-center text-[9px] text-slate-400 font-mono select-none">
+                          <span>Last Revised: {activeMeta.lastRevised || 'Today'}</span>
+                          <button
+                            onClick={() => setIsQuickNotesOpen(true)}
+                            className="text-amber-600 hover:text-amber-700 font-black uppercase tracking-wider cursor-pointer underline"
+                          >
+                            [ Edit Shortcut ]
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Learning Context Section (Below question) */}
               <div className="p-4 bg-rose-500/5 dark:bg-rose-950/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl text-xs flex gap-3 text-left">
                 <AlertCircle className="w-5 h-5 text-rose-505 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block text-[10px] mb-1 select-none">Common Pitfalls & Concepts</span>
+                  <span className="font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block text-[10px] mb-1 select-none">Students Commonly Struggle With:</span>
                   <p className="text-slate-600 dark:text-slate-400 font-medium">
-                    Students solving this question often struggle with:{' '}
                     {activeQuestion.domainId === 'quant' ? (
-                      <span className="font-bold text-slate-700 dark:text-slate-350">✓ Percentage base mismatches, ✓ Reverse profit compounding, ✓ Fraction approximations.</span>
+                      <span>✓ Percentage conversion mismatches, ✓ Reverse calculations, ✓ Ratio interpretation boundaries.</span>
                     ) : activeQuestion.domainId === 'logical' ? (
-                      <span className="font-bold text-slate-700 dark:text-slate-355">✓ Relative direction reversals, ✓ Overlooking circular boundaries, ✓ Branching case assumptions.</span>
+                      <span>✓ Relative seat directions (inward vs outward), ✓ Overlooking boundary cases, ✓ Seating layout assumptions.</span>
                     ) : (
-                      <span className="font-bold text-slate-700 dark:text-slate-355">✓ Context tone interpretation, ✓ Neglecting secondary definitions, ✓ Confusing synonym roots.</span>
+                      <span>✓ Subtle synonym distinctions, ✓ Word root misunderstandings, ✓ Contextual tone mismatches.</span>
                     )}
                   </p>
                 </div>
               </div>
+            </section>
 
-              {/* Math preview highlight */}
-              {activeQuestion.questionStem.includes('$$') && (
-                <div className="p-3 bg-slate-50 dark:bg-slate-900/40 border border-slate-250/50 dark:border-slate-850 rounded-2xl flex items-center gap-2 select-none">
-                  <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Supports KaTeX Math Formulas</span>
-                </div>
-              )}
-            </div>
-
-            {/* Personal Shortcut Card (collapsed before solving, expanded after solving) */}
-            {activeMeta.notes && (
-              <div className="p-5 bg-amber-500/5 dark:bg-amber-950/10 border border-amber-500/15 dark:border-amber-900/35 rounded-3xl relative overflow-hidden text-left">
-                {!isShortcutExpanded ? (
-                  <button 
-                    onClick={() => setIsShortcutExpanded(true)}
-                    className="w-full flex items-center justify-between text-xs font-black uppercase text-amber-600 dark:text-amber-405 tracking-wider cursor-pointer select-none"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Sparkle className="w-4 h-4 fill-current animate-pulse text-amber-550" />
-                      <span>💡 Personal Notes Available</span>
-                    </div>
-                    <span className="text-[10px] hover:underline">[ Click to Expand ]</span>
-                  </button>
-                ) : (
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center shrink-0">
-                      <Sparkle className="w-5 h-5 fill-current" />
-                    </div>
-                    
-                    <div className="space-y-1.5 flex-1 min-w-0">
-                      <div className="flex justify-between items-center select-none">
-                        <span className="text-xs font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider">💡 My Shortcut</span>
-                        <button 
-                          onClick={() => setIsShortcutExpanded(false)}
-                          className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
-                        >
-                          [ Collapse ]
-                        </button>
-                      </div>
-
-                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-350 leading-relaxed italic pr-4">
-                        <SafeHtmlWithMath html={markdownToHtml(activeMeta.notes)} />
-                      </p>
-
-                      <button
-                        onClick={() => {
-                          setActiveTab('notes');
-                          if (!isQuestionSubmitted) {
-                            setIsQuickNotesOpen(true);
-                          }
-                        }}
-                        className="text-[9.5px] font-black text-amber-600 hover:text-amber-700 underline uppercase tracking-wider block pt-1 select-none cursor-pointer"
-                      >
-                        [ Edit Shortcut ]
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-            {/* MCQ grid Options */}
-            <div className="space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block select-none">Interactive Options</span>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {activeQuestion.options.map((opt) => {
-                  const isOptionSelected = selectedOptionId === opt.id;
-                  const isCorrectAnswer = opt.isCorrect;
-                  const isUserChosen = selectedAnswers[activeQuestion.id] === opt.id;
-
-                  const showCorrect = isQuestionSubmitted && isCorrectAnswer;
-                  const showWrong = isQuestionSubmitted && isUserChosen && !isCorrectAnswer;
-
-                  return (
-                    <motion.button
-                      key={opt.id}
-                      disabled={isQuestionSubmitted}
-                      onClick={() => setSelectedOptionId(opt.id)}
-                      whileHover={!isQuestionSubmitted ? { scale: 1.01, translateY: -2 } : {}}
-                      whileTap={!isQuestionSubmitted ? { scale: 0.99 } : {}}
-                      className={`p-5 rounded-2xl border text-left flex items-start justify-between gap-4 text-sm transition-all duration-205 relative overflow-hidden group cursor-pointer ${
-                        showCorrect
-                          ? 'border-emerald-500 bg-emerald-50/50 dark:border-emerald-600 dark:bg-emerald-950/20 text-emerald-955 dark:text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                          : showWrong
-                            ? 'border-rose-500 bg-rose-50/50 dark:border-rose-600 dark:bg-rose-955/20 text-rose-955 dark:text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] animate-shake'
-                            : isOptionSelected
-                              ? 'border-blue-605 bg-blue-50/30 dark:border-blue-500 dark:bg-blue-955/30 text-slate-900 dark:text-white font-bold shadow-xs'
-                              : 'border-slate-200 bg-white hover:border-blue-500/30 hover:shadow-md dark:border-slate-900 dark:bg-slate-955/40 dark:hover:border-slate-800 text-slate-700 dark:text-slate-350'
+            {/* Column 3: Right Learning Hub panel (Width 25-30%) */}
+            <aside className="w-80 shrink-0 sticky top-24 self-start max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 shadow-xs flex flex-col justify-between hidden xl:flex text-left min-h-[480px]">
+              <div className="space-y-4">
+                {/* Switcher tabs */}
+                <div className="flex border-b border-slate-200 dark:border-slate-900 pb-0.5 justify-start gap-1 select-none overflow-x-auto scrollbar-none">
+                  {[
+                    { id: 'editorial', label: 'Editorial' },
+                    { id: 'video', label: 'Video' },
+                    { id: 'aiexplain', label: 'AI Explain' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setLearningHubTab(tab.id as any)}
+                      className={`px-2 py-1.5 text-[10px] font-black uppercase tracking-wider relative cursor-pointer whitespace-nowrap ${
+                        learningHubTab === tab.id 
+                          ? 'text-blue-605 dark:text-blue-400 font-extrabold'
+                          : 'text-slate-400 hover:text-slate-650 dark:text-slate-500'
                       }`}
                     >
-                      <div className="flex items-start gap-4 min-w-0">
-                        <span className={`w-7 h-7 rounded-xl flex items-center justify-center font-mono font-black text-xs shrink-0 border transition-all duration-200 ${
-                          showCorrect
-                            ? 'border-emerald-300 bg-emerald-100 text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-900/30 dark:text-emerald-500'
-                            : showWrong
-                              ? 'border-rose-300 bg-rose-100 text-rose-800 dark:border-rose-800/40 dark:bg-rose-900/30 dark:text-rose-550'
-                              : isOptionSelected
-                                ? 'border-blue-400 bg-blue-100 text-blue-800 dark:border-blue-800/40 dark:bg-blue-900/30 dark:text-blue-450'
-                                : 'border-slate-200 bg-slate-550 text-slate-500 dark:border-slate-850 dark:bg-slate-900/60 dark:text-slate-400'
-                        }`}>
-                          {opt.id}
-                        </span>
-                        
-                        <div className="font-semibold pt-0.5 leading-relaxed">
-                          <SafeHtmlWithMath html={markdownToHtml(opt.text)} />
-                        </div>
+                      {tab.id === 'aiexplain' ? 'AI Explain' : tab.label}
+                      {learningHubTab === tab.id && (
+                        <motion.div
+                          layoutId="learningHubTabGlow"
+                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tab content panel */}
+                <div className="pt-2 text-xs leading-relaxed">
+                  
+                  {/* Solution Locking visual overlay for non-notes tabs when unsolved */}
+                  {!isQuestionSubmitted ? (
+                    <div className="py-12 flex flex-col items-center justify-center text-center space-y-4 select-none animate-fadeIn">
+                      <div className="w-12 h-12 bg-slate-100 dark:bg-slate-900 text-slate-400 rounded-full flex items-center justify-center">
+                        <Lock className="w-5 h-5" />
                       </div>
-
-                      {showCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />}
-                      {showWrong && <X className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />}
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Progressive Hint System Card */}
-            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 md:p-6 space-y-4 shadow-xs text-left">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block select-none">💡 Need a hand? Progressive Hints</span>
-              
-              <div className="space-y-3">
-                {/* Hint 1 */}
-                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setShowHint1(!showHint1)}
-                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
-                  >
-                    <span>💡 Hint 1: Core Concept Clue</span>
-                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint1 ? '[ Hide ]' : '[ Reveal ]'}</span>
-                  </button>
-                  {showHint1 && (
-                    <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
-                      <SafeHtmlWithMath html={markdownToHtml(
-                        activeQuestion.domainId === 'quant'
-                          ? "Let the cost price of the article be $100x$. What is the initial marked selling price at a 20% profit?"
-                          : activeQuestion.domainId === 'logical'
-                            ? "Anchor a key candidate seat first (e.g. seating opposite or in fixed spots) before analyzing relative adjacencies."
-                            : "Identify the part of speech and tone of the word. Is it positive, negative, or neutral?"
-                      )} />
+                      <div className="space-y-1">
+                        <h4 className="text-[10px] font-black uppercase text-slate-808 dark:text-white tracking-widest">Explanations Locked</h4>
+                        <p className="text-[11px] text-slate-400 leading-relaxed max-w-[200px] mx-auto">
+                          Submit a correct answer to unlock this learning channel.
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {learningHubTab === 'editorial' && (
+                        <div className="space-y-3 animate-fadeIn">
+                          <div className="p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-850 rounded-2xl">
+                            <span className="text-[9px] font-black text-blue-605 dark:text-blue-400 uppercase tracking-widest block mb-1">Approach & Logic</span>
+                            <p className="text-slate-600 dark:text-slate-400 font-medium">
+                              Break down variables. Relate cost price CP and marked price SP. Compounding discounts correctly anchor linear scales.
+                            </p>
+                          </div>
 
-                {/* Hint 2 */}
-                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setShowHint2(!showHint2)}
-                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
-                  >
-                    <span>💡 Hint 2: Equation / Steps Setup</span>
-                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint2 ? '[ Hide ]' : '[ Reveal ]'}</span>
-                  </button>
-                  {showHint2 && (
-                    <div className="p-4 bg-white dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
-                      <SafeHtmlWithMath html={markdownToHtml(
-                        activeQuestion.domainId === 'quant'
-                          ? "If the cost price falls by 20%, the new cost price becomes $80x$. The markup profit is 25% on this new CP."
-                          : activeQuestion.domainId === 'logical'
-                            ? "Check the direction everyone is facing. Facing inward means clockwise is right and anti-clockwise is left."
-                            : "Look for sentence prefix roots. 'Pro-' usually means forward, high-production, or positive."
-                      )} />
-                    </div>
-                  )}
-                </div>
+                          <div className="p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-850 rounded-2xl">
+                            <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-450 uppercase tracking-widest block mb-1">Calculation Steps</span>
+                            <div className="font-semibold text-slate-655 dark:text-slate-350">
+                              <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[1] || activeQuestion.hintText || 'Calculations are available post-solve.')} />
+                            </div>
+                          </div>
 
-                {/* Hint 3 */}
-                <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setShowHint3(!showHint3)}
-                    className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-slate-900/30 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:bg-slate-105/50 dark:hover:bg-slate-900/50"
-                  >
-                    <span>💡 Hint 3: Step-by-Step Solve Shortcut</span>
-                    <span className="text-[10px] text-blue-505 font-black uppercase tracking-wider">{showHint3 ? '[ Hide ]' : '[ Reveal ]'}</span>
-                  </button>
-                  {showHint3 && (
-                    <div className="p-4 bg-white dark:bg-slate-955 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-900 leading-relaxed font-semibold animate-fadeIn">
-                      <SafeHtmlWithMath html={markdownToHtml(
-                        activeQuestion.domainId === 'quant'
-                          ? "New SP = $80x \\times 1.25 = 100x$. The difference between the original SP ($120x$) and new SP ($100x$) is $20x$, which corresponds to $10$. Solve for $x$!"
-                          : activeQuestion.domainId === 'logical'
-                            ? "Draw the circular grid and eliminate candidates that violate the immediate neighbor bounds."
-                            : "Eliminate options representing scarcity or passivity. Prolific implies high output rate."
-                      )} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Question Bank Progress Tracker */}
-            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 space-y-2.5 text-left">
-              <div className="flex justify-between items-center select-none">
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Overall Question Bank Progress</span>
-                <span className="text-[11px] font-mono font-black text-blue-500 dark:text-blue-400">
-                  {currentIndex + 1} / {questions.length} Questions
-                </span>
-              </div>
-              <div className="w-full h-2 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-indigo-650 transition-all duration-300"
-                  style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
-                />
-              </div>
-            </div>
-
-          </section>
-
-          {/* Right panel solution tabs (3 columns) */}
-          <section className="col-span-1 lg:col-span-3 space-y-6 text-left">
-            <div className="bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 md:p-6 space-y-5 shadow-xs relative flex flex-col h-full min-h-[450px]">
-              {!isQuestionSubmitted ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4 my-auto select-none animate-fadeIn">
-                  <div className="w-14 h-14 bg-slate-105 dark:bg-slate-900 text-slate-400 dark:text-slate-505 rounded-full flex items-center justify-center">
-                    <Lock className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="text-xs font-black uppercase text-slate-800 dark:text-white tracking-widest">Solution Locked</h3>
-                    <p className="text-[11px] text-slate-405 leading-relaxed max-w-[220px] mx-auto">
-                      Solve this question to unlock step-by-step explanations, video walkthroughs, and AI insights.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {/* Switcher headers */}
-                  <div className="flex border-b border-slate-200 dark:border-slate-900 pb-0.5 justify-start gap-1 select-none overflow-x-auto scrollbar-none">
-                    {[
-                      { id: 'written', label: 'Written' },
-                      { id: 'video', label: 'Video' },
-                      { id: 'eli5', label: 'AI ELI5' },
-                      { id: 'notes', label: 'My Notes' }
-                    ].map(tab => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        className={`px-3 py-1.5 text-xs font-black uppercase tracking-wider relative cursor-pointer whitespace-nowrap ${
-                          activeTab === tab.id 
-                            ? 'text-blue-600 dark:text-blue-400 font-extrabold'
-                            : 'text-slate-400 hover:text-slate-650 dark:text-slate-500 dark:hover:text-slate-350'
-                        }`}
-                      >
-                        {tab.label}
-                        {activeTab === tab.id && (
-                          <motion.div
-                            layoutId="editorialActiveTabGlow"
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
-                          />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Tab Panels */}
-                  <div className="min-h-56">
-                    
-                    {activeTab === 'written' && (
-                      <div className="space-y-4 animate-fadeIn text-xs leading-relaxed">
-                        <div className="bg-slate-50/50 dark:bg-slate-900/20 p-4 border border-slate-200/60 dark:border-slate-850 rounded-2xl">
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 select-none">LaTeX Calculations</span>
-                          <div className="text-slate-700 dark:text-slate-300 space-y-2">
-                            <SafeHtmlWithMath html={markdownToHtml(activeQuestion.questionStem.split('###')[1] || activeQuestion.hintText || 'Formula derivation is loading...')} />
+                          <div className="p-3 bg-rose-500/5 dark:bg-rose-950/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl">
+                            <span className="text-[9px] font-black text-rose-605 dark:text-rose-455 uppercase tracking-widest block mb-1">Shortcut Method</span>
+                            <p className="text-slate-600 dark:text-slate-400 font-medium">
+                              Assume CP = 100x. Then SP = 120x. When CP becomes 80x, SP-10 = 100x. Thus 20x = 10, meaning 100x = 50.
+                            </p>
                           </div>
                         </div>
+                      )}
 
-                        <div className="p-4 bg-emerald-500/5 dark:bg-emerald-950/10 border border-emerald-500/10 dark:border-emerald-900/35 rounded-2xl">
-                          <h4 className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 select-none">
-                            <Sparkles className="w-3.5 h-3.5" /> Key Insight
-                          </h4>
-                          <p className="mt-2 text-slate-600 dark:text-slate-400 font-medium">
-                            {activeQuestion.domainId === 'quant' 
-                              ? "Assuming base CP = 100x eliminates fractions. When CP drops to 80x and markup increases to 25%, SP becomes 100x, allowing quick linear mapping."
-                              : "Start circular layouts by anchoring the absolute coordinates bottom node. Relative movements map outward safely."
-                            }
-                          </p>
-                        </div>
-
-                        <div className="p-4 bg-rose-500/5 dark:bg-rose-955/10 border border-rose-500/10 dark:border-rose-900/35 rounded-2xl">
-                          <h4 className="text-[10px] font-black text-rose-700 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5 select-none">
-                            <AlertTriangle className="w-3.5 h-3.5" /> Common Mistake
-                          </h4>
-                          <p className="mt-2 text-slate-600 dark:text-slate-400 font-medium">
-                            {activeQuestion.domainId === 'quant'
-                              ? "Failing to account for the profit markup on the NEW cost price (e.g. 25% on 80x) rather than the original 100x."
-                              : "Confusing relative directions when candidates face outside the arrangement circle."
-                            }
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === 'video' && (
-                      <div className="space-y-4 animate-fadeIn">
-                        <div className="relative aspect-video bg-black border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs flex flex-col items-center justify-center group">
-                          {(() => {
-                            const ytId = getYouTubeId(activeQuestion.videoUrl);
-                            if (ytId) {
-                              if (isVideoActive) {
-                                return (
-                                  <iframe
-                                    id="youtube-solution-player"
-                                    width="100%"
-                                    height="100%"
-                                    src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`}
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                    className="w-full h-full border-0 absolute inset-0"
-                                  />
-                                );
-                              } else {
-                                return (
-                                  <>
-                                    <img 
-                                      src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} 
-                                      alt="Video Walkthrough"
-                                      className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-102 transition-transform duration-350"
+                      {learningHubTab === 'video' && (
+                        <div className="space-y-3 animate-fadeIn">
+                          <div className="relative aspect-video bg-black border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden flex flex-col items-center justify-center group">
+                            {(() => {
+                              const ytId = getYouTubeId(activeQuestion.videoUrl);
+                              if (ytId) {
+                                if (isVideoActive) {
+                                  return (
+                                    <iframe
+                                      id="youtube-hub-player"
+                                      width="100%"
+                                      height="100%"
+                                      src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`}
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                      allowFullScreen
+                                      className="w-full h-full border-0 absolute inset-0"
                                     />
-                                    <button
-                                      onClick={() => setIsVideoActive(true)}
-                                      className="z-10 w-11 h-11 bg-blue-600/90 text-white rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform cursor-pointer"
-                                    >
-                                      <Play className="w-5 h-5 fill-current ml-0.5" />
-                                    </button>
-                                  </>
-                                );
+                                  );
+                                } else {
+                                  return (
+                                    <>
+                                      <img 
+                                        src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} 
+                                        alt="Walkthrough Video"
+                                        className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-102 transition-transform duration-350"
+                                      />
+                                      <button
+                                        onClick={() => setIsVideoActive(true)}
+                                        className="z-10 w-9 h-9 bg-blue-600/90 text-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer"
+                                      >
+                                        <Play className="w-4 h-4 fill-current ml-0.5" />
+                                      </button>
+                                    </>
+                                  );
+                                }
                               }
-                            }
-                            return <span className="text-xs text-slate-500">Walkthrough video loading...</span>;
-                          })()}
-                        </div>
-
-                        <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold px-0.5 select-none">
-                          <span>By: <strong className="text-slate-650 dark:text-slate-350">Ravi Kumar</strong></span>
-                          <span>Duration: <strong className="text-slate-650 dark:text-slate-350">{activeQuestion.videoDuration || '10 mins'}</strong></span>
-                        </div>
-
-                        {/* Chapters timestamp lists */}
-                        <div className="space-y-2 border-t border-slate-100 dark:border-slate-900 pt-3 text-left">
-                          <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-widest block select-none">Chapters Jump-To</span>
-                          
-                          <div className="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1">
-                            {(activeQuestion.domainId === 'quant' ? [
-                              { time: '0:00', sec: 0, text: 'Variable modeling introduction' },
-                              { time: '1:30', sec: 90, text: 'CP markup calculations' },
-                              { time: '3:15', sec: 195, text: 'Setting up linear SP equations' },
-                              { time: '5:45', sec: 345, text: 'Shortcut method demonstration' }
-                            ] : [
-                              { time: '0:00', sec: 0, text: 'Arrangement coordinates start' },
-                              { time: '2:15', sec: 135, text: 'Anchoring seats logic' },
-                              { time: '4:40', sec: 280, text: 'Final checklist solutions' }
-                            ]).map((note, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => handleJumpToTimestamp(note.sec)}
-                                className="p-2 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-105 hover:border-slate-200 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 text-[11px] font-semibold text-slate-600 dark:text-slate-350 transition-colors flex items-center justify-between text-left cursor-pointer"
-                              >
-                                <span className="truncate">{note.text}</span>
-                                <span className="font-mono text-[9px] font-black bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 px-1.5 py-0.2 rounded shrink-0">{note.time}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === 'eli5' && (
-                      <div className="space-y-4 animate-fadeIn text-left">
-                        <div className="p-4 bg-blue-500/5 border border-blue-500/10 dark:bg-blue-950/10 dark:border-blue-900/30 rounded-2xl text-xs space-y-3 relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 blur-xl rounded-full animate-pulse" />
-                          
-                          <div className="flex items-center justify-between border-b border-blue-500/10 pb-2 select-none">
-                            <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
-                              <Cpu className="w-4 h-4" /> AI ELI5 Explainer
-                            </span>
-                            <span className="text-[9px] font-mono font-bold text-slate-400">Model: GPT-4o</span>
+                              return <span className="text-slate-500">Loading Walkthrough video...</span>;
+                            })()}
                           </div>
 
-                          {eli5Text.length === 0 && !isEli5Generating ? (
-                            <div className="py-6 flex flex-col items-center justify-center text-center">
-                              <p className="text-slate-505 font-semibold mb-4">
-                                Need a simplified, intuitive analogy? Let the AI explain this concept simply!
-                              </p>
-                              <button
-                                onClick={handleStartEli5}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
-                              >
-                                <Sparkles className="w-3.5 h-3.5 animate-bounce" />
-                                <span>Explain Like I'm 5</span>
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="space-y-3 font-medium text-slate-700 dark:text-slate-350">
-                              {eli5Text.map((bullet, idx) => (
-                                <motion.div
+                          <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold px-0.5 select-none mt-1">
+                            <span>Speaker: <strong className="text-slate-655 dark:text-slate-350">Ravi Kumar</strong></span>
+                            <span>Duration: <strong className="text-slate-655 dark:text-slate-350">{activeQuestion.videoDuration || '10 mins'}</strong></span>
+                          </div>
+
+                          {/* Timestamps chapters */}
+                          <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-900 mt-2">
+                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-widest block select-none">Timestamps</span>
+                            <div className="grid grid-cols-1 gap-1 max-h-32 overflow-y-auto pr-1">
+                              {[
+                                { time: '0:00', sec: 0, text: 'Core setup' },
+                                { time: '1:30', sec: 90, text: 'Variables modeling' },
+                                { time: '3:15', sec: 195, text: 'Linear equations' },
+                                { time: '5:45', sec: 345, text: 'Shortcut tricks' }
+                              ].map((note, idx) => (
+                                <button
                                   key={idx}
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  className="p-3 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-805 rounded-xl shadow-xs"
+                                  onClick={() => handleJumpToTimestamp(note.sec)}
+                                  className="p-1.5 rounded-lg border border-slate-100 bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:border-slate-850 dark:hover:bg-slate-800 text-[10.5px] font-semibold text-slate-600 dark:text-slate-350 transition-colors flex items-center justify-between text-left cursor-pointer"
                                 >
-                                  {bullet}
-                                </motion.div>
+                                  <span className="truncate">{note.text}</span>
+                                  <span className="font-mono text-[9px] font-black bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 px-1 py-0.2 rounded shrink-0">{note.time}</span>
+                                </button>
                               ))}
-                              {isEli5Generating && (
-                                <div className="flex items-center gap-1 text-blue-500 px-1.5 select-none">
-                                  <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                                  <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                                  <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" />
-                                </div>
-                              )}
                             </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === 'notes' && (
-                      <div className="space-y-4 animate-fadeIn text-xs leading-relaxed text-left flex flex-col">
-                        
-                        {/* Notes meta chips */}
-                        <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900 p-3 border border-slate-200/50 dark:border-slate-850 rounded-2xl select-none">
-                          <div>
-                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Saved Folder</span>
-                            <span className="text-[10.5px] font-bold text-slate-750 dark:text-slate-350 block mt-0.5 truncate">{activeMeta.folder || 'All Saved'}</span>
-                          </div>
-                          <div>
-                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Priority</span>
-                            <span className={`text-[10.5px] font-extrabold block mt-0.5 uppercase ${
-                              activeMeta.priority === 'High' ? 'text-rose-500' : activeMeta.priority === 'Medium' ? 'text-amber-500' : 'text-emerald-500'
-                            }`}>{activeMeta.priority}</span>
                           </div>
                         </div>
+                      )}
 
-                        {/* Note textarea input */}
-                        <div className="space-y-1">
-                          <label className="text-[8.5px] font-black text-slate-400 uppercase tracking-widest block select-none">Edit Note Contents</label>
-                          <textarea
-                            value={drawerNotes}
-                            onChange={(e) => {
-                              setDrawerNotes(e.target.value);
-                              saveRevisionMeta(activeQuestion.id, { notes: e.target.value });
-                            }}
-                            placeholder="Type markdown shortcut equations (e.g. $CP = 100x$, ratio speed $\\propto \\frac{1}{time}$)..."
-                            className="w-full h-32 p-3 font-mono border border-slate-250 bg-slate-50/50 dark:bg-slate-900 dark:border-slate-800 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none"
-                          />
-                        </div>
-
-                        {/* KaTeX math Preview compiled */}
-                        <div className="space-y-1.5 pt-1">
-                          <label className="text-[8.5px] font-black text-slate-400 uppercase tracking-widest block select-none">Live LaTeX Preview</label>
-                          <div className="p-3.5 bg-slate-50/50 border border-slate-200/60 dark:bg-slate-900/30 dark:border-slate-850 rounded-2xl text-[11.5px] min-h-[90px] max-h-48 overflow-y-auto">
-                            {drawerNotes.trim() ? (
-                              <SafeHtmlWithMath html={markdownToHtml(drawerNotes)} />
-                            ) : (
-                              <span className="italic text-slate-400">Notes are empty. Start typing above to see math formatting preview...</span>
-                            )}
+                      {learningHubTab === 'aiexplain' && (
+                        <div className="space-y-3 animate-fadeIn">
+                          <div className="p-3.5 bg-blue-500/5 border border-blue-500/10 dark:bg-blue-950/15 dark:border-blue-900/35 rounded-2xl space-y-2.5">
+                            <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest block">Explain Like I'm 5</span>
+                            <p className="text-slate-600 dark:text-slate-400 font-medium">
+                              "Think of it this way: you buy a toy for $100. If you got it for 20% off ($80) and sold it for $10 less, you'd still get a 25% profit. That maps the math!"
+                            </p>
+                          </div>
+                          <div className="p-3.5 bg-slate-50 dark:bg-slate-900/60 border border-slate-205 dark:border-slate-850 rounded-2xl space-y-1">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Exam Strategy</span>
+                            <p className="text-slate-600 dark:text-slate-400 font-medium font-sans">
+                              Compounding percentage calculations (e.g. 25% increase on 80x) maps directly to 100x. Memorize base 100 mappings for fast solving.
+                            </p>
                           </div>
                         </div>
-
-                  </div>
-                )}
-
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </>
-          )}
-        </div>
-      </section>
-
-        </div>
+            </aside>
+          </div>
+        )}
       </main>
 
       {/* Sticky Bottom Actions footer bar */}
@@ -1485,44 +1954,51 @@ export default function PracticeArena({
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           
           {/* Left bottom Submit CTA */}
-          <div className="flex items-center gap-4 text-left">
-            <button
-              onClick={handleSubmitAnswer}
-              disabled={!selectedOptionId || isQuestionSubmitted || isEvaluating}
-              className={`px-8 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-md flex items-center justify-center gap-2 cursor-pointer ${
-                isQuestionSubmitted
-                  ? 'bg-emerald-600 text-white cursor-default shadow-none border border-emerald-500'
-                  : !selectedOptionId
-                    ? 'bg-slate-200 text-slate-400 opacity-60 cursor-not-allowed shadow-none'
-                    : isEvaluating
-                      ? 'bg-blue-600 text-white cursor-wait opacity-80'
-                      : 'bg-blue-600 text-white hover:bg-blue-500 hover:scale-103'
-              }`}
-            >
-              {isQuestionSubmitted ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Answer Submitted</span>
-                </>
-              ) : isEvaluating ? (
-                <>
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Evaluating...</span>
-                </>
-              ) : (
-                <span>Submit Answer</span>
+          {isCodingQuestion ? (
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 dark:text-slate-500">
+              <Cpu className="w-4.5 h-4.5 text-blue-500 shrink-0" />
+              <span>Coding Workspace • Run and Submit your solution directly in the editor pane above</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 text-left">
+              <button
+                onClick={handleSubmitAnswer}
+                disabled={!selectedOptionId || isQuestionSubmitted || isEvaluating}
+                className={`px-8 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                  isQuestionSubmitted
+                    ? 'bg-emerald-600 text-white cursor-default shadow-none border border-emerald-500'
+                    : !selectedOptionId
+                      ? 'bg-slate-200 text-slate-400 dark:bg-slate-900 dark:text-slate-600 opacity-60 cursor-not-allowed shadow-none'
+                      : isEvaluating
+                        ? 'bg-blue-600 text-white cursor-wait opacity-80'
+                        : 'bg-blue-600 text-white hover:bg-blue-500 hover:scale-103'
+                }`}
+              >
+                {isQuestionSubmitted ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Answer Submitted</span>
+                  </>
+                ) : isEvaluating ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Evaluating...</span>
+                  </>
+                ) : (
+                  <span>Submit Answer</span>
+                )}
+              </button>
+              
+              {!selectedOptionId && !isQuestionSubmitted && (
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Select option to submit</span>
               )}
-            </button>
-            
-            {!selectedOptionId && !isQuestionSubmitted && (
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Select option to submit</span>
-            )}
-            {selectedOptionId && !isQuestionSubmitted && !isEvaluating && (
-              <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wide flex items-center gap-1">
-                <Check className="w-3 h-3" /> Option {selectedOptionId} Selected
-              </span>
-            )}
-          </div>
+              {selectedOptionId && !isQuestionSubmitted && !isEvaluating && (
+                <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wide flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Option {selectedOptionId} Selected
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Right bottom items bar */}
           <div className="flex items-center gap-1.5 self-end sm:self-auto relative">
@@ -1578,73 +2054,6 @@ export default function PracticeArena({
               <span>📝</span>
               <span>Notes</span>
             </button>
-
-            {/* Quick Notes popover mini-editor overlay */}
-            <AnimatePresence>
-              {isQuickNotesOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 15 }}
-                  className="absolute bottom-full right-16 mb-3 p-4 glassmorphism-light dark:glassmorphism rounded-2xl w-80 shadow-2xl z-40 text-left space-y-4"
-                >
-                  <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-900 pb-2 select-none">
-                    <span className="text-[10px] font-black uppercase text-slate-650 dark:text-slate-400 tracking-wider">Quick Note Editor</span>
-                    <button onClick={() => setIsQuickNotesOpen(false)} className="hover:bg-slate-100 p-0.5 rounded cursor-pointer">
-                      <X className="w-3.5 h-3.5 text-slate-400" />
-                    </button>
-                  </div>
-
-                  {/* Priority selector row */}
-                  <div className="space-y-1">
-                    <label className="text-[8px] font-black text-slate-450 uppercase tracking-widest block select-none">Set Priority Flag</label>
-                    <div className="flex gap-2">
-                      {(['High', 'Medium', 'Low'] as const).map(p => (
-                        <button
-                          key={p}
-                          type="button"
-                          onClick={() => saveRevisionMeta(activeQuestion.id, { priority: p })}
-                          className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-xl border transition-colors cursor-pointer ${
-                            activeMeta.priority === p 
-                              ? p === 'High' ? 'bg-rose-500/10 border-rose-500/20 text-rose-505 font-bold' :
-                                p === 'Medium' ? 'bg-amber-500/10 border-amber-500/20 text-amber-505 font-bold' :
-                                'bg-emerald-500/10 border-emerald-500/20 text-emerald-505 font-bold'
-                              : 'border-slate-200 hover:bg-slate-50 dark:border-slate-900 dark:hover:bg-slate-900/60 text-slate-455'
-                          }`}
-                        >
-                          {p === 'High' ? '🔴 High' : p === 'Medium' ? '🟡 Med' : '🟢 Low'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Note textarea */}
-                  <div className="space-y-1">
-                    <label className="text-[8px] font-black text-slate-455 uppercase tracking-widest block select-none">Shortcut Insight</label>
-                    <textarea
-                      value={drawerNotes}
-                      onChange={(e) => {
-                        setDrawerNotes(e.target.value);
-                        saveRevisionMeta(activeQuestion.id, { notes: e.target.value });
-                      }}
-                      placeholder="Add key insights to look back on..."
-                      className="w-full h-24 p-2.5 text-xs border border-slate-250 bg-slate-50/50 dark:bg-slate-900 dark:border-slate-900 rounded-xl focus:outline-none focus:border-blue-500 text-slate-800 dark:text-slate-100 placeholder-slate-405 resize-none font-medium"
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setIsQuickNotesOpen(false);
-                      setToastMessage({ text: 'Note Saved! 📝', isSuccess: true });
-                      setTimeout(() => setToastMessage(null), 2000);
-                    }}
-                    className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-black text-[9.5px] uppercase tracking-wider rounded-xl cursor-pointer select-none"
-                  >
-                    Save & Continue
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             {/* 📚 Library */}
             <button
@@ -2359,6 +2768,91 @@ export default function PracticeArena({
                   </div>
                 </div>
               )}
+
+            </motion.div>
+          </>
+        )}
+
+        {/* 5. Notes Drawer layout (Slide-in from right) */}
+        {isQuickNotesOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsQuickNotesOpen(false)}
+              className="fixed inset-0 bg-black z-45 cursor-pointer"
+            />
+            
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.22 }}
+              className="fixed top-0 right-0 h-full w-full max-w-[420px] bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-900 z-50 shadow-2xl flex flex-col text-left"
+            >
+              <div className="p-5 border-b border-slate-200 dark:border-slate-900 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/40 select-none">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">📝</span>
+                  <span className="text-xs font-black uppercase text-slate-700 dark:text-white tracking-widest">Quick Note Editor</span>
+                </div>
+                <button onClick={() => setIsQuickNotesOpen(false)} className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-850 cursor-pointer">
+                  <X className="w-4 h-4 text-slate-400" />
+                </button>
+              </div>
+
+              <div className="flex-1 p-5 space-y-6 overflow-y-auto custom-scrollbar">
+                {/* Priority selector row */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block select-none">Set Priority Flag</label>
+                  <div className="flex gap-2">
+                    {(['High', 'Medium', 'Low'] as const).map(p => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => saveRevisionMeta(activeQuestion.id, { priority: p })}
+                        className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider rounded-xl border transition-colors cursor-pointer ${
+                          activeMeta.priority === p 
+                            ? p === 'High' ? 'bg-rose-500/10 border-rose-500/20 text-rose-605 font-bold' :
+                              p === 'Medium' ? 'bg-amber-500/10 border-amber-500/20 text-amber-650 font-bold' :
+                              'bg-emerald-500/10 border-emerald-500/20 text-emerald-605 font-bold'
+                            : 'border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900 text-slate-500 dark:text-slate-400'
+                        }`}
+                      >
+                        {p === 'High' ? '🔴 High' : p === 'Medium' ? '🟡 Med' : '🟢 Low'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Note textarea */}
+                <div className="space-y-2 flex-1 flex flex-col">
+                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block select-none">Shortcut Insight</label>
+                  <textarea
+                    value={drawerNotes}
+                    onChange={(e) => {
+                      setDrawerNotes(e.target.value);
+                      saveRevisionMeta(activeQuestion.id, { notes: e.target.value });
+                    }}
+                    placeholder="Add key insights to look back on..."
+                    className="w-full flex-1 min-h-[200px] p-3 text-xs border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none font-medium leading-relaxed"
+                  />
+                </div>
+              </div>
+
+              {/* Action footer */}
+              <div className="p-5 border-t border-slate-200 dark:border-slate-900 bg-slate-50/50 dark:bg-slate-900/40 select-none">
+                <button
+                  onClick={() => {
+                    setIsQuickNotesOpen(false);
+                    setToastMessage({ text: 'Note Saved! 📝', isSuccess: true });
+                    setTimeout(() => setToastMessage(null), 2000);
+                  }}
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider rounded-xl cursor-pointer select-none"
+                >
+                  Save & Continue
+                </button>
+              </div>
 
             </motion.div>
           </>

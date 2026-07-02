@@ -23,7 +23,6 @@ import {
   Activity, 
   CheckCircle,
   HelpCircle,
-  Cpu,
   Lock,
   Edit3,
   X,
@@ -55,6 +54,10 @@ interface PlacementProfileProps {
   handleProfileSave: (e: React.FormEvent) => void;
   saveSuccess: boolean;
   setSaveSuccess: (val: boolean) => void;
+  customColor: string;
+  changeCustomColor: (color: string) => void;
+  themeMode: 'light' | 'dark' | 'system';
+  handleThemeChange: (mode: 'light' | 'dark' | 'system') => void;
 }
 
 export default function PlacementProfile({
@@ -62,7 +65,11 @@ export default function PlacementProfile({
   setProfile,
   handleProfileSave,
   saveSuccess,
-  setSaveSuccess
+  setSaveSuccess,
+  customColor,
+  changeCustomColor,
+  themeMode,
+  handleThemeChange
 }: PlacementProfileProps) {
 
   // Modals & Drawers States
@@ -84,10 +91,6 @@ export default function PlacementProfile({
   const [customToast, setCustomToast] = useState<string | null>(null);
   const [rankCardType, setRankCardType] = useState<'LinkedIn' | 'WhatsApp' | 'Instagram' | 'Placement Resume'>('LinkedIn');
 
-  // Theme presets & theme mode
-  const [themePreset, setThemePreset] = useState<string>('Midnight Blue');
-  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('dark');
-
   // Active tooltip coordinate mapping for SVG components
   const [activeRadarTooltip, setActiveRadarTooltip] = useState<{ x: number; y: number; label: string; val: number } | null>(null);
   const [activeHeatmapTooltip, setActiveHeatmapTooltip] = useState<{ 
@@ -100,54 +103,16 @@ export default function PlacementProfile({
     timeSpent: string;
   } | null>(null);
 
-  // Load custom visual overrides from local storage
-  useEffect(() => {
+  const changeCustomColorLocal = (color: string) => {
+    changeCustomColor(color);
     if (typeof window !== 'undefined') {
-      const savedPreset = localStorage.getItem('aptitude_profile_theme_preset');
-      if (savedPreset) setThemePreset(savedPreset);
-
-      const storedTheme = localStorage.getItem('theme');
-      if (storedTheme === 'light' || storedTheme === 'dark') {
-        setThemeMode(storedTheme);
+      if (color === 'default') {
+        setCustomToast(`Default layout theme restored! 🎨`);
       } else {
-        setThemeMode('system');
+        setCustomToast(`Theme color updated successfully! 🎨`);
       }
     }
-  }, []);
-
-  const changeThemePreset = (preset: string) => {
-    setThemePreset(preset);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('aptitude_profile_theme_preset', preset);
-    }
-    setCustomToast(`Theme Preset changed to ${preset}! ✨`);
     setTimeout(() => setCustomToast(null), 2000);
-  };
-
-  const handleThemeChange = (mode: 'light' | 'dark' | 'system') => {
-    setThemeMode(mode);
-    if (typeof window !== 'undefined') {
-      document.documentElement.classList.add('theme-transitioning');
-      if (mode === 'system') {
-        localStorage.removeItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (systemPrefersDark) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      } else {
-        localStorage.setItem('theme', mode);
-        if (mode === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      }
-      setTimeout(() => {
-        document.documentElement.classList.remove('theme-transitioning');
-      }, 500);
-    }
   };
 
   // Generate username handle from student name
@@ -163,65 +128,17 @@ export default function PlacementProfile({
 
   // Preset style mapping helper
   const stylePreset = useMemo(() => {
-    switch (themePreset) {
-      case 'Corporate Light':
-        return {
-          cardBg: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs',
-          accentText: 'text-slate-800 dark:text-slate-200',
-          accentTextSub: 'text-slate-500',
-          accentBtn: 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 border-transparent',
-          meshGradient: 'from-slate-400/5 via-transparent to-slate-400/5',
-          dividerClass: 'border-slate-200 dark:border-slate-800',
-          iconColor: 'text-slate-600 dark:text-slate-400',
-          badgeColor: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-350 border-slate-200 dark:border-slate-700'
-        };
-      case 'Placement Gold':
-        return {
-          cardBg: 'bg-white dark:bg-slate-900/60 border border-amber-500/20 dark:border-amber-900/40 shadow-sm',
-          accentText: 'text-amber-500 dark:text-amber-400',
-          accentTextSub: 'text-amber-600/70 dark:text-amber-400/60',
-          accentBtn: 'bg-gradient-to-r from-amber-500 to-yellow-600 text-white hover:opacity-90 border-transparent',
-          meshGradient: 'from-amber-600/5 via-transparent to-yellow-600/5',
-          dividerClass: 'border-amber-500/10 dark:border-amber-900/20',
-          iconColor: 'text-amber-500',
-          badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-        };
-      case 'Neon Purple':
-        return {
-          cardBg: 'bg-white dark:bg-slate-900/60 border border-purple-500/20 dark:border-purple-900/40 shadow-sm',
-          accentText: 'text-purple-500 dark:text-purple-400',
-          accentTextSub: 'text-purple-600/70 dark:text-purple-400/60',
-          accentBtn: 'bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:opacity-90 border-transparent',
-          meshGradient: 'from-purple-600/5 via-transparent to-pink-600/5',
-          dividerClass: 'border-purple-500/10 dark:border-purple-900/20',
-          iconColor: 'text-purple-500 dark:text-purple-400',
-          badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
-        };
-      case 'Emerald':
-        return {
-          cardBg: 'bg-white dark:bg-slate-900/60 border border-emerald-500/20 dark:border-emerald-900/40 shadow-sm',
-          accentText: 'text-emerald-500 dark:text-emerald-400',
-          accentTextSub: 'text-emerald-600/70 dark:text-emerald-400/60',
-          accentBtn: 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white hover:opacity-90 border-transparent',
-          meshGradient: 'from-emerald-600/5 via-transparent to-teal-600/5',
-          dividerClass: 'border-emerald-500/10 dark:border-emerald-900/20',
-          iconColor: 'text-emerald-500',
-          badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-        };
-      case 'Midnight Blue':
-      default:
-        return {
-          cardBg: 'bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-900 shadow-sm',
-          accentText: 'text-blue-600 dark:text-blue-400',
-          accentTextSub: 'text-slate-400 dark:text-slate-500',
-          accentBtn: 'bg-blue-600 hover:bg-blue-500 text-white border-transparent',
-          meshGradient: 'from-blue-600/5 via-transparent to-indigo-600/5',
-          dividerClass: 'border-slate-100 dark:border-slate-900',
-          iconColor: 'text-blue-500',
-          badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-        };
-    }
-  }, [themePreset]);
+    return {
+      cardBg: 'bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-900 shadow-sm',
+      accentText: 'text-[var(--clr-primary)]',
+      accentTextSub: 'opacity-85 text-[var(--clr-primary)]',
+      accentBtn: 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white shadow-lg border-transparent transition-all',
+      meshGradient: 'from-[var(--clr-primary)]/5 via-transparent to-[var(--clr-primary)]/5',
+      dividerClass: 'border-slate-200/50 dark:border-slate-800/60',
+      iconColor: 'text-[var(--clr-primary)]',
+      badgeColor: 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)] border-[var(--clr-primary)]/20'
+    };
+  }, []);
 
   // Radar chart configuration parameters
   const radarData = [
@@ -271,7 +188,8 @@ export default function PlacementProfile({
 
     for (let i = 0; i < 371; i++) {
       const dayOfWeek = date.getDay();
-      const monthLabel = date.toLocaleString('default', { month: 'short' });
+      const monthsMap = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthLabel = monthsMap[date.getMonth()];
       
       const seed = Math.random();
       let solves = 0;
@@ -313,6 +231,11 @@ export default function PlacementProfile({
     return data;
   }, []);
 
+  const [selectedHeatmapCell, setSelectedHeatmapCell] = useState<any>(() => {
+    const latestActive = [...heatmapSolves].reverse().find(c => c.solves > 0);
+    return latestActive || heatmapSolves[heatmapSolves.length - 1];
+  });
+
   const handleVisibilityChange = (mode: 'public' | 'private' | 'recruiter' | 'friends') => {
     setVisibility(mode);
     setCustomToast(`Visibility updated to ${mode.toUpperCase()}! 🛡️`);
@@ -335,10 +258,6 @@ export default function PlacementProfile({
     { id: 'p2', title: 'Infosys Champion', req: 'Unlock 8 Infosys test sets', category: 'placement', icon: '🛡️', unlocked: true, rarity: 'Rare', currentProgress: 8, targetProgress: 8 },
     { id: 'p3', title: 'Amazon Tag Master', req: 'Solve 15 Amazon tagged hard items', category: 'placement', icon: '📦', unlocked: false, rarity: 'Epic', currentProgress: 11, targetProgress: 15 },
     { id: 'p4', title: 'Accenture Expert', req: 'Attain 90% accuracy in Accenture mocks', category: 'placement', icon: '💎', unlocked: false, rarity: 'Legendary', currentProgress: 86, targetProgress: 90 },
-    { id: 'c1', title: '7 Day Streak', req: 'Practice 7 days consecutively', category: 'consistency', icon: '🔥', unlocked: true, rarity: 'Common', currentProgress: 7, targetProgress: 7 },
-    { id: 'c2', title: '30 Day Streak', req: 'Practice 30 days consecutively', category: 'consistency', icon: '⚡', unlocked: true, rarity: 'Rare', currentProgress: 30, targetProgress: 30 },
-    { id: 'c3', title: '100 Day Streak', req: 'Practice 100 days consecutively', category: 'consistency', icon: '🌟', unlocked: false, rarity: 'Epic', currentProgress: 42, targetProgress: 100 },
-    { id: 'c4', title: '365 Day Warrior', req: 'Maintain consistent learning for 365 days', category: 'consistency', icon: '🎖️', unlocked: false, rarity: 'Mythic', currentProgress: 42, targetProgress: 365 },
     { id: 'l1', title: 'Arithmetic Apprentice', req: 'Solve 20 Arithmetic questions', category: 'learning', icon: '📐', unlocked: true, rarity: 'Common', currentProgress: 20, targetProgress: 20 },
     { id: 'l2', title: 'Ratio Master', req: 'Attain 100% ratios solving speed', category: 'learning', icon: '🧩', unlocked: true, rarity: 'Rare', currentProgress: 100, targetProgress: 100 },
     { id: 'l3', title: 'Geometry Ninja', req: 'Complete 30 geometry sets', category: 'learning', icon: '🎯', unlocked: false, rarity: 'Epic', currentProgress: 12, targetProgress: 30 },
@@ -384,6 +303,8 @@ export default function PlacementProfile({
   };
 
   const { frameClass, rankBorderClass, effectGlow } = getAvatarStyles();
+
+  const activeBaseColor = customColor === 'default' ? '#3B82F6' : customColor;
 
   // Save actions mapping
   const onSaveProfile = (e: React.FormEvent) => {
@@ -524,12 +445,7 @@ export default function PlacementProfile({
             >
               📝 Edit Profile
             </button>
-            <button
-              onClick={() => setShowPrivacyModal(true)}
-              className="py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-[10.5px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-350 cursor-pointer transition-colors"
-            >
-              🛡️ Visibility Settings
-            </button>
+
             <button
               onClick={() => setShowRankCardModal(true)}
               className={`py-1.5 px-3 rounded-xl text-[10.5px] font-black uppercase tracking-wider cursor-pointer transition-all ${stylePreset.accentBtn}`}
@@ -539,89 +455,88 @@ export default function PlacementProfile({
           </div>
         </div>
 
-        {/* SIDE PANELS: Readiness Circular progress & Rank Card summary */}
+        {/* SIDE PANELS: Current Rank Tier & Styling Preset Card */}
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto shrink-0 select-none z-10">
-          {/* Readiness Circular progress card */}
-          <div className={`${stylePreset.cardBg} rounded-2xl p-4 flex flex-col items-center justify-center text-center w-full sm:w-36 aspect-square`}>
-            <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none block mb-3">Readiness Index</span>
-            <div className="relative w-16 h-16">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="32" cy="32" r="26" stroke="rgba(226,232,240,0.06)" strokeWidth="4.5" fill="transparent" />
-                <circle cx="32" cy="32" r="26" stroke="#10B981" strokeWidth="4.5" fill="transparent"
-                  strokeDasharray={2 * Math.PI * 26}
-                  strokeDashoffset={2 * Math.PI * 26 * (1 - 0.796)}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
-                <span className="font-mono text-base font-black text-slate-800 dark:text-white">79%</span>
-              </div>
-            </div>
-            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest mt-3">Good Status</span>
-          </div>
-
           {/* Current Rank Tier Card */}
-          <div className={`${stylePreset.cardBg} rounded-2xl p-4 flex flex-col justify-between w-full sm:w-44 text-left`}>
-            <div className="space-y-1">
-              <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Aptitude Rank</span>
-              <h4 className="text-sm font-black text-slate-900 dark:text-white tracking-wide uppercase">Gold III</h4>
-              <span className="text-[9px] font-bold text-slate-400 font-mono">Top 12% global tier</span>
+          <div className={`${stylePreset.cardBg} rounded-2xl p-5 md:p-6 flex flex-col justify-between w-full sm:w-60 min-h-[170px] text-left`}>
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Aptitude Rank</span>
+              <h4 className="text-lg font-black text-slate-900 dark:text-white tracking-wide uppercase">Gold III</h4>
+              <span className="text-xs font-bold text-slate-400 font-mono">Top 12% global tier</span>
             </div>
             
-            <div className="space-y-1.5 pt-4">
-              <div className="flex justify-between items-center text-[8px] font-bold font-mono text-slate-500 uppercase">
+            <div className="space-y-2 pt-4">
+              <div className="flex justify-between items-center text-[10px] font-bold font-mono text-slate-500 uppercase">
                 <span>To Gold IV</span>
                 <span>260 XP Needed</span>
               </div>
-              <div className="w-full bg-slate-100 dark:bg-slate-950 h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-100 dark:bg-slate-950 h-2 rounded-full overflow-hidden">
                 <div className="bg-amber-500 h-full rounded-full" style={{ width: '45%' }} />
               </div>
             </div>
           </div>
 
           {/* Preset selector panel & Mode Toggles */}
-          <div className={`${stylePreset.cardBg} rounded-2xl p-4 flex flex-col justify-between w-full sm:w-44 gap-4`}>
-            {/* Visual themes select */}
-            <div className="space-y-2 text-left">
-              <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Styling Preset</span>
-              <div className="flex items-center gap-1.5">
+          <div className={`${stylePreset.cardBg} rounded-2xl p-5 md:p-6 flex flex-col justify-between w-full sm:w-60 min-h-[170px] gap-6`}>
+            {/* Custom Brand Color Palette */}
+            <div className="space-y-2.5 text-left">
+              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">COLOR PALETTE</span>
+              <div className="flex items-center gap-2 flex-wrap">
                 {[
-                  { name: 'Midnight Blue', color: 'bg-blue-600 border-blue-400' },
-                  { name: 'Corporate Light', color: 'bg-slate-400 border-slate-300 dark:bg-slate-600' },
-                  { name: 'Placement Gold', color: 'bg-amber-500 border-amber-300' },
-                  { name: 'Neon Purple', color: 'bg-purple-600 border-purple-400' },
-                  { name: 'Emerald', color: 'bg-emerald-600 border-emerald-400' }
+                  { name: 'Default', hex: 'default', bg: 'bg-gradient-to-tr from-blue-500 via-purple-500 to-emerald-500 border-slate-350 dark:border-slate-700' },
+                  { name: 'Indigo', hex: '#6366F1', bg: 'bg-[#6366F1] border-indigo-300' },
+                  { name: 'Purple', hex: '#8B5CF6', bg: 'bg-[#8B5CF6] border-purple-300' },
+                  { name: 'Rose', hex: '#F43F5E', bg: 'bg-[#F43F5E] border-rose-300' },
+                  { name: 'Amber', hex: '#F59E0B', bg: 'bg-[#F59E0B] border-amber-300' },
+                  { name: 'Emerald', hex: '#10B981', bg: 'bg-[#10B981] border-emerald-300' }
                 ].map((preset) => (
                   <button
                     key={preset.name}
-                    onClick={() => changeThemePreset(preset.name)}
-                    className={`w-5 h-5 rounded-full cursor-pointer transition-all border ${preset.color} ${themePreset === preset.name ? 'scale-120 ring-2 ring-blue-500/20 shadow-md' : 'opacity-70 hover:opacity-100'}`}
+                    onClick={() => changeCustomColorLocal(preset.hex)}
+                    className={`w-6.5 h-6.5 rounded-full cursor-pointer transition-all border ${preset.bg} ${customColor === preset.hex ? 'scale-120 ring-2 ring-white/40 shadow-md' : 'opacity-75 hover:opacity-100'}`}
                     title={preset.name}
                   />
                 ))}
+                
+                {/* Custom Color Picker Swatch */}
+                <div className="relative w-6.5 h-6.5 rounded-full overflow-hidden border border-slate-350 dark:border-slate-700 bg-gradient-to-tr from-pink-500 via-purple-500 to-blue-500 cursor-pointer hover:scale-110 active:scale-95 transition-all shadow-xs flex items-center justify-center" title="Choose custom color">
+                  <span className="text-[10px] text-white font-black select-none pointer-events-none">+</span>
+                  <input
+                    type="color"
+                    value={customColor}
+                    onInput={(e: any) => changeCustomColor(e.target.value)}
+                    onChange={(e: any) => changeCustomColorLocal(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Dark/Light mode switch */}
-            <div className="space-y-2 text-left">
-              <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Viewport Mode</span>
-              <div className="grid grid-cols-3 gap-1 bg-slate-50 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/50 dark:border-slate-900">
+            <div className="space-y-2.5 text-left">
+              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Viewport Mode</span>
+              <div className="grid grid-cols-3 gap-1 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200/50 dark:border-slate-900">
                 {[
-                  { id: 'light', label: '☀ Light' },
-                  { id: 'dark', label: '🌙 Dark' },
-                  { id: 'system', label: '💻 Sys' }
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleThemeChange(item.id as any)}
-                    className={`py-1 text-[8.5px] font-bold rounded-lg cursor-pointer transition-all ${themeMode === item.id 
-                      ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-2xs font-extrabold'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                    }`}
-                  >
-                    {item.label.split(' ')[0]}
-                  </button>
-                ))}
+                  { id: 'light', icon: Sun, label: 'Light' },
+                  { id: 'dark', icon: Moon, label: 'Dark' },
+                  { id: 'system', icon: Laptop, label: 'Sys' }
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = themeMode === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleThemeChange(item.id as any)}
+                      className={`py-2 px-1 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-300 ${isActive 
+                        ? 'bg-white dark:bg-slate-800 text-[var(--clr-primary)] shadow-md'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-slate-900/50'
+                      }`}
+                      title={item.label}
+                    >
+                      <Icon className={`w-5.5 h-5.5 transition-transform duration-300 ${isActive ? 'scale-110 stroke-[2.5]' : 'stroke-[2]'}`} />
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -632,10 +547,9 @@ export default function PlacementProfile({
       {/* NEW SECTION: Company Matches & Weekly Performance Widget */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 select-none">
         {/* Left Card: Company Matches (7 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-6`}>
+        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-start space-y-6`}>
           <div>
             <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Best Company Matches</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Estimated placement readiness based on curriculum domains scores.</p>
           </div>
 
           <div className="space-y-3.5">
@@ -657,54 +571,63 @@ export default function PlacementProfile({
               </div>
             ))}
           </div>
-
-          <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl flex items-start gap-3">
-            <Cpu className={`w-5 h-5 shrink-0 mt-0.5 ${stylePreset.iconColor}`} />
-            <div className="leading-tight text-left">
-              <span className="text-[10px] font-black uppercase text-slate-800 dark:text-white">Prep Recommendation</span>
-              <p className="text-[10.5px] font-semibold text-slate-500 mt-1 leading-relaxed">
-                Strong Logic and Quant scores. Improve <strong className={`${stylePreset.accentText} font-black`}>Verbal Accuracy</strong> and <strong className="text-slate-800 dark:text-white font-black">Solving Speed</strong> to unlock higher-tier matches like Amazon and Google.
-              </p>
-            </div>
-          </div>
         </div>
 
-        {/* Right Card: Weekly Performance Widget (5 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-6`}>
-          <div>
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">This Week</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Short-term prep activity and motivation landmarks.</p>
+        {/* Right Card: Weekly Performance Activity Spark Chart */}
+        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-4`}>
+          <div className="flex items-center justify-between select-none">
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Weekly Solves Activity</h4>
+            <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-505 uppercase">Streak: 14 Days 🔥</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl text-left relative overflow-hidden">
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Questions Solved</span>
-              <span className="text-2xl font-black font-mono text-slate-950 dark:text-white block mt-2">47</span>
-              <span className="text-[8.5px] font-bold text-emerald-500 font-mono block mt-1">+12% vs last week</span>
+          <div className="flex-1 flex flex-col justify-end space-y-4">
+            {/* Visual Mini Bar Chart */}
+            <div className="h-24 w-full flex items-end justify-between gap-2 px-1 select-none">
+              {[
+                { day: 'M', solves: 4, label: '4 Solves' },
+                { day: 'T', solves: 8, label: '8 Solves' },
+                { day: 'W', solves: 12, label: '12 Solves' },
+                { day: 'T', solves: 6, label: '6 Solves' },
+                { day: 'F', solves: 10, label: '10 Solves' },
+                { day: 'S', solves: 5, label: '5 Solves' },
+                { day: 'S', solves: 2, label: '2 Solves' }
+              ].map((item, idx) => {
+                const maxSolves = 12;
+                const percentage = (item.solves / maxSolves) * 100;
+                
+                return (
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group/bar relative">
+                    {/* Tooltip on hover */}
+                    <span className="absolute bottom-full mb-1 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-slate-900 text-white text-[8px] font-bold py-1 px-2 rounded-md whitespace-nowrap shadow-md z-10 pointer-events-none">
+                      {item.label}
+                    </span>
+                    {/* Bar Pillar */}
+                    <div className="w-full bg-slate-100 dark:bg-slate-950/60 rounded-t-lg overflow-hidden border border-slate-200/20 dark:border-slate-800/40 h-20 flex flex-col justify-end">
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${percentage}%` }}
+                        transition={{ duration: 0.8, delay: idx * 0.05, ease: "easeOut" }}
+                        className="w-full bg-gradient-to-t from-[var(--clr-primary)]/80 to-[var(--clr-primary)] rounded-t-md"
+                        style={{ backgroundColor: activeBaseColor }}
+                      />
+                    </div>
+                    {/* Day label */}
+                    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-505 font-mono">
+                      {item.day}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl text-left">
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Weekly Accuracy</span>
-              <span className="text-2xl font-black font-mono text-emerald-500 block mt-2">91%</span>
-              <span className="text-[8.5px] font-bold text-emerald-600 dark:text-emerald-400 font-mono block mt-1">Excellent tier</span>
+            {/* Micro Stats summary footer */}
+            <div className="border-t border-slate-100 dark:border-slate-900/60 pt-3 flex items-center justify-between text-[9px] font-mono font-bold text-slate-500 select-none">
+              <span className="uppercase">Avg Solves / Day: 6.7</span>
+              <span className="text-emerald-500 uppercase flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Active Habit
+              </span>
             </div>
-
-            <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl text-left">
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Rank Shift</span>
-              <span className="text-2xl font-black font-mono text-blue-500 block mt-2">+123</span>
-              <span className="text-[8.5px] font-bold text-slate-400 font-mono block mt-1">Global ranking jump</span>
-            </div>
-
-            <div className="bg-slate-50 dark:bg-slate-950/40 p-4 border border-slate-200/50 dark:border-slate-900 rounded-2xl text-left">
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">XP Earned</span>
-              <span className="text-2xl font-black font-mono text-purple-400 block mt-2">640</span>
-              <span className="text-[8.5px] font-bold text-purple-600 dark:text-purple-400 font-mono block mt-1">Goal 500 XP met</span>
-            </div>
-          </div>
-
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-900 flex justify-between text-[8px] font-bold text-slate-500 font-mono uppercase">
-            <span>2 Mocks Completed</span>
-            <span>Streak Maintained</span>
           </div>
         </div>
       </section>
@@ -713,34 +636,36 @@ export default function PlacementProfile({
       <section className="grid grid-cols-1 md:grid-cols-12 gap-6 select-none">
         
         {/* PRIMARY CARD 1: Placement Readiness Index */}
-        <div className={`${stylePreset.cardBg} md:col-span-4 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
+        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
           <div className="absolute top-0 right-0 w-2 h-full bg-[#10B981]" />
           <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Overall Readiness</span>
           
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">79.6%</span>
-            <span className="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Index Score</span>
+          <div className="mt-4 flex items-baseline justify-between">
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">79.6%</span>
+              <span className="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Index Score</span>
+            </div>
+            <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">▲ +2.4% this week</span>
           </div>
 
-          <div className="mt-4 space-y-1.5">
+          <div className="mt-5 space-y-1.5">
             <div className="w-full bg-slate-100 dark:bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-900">
               <div className="bg-[#10B981] h-full rounded-full" style={{ width: '79.6%' }} />
-            </div>
-            <div className="flex justify-between text-[8px] font-bold text-slate-400 font-mono uppercase">
-              <span>Verified Index</span>
-              <span>Top Academic Match</span>
             </div>
           </div>
         </div>
 
         {/* PRIMARY CARD 2: Global Rank */}
-        <div className={`${stylePreset.cardBg} md:col-span-4 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
+        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
           <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-purple-500 to-pink-500" />
           <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Global Ranking</span>
           
           <div className="mt-4 flex items-baseline justify-between">
             <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">#1,402</span>
-            <span className="text-[9px] font-black bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider inline-block">Top 12%</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold text-blue-500 uppercase tracking-wider font-mono bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-lg">▲ +123 ranks</span>
+              <span className="text-[9px] font-black bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider inline-block">Top 12%</span>
+            </div>
           </div>
 
           <p className="text-[9.5px] font-semibold text-slate-400 mt-5 leading-normal block">
@@ -748,41 +673,37 @@ export default function PlacementProfile({
           </p>
         </div>
 
-        {/* PRIMARY CARD 3: Daily Streak */}
-        <div className={`${stylePreset.cardBg} md:col-span-4 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200 flex flex-col justify-between`}>
-          <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-amber-500 to-orange-500" />
-          
-          <div>
-            <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Daily Streak</span>
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">42 Days</span>
-              <Flame className="w-6.5 h-6.5 text-amber-500 fill-current animate-pulse" />
+        {/* UNIFIED SECONDARY STATS BANNER */}
+        <div className={`${stylePreset.cardBg} md:col-span-12 rounded-3xl p-5 md:p-6 backdrop-blur-md hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-200`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-900/60">
+            {/* Accuracy Rate */}
+            <div className="flex items-center justify-between text-left sm:pr-6">
+              <div className="space-y-1">
+                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Accuracy Rate</span>
+                <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">88.5%</span>
+              </div>
+              <div className="text-right space-y-1 select-none">
+                <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg inline-block">91% this week</span>
+                <span className="text-[8px] font-bold text-slate-400 font-mono block">▲ +1.4% OVERALL</span>
+              </div>
             </div>
-          </div>
-          
-          <span className="text-[9.5px] font-bold text-slate-400 font-mono block mt-4">Personal Best Record: 75 Days</span>
-        </div>
 
-        {/* SECONDARY CARD 1: Accuracy (Smaller visual weight) */}
-        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-2xl p-4 text-left flex items-center justify-between hover:border-slate-350 dark:hover:border-slate-700 transition-colors`}>
-          <div className="space-y-1">
-            <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Accuracy Rate</span>
-            <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">88.5%</span>
-          </div>
-          <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">+1.4% this week</span>
-        </div>
-
-        {/* SECONDARY CARD 2: Total Solved */}
-        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-2xl p-4 text-left flex items-center justify-between hover:border-slate-350 dark:hover:border-slate-700 transition-colors`}>
-          <div className="space-y-1">
-            <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Solved</span>
-            <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">1,240 <span className="text-xs text-slate-400 font-bold font-sans">/ 10k</span></span>
-          </div>
-          <div className="w-24 text-right space-y-1">
-            <div className="w-full bg-slate-100 dark:bg-slate-950 h-1 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-800">
-              <div className="bg-blue-500 h-full rounded-full" style={{ width: '12.4%' }} />
+            {/* Total Solved */}
+            <div className="flex items-center justify-between text-left sm:pl-6 pt-4 sm:pt-0">
+              <div className="space-y-1">
+                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Solved</span>
+                <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">1,240 <span className="text-xs text-slate-400 font-bold font-sans">/ 10k</span></span>
+              </div>
+              <div className="text-right space-y-1 select-none">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-wider font-mono bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-lg inline-block">+47 this week</span>
+                  <span className="text-[8px] font-bold text-slate-400 font-mono block">12.4% COMPLETE</span>
+                </div>
+                <div className="w-28 bg-slate-100 dark:bg-slate-955 h-1 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-800 ml-auto">
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: '12.4%' }} />
+                </div>
+              </div>
             </div>
-            <span className="text-[8px] font-bold text-slate-400 font-mono block">12.4% COMPLETE</span>
           </div>
         </div>
 
@@ -791,182 +712,28 @@ export default function PlacementProfile({
       {/* Main Charts & Consistency layout section */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Column: Placement Radar chart + Skill progress bars (5 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md relative overflow-hidden min-h-[360px] flex flex-col justify-between select-none`}>
-          
-          <div className="text-left space-y-0.5">
-            <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest">Placement Readiness Radar</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500">Your strengths across aptitude domains</p>
-          </div>
-
-          {/* SVG Radar Chart */}
-          <div className="relative w-full flex items-center justify-center py-4">
-            <svg width="260" height="260" className="overflow-visible">
-              {pentagons.map((pent, pIdx) => {
-                const pointsStr = pent.map(pt => `${pt.x},${pt.y}`).join(' ');
-                return (
-                  <polygon
-                    key={pIdx}
-                    points={pointsStr}
-                    fill="none"
-                    stroke="rgba(226,232,240,0.06)"
-                    strokeWidth="1"
-                  />
-                );
-              })}
-
-              {radarPoints.map((pt, idx) => {
-                const angle = (idx * 2 * Math.PI) / 5 - Math.PI / 2;
-                const endX = radarCenter + radarRadius * Math.cos(angle);
-                const endY = radarCenter + radarRadius * Math.sin(angle);
-                return (
-                  <line
-                    key={idx}
-                    x1={radarCenter}
-                    y1={radarCenter}
-                    x2={endX}
-                    y2={endY}
-                    stroke="rgba(226,232,240,0.06)"
-                    strokeWidth="1.5"
-                  />
-                );
-              })}
-
-              {(() => {
-                const pointsStr = radarPoints.map(pt => `${pt.x},${pt.y}`).join(' ');
-                return (
-                  <polygon
-                    points={pointsStr}
-                    fill="rgba(59,130,246,0.18)"
-                    stroke="#3B82F6"
-                    strokeWidth="2.5"
-                    className="transition-all duration-300"
-                  />
-                );
-              })()}
-
-              {radarPoints.map((pt, idx) => (
-                <g key={idx}>
-                  <circle
-                    cx={pt.x}
-                    cy={pt.y}
-                    r="4.5"
-                    fill="#3B82F6"
-                    stroke="#030712"
-                    strokeWidth="2"
-                    className="cursor-pointer hover:r-6 transition-all"
-                    onMouseEnter={(e) => {
-                      setActiveRadarTooltip({
-                        x: pt.x,
-                        y: pt.y - 12,
-                        label: pt.fullName,
-                        val: pt.val
-                      });
-                    }}
-                    onMouseLeave={() => setActiveRadarTooltip(null)}
-                  />
-                </g>
-              ))}
-
-              {radarPoints.map((pt, idx) => {
-                const angle = (idx * 2 * Math.PI) / 5 - Math.PI / 2;
-                const labelR = radarRadius + 18;
-                const labelX = radarCenter + labelR * Math.cos(angle);
-                const labelY = radarCenter + labelR * Math.sin(angle);
-
-                let textAnchor: 'start' | 'end' | 'middle' = 'middle';
-                if (Math.cos(angle) > 0.1) textAnchor = 'start';
-                if (Math.cos(angle) < -0.1) textAnchor = 'end';
-
-                return (
-                  <text
-                    key={idx}
-                    x={labelX}
-                    y={labelY + 4}
-                    fill="#94A3B8"
-                    fontSize="9.5"
-                    fontWeight="black"
-                    textAnchor={textAnchor}
-                    className="font-mono uppercase select-none"
-                  >
-                    {pt.subject} ({pt.val})
-                  </text>
-                );
-              })}
-            </svg>
-
-            {activeRadarTooltip && (
-              <div 
-                className="absolute z-20 px-2.5 py-1.5 bg-slate-900 border border-slate-800 text-white rounded-xl text-[9px] font-bold flex flex-col pointer-events-none shadow-md"
-                style={{ left: `${activeRadarTooltip.x - 40}px`, top: `${activeRadarTooltip.y - 30}px` }}
-              >
-                <span className="text-slate-400 font-semibold">{activeRadarTooltip.label}</span>
-                <span className="font-mono text-blue-400 mt-0.5 font-bold">Strength: {activeRadarTooltip.val}%</span>
-              </div>
-            )}
-          </div>
-
-          {/* Supporting Skill Bars underneath Radar */}
-          <div className="space-y-2.5 pt-4 border-t border-slate-100 dark:border-slate-900">
-            {[
-              { label: 'Quantitative Aptitude', percent: 82, color: 'bg-blue-500' },
-              { label: 'Logical Reasoning', percent: 91, color: 'bg-purple-500' },
-              { label: 'Verbal Ability', percent: 63, color: 'bg-rose-500' },
-              { label: 'Solving Speed', percent: 74, color: 'bg-amber-500' },
-              { label: 'Accuracy Rating', percent: 88, color: 'bg-emerald-500' }
-            ].map((bar) => (
-              <div key={bar.label} className="space-y-1 text-left">
-                <div className="flex justify-between items-center text-[9.5px] font-extrabold uppercase font-mono tracking-wide text-slate-500 dark:text-slate-400">
-                  <span>{bar.label}</span>
-                  <span className="text-slate-800 dark:text-white font-black">{bar.percent}%</span>
-                </div>
-                <div className="w-full bg-slate-100 dark:bg-slate-950 h-1 rounded-full overflow-hidden border border-slate-200/10 dark:border-slate-900">
-                  <div className={`h-full rounded-full ${bar.color}`} style={{ width: `${bar.percent}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-        {/* Right Column: Consistency Heatmap Grid (7 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md relative overflow-hidden select-none space-y-5`}>
+        {/* Consistency Heatmap Grid (Full width) */}
+        <div className={`${stylePreset.cardBg} lg:col-span-12 rounded-3xl p-6 backdrop-blur-md relative overflow-hidden select-none space-y-5`}>
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
             <div>
               <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest">Consistency Tracker</h4>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">365-day commitment to learning & problem solving</p>
             </div>
             
             <div className="flex items-center gap-1.5 text-[8.5px] font-bold text-slate-400 font-mono uppercase">
               <span>Less</span>
               <div className="w-2.5 h-2.5 bg-slate-100 dark:bg-slate-950 rounded-xs border border-slate-250 dark:border-slate-800" />
-              <div className="w-2.5 h-2.5 bg-blue-900/20 rounded-xs border border-blue-900/10" />
-              <div className="w-2.5 h-2.5 bg-blue-500/30 rounded-xs border border-blue-500/20" />
-              <div className="w-2.5 h-2.5 bg-blue-600 rounded-xs border border-blue-500" />
+              <div className="w-2.5 h-2.5 rounded-xs border" style={{ backgroundColor: `${activeBaseColor}20`, borderColor: `${activeBaseColor}40` }} />
+              <div className="w-2.5 h-2.5 rounded-xs border" style={{ backgroundColor: `${activeBaseColor}80`, borderColor: `${activeBaseColor}50` }} />
+              <div className="w-2.5 h-2.5 rounded-xs border" style={{ backgroundColor: activeBaseColor, borderColor: activeBaseColor }} />
               <span>More</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 text-left bg-slate-50 dark:bg-slate-950/20 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-900">
-            <div>
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Streak</span>
-              <span className="text-sm font-mono font-black text-slate-900 dark:text-white mt-1 block">42 Days 🔥</span>
-            </div>
-            <div>
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Longest Streak</span>
-              <span className="text-sm font-mono font-black text-slate-900 dark:text-white mt-1 block">75 Days</span>
-            </div>
-            <div>
-              <span className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Solved Monthly</span>
-              <span className="text-sm font-mono font-black text-slate-900 dark:text-white mt-1 block">184 Sets</span>
-            </div>
-          </div>
-
           {/* Heatmap Grid */}
-          <div className="relative w-full overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent">
-            <div className="relative" style={{ width: '660px', height: '110px' }}>
-              <svg width="660" height="98" className="overflow-visible">
+          <div className="relative w-full pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent">
+            <div className="relative w-full">
+              <svg viewBox="-20 0 680 98" width="100%" className="overflow-visible">
                 {Array.from({ length: 53 }).map((_, colIdx) => {
                   return Array.from({ length: 7 }).map((_, rowIdx) => {
                     const blockIdx = colIdx * 7 + rowIdx;
@@ -988,16 +755,10 @@ export default function PlacementProfile({
                       border = '#3B82F6';
                     }
 
-                    // Theme presets overrides for heatmap colors
-                    if (themePreset === 'Placement Gold' && cell.solves > 0) {
-                      color = cell.solves >= 6 ? '#D97706' : cell.solves >= 3 ? 'rgba(245, 158, 11, 0.5)' : 'rgba(217, 119, 6, 0.15)';
-                      border = cell.solves >= 6 ? '#F59E0B' : 'rgba(245, 158, 11, 0.3)';
-                    } else if (themePreset === 'Neon Purple' && cell.solves > 0) {
-                      color = cell.solves >= 6 ? '#7C3AED' : cell.solves >= 3 ? 'rgba(139, 92, 246, 0.5)' : 'rgba(124, 58, 237, 0.15)';
-                      border = cell.solves >= 6 ? '#8B5CF6' : 'rgba(139, 92, 246, 0.3)';
-                    } else if (themePreset === 'Emerald' && cell.solves > 0) {
-                      color = cell.solves >= 6 ? '#059669' : cell.solves >= 3 ? 'rgba(16, 185, 129, 0.5)' : 'rgba(5, 150, 105, 0.15)';
-                      border = cell.solves >= 6 ? '#10B981' : 'rgba(16, 185, 129, 0.3)';
+                    // Dynamic custom color theme mapping for heatmap colors
+                    if (cell.solves > 0) {
+                      color = cell.solves >= 6 ? activeBaseColor : cell.solves >= 3 ? `${activeBaseColor}80` : `${activeBaseColor}20`;
+                      border = cell.solves >= 6 ? activeBaseColor : `${activeBaseColor}40`;
                     }
 
                     if (document.documentElement.classList.contains('dark') === false && cell.solves === 0) {
@@ -1020,16 +781,35 @@ export default function PlacementProfile({
                         stroke={border}
                         strokeWidth="0.8"
                         className="cursor-pointer transition-all hover:stroke-blue-500/80"
+                        onClick={() => setSelectedHeatmapCell(cell)}
                         onMouseEnter={(e) => {
-                          setActiveHeatmapTooltip({
-                            x: x,
-                            y: y - 10,
-                            date: cell.dateStr,
-                            solves: cell.solves,
-                            acc: cell.accuracy,
-                            topics: cell.topics,
-                            timeSpent: cell.timeSpent
-                          });
+                          const rectEl = e.currentTarget;
+                          const rectBounds = rectEl.getBoundingClientRect();
+                          const svg = rectEl.ownerSVGElement;
+                          const container = svg?.parentElement;
+                          if (container) {
+                            const containerRect = container.getBoundingClientRect();
+                            let tooltipX = rectBounds.left - containerRect.left + (rectBounds.width / 2);
+                            
+                            // Prevent tooltip from overflowing the left or right container boundaries
+                            const halfWidth = 88; // half of min-w-44 (176px)
+                            const padding = 12;
+                            if (tooltipX < halfWidth + padding) {
+                              tooltipX = halfWidth + padding;
+                            } else if (tooltipX > containerRect.width - halfWidth - padding) {
+                              tooltipX = containerRect.width - halfWidth - padding;
+                            }
+
+                            setActiveHeatmapTooltip({
+                              x: tooltipX,
+                              y: rectBounds.top - containerRect.top,
+                              date: cell.dateStr,
+                              solves: cell.solves,
+                              acc: cell.accuracy,
+                              topics: cell.topics,
+                              timeSpent: cell.timeSpent
+                            });
+                          }
                         }}
                         onMouseLeave={() => setActiveHeatmapTooltip(null)}
                       />
@@ -1037,17 +817,56 @@ export default function PlacementProfile({
                   });
                 })}
 
-                {['M', 'W', 'F'].map((day, idx) => (
+                {/* Months labels on the top of the heatmap */}
+                {(() => {
+                  let lastPrintedCol = -10;
+                  return Array.from({ length: 53 }).map((_, colIdx) => {
+                    const cell = heatmapSolves[colIdx * 7];
+                    if (!cell) return null;
+                    
+                    // Draw month name if it's the first column or month changes
+                    const prevCell = colIdx > 0 ? heatmapSolves[(colIdx - 1) * 7] : null;
+                    const isNewMonth = !prevCell || cell.month !== prevCell.month;
+                    
+                    // Only print if month changes and it is at least 3 columns away from the last printed month
+                    if (isNewMonth && (colIdx - lastPrintedCol >= 3)) {
+                      lastPrintedCol = colIdx;
+                      return (
+                        <text
+                          key={`month-${colIdx}`}
+                          x={colIdx * 12}
+                          y="6"
+                          fill="#94A3B8"
+                          fontSize="7.5"
+                          fontWeight="black"
+                          className="font-mono select-none text-left"
+                        >
+                          {cell.month}
+                        </text>
+                      );
+                    }
+                    return null;
+                  });
+                })()}
+
+                {/* Days labels on the left of the heatmap */}
+                {[
+                  { label: 'Mon', row: 0 },
+                  { label: 'Wed', row: 2 },
+                  { label: 'Fri', row: 4 },
+                  { label: 'Sun', row: 6 }
+                ].map((item) => (
                   <text
-                    key={day}
-                    x="-12"
-                    y={idx * 24 + 31}
+                    key={item.label}
+                    x="-6"
+                    y={item.row * 12 + 19}
                     fill="#94A3B8"
                     fontSize="7.5"
                     fontWeight="black"
-                    className="font-mono select-none text-right"
+                    textAnchor="end"
+                    className="font-mono select-none"
                   >
-                    {day}
+                    {item.label}
                   </text>
                 ))}
               </svg>
@@ -1056,7 +875,11 @@ export default function PlacementProfile({
               {activeHeatmapTooltip && (
                 <div 
                   className="absolute z-20 px-3 py-2 bg-slate-950/95 dark:bg-slate-900/95 border border-slate-800 text-white rounded-xl text-[10.5px] font-bold flex flex-col pointer-events-none shadow-xl min-w-44 text-left"
-                  style={{ left: `${activeHeatmapTooltip.x - 70}px`, top: `${activeHeatmapTooltip.y - 74}px` }}
+                  style={{ 
+                    left: `${activeHeatmapTooltip.x}px`, 
+                    top: `${activeHeatmapTooltip.y + 20}px`, 
+                    transform: 'translate(-50%, 0)' 
+                  }}
                 >
                   <span className="text-slate-400 font-extrabold text-[9.5px] tracking-wide block border-b border-slate-800 pb-1">{activeHeatmapTooltip.date}</span>
                   {activeHeatmapTooltip.solves > 0 ? (
@@ -1085,20 +908,51 @@ export default function PlacementProfile({
             </div>
           </div>
 
+          {/* Activity Detail Info Box (below heatmap) */}
+          <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-900 rounded-2xl min-h-[85px] flex items-center justify-between text-left transition-all">
+            {selectedHeatmapCell ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4">
+                <div className="space-y-1">
+                  <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono">{selectedHeatmapCell.dateStr}</span>
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-black">
+                    <span className="text-slate-900 dark:text-white uppercase">Solves: <span className="text-blue-500 font-mono">{selectedHeatmapCell.solves} Sets</span></span>
+                    <span className="text-slate-400 dark:text-slate-600">•</span>
+                    <span className="text-slate-900 dark:text-white uppercase">Accuracy: <span className="text-emerald-500 font-mono">{selectedHeatmapCell.accuracy}%</span></span>
+                    <span className="text-slate-400 dark:text-slate-600">•</span>
+                    <span className="text-slate-900 dark:text-white uppercase">Duration: <span className="text-amber-500 font-mono">{selectedHeatmapCell.timeSpent}</span></span>
+                  </div>
+                </div>
+
+                {selectedHeatmapCell.topics.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end max-w-md">
+                    {selectedHeatmapCell.topics.map((topic: string, i: number) => (
+                      <span key={i} className="text-[8.5px] font-black uppercase font-mono bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg tracking-wider">
+                        {topic}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2.5 text-slate-450 dark:text-slate-550">
+                <span className="text-xs font-semibold">Click on any grid block to view learning activity details for that day.</span>
+              </div>
+            )}
+          </div>
+
         </div>
 
       </section>
 
-      {/* LOWER SECTION: Achievements & Recent Activity */}
+      {/* LOWER SECTION: Achievements */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 select-none">
         
-        {/* Left Column: Trophy Case (7 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-5`}>
+        {/* Trophy Case (Full width) */}
+        <div className={`${stylePreset.cardBg} lg:col-span-12 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-5`}>
           
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
             <div>
               <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Placement Achievements</h4>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Top unlocked badges and locked milestones progress.</p>
             </div>
             
             <button 
@@ -1109,13 +963,13 @@ export default function PlacementProfile({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {achievements.filter((_, idx) => idx < 6).map((item) => (
               <div
                 key={item.id}
                 className={`p-3 rounded-2xl border text-left flex items-start gap-3 transition-all relative overflow-hidden group ${
                   item.unlocked
-                    ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-850 hover:border-blue-500/50'
+                    ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800 hover:border-blue-500/55'
                     : 'bg-slate-100/30 dark:bg-slate-950/5 border-slate-200/40 dark:border-slate-900 opacity-60'
                 }`}
               >
@@ -1148,114 +1002,6 @@ export default function PlacementProfile({
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-        {/* Right Column: Recent Activity Feed (5 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-5`}>
-          <div>
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Recent Activity</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Real-time log of solved commits and dashboard triggers.</p>
-          </div>
-
-          <div className="space-y-3.5 pl-1.5 relative border-l border-slate-100 dark:border-slate-900 py-1">
-            {[
-              { text: "Solved Percentages #842", time: "2 hours ago", icon: "✓" },
-              { text: "Earned 30 Day Streak Achievement", time: "1 day ago", icon: "✓" },
-              { text: "Added Revision Note on Time & Work", time: "2 days ago", icon: "✓" },
-              { text: "Completed TCS Placement Mock #12", time: "3 days ago", icon: "✓" },
-              { text: "Reached Top 15% Global Ranking", time: "4 days ago", icon: "✓" },
-              { text: "Prestige Title Logic Legend unlocked", time: "5 days ago", icon: "✓" }
-            ].map((act, index) => (
-              <div key={index} className="relative pl-4 text-left leading-none">
-                {/* Check dot */}
-                <div className={`absolute -left-[10px] top-0 w-4 h-4 rounded-full border flex items-center justify-center text-[7.5px] font-black text-white ${
-                  index === 0 ? 'bg-emerald-500 border-emerald-400' : 'bg-slate-200 dark:bg-slate-800 border-slate-350 dark:border-slate-700 text-slate-400 dark:text-slate-500'
-                }`}>
-                  {act.icon}
-                </div>
-                
-                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block leading-tight">{act.text}</span>
-                <span className="text-[8.5px] text-slate-400 dark:text-slate-500 font-semibold block mt-0.5">{act.time}</span>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* PROGRESS TIMELINE & SMART INSIGHTS */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* Left Column: Progress Timeline (6 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-6 rounded-3xl p-6 backdrop-blur-md text-left space-y-5 select-none`}>
-          <div>
-            <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest">Aptitude Progress Timeline</h4>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Chronological record of prep achievements and solved landmarks.</p>
-          </div>
-
-          <div className="relative pl-6 border-l border-slate-200 dark:border-slate-800 space-y-5 py-2">
-            {[
-              { milestone: 'First Aptitude Question Solved', date: 'Oct 02, 2023', achieved: true, tag: 'START' },
-              { milestone: 'Reached Level 10 prep stage', date: 'Dec 12, 2023', achieved: true, tag: 'LEVEL' },
-              { milestone: '7-Day Streak challenge unlocked', date: 'Feb 15, 2024', achieved: true, tag: 'STREAK' },
-              { milestone: 'Entered Top 10,000 global ranking', date: 'Jun 20, 2024', achieved: true, tag: 'RANK' },
-              { milestone: 'Solved 500 total questions milestone', date: 'Nov 04, 2025', achieved: true, tag: 'SOLVE' },
-              { milestone: 'Earned Logic Legend prestige title', date: 'Jun 18, 2026', achieved: true, tag: 'PRESTIGE' }
-            ].map((step, idx) => (
-              <div key={idx} className="relative">
-                <div className="absolute -left-9 top-0.5 w-6 h-6 rounded-full flex items-center justify-center border-2 border-blue-600 bg-blue-500 text-white shadow-xs">
-                  <CheckCircle className="w-3.5 h-3.5 stroke-[3.5]" />
-                </div>
-                
-                <div className="leading-tight text-left pl-1">
-                  <div className="flex items-center gap-2">
-                    <h5 className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white">
-                      {step.milestone}
-                    </h5>
-                    <span className="text-[8px] font-black font-mono bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 px-1.5 py-0.2 rounded uppercase tracking-wider">
-                      {step.tag}
-                    </span>
-                  </div>
-                  <span className="text-[9.5px] text-slate-450 dark:text-slate-550 font-semibold block mt-0.5">
-                    Completed • {step.date}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-        {/* Right Column: AI Smart Insights (6 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-6 rounded-3xl p-6 backdrop-blur-md text-left space-y-4 select-none`}>
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
-            <div>
-              <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest flex items-center gap-1.5">
-                <Cpu className={`w-4 h-4 ${stylePreset.iconColor}`} /> Smart Prep Insights
-              </h4>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">AI-powered suggestions based on solves profile.</p>
-            </div>
-            <span className="text-[8px] font-mono font-bold text-slate-400">Agent: Antigravity</span>
-          </div>
-
-          <div className="space-y-3.5">
-            {[
-              { text: "Your Logical reasoning index is stronger than 87% of active placement students.", badge: "STRENGTH", color: "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" },
-              { text: "Optimal Activity Peak: You consistently perform best with 94% accuracy between 7 PM and 10 PM.", badge: "PEAK TIME", color: "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400" },
-              { text: "Improvement Target: Elevating Verbal Ability Accuracy by 8% would increase your global rank by 500+ positions.", badge: "RANK BOOSTER", color: "bg-purple-500/10 border-purple-500/20 text-purple-600 dark:text-purple-400" }
-            ].map((insight, idx) => (
-              <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/50 dark:border-slate-900 rounded-2xl flex flex-col gap-2">
-                <span className={`text-[8.5px] font-black font-mono border px-2 py-0.5 rounded-md w-max uppercase tracking-wider ${insight.color}`}>
-                  {insight.badge}
-                </span>
-                <p className="text-xs font-semibold text-slate-600 dark:text-slate-350 leading-relaxed">
-                  "{insight.text}"
-                </p>
               </div>
             ))}
           </div>
@@ -1806,7 +1552,7 @@ export default function PlacementProfile({
                     key={item.id}
                     className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all relative overflow-hidden group ${
                       item.unlocked
-                        ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-855 hover:border-blue-500/50'
+                        ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800 hover:border-blue-500/55'
                         : 'bg-slate-100/30 dark:bg-slate-950/5 border-slate-200/40 dark:border-slate-900 opacity-60'
                     }`}
                   >
@@ -1816,7 +1562,7 @@ export default function PlacementProfile({
 
                     <div className="flex-1 space-y-1 text-left min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h5 className="text-[10.5px] font-black uppercase text-slate-850 dark:text-white tracking-wide truncate">
+                        <h5 className="text-[10.5px] font-black uppercase text-slate-800 dark:text-white tracking-wide truncate">
                           {item.title}
                         </h5>
                         <span className={`text-[7.5px] font-extrabold px-1.5 py-0.2 rounded border font-mono uppercase shrink-0 ${getRarityStyle(item.rarity)}`}>
@@ -1833,7 +1579,7 @@ export default function PlacementProfile({
                           <span>Progress</span>
                           <span>{item.currentProgress} / {item.targetProgress}</span>
                         </div>
-                        <div className="w-full bg-slate-200/50 dark:bg-slate-955 h-1 rounded-full overflow-hidden border border-slate-200/10 dark:border-slate-900">
+                        <div className="w-full bg-slate-200/50 dark:bg-slate-900 h-1 rounded-full overflow-hidden border border-slate-200/10 dark:border-slate-900">
                           <div className={`h-full rounded-full ${item.unlocked ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${(item.currentProgress / item.targetProgress) * 100}%` }} />
                         </div>
                       </div>
