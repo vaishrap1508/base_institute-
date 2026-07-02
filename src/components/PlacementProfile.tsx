@@ -544,171 +544,6 @@ export default function PlacementProfile({
 
       </section>
 
-      {/* NEW SECTION: Company Matches & Weekly Performance Widget */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 select-none">
-        {/* Left Card: Company Matches (7 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-start space-y-6`}>
-          <div>
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Best Company Matches</h4>
-          </div>
-
-          <div className="space-y-3.5">
-            {[
-              { company: 'TCS', percent: 94, color: 'bg-emerald-500' },
-              { company: 'Infosys', percent: 89, color: 'bg-blue-500' },
-              { company: 'Accenture', percent: 86, color: 'bg-indigo-500' },
-              { company: 'Amazon', percent: 61, color: 'bg-amber-500' },
-              { company: 'Google', percent: 44, color: 'bg-rose-500' }
-            ].map((match) => (
-              <div key={match.company} className="space-y-1">
-                <div className="flex justify-between items-center text-[10.5px] font-bold font-mono">
-                  <span className="text-slate-700 dark:text-slate-350">{match.company}</span>
-                  <span className="text-slate-800 dark:text-white font-extrabold">{match.percent}% Match</span>
-                </div>
-                <div className="w-full bg-slate-50 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-100 dark:border-slate-900">
-                  <div className={`h-full rounded-full ${match.color}`} style={{ width: `${match.percent}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Card: Weekly Performance Activity Spark Chart */}
-        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-4`}>
-          <div className="flex items-center justify-between select-none">
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Weekly Solves Activity</h4>
-            <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-505 uppercase">Streak: 14 Days 🔥</span>
-          </div>
-
-          <div className="flex-1 flex flex-col justify-end space-y-4">
-            {/* Visual Mini Bar Chart */}
-            <div className="h-24 w-full flex items-end justify-between gap-2 px-1 select-none">
-              {[
-                { day: 'M', solves: 4, label: '4 Solves' },
-                { day: 'T', solves: 8, label: '8 Solves' },
-                { day: 'W', solves: 12, label: '12 Solves' },
-                { day: 'T', solves: 6, label: '6 Solves' },
-                { day: 'F', solves: 10, label: '10 Solves' },
-                { day: 'S', solves: 5, label: '5 Solves' },
-                { day: 'S', solves: 2, label: '2 Solves' }
-              ].map((item, idx) => {
-                const maxSolves = 12;
-                const percentage = (item.solves / maxSolves) * 100;
-                
-                return (
-                  <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group/bar relative">
-                    {/* Tooltip on hover */}
-                    <span className="absolute bottom-full mb-1 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-slate-900 text-white text-[8px] font-bold py-1 px-2 rounded-md whitespace-nowrap shadow-md z-10 pointer-events-none">
-                      {item.label}
-                    </span>
-                    {/* Bar Pillar */}
-                    <div className="w-full bg-slate-100 dark:bg-slate-950/60 rounded-t-lg overflow-hidden border border-slate-200/20 dark:border-slate-800/40 h-20 flex flex-col justify-end">
-                      <motion.div 
-                        initial={{ height: 0 }}
-                        animate={{ height: `${percentage}%` }}
-                        transition={{ duration: 0.8, delay: idx * 0.05, ease: "easeOut" }}
-                        className="w-full bg-gradient-to-t from-[var(--clr-primary)]/80 to-[var(--clr-primary)] rounded-t-md"
-                        style={{ backgroundColor: activeBaseColor }}
-                      />
-                    </div>
-                    {/* Day label */}
-                    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-505 font-mono">
-                      {item.day}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Micro Stats summary footer */}
-            <div className="border-t border-slate-100 dark:border-slate-900/60 pt-3 flex items-center justify-between text-[9px] font-mono font-bold text-slate-500 select-none">
-              <span className="uppercase">Avg Solves / Day: 6.7</span>
-              <span className="text-emerald-500 uppercase flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Active Habit
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 2: Restructured KPI Section (Hierarchy Created) */}
-      <section className="grid grid-cols-1 md:grid-cols-12 gap-6 select-none">
-        
-        {/* PRIMARY CARD 1: Placement Readiness Index */}
-        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
-          <div className="absolute top-0 right-0 w-2 h-full bg-[#10B981]" />
-          <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Overall Readiness</span>
-          
-          <div className="mt-4 flex items-baseline justify-between">
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">79.6%</span>
-              <span className="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Index Score</span>
-            </div>
-            <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">▲ +2.4% this week</span>
-          </div>
-
-          <div className="mt-5 space-y-1.5">
-            <div className="w-full bg-slate-100 dark:bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-900">
-              <div className="bg-[#10B981] h-full rounded-full" style={{ width: '79.6%' }} />
-            </div>
-          </div>
-        </div>
-
-        {/* PRIMARY CARD 2: Global Rank */}
-        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
-          <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-purple-500 to-pink-500" />
-          <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Global Ranking</span>
-          
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-3xl font-black font-mono text-slate-950 dark:text-white">#1,402</span>
-            <div className="flex items-center gap-2">
-              <span className="text-[9px] font-bold text-blue-500 uppercase tracking-wider font-mono bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-lg">▲ +123 ranks</span>
-              <span className="text-[9px] font-black bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider inline-block">Top 12%</span>
-            </div>
-          </div>
-
-          <p className="text-[9.5px] font-semibold text-slate-400 mt-5 leading-normal block">
-            Ranked out of 11,540 active students inside the placement dashboard.
-          </p>
-        </div>
-
-        {/* UNIFIED SECONDARY STATS BANNER */}
-        <div className={`${stylePreset.cardBg} md:col-span-12 rounded-3xl p-5 md:p-6 backdrop-blur-md hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-200`}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-900/60">
-            {/* Accuracy Rate */}
-            <div className="flex items-center justify-between text-left sm:pr-6">
-              <div className="space-y-1">
-                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Accuracy Rate</span>
-                <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">88.5%</span>
-              </div>
-              <div className="text-right space-y-1 select-none">
-                <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg inline-block">91% this week</span>
-                <span className="text-[8px] font-bold text-slate-400 font-mono block">▲ +1.4% OVERALL</span>
-              </div>
-            </div>
-
-            {/* Total Solved */}
-            <div className="flex items-center justify-between text-left sm:pl-6 pt-4 sm:pt-0">
-              <div className="space-y-1">
-                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Solved</span>
-                <span className="text-2xl font-black font-mono text-slate-950 dark:text-white">1,240 <span className="text-xs text-slate-400 font-bold font-sans">/ 10k</span></span>
-              </div>
-              <div className="text-right space-y-1 select-none">
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-wider font-mono bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-lg inline-block">+47 this week</span>
-                  <span className="text-[8px] font-bold text-slate-400 font-mono block">12.4% COMPLETE</span>
-                </div>
-                <div className="w-28 bg-slate-100 dark:bg-slate-955 h-1 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-800 ml-auto">
-                  <div className="bg-blue-500 h-full rounded-full" style={{ width: '12.4%' }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
       {/* Main Charts & Consistency layout section */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
@@ -913,7 +748,7 @@ export default function PlacementProfile({
             {selectedHeatmapCell ? (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4">
                 <div className="space-y-1">
-                  <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono">{selectedHeatmapCell.dateStr}</span>
+                  <span className="text-[9px] font-black text-slate-400 dark:text-slate-505 uppercase tracking-widest block font-mono">{selectedHeatmapCell.dateStr}</span>
                   <div className="flex flex-wrap items-center gap-4 text-xs font-black">
                     <span className="text-slate-900 dark:text-white uppercase">Solves: <span className="text-blue-500 font-mono">{selectedHeatmapCell.solves} Sets</span></span>
                     <span className="text-slate-400 dark:text-slate-600">•</span>
@@ -934,12 +769,177 @@ export default function PlacementProfile({
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2.5 text-slate-450 dark:text-slate-550">
+              <div className="flex items-center gap-2.5 text-slate-450 dark:text-slate-555">
                 <span className="text-xs font-semibold">Click on any grid block to view learning activity details for that day.</span>
               </div>
             )}
           </div>
 
+        </div>
+
+      </section>
+
+      {/* NEW SECTION: Company Matches & Weekly Performance Widget */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 select-none">
+        {/* Left Card: Company Matches (7 columns) */}
+        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-start space-y-6`}>
+          <div>
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Best Company Matches</h4>
+          </div>
+
+          <div className="space-y-3.5">
+            {[
+              { company: 'TCS', percent: 94, color: 'bg-emerald-500' },
+              { company: 'Infosys', percent: 89, color: 'bg-blue-500' },
+              { company: 'Accenture', percent: 86, color: 'bg-indigo-500' },
+              { company: 'Amazon', percent: 61, color: 'bg-amber-500' },
+              { company: 'Google', percent: 44, color: 'bg-rose-500' }
+            ].map((match) => (
+              <div key={match.company} className="space-y-1">
+                <div className="flex justify-between items-center text-[10.5px] font-bold font-mono">
+                  <span className="text-slate-700 dark:text-slate-350">{match.company}</span>
+                  <span className="text-slate-800 dark:text-white font-extrabold">{match.percent}% Match</span>
+                </div>
+                <div className="w-full bg-slate-50 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-100 dark:border-slate-900">
+                  <div className={`h-full rounded-full ${match.color}`} style={{ width: `${match.percent}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Card: Weekly Performance Activity Spark Chart */}
+        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-4`}>
+          <div className="flex items-center justify-between select-none">
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Weekly Solves Activity</h4>
+            <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-505 uppercase">Streak: 14 Days 🔥</span>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-end space-y-4">
+            {/* Visual Mini Bar Chart */}
+            <div className="h-24 w-full flex items-end justify-between gap-2 px-1 select-none">
+              {[
+                { day: 'M', solves: 4, label: '4 Solves' },
+                { day: 'T', solves: 8, label: '8 Solves' },
+                { day: 'W', solves: 12, label: '12 Solves' },
+                { day: 'T', solves: 6, label: '6 Solves' },
+                { day: 'F', solves: 10, label: '10 Solves' },
+                { day: 'S', solves: 5, label: '5 Solves' },
+                { day: 'S', solves: 2, label: '2 Solves' }
+              ].map((item, idx) => {
+                const maxSolves = 12;
+                const percentage = (item.solves / maxSolves) * 100;
+                
+                return (
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group/bar relative">
+                    {/* Tooltip on hover */}
+                    <span className="absolute bottom-full mb-1 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-slate-900 text-white text-[8px] font-bold py-1 px-2 rounded-md whitespace-nowrap shadow-md z-10 pointer-events-none">
+                      {item.label}
+                    </span>
+                    {/* Bar Pillar */}
+                    <div className="w-full bg-slate-100 dark:bg-slate-950/60 rounded-t-lg overflow-hidden border border-slate-200/20 dark:border-slate-800/40 h-20 flex flex-col justify-end">
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${percentage}%` }}
+                        transition={{ duration: 0.8, delay: idx * 0.05, ease: "easeOut" }}
+                        className="w-full bg-gradient-to-t from-[var(--clr-primary)]/80 to-[var(--clr-primary)] rounded-t-md"
+                        style={{ backgroundColor: activeBaseColor }}
+                      />
+                    </div>
+                    {/* Day label */}
+                    <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-505 font-mono">
+                      {item.day}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Micro Stats summary footer */}
+            <div className="border-t border-slate-100 dark:border-slate-900/60 pt-3 flex items-center justify-between text-[9px] font-mono font-bold text-slate-500 select-none">
+              <span className="uppercase">Avg Solves / Day: 6.7</span>
+              <span className="text-emerald-500 uppercase flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Active Habit
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 2: Restructured KPI Section (Hierarchy Created) */}
+      <section className="grid grid-cols-1 md:grid-cols-12 gap-6 select-none">
+        
+        {/* PRIMARY CARD 1: Placement Readiness Index */}
+        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
+          <div className="absolute top-0 right-0 w-2 h-full bg-[#10B981]" />
+          <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Overall Readiness</span>
+          
+          <div className="mt-4 flex items-baseline justify-between">
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-black font-mono text-slate-955 dark:text-white">79.6%</span>
+              <span className="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Index Score</span>
+            </div>
+            <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">▲ +2.4% this week</span>
+          </div>
+
+          <div className="mt-5 space-y-1.5">
+            <div className="w-full bg-slate-100 dark:bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-900">
+              <div className="bg-[#10B981] h-full rounded-full" style={{ width: '79.6%' }} />
+            </div>
+          </div>
+        </div>
+
+        {/* PRIMARY CARD 2: Global Rank */}
+        <div className={`${stylePreset.cardBg} md:col-span-6 rounded-3xl p-5 md:p-6 text-left relative overflow-hidden group hover:translate-y-[-2px] hover:shadow-md transition-all duration-200`}>
+          <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-purple-500 to-pink-500" />
+          <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Global Ranking</span>
+          
+          <div className="mt-4 flex items-baseline justify-between">
+            <span className="text-3xl font-black font-mono text-slate-955 dark:text-white">#1,402</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold text-blue-500 uppercase tracking-wider font-mono bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-lg">▲ +123 ranks</span>
+              <span className="text-[9px] font-black bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider inline-block">Top 12%</span>
+            </div>
+          </div>
+
+          <p className="text-[9.5px] font-semibold text-slate-400 mt-5 leading-normal block">
+            Ranked out of 11,540 active students inside the placement dashboard.
+          </p>
+        </div>
+
+        {/* UNIFIED SECONDARY STATS BANNER */}
+        <div className={`${stylePreset.cardBg} md:col-span-12 rounded-3xl p-5 md:p-6 backdrop-blur-md hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-200`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-900/60">
+            {/* Accuracy Rate */}
+            <div className="flex items-center justify-between text-left sm:pr-6">
+              <div className="space-y-1">
+                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Accuracy Rate</span>
+                <span className="text-2xl font-black font-mono text-slate-955 dark:text-white">88.5%</span>
+              </div>
+              <div className="text-right space-y-1 select-none">
+                <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg inline-block">91% this week</span>
+                <span className="text-[8px] font-bold text-slate-400 font-mono block">▲ +1.4% OVERALL</span>
+              </div>
+            </div>
+
+            {/* Total Solved */}
+            <div className="flex items-center justify-between text-left sm:pl-6 pt-4 sm:pt-0">
+              <div className="space-y-1">
+                <span className="text-[8.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Total Solved</span>
+                <span className="text-2xl font-black font-mono text-slate-955 dark:text-white">1,240 <span className="text-xs text-slate-400 font-bold font-sans">/ 10k</span></span>
+              </div>
+              <div className="text-right space-y-1 select-none">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-wider font-mono bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-lg inline-block">+47 this week</span>
+                  <span className="text-[8px] font-bold text-slate-400 font-mono block">12.4% COMPLETE</span>
+                </div>
+                <div className="w-28 bg-slate-100 dark:bg-slate-955 h-1 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-800 ml-auto">
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: '12.4%' }} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
       </section>
@@ -1009,7 +1009,6 @@ export default function PlacementProfile({
         </div>
 
       </section>
-
       {/* ====================================================================
           MODALS & DRAWERS OVERLAYS (AnimatePresence)
           ==================================================================== */}

@@ -1725,7 +1725,7 @@ export default function DomainDetailPage() {
         <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
           {[
             { id: 'domains', label: 'Domains', icon: LayoutGrid, route: '/student/dashboard?tab=domains' },
-            { id: 'learning', label: 'Learning Roadmap', route: '/student/dashboard?tab=learning', icon: BookOpen },
+            { id: 'learning', label: 'Progress', route: '/student/dashboard?tab=learning', icon: BookOpen },
             { id: 'mockTests', label: 'Mock Tests', route: '/student/dashboard?tab=mockTests', icon: Award },
             { id: 'careerHub', label: 'Career Hub', route: '/student/dashboard?tab=careerHub', icon: Briefcase },
             { id: 'leaderboards', label: 'Leaderboard Rankings', route: '/student/dashboard?tab=leaderboards', icon: Trophy },
@@ -1855,73 +1855,6 @@ export default function DomainDetailPage() {
               </div>
             ) : (
               <div className="space-y-6 animate-fadeIn">
-                {/* Dynamic Hero Section */}
-                <div className="group bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[24px] p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-[0_15px_30px_rgba(59,130,246,0.02)] transition-all duration-300">
-                  <div className="space-y-3 flex-1 text-left">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--clr-primary)]/10 text-[var(--clr-primary)] text-[10px] font-black uppercase tracking-wider">
-                      <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                      <span>Learning Journey Detail</span>
-                    </div>
-
-                    <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl">
-                      {domainInfo?.description}
-                    </p>
-
-                    <div className="pt-2 flex flex-wrap gap-4 text-xs font-mono font-extrabold text-slate-505 dark:text-slate-400 select-none">
-                      <div className="flex items-center gap-1.5">
-                        <BookOpenCheck className="w-4 h-4 text-[var(--clr-primary)]" />
-                        <span>{progress?.solvedCount} / {progress?.totalCount} Problems Solved</span>
-                      </div>
-                      <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 self-center" />
-                      <div className="flex items-center gap-1.5">
-                        <Target className="w-4 h-4 text-emerald-655 dark:text-emerald-400" />
-                        <span>{progress?.accuracy}% Accuracy</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Circular mastery circle */}
-                  <div className="relative shrink-0 flex items-center justify-center bg-slate-50/50 dark:bg-slate-950/45 border border-slate-100 dark:border-slate-900/60 p-4 rounded-3xl select-none">
-                    <div className="relative w-28 h-28 flex items-center justify-center">
-                      <svg className="transform -rotate-90 w-full h-full">
-                        <circle
-                          cx="56"
-                          cy="56"
-                          r="48"
-                          className="stroke-slate-100 dark:stroke-slate-900 transition-colors"
-                          strokeWidth="9"
-                          fill="transparent"
-                        />
-                        <circle
-                          cx="56"
-                          cy="56"
-                          r="48"
-                          stroke="url(#hero-grad)"
-                          strokeWidth="9"
-                          fill="transparent"
-                          strokeDasharray={2 * Math.PI * 48}
-                          strokeDashoffset={((100 - (progress?.overallMastery || 0)) / 100) * (2 * Math.PI * 48)}
-                          strokeLinecap="round"
-                          className="transition-all duration-1000 ease-out"
-                        />
-                        <defs>
-                          <linearGradient id="hero-grad" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor="#2563EB" />
-                            <stop offset="100%" stopColor="#8B5CF6" />
-                          </linearGradient>
-                        </defs>
-                      </svg>
-                      <div className="absolute flex flex-col items-center justify-center">
-                        <span className="text-xl font-black text-slate-800 dark:text-white tracking-tight font-mono leading-none">
-                          {progress?.overallMastery}%
-                        </span>
-                        <span className="text-[7.5px] text-slate-400 dark:text-slate-505 font-extrabold uppercase tracking-widest mt-1 leading-none">
-                          Mastery
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Analytics Summary widgets row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 select-none">
@@ -2186,10 +2119,7 @@ export default function DomainDetailPage() {
 
                     {/* AI Insights Card */}
                     <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-2xl p-5 flex flex-col justify-between gap-4 text-left">
-                      <div className="space-y-0.5 select-none">
-                        <span className="text-[7.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block leading-none">
-                          AI telemetry diagnostics
-                        </span>
+                      <div className="select-none">
                         <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider block">
                           Smart Performance Insights
                         </h3>
@@ -2230,7 +2160,7 @@ export default function DomainDetailPage() {
 
                       <div className="border-t border-slate-100 dark:border-slate-900/60 pt-3 flex flex-wrap gap-2 select-none">
                         <button
-                          onClick={() => router.push('/student/dashboard?tab=learning')}
+                          onClick={() => router.push(`/student/study-planner?domain=${activeDomainId}`)}
                           className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white hover:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-900 text-[10px] font-bold text-slate-505 dark:text-slate-400 uppercase tracking-wide cursor-pointer transition-colors"
                         >
                           Roadmap

@@ -2521,7 +2521,7 @@ export default function StudentDashboard() {
 
   const sidebarTabs: SidebarTab[] = [
     { id: 'domains', label: 'Domains', icon: LayoutGrid, action: 'tab' },
-    { id: 'learning', label: 'Learning Roadmap', icon: BookOpen, action: 'tab' },
+    { id: 'learning', label: 'Progress', icon: BookOpen, action: 'tab' },
     { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
     { id: 'careerHub', label: 'Career Hub', icon: Briefcase, action: 'tab', subAction: () => setSelectedOpportunityType('All') },
     { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
@@ -2628,7 +2628,7 @@ export default function StudentDashboard() {
                 ) : activeSidebarTab === 'domains' ? (
                   <>Learning Domains 🌐</>
                 ) : activeSidebarTab === 'learning' ? (
-                  <>Learning Roadmap 🗺️</>
+                  <>Progress 🗺️</>
                 ) : activeSidebarTab === 'mockTests' ? (
                   <>Placement Mock Arena 🏆</>
                 ) : activeSidebarTab === 'careerHub' ? (
@@ -3175,100 +3175,6 @@ export default function StudentDashboard() {
                       </div>
 
 
-
-                    </div>
-                  </div>
-
-                  {/* 2. Time Tracker Stopwatch widget (Reference 1 style) */}
-                  <div className={`transition-all duration-500 text-white border rounded-3xl p-7 shadow-lg relative overflow-hidden flex flex-col justify-between h-56 group ${
-                    timeTrackerIsRunning
-                      ? "bg-[#0B3A27] dark:bg-[#062418] border-[#0A3322] dark:border-[#041B12]"
-                      : "bg-[#4A1515] dark:bg-[#2D0B0B] border-[#441212] dark:border-[#250707]"
-                  }`}>
-                    {/* Visual pattern overlay */}
-                    <div className={`absolute inset-0 transition-opacity duration-500 pointer-events-none ${
-                      timeTrackerIsRunning
-                        ? "bg-[radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.15),transparent_60%)]"
-                        : "bg-[radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.15),transparent_60%)]"
-                    }`} />
-
-                    <div className="flex items-center justify-between relative z-10">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                          timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
-                        }`} />
-                        <span className={`text-[10px] font-black uppercase tracking-widest font-mono transition-colors duration-500 ${
-                          timeTrackerIsRunning ? "text-[#A7F3D0]" : "text-[#FECACA]"
-                        }`}>Time Tracker</span>
-                      </div>
-                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-colors duration-500 ${
-                        timeTrackerIsRunning ? "bg-[#065F46] text-emerald-200" : "bg-[#991B1B] text-rose-200"
-                      }`}>
-                        {timeTrackerIsRunning ? "Active" : "Paused"}
-                      </span>
-                    </div>
-
-                    <div className="text-center py-2 relative z-10">
-                      <span className="text-4xl font-black font-mono tracking-tight leading-none text-white block">
-                        {formatTimeTracker(timeTrackerSeconds)}
-                      </span>
-                      <span className={`text-[9px] font-semibold mt-1.5 block uppercase tracking-wider transition-colors duration-500 ${
-                        timeTrackerIsRunning ? "text-[#A7F3D0]/60" : "text-[#FECACA]/60"
-                      }`}>
-                        {timeTrackerIsRunning ? "Active Study Session duration" : "Paused Study Session duration"}
-                      </span>
-                    </div>
-
-                    <div className={`flex justify-center gap-4 relative z-10 pt-4 border-t transition-colors duration-500 ${
-                      timeTrackerIsRunning ? "border-[#092B1D]/80" : "border-[#3D0F0F]/80"
-                    }`}>
-
-                      {/* Play Button */}
-                      <button
-                        onClick={() => setTimeTrackerIsRunning(true)}
-                        disabled={timeTrackerIsRunning}
-                        title="Start Study"
-                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          timeTrackerIsRunning
-                            ? "bg-[#061E14] text-emerald-800/40 border border-[#082419] cursor-not-allowed"
-                            : "bg-emerald-600 hover:bg-emerald-500 text-white"
-                        }`}
-                        type="button"
-                      >
-                        <Play className="w-5 h-5 fill-current" />
-                      </button>
-
-                      {/* Pause Button */}
-                      <button
-                        onClick={() => setTimeTrackerIsRunning(false)}
-                        disabled={!timeTrackerIsRunning}
-                        title="Pause Session"
-                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          !timeTrackerIsRunning
-                            ? "bg-[#2D1212] text-rose-900/30 border border-[#3D1414] cursor-not-allowed"
-                            : "bg-rose-800 hover:bg-rose-700 text-white"
-                        }`}
-                        type="button"
-                      >
-                        <Pause className="w-5 h-5" />
-                      </button>
-
-                      {/* Reset Button */}
-                      <button
-                        onClick={() => {
-                          setTimeTrackerIsRunning(false);
-                          setTimeTrackerSeconds(0);
-                        }}
-                        title="Reset Session"
-                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          timeTrackerIsRunning
-                            ? "bg-[#092B1D] hover:bg-[#061E14] text-[#A7F3D0] border border-[#082419]"
-                            : "bg-[#3D1414] hover:bg-[#2D1010] text-[#FECACA] border border-[#4A1818]"
-                        }`}
-                        type="button"
-                      >
-                        <RotateCcw className="w-5 h-5" />
-                      </button>
 
                     </div>
                   </div>
