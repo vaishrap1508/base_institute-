@@ -231,6 +231,26 @@ export default function PlacementProfile({
     return data;
   }, []);
 
+  // Pre-calculate x position for each column, adding margin on month boundaries
+  const colXPositions = useMemo(() => {
+    const positions: number[] = [];
+    let currentX = 0;
+    let prevMonth = '';
+    for (let colIdx = 0; colIdx < 53; colIdx++) {
+      const blockIdx = colIdx * 7;
+      const cell = heatmapSolves[blockIdx];
+      if (cell) {
+        if (colIdx > 0 && cell.month !== prevMonth) {
+          currentX += 5; // Month boundary gap spacing
+        }
+        prevMonth = cell.month;
+      }
+      positions.push(currentX);
+      currentX += 12; // Standard column width (9.5px rect + 2.5px gap)
+    }
+    return positions;
+  }, [heatmapSolves]);
+
   const [selectedHeatmapCell, setSelectedHeatmapCell] = useState<any>(() => {
     const latestActive = [...heatmapSolves].reverse().find(c => c.solves > 0);
     return latestActive || heatmapSolves[heatmapSolves.length - 1];
@@ -565,10 +585,9 @@ export default function PlacementProfile({
             </div>
           </div>
 
-          {/* Heatmap Grid */}
           <div className="relative w-full pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 scrollbar-track-transparent">
             <div className="relative w-full">
-              <svg viewBox="-20 0 680 98" width="100%" className="overflow-visible">
+              <svg viewBox="-20 0 715 102" width="100%" className="overflow-visible">
                 {Array.from({ length: 53 }).map((_, colIdx) => {
                   return Array.from({ length: 7 }).map((_, rowIdx) => {
                     const blockIdx = colIdx * 7 + rowIdx;
@@ -601,7 +620,7 @@ export default function PlacementProfile({
                       border = 'rgba(15,23,42,0.06)';
                     }
 
-                    const x = colIdx * 12;
+                    const x = colXPositions[colIdx];
                     const y = rowIdx * 12 + 12;
 
                     return (
@@ -652,56 +671,49 @@ export default function PlacementProfile({
                   });
                 })}
 
-                {/* Months labels on the top of the heatmap */}
+                {/* Month labels at start of each month */}
                 {(() => {
-                  let lastPrintedCol = -10;
-                  return Array.from({ length: 53 }).map((_, colIdx) => {
-                    const cell = heatmapSolves[colIdx * 7];
-                    if (!cell) return null;
-                    
-                    // Draw month name if it's the first column or month changes
-                    const prevCell = colIdx > 0 ? heatmapSolves[(colIdx - 1) * 7] : null;
-                    const isNewMonth = !prevCell || cell.month !== prevCell.month;
-                    
-                    // Only print if month changes and it is at least 3 columns away from the last printed month
-                    if (isNewMonth && (colIdx - lastPrintedCol >= 3)) {
-                      lastPrintedCol = colIdx;
-                      return (
-                        <text
-                          key={`month-${colIdx}`}
-                          x={colIdx * 12}
-                          y="6"
-                          fill="#94A3B8"
-                          fontSize="7.5"
-                          fontWeight="black"
-                          className="font-mono select-none text-left"
-                        >
-                          {cell.month}
-                        </text>
-                      );
+                  const labels: { label: string; x: number }[] = [];
+                  let prevMonth = '';
+                  for (let colIdx = 0; colIdx < 53; colIdx++) {
+                    const blockIdx = colIdx * 7;
+                    const cell = heatmapSolves[blockIdx];
+                    if (cell && cell.month !== prevMonth) {
+                      labels.push({
+                        label: cell.month,
+                        x: colXPositions[colIdx]
+                      });
+                      prevMonth = cell.month;
                     }
-                    return null;
-                  });
+                  }
+                  return labels.map((m, idx) => (
+                    <text
+                      key={idx}
+                      x={m.x}
+                      y="6"
+                      fill="#94A3B8"
+                      fontSize="7"
+                      fontWeight="black"
+                      className="font-mono select-none"
+                    >
+                      {m.label}
+                    </text>
+                  ));
                 })()}
 
-                {/* Days labels on the left of the heatmap */}
-                {[
-                  { label: 'Mon', row: 0 },
-                  { label: 'Wed', row: 2 },
-                  { label: 'Fri', row: 4 },
-                  { label: 'Sun', row: 6 }
-                ].map((item) => (
+                {/* Day labels on the left side */}
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
                   <text
-                    key={item.label}
-                    x="-6"
-                    y={item.row * 12 + 19}
+                    key={day}
+                    x="-14"
+                    y={idx * 12 + 19.5}
                     fill="#94A3B8"
-                    fontSize="7.5"
+                    fontSize="7"
                     fontWeight="black"
                     textAnchor="end"
-                    className="font-mono select-none"
+                    className="font-mono select-none text-right"
                   >
-                    {item.label}
+                    {day}
                   </text>
                 ))}
               </svg>
@@ -731,12 +743,20 @@ export default function PlacementProfile({
                         <span>Duration:</span>
                         <span className="text-amber-400 font-black">{activeHeatmapTooltip.timeSpent}</span>
                       </div>
+                      <div className="flex justify-between font-mono">
+                        <span>XP Earned:</span>
+                        <span className="text-purple-400 font-black">+{activeHeatmapTooltip.solves * 15} XP</span>
+                      </div>
+                      <div className="flex justify-between font-mono">
+                        <span>Streak:</span>
+                        <span className="text-orange-400 font-black">Active 🔥</span>
+                      </div>
                       <div className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold pt-1 border-t border-slate-800">
                         Topics: {activeHeatmapTooltip.topics.join(', ')}
                       </div>
                     </div>
                   ) : (
-                    <span className="italic text-slate-500 font-mono mt-1 text-[9.5px]">No activity commits</span>
+                    <span className="italic text-slate-505 font-mono mt-1 text-[9.5px]">No activity commits</span>
                   )}
                 </div>
               )}
@@ -744,24 +764,41 @@ export default function PlacementProfile({
           </div>
 
           {/* Activity Detail Info Box (below heatmap) */}
-          <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-900 rounded-2xl min-h-[85px] flex items-center justify-between text-left transition-all">
+          <div className="mt-2 p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-900 rounded-2xl min-h-[75px] flex items-center justify-between text-left transition-all">
             {selectedHeatmapCell ? (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4">
-                <div className="space-y-1">
-                  <span className="text-[9px] font-black text-slate-400 dark:text-slate-505 uppercase tracking-widest block font-mono">{selectedHeatmapCell.dateStr}</span>
-                  <div className="flex flex-wrap items-center gap-4 text-xs font-black">
-                    <span className="text-slate-900 dark:text-white uppercase">Solves: <span className="text-blue-500 font-mono">{selectedHeatmapCell.solves} Sets</span></span>
-                    <span className="text-slate-400 dark:text-slate-600">•</span>
-                    <span className="text-slate-900 dark:text-white uppercase">Accuracy: <span className="text-emerald-500 font-mono">{selectedHeatmapCell.accuracy}%</span></span>
-                    <span className="text-slate-400 dark:text-slate-600">•</span>
-                    <span className="text-slate-900 dark:text-white uppercase">Duration: <span className="text-amber-500 font-mono">{selectedHeatmapCell.timeSpent}</span></span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 md:gap-6">
+                  {/* Date Block */}
+                  <div className="shrink-0 text-left">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono">ACTIVITY DATE</span>
+                    <span className="text-xs font-black text-slate-800 dark:text-white uppercase mt-0.5 block font-mono">
+                      {selectedHeatmapCell.dateStr}
+                    </span>
+                  </div>
+
+                  <div className="hidden sm:block h-8 w-px bg-slate-200 dark:bg-slate-850" />
+
+                  {/* Metrics Row */}
+                  <div className="flex flex-wrap items-center gap-6 md:gap-8 text-xs font-black">
+                    <div className="text-left">
+                      <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">SOLVES</span>
+                      <span className="text-sm font-black text-blue-500 font-mono mt-0.5 block">{selectedHeatmapCell.solves} Sets</span>
+                    </div>
+                    <div className="text-left">
+                      <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">ACCURACY</span>
+                      <span className="text-sm font-black text-emerald-500 font-mono mt-0.5 block">{selectedHeatmapCell.accuracy}%</span>
+                    </div>
+                    <div className="text-left">
+                      <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">DURATION</span>
+                      <span className="text-sm font-black text-amber-500 font-mono mt-0.5 block">{selectedHeatmapCell.timeSpent}</span>
+                    </div>
                   </div>
                 </div>
 
                 {selectedHeatmapCell.topics.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end max-w-md">
+                  <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end max-w-xs md:max-w-md self-center">
                     {selectedHeatmapCell.topics.map((topic: string, i: number) => (
-                      <span key={i} className="text-[8.5px] font-black uppercase font-mono bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-lg tracking-wider">
+                      <span key={i} className="text-[8.5px] font-black uppercase font-mono bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded-lg tracking-wider">
                         {topic}
                       </span>
                     ))}
@@ -769,14 +806,12 @@ export default function PlacementProfile({
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2.5 text-slate-450 dark:text-slate-555">
-                <span className="text-xs font-semibold">Click on any grid block to view learning activity details for that day.</span>
+              <div className="flex items-center gap-2.5 text-slate-455 dark:text-slate-555">
+                Select a cell to view daily activity logs.
               </div>
             )}
           </div>
-
         </div>
-
       </section>
 
       {/* NEW SECTION: Company Matches & Weekly Performance Widget */}
