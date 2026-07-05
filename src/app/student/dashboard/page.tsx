@@ -2949,50 +2949,27 @@ export default function StudentDashboard() {
             <div className="flex flex-col items-start text-left">
               <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
                 {activeSidebarTab === 'dashboard' ? (
-                  <>Welcome back, {profile.username.split(' ')[0]} 👋</>
+                  <>Welcome back, {profile.username.split(' ')[0]}</>
                 ) : activeSidebarTab === 'domains' ? (
-                  <>Learning Domains 🌐</>
+                  <>Learning Domains</>
                 ) : activeSidebarTab === 'learning' ? (
-                  <>Progress 🗺️</>
+                  <>Progress</>
                 ) : activeSidebarTab === 'mockTests' ? (
                   <>Placement Mock Arena</>
                 ) : activeSidebarTab === 'careerHub' ? (
-                  <>Company-Specific Placement Hub 🎯</>
+                  <>Company-Specific Placement Hub</>
                 ) : activeSidebarTab === 'leaderboards' ? (
-                  <>Placement Leaderboard 📊</>
+                  <>Placement Leaderboard</>
                 ) : activeSidebarTab === 'badges' ? (
-                  <>Achievements & Credentials 🏅</>
+                  <>Achievements & Credentials</>
                 ) : activeSidebarTab === 'profile' ? (
-                  <>Student Credentials ⚙️</>
+                  <>Student Credentials</>
                 ) : activeSidebarTab === 'library' ? (
-                  <>Bookmarks & Notes Library 📁</>
+                  <>Bookmarks & Notes Library</>
                 ) : (
-                  <>Settings Hub ⚙️</>
+                  <>Settings Hub</>
                 )}
               </h1>
-              <p className="text-[11px] text-slate-400 dark:text-slate-505 font-medium mt-0.5">
-                {activeSidebarTab === 'dashboard' ? (
-                  'Here is your activities overview for today.'
-                ) : activeSidebarTab === 'domains' ? (
-                  'Select a syllabus domain to view lessons and progress.'
-                ) : activeSidebarTab === 'learning' ? (
-                  'Personalized step-by-step preparation path.'
-                ) : activeSidebarTab === 'mockTests' ? (
-                  ''
-                ) : activeSidebarTab === 'careerHub' ? (
-                  'Interactive dashboards, exam blueprint weights, focus questions, and direct practice tests.'
-                ) : activeSidebarTab === 'leaderboards' ? (
-                  'Compare progress, metrics, and speeds with peers globally.'
-                ) : activeSidebarTab === 'badges' ? (
-                  'Celebrate preparation milestones and dynamic digital badges.'
-                ) : activeSidebarTab === 'profile' ? (
-                  'Review onboarding selections and active prep goals.'
-                ) : activeSidebarTab === 'library' ? (
-                  ''
-                ) : (
-                  'Configure advanced dashboard properties, themes, and animations.'
-                )}
-              </p>
             </div>
 
             <div className="flex items-center gap-5">
