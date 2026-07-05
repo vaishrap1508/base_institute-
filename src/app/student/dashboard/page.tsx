@@ -2825,7 +2825,7 @@ export default function StudentDashboard() {
           })}
 
           {/* Admin Tools Section */}
-          {currentRole?.role === 'admin' && (
+          {themeMounted && currentRole?.role === 'admin' && (
             <div className="pt-3 border-t border-slate-100 dark:border-slate-900 w-full flex flex-col gap-3 items-center">
               <button
                 onClick={() => router.push('/admin/editor')}
@@ -2936,7 +2936,7 @@ export default function StudentDashboard() {
                     localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
                     setCurrentRole(studentRole);
                   }}
-                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role !== 'admin'
+                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${(!themeMounted || currentRole?.role !== 'admin')
                       ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
                       : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
@@ -2956,7 +2956,7 @@ export default function StudentDashboard() {
                     setCurrentRole(adminRole);
                     router.push('/admin/editor');
                   }}
-                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role === 'admin'
+                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${(themeMounted && currentRole?.role === 'admin')
                       ? 'bg-white dark:bg-slate-950 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
                       : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
@@ -3074,7 +3074,7 @@ export default function StudentDashboard() {
               >
 
               {/* Admin Banner Alert */}
-              {currentRole?.role === 'admin' && (
+              {themeMounted && currentRole?.role === 'admin' && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-blue-50/80 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40 text-blue-800 dark:text-blue-400 animate-fadeIn shadow-xs select-none">
                   <div className="flex items-center gap-3">
                     <span className="p-2 rounded-lg bg-blue-600 text-white shadow-xs">
