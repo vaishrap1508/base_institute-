@@ -194,6 +194,224 @@ const DOMAIN_ROADMAPS: Record<string, any[]> = {
   ]
 };
 
+const COMPANY_PREP_HUBS: Record<string, {
+  title: string;
+  desc: string;
+  probability: number;
+  probabilityLabel: string;
+  probabilitySub: string;
+  patternLabel: string;
+  badges: string[];
+  metrics: {
+    duration: string;
+    questionsCount: number;
+    difficulty: string;
+  };
+  insights: {
+    weightage: Array<{ category: string; value: number; color: string }>;
+    difficulty: Array<{ level: string; value: number; color: string }>;
+  };
+  focusFeed: Array<{ id: string; category: string; question: string; options: string[]; correctIndex: number; solution?: string }>;
+  directMocks: Array<{ id: string; title: string; desc: string; questions: number; duration: number; status: 'Open' | 'Planned' | 'Locked' }>;
+}> = {
+  tcs: {
+    title: 'TCS NQT Preparation Hub',
+    desc: 'Analyzing historical trends from 2021-2026. The current pattern emphasizes Advanced Quantitative Analysis and Psychometric Evaluation.',
+    probability: 75,
+    probabilityLabel: 'OPTIMAL',
+    probabilitySub: 'Based on 142 past questions solved correctly.',
+    patternLabel: 'Advanced Quantitative & Psychometric Focus',
+    badges: ['Priority Target', 'Luminex Pulse Active', 'Top Candidate'],
+    metrics: { duration: '90 Mins', questionsCount: 60, difficulty: 'Medium-High' },
+    insights: {
+      weightage: [
+        { category: 'Numerical Ability', value: 85, color: 'bg-blue-500' },
+        { category: 'Verbal Ability', value: 70, color: 'bg-emerald-500' },
+        { category: 'Logical Reasoning', value: 75, color: 'bg-amber-500' },
+        { category: 'Coding (Advanced)', value: 60, color: 'bg-rose-500' }
+      ],
+      difficulty: [
+        { level: 'Easy', value: 20, color: 'bg-emerald-500' },
+        { level: 'Medium', value: 60, color: 'bg-blue-500' },
+        { level: 'Hard', value: 20, color: 'bg-rose-500' }
+      ]
+    },
+    focusFeed: [
+      {
+        id: 'tcs_q1',
+        category: 'Numerical Ability',
+        question: 'The ratio of profit to investment in a partnership scheme is 3:5. If total investment is $25,000 and the duration is 1 year, what is the total profit?',
+        options: ['$15,000', '$10,000', '$7,500', '$12,500'],
+        correctIndex: 0,
+        solution: 'Investment ratio is 5 units = $25,000, so 1 unit = $5,000. Profit ratio is 3 units = $15,000.'
+      },
+      {
+        id: 'tcs_q2',
+        category: 'Verbal Ability',
+        question: 'Choose the correct preposition: She has been working at the office ____ five years.',
+        options: ['since', 'for', 'from', 'during'],
+        correctIndex: 1,
+        solution: "'for' is used for a duration/period of time (five years)."
+      },
+      {
+        id: 'tcs_q3',
+        category: 'Logical Reasoning',
+        question: 'In a row of 60 students, Raj is 15th from the left. What is his position from the right end of the row?',
+        options: ['45th', '46th', '44th', '47th'],
+        correctIndex: 1,
+        solution: 'Right position = (Total - Left position) + 1 = (60 - 15) + 1 = 46th.'
+      }
+    ],
+    directMocks: [
+      { id: 'tcs_m1', title: 'TCS Mock #12 (Advanced)', desc: 'August 2026 pattern with new psychometric items.', questions: 60, duration: 90, status: 'Open' },
+      { id: 'tcs_m2', title: 'TCS Mock #11 (Standard)', desc: 'Full length quant and reasoning test framework.', questions: 60, duration: 90, status: 'Open' },
+      { id: 'tcs_m3', title: 'TCS Mock #10 (Diagnostic)', desc: 'Historical benchmark assessment.', questions: 60, duration: 90, status: 'Open' },
+      { id: 'tcs_m4', title: 'TCS Mock #13 (Locked)', desc: 'High stakes exam simulator.', questions: 60, duration: 90, status: 'Locked' }
+    ]
+  },
+  infosys: {
+    title: 'Infosys SP/DSE Prep Hub',
+    desc: 'Focuses heavily on algorithmic design, programming constructs, object-oriented concepts, and puzzles.',
+    probability: 64,
+    probabilityLabel: 'IMPROVING',
+    probabilitySub: 'Based on 89 custom database queries executed.',
+    patternLabel: 'Advanced Coding & Puzzle Solving',
+    badges: ['Secondary Goal', 'Practice Mode Active'],
+    metrics: { duration: '180 Mins', questionsCount: 5, difficulty: 'High' },
+    insights: {
+      weightage: [
+        { category: 'Data Structures & Algos', value: 90, color: 'bg-rose-500' },
+        { category: 'Mathematical Puzzles', value: 80, color: 'bg-amber-500' },
+        { category: 'DBMS & Query Design', value: 70, color: 'bg-blue-500' },
+        { category: 'System Architecture', value: 45, color: 'bg-emerald-500' }
+      ],
+      difficulty: [
+        { level: 'Easy', value: 10, color: 'bg-emerald-500' },
+        { level: 'Medium', value: 40, color: 'bg-blue-500' },
+        { level: 'Hard', value: 50, color: 'bg-rose-500' }
+      ]
+    },
+    focusFeed: [
+      {
+        id: 'info_q1',
+        category: 'Data Structures',
+        question: 'What is the time complexity to search an element in a balanced Binary Search Tree?',
+        options: ['O(1)', 'O(n)', 'O(log n)', 'O(n log n)'],
+        correctIndex: 2,
+        solution: 'A balanced BST splits the search space in half at each level, taking logarithmic time O(log n).'
+      },
+      {
+        id: 'info_q2',
+        category: 'Puzzles',
+        question: 'A clock shows 3:15. What is the angle between the hour hand and the minute hand?',
+        options: ['0°', '7.5°', '15°', '12.5°'],
+        correctIndex: 1,
+        solution: 'At 3:00, hands are 90 deg apart. In 15 minutes, hour hand moves 15 * 0.5 = 7.5 deg. So angle is 7.5°.'
+      }
+    ],
+    directMocks: [
+      { id: 'info_m1', title: 'Infosys Specialist Mock #1', desc: 'Coding-heavy test case scenarios.', questions: 3, duration: 180, status: 'Open' },
+      { id: 'info_m2', title: 'Infosys DSE Standard Test', desc: 'Syllabus alignment with recent hiring tests.', questions: 5, duration: 180, status: 'Open' },
+      { id: 'info_m3', title: 'Infosys Specialist Mock #2', desc: 'Graph algorithm simulation tests.', questions: 3, duration: 180, status: 'Locked' }
+    ]
+  },
+  accenture: {
+    title: 'Accenture Masterclass Prep',
+    desc: 'Emphasizes analytical skills, critical reasoning, and common applications of technical aptitude.',
+    probability: 88,
+    probabilityLabel: 'EXCELLENT',
+    probabilitySub: 'Outstanding marks across 5 active test sets.',
+    patternLabel: 'Analytical & Technical Integration',
+    badges: ['High Match', 'Top Tier Candidate'],
+    metrics: { duration: '90 Mins', questionsCount: 75, difficulty: 'Medium' },
+    insights: {
+      weightage: [
+        { category: 'Cognitive Assessment', value: 80, color: 'bg-emerald-500' },
+        { category: 'Technical & Pseudo-code', value: 85, color: 'bg-blue-500' },
+        { category: 'Network Security Basics', value: 70, color: 'bg-purple-500' },
+        { category: 'MS Office Applications', value: 90, color: 'bg-amber-500' }
+      ],
+      difficulty: [
+        { level: 'Easy', value: 30, color: 'bg-emerald-500' },
+        { level: 'Medium', value: 50, color: 'bg-blue-500' },
+        { level: 'Hard', value: 20, color: 'bg-rose-500' }
+      ]
+    },
+    focusFeed: [
+      {
+        id: 'acc_q1',
+        category: 'Pseudo-code',
+        question: 'What is the value of: Integer a = 10, b = 20; a = a + b; b = a - b; a = a - b; print a, b;',
+        options: ['10, 20', '20, 10', '30, -10', '10, 10'],
+        correctIndex: 1,
+        solution: 'This is the standard arithmetic XOR swap: a becomes 30, b becomes 10 (30 - 20), a becomes 20 (30 - 10).'
+      },
+      {
+        id: 'acc_q2',
+        category: 'Cognitive',
+        question: 'Complete the sequence: 2, 6, 12, 20, 30, ____',
+        options: ['40', '42', '36', '44'],
+        correctIndex: 1,
+        solution: 'Differences are 4, 6, 8, 10, 12. Next is 30 + 12 = 42.'
+      }
+    ],
+    directMocks: [
+      { id: 'acc_m1', title: 'Accenture Masterclass Mock #1', desc: 'Complete assessment with pseudo-code analysis.', questions: 75, duration: 90, status: 'Open' },
+      { id: 'acc_m2', title: 'Accenture Cognitive Prep #1', desc: 'Timed reasoning speed drill.', questions: 50, duration: 60, status: 'Open' }
+    ]
+  },
+  amazon: {
+    title: 'Amazon AWS/SDE Prep Hub',
+    desc: 'Targeted preparation for SDE-1, specializing in algorithmic complexity, concurrency, system scale, and leadership principles.',
+    probability: 52,
+    probabilityLabel: 'CRITICAL ZONE',
+    probabilitySub: 'Requires additional hard item completions.',
+    patternLabel: 'DSA Mastery & Leadership Behavior',
+    badges: ['Dream Target', 'Elite Tier Challenging'],
+    metrics: { duration: '120 Mins', questionsCount: 4, difficulty: 'Expert' },
+    insights: {
+      weightage: [
+        { category: 'Algorithms & Optimizations', value: 95, color: 'bg-rose-500' },
+        { category: 'System Architecture & Scale', value: 85, color: 'bg-purple-500' },
+        { category: 'Object-Oriented Design', value: 75, color: 'bg-blue-500' },
+        { category: 'Leadership Principles', value: 90, color: 'bg-amber-500' }
+      ],
+      difficulty: [
+        { level: 'Easy', value: 5, color: 'bg-emerald-500' },
+        { level: 'Medium', value: 25, color: 'bg-blue-500' },
+        { level: 'Hard', value: 70, color: 'bg-rose-500' }
+      ]
+    },
+    focusFeed: [
+      {
+        id: 'amzn_q1',
+        category: 'Algorithms',
+        question: 'Which scheduling approach is optimal for sorting massive datasets that do not fit in RAM?',
+        options: ['Quick Sort', 'Merge Sort (External)', 'Heap Sort', 'Radix Sort'],
+        correctIndex: 1,
+        solution: 'External Merge Sort is a key algorithm for external sorting because it manages chunked disk IO efficiently.'
+      },
+      {
+        id: 'amzn_q2',
+        category: 'Leadership Principles',
+        question: 'If you disagree with your manager on a technical architecture decision, what should you do?',
+        options: [
+          'Acquiesce to avoid conflict',
+          'Respectfully disagree, explain your data, and commit to the final decision',
+          'Escalate to the director immediately',
+          'Implement your choice secretly'
+        ],
+        correctIndex: 1,
+        solution: "Amazon's principle is: Have Backbone; Disagree and Commit."
+      }
+    ],
+    directMocks: [
+      { id: 'amzn_m1', title: 'Amazon Online Assessment #1', desc: 'Two coding items and behavioral queries.', questions: 12, duration: 120, status: 'Open' },
+      { id: 'amzn_m2', title: 'Amazon System Design Simulation', desc: 'High level design mock evaluation.', questions: 2, duration: 90, status: 'Planned' }
+    ]
+  }
+};
+
 const AVATAR_PRESETS = [
   'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack',     // Female
   'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana',  // Female
@@ -1167,7 +1385,18 @@ export default function StudentDashboard() {
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
+  const [activeCompanyHub, setActiveCompanyHub] = useState<string>('tcs');
+  const [answeredFeedQuestions, setAnsweredFeedQuestions] = useState<Record<string, number>>({});
+  const [selectedHubInsightTab, setSelectedHubInsightTab] = useState<'breakdown' | 'pattern'>('breakdown');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (toastMsg) {
+      const timer = setTimeout(() => setToastMsg(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMsg]);
 
   // Concept-Hub Practice Arena Redesign States
   const [selectedCollection, setSelectedCollection] = useState<string>('all');
@@ -1201,9 +1430,9 @@ export default function StudentDashboard() {
       { id: 'fc1', user: 'Admin Instructor', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', comment: 'Be sure to post any clarifications here. Standard response turnaround is within 4 hours.', time: 'Just now' }
     ];
   }, [activeQuestion, activeQuestionComments]);
-
-
-
+  const currentHub = useMemo(() => {
+    return COMPANY_PREP_HUBS[activeCompanyHub] || COMPANY_PREP_HUBS.tcs;
+  }, [activeCompanyHub]);
   // Increment practice time spent
   useEffect(() => {
     if ((activeSidebarTab as string) !== 'practice') return;
@@ -2526,7 +2755,7 @@ export default function StudentDashboard() {
     { id: 'learning', label: 'Progress', icon: BookOpen, action: 'tab' },
     { id: 'studyPlanner', label: 'Study Plan', icon: Calendar, action: 'nav', route: '/student/study-planner' },
     { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
-    { id: 'careerHub', label: 'Career Hub', icon: Briefcase, action: 'tab', subAction: () => setSelectedOpportunityType('All') },
+    { id: 'careerHub', label: 'Placement Hub', icon: Briefcase, action: 'tab' },
     { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
     { id: 'badges', label: 'Badges & Achievements', icon: Sparkles, action: 'tab' }
   ];
@@ -2635,7 +2864,7 @@ export default function StudentDashboard() {
                 ) : activeSidebarTab === 'mockTests' ? (
                   <>Placement Mock Arena 🏆</>
                 ) : activeSidebarTab === 'careerHub' ? (
-                  <>Career Opportunity Hub 💼</>
+                  <>Company-Specific Placement Hub 🎯</>
                 ) : activeSidebarTab === 'leaderboards' ? (
                   <>Placement Leaderboard 📊</>
                 ) : activeSidebarTab === 'badges' ? (
@@ -2646,7 +2875,7 @@ export default function StudentDashboard() {
                   <>Settings Hub ⚙️</>
                 )}
               </h1>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
+              <p className="text-[11px] text-slate-400 dark:text-slate-505 font-medium mt-0.5">
                 {activeSidebarTab === 'dashboard' ? (
                   'Here is your activities overview for today.'
                 ) : activeSidebarTab === 'domains' ? (
@@ -2656,7 +2885,7 @@ export default function StudentDashboard() {
                 ) : activeSidebarTab === 'mockTests' ? (
                   'Prepare under simulated company timeline checks.'
                 ) : activeSidebarTab === 'careerHub' ? (
-                  'Live portal access drives, internships, government exams, hackathons, and placement updates.'
+                  'Interactive dashboards, exam blueprint weights, focus questions, and direct practice tests.'
                 ) : activeSidebarTab === 'leaderboards' ? (
                   'Compare progress, metrics, and speeds with peers globally.'
                 ) : activeSidebarTab === 'badges' ? (
@@ -3764,153 +3993,379 @@ export default function StudentDashboard() {
             </motion.div>
           )}
 
-          {/* ====================================================================
-              5. TAB: CAREER HUB (Dedicated page with sub-filters)
-              ==================================================================== */}
           {activeSidebarTab === 'careerHub' && (
             <motion.div
-              key="careerHub"
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={tabTransition}
-              className="w-full space-y-8"
-            >
-
-
-
-              {/* Category sub-filters tabs */}
-              <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900 overflow-x-auto scrollbar-none whitespace-nowrap gap-1">
-                {['All', 'Hiring Drives', 'Internships', 'Government Exams', 'Hackathons', 'Placement Updates'].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setSelectedOpportunityType(type)}
-                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${selectedOpportunityType === type
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                      }`}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-
-              {/* Feed Grid */}
-              {oppsLoading || announcementsLoading ? (
-                <div className="py-14 flex flex-col items-center justify-center text-center">
-                  <div className="w-8 h-8 rounded-full border border-blue-600 border-t-transparent animate-spin mb-3" />
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Compiling opportunities files...</span>
+                key="careerHub"
+                variants={tabVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={tabTransition}
+                className="w-full space-y-8 select-none text-left"
+              >
+                {/* Header row & selector */}
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5">
+                  <div>
+                    <h2 className="text-xl font-black text-slate-905 dark:text-white uppercase tracking-tight flex items-center gap-2">
+                      <Briefcase className="w-5.5 h-5.5 text-[var(--clr-primary)]" /> Company-Specific Placement Hub
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
+                      Prep tracker, syllabus weightage breakdown, interactive diagnostics, and direct mock exams.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[9px] font-black uppercase text-slate-400 font-mono tracking-widest shrink-0">Select Target:</span>
+                    <select
+                      value={activeCompanyHub}
+                      onChange={(e) => {
+                        setActiveCompanyHub(e.target.value);
+                        playPreviewChime();
+                        setToastMsg(`Switched target hub to ${e.target.value.toUpperCase()}! 🎯`);
+                      }}
+                      className="py-2.5 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[var(--clr-primary)] cursor-pointer shadow-sm"
+                      style={{ colorScheme: theme }}
+                    >
+                      <option value="tcs">TCS NQT Prep Hub</option>
+                      <option value="infosys">Infosys SP/DSE Prep Hub</option>
+                      <option value="accenture">Accenture Masterclass</option>
+                      <option value="amazon">Amazon AWS/SDE Prep Hub</option>
+                    </select>
+                  </div>
                 </div>
-              ) : selectedOpportunityType === 'Placement Updates' ? (
-                // Display Placement Updates Announcements
-                <div className="space-y-4">
-                  {announcements.map((a) => (
-                    <div key={a.id} className="bg-white border border-slate-200 dark:bg-slate-900/15 dark:border-slate-900 p-5 rounded-2xl space-y-2.5 hover:border-slate-300 transition-colors">
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[9px] font-black text-indigo-600 bg-indigo-50 border border-indigo-200 dark:text-indigo-400 dark:bg-indigo-950/20 dark:border-indigo-900/30 px-2 py-0.5 rounded-lg uppercase">
-                            {a.type}
+
+                {/* Grid Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  
+                  {/* LEFT WIDE PANEL (8 cols) */}
+                  <div className="lg:col-span-8 space-y-8">
+                    
+                    {/* HUB HERO BLOCK */}
+                    <div className="bg-slate-900 text-white rounded-[2rem] p-6 md:p-8 relative overflow-hidden shadow-xl shadow-slate-950/20 text-left border border-slate-800">
+                      {/* Background design elements */}
+                      <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-tr from-[var(--clr-primary)]/10 to-[var(--clr-primary)]/20 blur-2xl rounded-full pointer-events-none" />
+                      
+                      <div className="space-y-4 relative z-10">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[8.5px] font-mono font-black uppercase tracking-wider bg-[var(--clr-primary)]/20 border border-[var(--clr-primary)]/30 text-[var(--clr-primary)] px-2 py-0.5 rounded-lg">
+                            {currentHub.patternLabel}
                           </span>
-                          {a.priority === 'High' && (
-                            <span className="text-[8px] font-black bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-400 px-1.5 py-0.2 rounded uppercase animate-pulse">
-                              High Priority
+                          {currentHub.badges.map((b) => (
+                            <span key={b} className="text-[8.5px] font-mono font-black uppercase tracking-wider bg-slate-800 border border-slate-700 text-slate-300 px-2 py-0.5 rounded-lg">
+                              {b}
                             </span>
-                          )}
+                          ))}
                         </div>
-                        <span className="text-[9.5px] text-slate-500 font-semibold">{a.publisher} · {a.date || 'June 4'}</span>
+
+                        <h3 className="text-2xl font-black uppercase tracking-tight leading-none mt-2">
+                          {currentHub.title}
+                        </h3>
+
+                        <p className="text-xs text-slate-400 font-medium max-w-2xl leading-relaxed">
+                          {currentHub.desc}
+                        </p>
+
+                        <div className="pt-2 flex flex-wrap items-center gap-6 text-slate-350 font-mono text-[10.5px]">
+                          <span>Duration: <strong className="text-white font-extrabold">{currentHub.metrics.duration}</strong></span>
+                          <span>•</span>
+                          <span>Total Items: <strong className="text-white font-extrabold">{currentHub.metrics.questionsCount} Qs</strong></span>
+                          <span>•</span>
+                          <span>Difficulty: <strong className="text-white font-extrabold">{currentHub.metrics.difficulty}</strong></span>
+                        </div>
+
+                        <div className="pt-4 flex gap-3">
+                          <button
+                            onClick={() => {
+                              playPreviewChime();
+                              setToastMsg("Resuming preparation checkpoints!");
+                            }}
+                            className="py-3 px-6 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-[var(--clr-primary-tint)]/25 cursor-pointer border-0"
+                          >
+                            Resume Preparation
+                          </button>
+                        </div>
                       </div>
-                      <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase leading-snug">{a.title}</h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">{a.content}</p>
                     </div>
-                  ))}
-                </div>
-              ) : filteredOpportunities.length === 0 ? (
-                <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl py-14 flex flex-col items-center justify-center text-center p-6">
-                  <Info className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-2.5" />
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">No Active Opportunities in this Category</span>
-                  <p className="text-[10px] text-slate-400 mt-1 leading-normal">Check back later for active portal drives.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredOpportunities.map((o) => {
-                    const isExpanded = expandedOpportunityId === o.id;
-                    const statusColor =
-                      o.status === 'Open' ? 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/25' :
-                        o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-50/65 border-amber-200 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
-                          o.status === 'New' ? 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-900/25' :
-                            'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/20 dark:border-rose-900/25';
 
-                    const typeBadge =
-                      o.type === 'Hiring' ? 'Hiring Drive' :
-                        o.type === 'Internship' ? 'Internship' :
-                          o.type === 'Government Exam' ? 'Government Exam' :
-                            o.type === 'Hackathon' ? 'Hackathon' : o.type;
-
-                    return (
-                      <div
-                        key={o.id}
-                        className="bg-white border border-slate-200 hover:border-slate-300 dark:bg-slate-900/10 dark:border-slate-900 dark:hover:border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all duration-200"
-                      >
-                        <div className="space-y-3.5">
-                          <div className="flex items-center justify-between gap-1 flex-wrap">
-                            <span className="text-[8.5px] font-black px-2 py-0.5 rounded border bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 uppercase font-mono">
-                              {typeBadge}
-                            </span>
-                            <span className={`text-[8.5px] font-black px-2 py-0.5 rounded border uppercase font-mono ${statusColor}`}>
-                              {o.status}
-                            </span>
-                          </div>
-
-                          <div className="space-y-1">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight uppercase leading-snug">{o.title}</h3>
-                            <span className="text-xs text-slate-500 font-bold tracking-tight block">{o.organization}</span>
-                          </div>
-                        </div>
-
-                        <div className="border-t border-slate-100 dark:border-slate-900/60 pt-3 space-y-3 transition-colors duration-300">
-                          <div className="flex items-center justify-between text-[10.5px]">
-                            <div className="flex items-center gap-1 text-slate-500 font-semibold">
-                              <Calendar className="w-3.5 h-3.5" />
-                              <span>Till {o.deadline}</span>
-                            </div>
-                            {o.days_remaining > 0 ? (
-                              <span className="text-amber-600 dark:text-amber-400 font-bold font-mono">{o.days_remaining} Days Left</span>
-                            ) : (
-                              <span className="text-slate-400 dark:text-slate-500 font-bold uppercase font-mono">Closed</span>
-                            )}
-                          </div>
-
-                          {isExpanded && o.details && (
-                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed border border-slate-200 dark:border-slate-800 animate-fadeIn font-medium">
-                              {o.details}
-                            </div>
-                          )}
-
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => setExpandedOpportunityId(isExpanded ? null : o.id)}
-                              className="flex-1 py-2 px-3 bg-white hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded-lg border border-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-800 transition-colors cursor-pointer text-center"
-                            >
-                              {isExpanded ? 'Hide' : 'Details'}
-                            </button>
-                            <a
-                              href={o.link}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] uppercase rounded-lg shadow-sm flex items-center justify-center gap-1 cursor-pointer transition-all"
-                            >
-                              <span>Apply</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          </div>
+                    {/* PATTERN BREAKDOWN & EXAM INSIGHTS */}
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 backdrop-blur-md space-y-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-4 gap-3">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                          Exam Blueprint & Metrics
+                        </h4>
+                        
+                        {/* Selector Toggles */}
+                        <div className="inline-flex bg-slate-50 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/40 dark:border-slate-900/60 relative">
+                          <button
+                            onClick={() => setSelectedHubInsightTab('breakdown')}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
+                              selectedHubInsightTab === 'breakdown'
+                                ? 'bg-slate-800 text-white dark:bg-slate-800'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent'
+                            }`}
+                          >
+                            Syllabus Breakdown
+                          </button>
+                          <button
+                            onClick={() => setSelectedHubInsightTab('pattern')}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
+                              selectedHubInsightTab === 'pattern'
+                                ? 'bg-slate-800 text-white dark:bg-slate-800'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent'
+                            }`}
+                          >
+                            Exam Pattern Insights
+                          </button>
                         </div>
                       </div>
-                    );
-                  })}
+
+                      {selectedHubInsightTab === 'breakdown' ? (
+                        <div className="space-y-4">
+                          {currentHub.insights.weightage.map((item) => (
+                            <div key={item.category} className="space-y-1.5 text-left">
+                              <div className="flex justify-between items-center text-[10.5px] font-bold">
+                                <span className="text-slate-700 dark:text-slate-355">{item.category}</span>
+                                <span className="text-slate-900 dark:text-white font-extrabold">{item.value}% Focus Weightage</span>
+                              </div>
+                              <div className="w-full bg-slate-50 dark:bg-slate-955 h-2.5 rounded-full overflow-hidden border border-slate-100 dark:border-slate-900/60 p-0.5">
+                                <div className={`h-full rounded-full ${item.color}`} style={{ width: `${item.value}%` }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                          
+                          {/* Weightage Distribution */}
+                          <div className="space-y-4">
+                            <span className="text-[9px] font-black font-mono text-slate-405 dark:text-slate-500 uppercase tracking-widest block animate-fadeIn">Question Weightage Distribution</span>
+                            <div className="h-6 w-full flex rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                              <div className="bg-blue-500 flex items-center justify-center text-[8.5px] font-black text-white" style={{ width: '50%' }}>50% ARITHMETIC</div>
+                              <div className="bg-emerald-500 flex items-center justify-center text-[8.5px] font-black text-white" style={{ width: '20%' }}>20% VERBAL</div>
+                              <div className="bg-amber-500 flex items-center justify-center text-[8.5px] font-black text-white" style={{ width: '30%' }}>30% LOGICAL</div>
+                            </div>
+                            <div className="flex justify-between text-[9px] font-bold text-slate-400 font-mono">
+                              <span>Arithmetic</span>
+                              <span>Verbal Ability</span>
+                              <span>Logical Reasoning</span>
+                            </div>
+                          </div>
+
+                          {/* Difficulty Distribution */}
+                          <div className="space-y-4">
+                            <span className="text-[9px] font-black font-mono text-slate-405 dark:text-slate-500 uppercase tracking-widest block">Difficulty Spread</span>
+                            <div className="h-6 w-full flex rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                              {currentHub.insights.difficulty.map((d) => (
+                                <div key={d.level} className={`${d.color} flex items-center justify-center text-[8.5px] font-black text-white`} style={{ width: `${d.value}%` }}>
+                                  {d.value}% {d.level.toUpperCase()}
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex justify-between text-[9px] font-bold text-slate-455 font-mono">
+                              <span>Easy</span>
+                              <span>Medium</span>
+                              <span>Hard</span>
+                            </div>
+                          </div>
+
+                        </div>
+                      )}
+                    </div>
+
+                    {/* CURATED FOCUS FEED */}
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 backdrop-blur-md space-y-6">
+                      <div className="border-b border-slate-100 dark:border-slate-900/60 pb-3 text-left">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                          Curated Focus Feed
+                        </h4>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5">
+                          Solve dynamic questions tailored precisely to your selected target's pattern.
+                        </p>
+                      </div>
+
+                      <div className="space-y-6 text-left">
+                        {currentHub.focusFeed.map((q) => {
+                          const userAns = answeredFeedQuestions[q.id];
+                          const hasAnswered = userAns !== undefined;
+                          
+                          return (
+                            <div key={q.id} className="p-5 bg-slate-50/50 dark:bg-slate-955/30 border border-slate-200/60 dark:border-slate-850 rounded-2xl space-y-4">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[8px] font-black font-mono border px-1.5 py-0.5 rounded-md uppercase tracking-wider bg-orange-500/10 border-orange-500/20 text-orange-600 dark:text-orange-400">
+                                  {q.category}
+                                </span>
+                                {hasAnswered && (
+                                  <span className={`text-[8.5px] font-black uppercase font-mono px-2 py-0.5 rounded ${
+                                    userAns === q.correctIndex
+                                      ? 'bg-emerald-500/10 text-emerald-500'
+                                      : 'bg-red-500/10 text-red-500'
+                                  }`}>
+                                    {userAns === q.correctIndex ? 'Correct' : 'Incorrect'}
+                                  </span>
+                                )}
+                              </div>
+
+                              <p className="text-xs font-bold text-slate-850 dark:text-white leading-normal">
+                                {q.question}
+                              </p>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {q.options.map((opt, oIdx) => {
+                                  const isSelected = userAns === oIdx;
+                                  const isCorrect = oIdx === q.correctIndex;
+                                  
+                                  let buttonStyle = 'bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-355 hover:bg-slate-100/50 dark:hover:bg-slate-800/50';
+                                  if (hasAnswered) {
+                                    if (isCorrect) {
+                                      buttonStyle = 'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-450';
+                                    } else if (isSelected) {
+                                      buttonStyle = 'bg-red-500/15 border-red-500 text-red-650 dark:text-red-400';
+                                    } else {
+                                      buttonStyle = 'bg-white dark:bg-slate-900 border-slate-200/30 dark:border-slate-800/40 text-slate-400 opacity-60';
+                                    }
+                                  }
+
+                                  return (
+                                    <button
+                                      key={oIdx}
+                                      disabled={hasAnswered}
+                                      onClick={() => {
+                                        setAnsweredFeedQuestions({
+                                          ...answeredFeedQuestions,
+                                          [q.id]: oIdx
+                                        });
+                                        if (oIdx === q.correctIndex) {
+                                          playPreviewChime();
+                                          setSolvedCount(prev => prev + 1);
+                                          setToastMsg("Correct answer! Heatmap activity registered. 🏆");
+                                        } else {
+                                          setToastMsg("Incorrect. Review the solution details below.");
+                                        }
+                                      }}
+                                      className={`py-2.5 px-4 rounded-xl border text-[11px] font-bold text-left cursor-pointer transition-all duration-200 flex items-center justify-between gap-2 ${buttonStyle}`}
+                                    >
+                                      <span>{opt}</span>
+                                      {hasAnswered && isCorrect && <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
+                                      {hasAnswered && isSelected && !isCorrect && <X className="w-3.5 h-3.5 text-red-500 shrink-0" />}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {hasAnswered && q.solution && (
+                                <div className="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-800/50 text-[10.5px] text-slate-500 dark:text-slate-400 bg-slate-100/40 dark:bg-slate-955/20 p-3 rounded-xl leading-relaxed animate-fadeIn">
+                                  <strong className="text-slate-700 dark:text-slate-350">Solution:</strong> {q.solution}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* RIGHT PANEL (4 cols) */}
+                  <div className="lg:col-span-4 space-y-8">
+                    
+                    {/* SUCCESS PROBABILITY Radial gauge card */}
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-center space-y-6 relative overflow-hidden backdrop-blur-md">
+                      <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono text-left">
+                        Success Probability
+                      </span>
+
+                      {/* Radial Gauge */}
+                      <div className="relative flex items-center justify-center py-2">
+                        <svg className="w-36 h-36 transform -rotate-90">
+                          <circle
+                            cx="72"
+                            cy="72"
+                            r="56"
+                            className="stroke-slate-100 dark:stroke-slate-800"
+                            strokeWidth="9"
+                            fill="transparent"
+                          />
+                          <circle
+                            cx="72"
+                            cy="72"
+                            r="56"
+                            className="stroke-[var(--clr-primary)]"
+                            strokeWidth="9"
+                            fill="transparent"
+                            strokeDasharray={2 * Math.PI * 56}
+                            strokeDashoffset={2 * Math.PI * 56 * (1 - currentHub.probability / 100)}
+                            strokeLinecap="round"
+                            style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-3xl font-black text-slate-900 dark:text-white font-mono leading-none">
+                            {currentHub.probability}%
+                          </span>
+                          <span className="text-[8px] font-black tracking-widest text-[var(--clr-primary)] uppercase mt-1 leading-none">
+                            {currentHub.probabilityLabel}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-xs font-bold text-slate-800 dark:text-white block uppercase">Probability Score</span>
+                        <span className="text-[9px] font-mono text-slate-450 dark:text-slate-500 block leading-tight">{currentHub.probabilitySub}</span>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          playPreviewChime();
+                          setToastMsg("Success probabilities boosted! Focus stats updated.");
+                        }}
+                        className="w-full py-3 px-4 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-[var(--clr-primary-tint)]/25 cursor-pointer border-0"
+                      >
+                        Boost Score
+                      </button>
+                    </div>
+
+                    {/* DIRECT MOCKS */}
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-left space-y-4">
+                      <span className="text-[9px] font-black text-slate-400 dark:text-slate-505 uppercase tracking-widest block font-mono">
+                        Direct Mocks
+                      </span>
+
+                      <div className="space-y-3.5">
+                        {currentHub.directMocks.map((mock) => {
+                          const isLocked = mock.status === 'Locked';
+                          return (
+                            <div key={mock.id} className="p-4 bg-slate-50 dark:bg-slate-955 border border-slate-200/60 dark:border-slate-850 rounded-2xl flex items-center justify-between gap-3 relative group">
+                              <div className="space-y-0.5 text-left truncate flex-1">
+                                <h4 className="text-xs font-black text-slate-850 dark:text-white uppercase truncate flex items-center gap-1.5">
+                                  {isLocked && <Lock className="w-3 h-3 text-slate-400" />} {mock.title}
+                                </h4>
+                                <p className="text-[10px] text-slate-400 dark:text-slate-505 truncate font-semibold leading-tight">{mock.desc}</p>
+                                <p className="text-[8px] text-slate-455 font-mono uppercase tracking-wider">{mock.questions} Qs · {mock.duration} Mins</p>
+                              </div>
+                              <button
+                                disabled={isLocked}
+                                onClick={() => {
+                                  playPreviewChime();
+                                  setToastMsg(`Starting simulator: ${mock.title}!`);
+                                }}
+                                className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-lg shrink-0 border-0 ${
+                                  isLocked
+                                    ? 'bg-slate-205 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                                    : 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white cursor-pointer shadow-sm shadow-[var(--clr-primary-tint)]/20'
+                                }`}
+                              >
+                                {isLocked ? 'Locked' : 'Take'}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
+
                 </div>
-              )}
-            </motion.div>
+
+              </motion.div>
           )}
 
           {/* ====================================================================
@@ -5279,6 +5734,21 @@ export default function StudentDashboard() {
           </div>
         )}
       </motion.div>
+
+      {/* Dynamic Toast Feedback alerts */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-6 right-6 z-50 bg-slate-900/90 dark:bg-white text-white dark:text-slate-900 px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-800 dark:border-slate-100 flex items-center gap-3 backdrop-blur-md"
+          >
+            <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-wider">{toastMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
