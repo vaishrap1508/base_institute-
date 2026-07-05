@@ -55,7 +55,14 @@ import {
   Video,
   Plus,
   GripVertical,
-  LayoutGrid
+  LayoutGrid,
+  Archive,
+  Trash2,
+  Folder,
+  FolderPlus,
+  Bold,
+  Italic,
+  Link
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
@@ -1351,7 +1358,7 @@ export default function StudentDashboard() {
           setActiveSidebarTab('domains');
         } else if (tabParam === 'studyPlanner') {
           router.replace('/student/study-planner');
-        } else if (['dashboard', 'domains', 'learning', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges'].includes(tabParam)) {
+        } else if (['dashboard', 'domains', 'learning', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges', 'library'].includes(tabParam)) {
           setActiveSidebarTab(tabParam as any);
         }
       }
@@ -1384,7 +1391,7 @@ export default function StudentDashboard() {
   ]);
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges' | 'library'>('dashboard');
   const [activeCompanyHub, setActiveCompanyHub] = useState<string>('tcs');
   const [answeredFeedQuestions, setAnsweredFeedQuestions] = useState<Record<string, number>>({});
   const [selectedHubInsightTab, setSelectedHubInsightTab] = useState<'breakdown' | 'pattern'>('breakdown');
@@ -1433,6 +1440,91 @@ export default function StudentDashboard() {
   const currentHub = useMemo(() => {
     return COMPANY_PREP_HUBS[activeCompanyHub] || COMPANY_PREP_HUBS.tcs;
   }, [activeCompanyHub]);
+
+  // STUDY LIBRARY DATASETS AND STATES
+  const [libraryNotes, setLibraryNotes] = useState<any[]>([
+    {
+      id: 'note-842',
+      category: 'aptitude',
+      tag: 'APTITUDE • #842',
+      title: 'Successive Percentage Change',
+      snippet: 'Remember the formula: x + y + xy/100. Crucial for discount chains...',
+      content: 'When two successive percentage changes of x% and y% occur, the effective change is given by the formula below. Remember to use negative values for percentage decreases or discounts.',
+      addedDate: 'Oct 24',
+      revisedDate: '2 days ago',
+      folder: 'all',
+      equation: 'Net\\ Change = \\left(x + y + \\frac{xy}{100}\\right)\\%',
+      keyPoints: [
+        'Compound Interest calculations.',
+        'Successive discounts in retail (Profit & Loss).',
+        'Population growth or depreciation over years.'
+      ]
+    },
+    {
+      id: 'note-1204',
+      category: 'logic',
+      tag: 'LOGIC • #1,204',
+      title: 'Syllogism: All A are B, Some B are C',
+      snippet: 'Draw Venn diagrams always. The \'Some\' case is tricky for \'All\'...',
+      content: 'Standard syllogistic reasoning. The relation between A and C is not directly defined; draw Euler circles to map overlap bounds. Remember that "Some B are C" does not guarantee "Some A are C".',
+      addedDate: 'Oct 22',
+      revisedDate: 'Today',
+      folder: 'all',
+      equation: 'A \\cap B = A \\implies A \\subseteq B',
+      keyPoints: [
+        'Verify negative statements first.',
+        'Check Venn intersections for "Some B are C" boundary limits.',
+        'Differentiate between possibilities and definite conclusions.'
+      ]
+    },
+    {
+      id: 'note-451',
+      category: 'data',
+      tag: 'DATA • #451',
+      title: 'Time & Distance Ratio Methods',
+      snippet: 'When distance is constant, speed is inversely proportional to time...',
+      content: 'If distance is kept constant, speed and time vary inversely. This means that if the ratio of speeds is a:b, then the ratio of time taken will be b:a.',
+      addedDate: 'Oct 20',
+      revisedDate: '1 week ago',
+      folder: 'all',
+      equation: 'Distance = Speed \\times Time \\implies S_1 T_1 = S_2 T_2',
+      keyPoints: [
+        'Useful for early/late arrival problems.',
+        'Applicable to train passing speed calculations.',
+        'Simplifies relative speed ratios in circular tracks.'
+      ]
+    }
+  ]);
+  const [selectedLibraryFolder, setSelectedLibraryFolder] = useState<string>('all');
+  const [activeLibraryNoteId, setActiveLibraryNoteId] = useState<string>('note-842');
+  const [librarySearchQuery, setLibrarySearchQuery] = useState<string>('');
+  const [libraryCustomFolders, setLibraryCustomFolders] = useState<string[]>([
+    'Arithmetic Shortcuts',
+    'TCS NQT Prep (24)',
+    'Geometry Formulas'
+  ]);
+  const [showAddFolderModal, setShowAddFolderModal] = useState<boolean>(false);
+  const [newFolderName, setNewFolderName] = useState<string>('');
+
+  const activeLibraryNote = useMemo(() => {
+    return libraryNotes.find(n => n.id === activeLibraryNoteId) || null;
+  }, [libraryNotes, activeLibraryNoteId]);
+
+  const [editingTitle, setEditingTitle] = useState('');
+  const [editingContent, setEditingContent] = useState('');
+  const [editingEquation, setEditingEquation] = useState('');
+
+  useEffect(() => {
+    if (activeLibraryNote) {
+      setEditingTitle(activeLibraryNote.title);
+      setEditingContent(activeLibraryNote.content);
+      setEditingEquation(activeLibraryNote.equation || '');
+    } else {
+      setEditingTitle('');
+      setEditingContent('');
+      setEditingEquation('');
+    }
+  }, [activeLibraryNoteId, activeLibraryNote]);
   // Increment practice time spent
   useEffect(() => {
     if ((activeSidebarTab as string) !== 'practice') return;
@@ -2742,7 +2834,7 @@ export default function StudentDashboard() {
   }, [solvedCount]);
 
   interface SidebarTab {
-    id: 'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
+    id: 'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges' | 'library';
     label: string;
     icon: any;
     action: 'tab' | 'nav';
@@ -2754,6 +2846,7 @@ export default function StudentDashboard() {
     { id: 'domains', label: 'Domains', icon: LayoutGrid, action: 'tab' },
     { id: 'learning', label: 'Progress', icon: BookOpen, action: 'tab' },
     { id: 'studyPlanner', label: 'Study Plan', icon: Calendar, action: 'nav', route: '/student/study-planner' },
+    { id: 'library', label: 'Study Library', icon: BookMarked, action: 'tab' },
     { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
     { id: 'careerHub', label: 'Placement Hub', icon: Briefcase, action: 'tab' },
     { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
@@ -4343,6 +4436,604 @@ export default function StudentDashboard() {
 
               </motion.div>
           )}
+
+          {/* ====================================================================
+              STUDY LIBRARY TAB (Bookmarks & Notes Library)
+              ==================================================================== */}
+          {activeSidebarTab === 'library' && (
+            <motion.div
+              key="library"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full h-[calc(100vh-140px)] select-none text-left flex flex-col space-y-6"
+            >
+              {/* Header section */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5 shrink-0">
+                <div>
+                  <h2 className="text-xl font-black text-slate-905 dark:text-white uppercase tracking-tight flex items-center gap-2">
+                    <BookMarked className="w-5.5 h-5.5 text-[var(--clr-primary)]" /> Bookmark & Notes Library
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
+                    Store formulas, core syllogism maps, bookmarks, and edit custom text guides.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    const newId = `note-${Date.now()}`;
+                    const newNote = {
+                      id: newId,
+                      category: 'aptitude',
+                      tag: `NOTE • #${libraryNotes.length + 1}`,
+                      title: 'New Saved Insight',
+                      snippet: 'Double-click to start writing...',
+                      content: 'Start writing your conceptual definitions, notes, formulas and key application points here.',
+                      addedDate: 'Today',
+                      revisedDate: 'Just now',
+                      folder: selectedLibraryFolder === 'archived' || selectedLibraryFolder === 'trash' ? 'all' : selectedLibraryFolder,
+                      equation: 'FormulaPreview = A \\times B'
+                    };
+                    setLibraryNotes(prev => [newNote, ...prev]);
+                    setActiveLibraryNoteId(newId);
+                    playPreviewChime();
+                    setToastMsg("Created new saved insight note! 📝");
+                  }}
+                  className="px-4 py-2.5 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95 border-0"
+                >
+                  <Plus className="w-4 h-4" /> New Note
+                </button>
+              </div>
+
+              {/* Main Workspace split */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1 min-h-0 overflow-hidden">
+                
+                {/* 1. LEFT SIDEBAR (Folders) */}
+                <div className="lg:col-span-3 bg-white dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-900/80 rounded-[2rem] p-6 h-full flex flex-col justify-between overflow-y-auto backdrop-blur-md">
+                  <div className="space-y-6">
+                    {/* System Folders */}
+                    <div className="space-y-2">
+                      <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest block mb-2 font-mono">System Folders</span>
+                      <button
+                        onClick={() => setSelectedLibraryFolder('all')}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                          selectedLibraryFolder === 'all'
+                            ? 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)]'
+                            : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                        }`}
+                      >
+                        <Bookmark className="w-4 h-4" /> All Bookmarks
+                      </button>
+                      <button
+                        onClick={() => setSelectedLibraryFolder('last50')}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                          selectedLibraryFolder === 'last50'
+                            ? 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)]'
+                            : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                        }`}
+                      >
+                        <Clock className="w-4 h-4" /> Last 50
+                      </button>
+                      <button
+                        onClick={() => setSelectedLibraryFolder('high')}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                          selectedLibraryFolder === 'high'
+                            ? 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)]'
+                            : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                        }`}
+                      >
+                        <Flame className="w-4 h-4" /> High Difficulty
+                      </button>
+                    </div>
+
+                    {/* Custom Folders */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between block mb-2">
+                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest font-mono">Custom Folders</span>
+                        <button
+                          onClick={() => setShowAddFolderModal(true)}
+                          className="p-1 hover:bg-slate-105 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-colors border-0 bg-transparent cursor-pointer"
+                          title="Add New Folder"
+                        >
+                          <FolderPlus className="w-4 h-4" />
+                        </button>
+                      </div>
+                      
+                      {libraryCustomFolders.map(folder => {
+                        const folderSlug = folder.toLowerCase().replace(/\s+/g, '-');
+                        return (
+                          <button
+                            key={folder}
+                            onClick={() => setSelectedLibraryFolder(folderSlug)}
+                            className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                              selectedLibraryFolder === folderSlug
+                                ? 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)]'
+                                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2.5 truncate">
+                              <Folder className="w-4 h-4 shrink-0" />
+                              <span className="truncate">{folder}</span>
+                            </span>
+                            <span className="text-[9px] opacity-60 font-mono">
+                              ({libraryNotes.filter(n => n.folder === folderSlug).length})
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Sidebar bottom (Archive / Trash) */}
+                  <div className="space-y-2 border-t border-slate-100 dark:border-slate-800/80 pt-4">
+                    <button
+                      onClick={() => setSelectedLibraryFolder('archived')}
+                      className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                        selectedLibraryFolder === 'archived'
+                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                          : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                      }`}
+                    >
+                      <Archive className="w-4 h-4" /> Archived
+                    </button>
+                    <button
+                      onClick={() => setSelectedLibraryFolder('trash')}
+                      className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                        selectedLibraryFolder === 'trash'
+                          ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                          : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                      }`}
+                    >
+                      <Trash2 className="w-4 h-4" /> Trash
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. MIDDLE REPOSITORY (Notes List) */}
+                <div className="lg:col-span-5 h-full flex flex-col space-y-4 overflow-hidden">
+                  
+                  {/* Search box */}
+                  <div className="relative shrink-0">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search across all bookmarks and notes..."
+                      value={librarySearchQuery}
+                      onChange={(e) => setLibrarySearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2.5 text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400 shadow-xs"
+                    />
+                  </div>
+
+                  {/* Notes repository */}
+                  <div className="flex-1 overflow-y-auto space-y-3.5 pr-1.5 custom-scrollbar pb-8">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-400 tracking-wider font-mono px-1">
+                      <span>{selectedLibraryFolder.replace('-', ' ')} folder</span>
+                      <span>{libraryNotes.filter(n => {
+                        if (librarySearchQuery) {
+                          const query = librarySearchQuery.toLowerCase();
+                          if (!n.title.toLowerCase().includes(query) && !n.content.toLowerCase().includes(query)) return false;
+                        }
+                        if (selectedLibraryFolder === 'all') return n.folder !== 'archived' && n.folder !== 'trash';
+                        if (selectedLibraryFolder === 'last50') return n.folder !== 'archived' && n.folder !== 'trash';
+                        if (selectedLibraryFolder === 'high') return n.category === 'aptitude' || n.category === 'logic';
+                        if (selectedLibraryFolder === 'archived') return n.folder === 'archived';
+                        if (selectedLibraryFolder === 'trash') return n.folder === 'trash';
+                        return n.folder.toLowerCase() === selectedLibraryFolder.toLowerCase();
+                      }).length} notes</span>
+                    </div>
+
+                    {libraryNotes.filter(n => {
+                      if (librarySearchQuery) {
+                        const query = librarySearchQuery.toLowerCase();
+                        if (!n.title.toLowerCase().includes(query) && !n.content.toLowerCase().includes(query)) return false;
+                      }
+                      if (selectedLibraryFolder === 'all') return n.folder !== 'archived' && n.folder !== 'trash';
+                      if (selectedLibraryFolder === 'last50') return n.folder !== 'archived' && n.folder !== 'trash';
+                      if (selectedLibraryFolder === 'high') return n.category === 'aptitude' || n.category === 'logic';
+                      if (selectedLibraryFolder === 'archived') return n.folder === 'archived';
+                      if (selectedLibraryFolder === 'trash') return n.folder === 'trash';
+                      return n.folder.toLowerCase() === selectedLibraryFolder.toLowerCase();
+                    }).length === 0 ? (
+                      <div className="bg-white dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-900/80 rounded-2xl p-12 text-center space-y-3">
+                        <span className="text-3xl block">📁</span>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">No notes found</h4>
+                        <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold max-w-xs mx-auto">
+                          There are no saved notes or bookmarks in this folder matching your query. Click "New Note" to create one.
+                        </p>
+                      </div>
+                    ) : (
+                      libraryNotes.filter(n => {
+                        if (librarySearchQuery) {
+                          const query = librarySearchQuery.toLowerCase();
+                          if (!n.title.toLowerCase().includes(query) && !n.content.toLowerCase().includes(query)) return false;
+                        }
+                        if (selectedLibraryFolder === 'all') return n.folder !== 'archived' && n.folder !== 'trash';
+                        if (selectedLibraryFolder === 'last50') return n.folder !== 'archived' && n.folder !== 'trash';
+                        if (selectedLibraryFolder === 'high') return n.category === 'aptitude' || n.category === 'logic';
+                        if (selectedLibraryFolder === 'archived') return n.folder === 'archived';
+                        if (selectedLibraryFolder === 'trash') return n.folder === 'trash';
+                        return n.folder.toLowerCase() === selectedLibraryFolder.toLowerCase();
+                      }).map((note) => {
+                        const isNoteActive = note.id === activeLibraryNoteId;
+                        const categoryColorMap: Record<string, string> = {
+                          aptitude: 'border-l-[4px] border-l-rose-500',
+                          logic: 'border-l-[4px] border-l-emerald-500',
+                          data: 'border-l-[4px] border-l-purple-500',
+                          verbal: 'border-l-[4px] border-l-blue-500'
+                        };
+
+                        return (
+                          <div
+                            key={note.id}
+                            onClick={() => setActiveLibraryNoteId(note.id)}
+                            className={`p-5 bg-white dark:bg-slate-900/40 border rounded-2xl text-left cursor-pointer transition-all duration-200 flex flex-col justify-between gap-3 relative hover:-translate-y-0.5 hover:shadow-md ${
+                              isNoteActive
+                                ? `border-[var(--clr-primary)] ring-1 ring-[var(--clr-primary)]/40 ${categoryColorMap[note.category] || 'border-l-[4px] border-l-slate-400'}`
+                                : `border-slate-200/80 dark:border-slate-900/80 ${categoryColorMap[note.category] || 'border-l-[4px] border-l-slate-400'}`
+                            }`}
+                          >
+                            <div className="space-y-1.5">
+                              <span className="text-[8.5px] font-mono font-black uppercase tracking-wider opacity-60">
+                                {note.tag}
+                              </span>
+                              <h4 className="text-sm font-extrabold text-slate-805 dark:text-white leading-tight">
+                                {note.title}
+                              </h4>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed italic">
+                                {note.snippet}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between text-[8.5px] font-mono font-black text-slate-400 uppercase tracking-widest pt-2 border-t border-slate-100/50 dark:border-slate-800/40">
+                              <span>Added {note.addedDate}</span>
+                              <span>Revised {note.revisedDate}</span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. RIGHT PANEL (Note Editor) */}
+                <div className="lg:col-span-4 h-full bg-white dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 flex flex-col justify-between overflow-y-auto backdrop-blur-md">
+                  {activeLibraryNote ? (
+                    <div className="space-y-6 flex-1 flex flex-col justify-between">
+                      <div className="space-y-5">
+                        {/* Editor Header */}
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80 select-none">
+                          <span className="text-[8.5px] font-mono font-black uppercase text-slate-400 tracking-widest">
+                            {activeLibraryNote.tag} • Revised {activeLibraryNote.revisedDate}
+                          </span>
+                          <button
+                            onClick={() => setActiveLibraryNoteId('')}
+                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-slate-605 transition-colors border-0 bg-transparent cursor-pointer"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Title input */}
+                        <div className="space-y-1 text-left">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 font-mono">Insight Title</label>
+                          <input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            className="w-full py-1.5 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl text-xs font-bold text-slate-905 dark:text-white focus:outline-none focus:border-[var(--clr-primary)] transition-colors"
+                          />
+                        </div>
+
+                        {/* Formatting toolbar */}
+                        <div className="flex items-center gap-1.5 p-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-855 rounded-xl select-none">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const selected = text.substring(start, end);
+                              const prefix = '**';
+                              const suffix = '**';
+                              const replacement = prefix + (selected || 'text') + suffix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                              setTimeout(() => {
+                                textarea.selectionStart = start + prefix.length;
+                                textarea.selectionEnd = start + prefix.length + (selected || 'text').length;
+                              }, 0);
+                            }}
+                            title="Bold Text"
+                            className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+                          >
+                            <Bold className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const selected = text.substring(start, end);
+                              const prefix = '*';
+                              const suffix = '*';
+                              const replacement = prefix + (selected || 'text') + suffix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                              setTimeout(() => {
+                                textarea.selectionStart = start + prefix.length;
+                                textarea.selectionEnd = start + prefix.length + (selected || 'text').length;
+                              }, 0);
+                            }}
+                            title="Italic Text"
+                            className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+                          >
+                            <Italic className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const selected = text.substring(start, end);
+                              const prefix = '$';
+                              const suffix = '$';
+                              const replacement = prefix + (selected || 'Equation') + suffix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                              setTimeout(() => {
+                                textarea.selectionStart = start + prefix.length;
+                                textarea.selectionEnd = start + prefix.length + (selected || 'Equation').length;
+                              }, 0);
+                            }}
+                            title="Insert LaTeX Equation"
+                            className="px-2 py-0.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 font-black text-xs border-0 bg-transparent cursor-pointer"
+                          >
+                            &Sigma;
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const prefix = '\n- ';
+                              const replacement = prefix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                            }}
+                            title="Bullet List"
+                            className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+                          >
+                            <List className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const selected = text.substring(start, end);
+                              const prefix = '[';
+                              const suffix = '](url)';
+                              const replacement = prefix + (selected || 'link') + suffix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                              setTimeout(() => {
+                                textarea.selectionStart = start + prefix.length;
+                                textarea.selectionEnd = start + prefix.length + (selected || 'link').length;
+                              }, 0);
+                            }}
+                            title="Insert Link"
+                            className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+                          >
+                            <Link className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Editor body text */}
+                        <div className="space-y-1 text-left">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 font-mono">Content Notes</label>
+                          <textarea
+                            id="note-textarea"
+                            value={editingContent}
+                            onChange={(e) => setEditingContent(e.target.value)}
+                            rows={6}
+                            className="w-full py-2 px-3 bg-slate-50 dark:bg-slate-955 border border-slate-200/60 dark:border-slate-850 rounded-2xl text-xs text-slate-800 dark:text-slate-202 focus:outline-none focus:border-[var(--clr-primary)] transition-colors resize-none font-medium leading-relaxed font-sans"
+                          />
+                        </div>
+
+                        {/* LaTeX equation field */}
+                        <div className="space-y-1 text-left">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 font-mono">Active Equation (LaTeX)</label>
+                          <input
+                            type="text"
+                            value={editingEquation}
+                            onChange={(e) => setEditingEquation(e.target.value)}
+                            placeholder="e.g. x + y = z"
+                            className="w-full py-1.5 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-855 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[var(--clr-primary)]"
+                          />
+                        </div>
+
+                        {/* LaTeX Math Equation Preview block */}
+                        {editingEquation && (
+                          <div className="bg-slate-50 dark:bg-slate-950/80 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-850 my-1 font-mono text-xs text-center text-[var(--clr-primary)] animate-fadeIn">
+                            <div className="text-[7.5px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest mb-1.5 text-left font-mono">LaTeX Mathematical Preview</div>
+                            <div className="py-2.5 text-sm font-extrabold select-all flex justify-center items-center overflow-x-auto text-slate-800 dark:text-slate-100">
+                              <span className="px-2.5 py-1.5 bg-[var(--clr-primary-tint)] dark:bg-slate-900/60 rounded-xl border border-[var(--clr-primary)]/15 font-semibold text-xs tracking-wider">
+                                $ {editingEquation} $
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80 mt-6 select-none shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLibraryNotes(prev => prev.map(n => {
+                              if (n.id === activeLibraryNoteId) {
+                                return {
+                                  ...n,
+                                  title: editingTitle,
+                                  content: editingContent,
+                                  snippet: editingContent.substring(0, 75) + (editingContent.length > 75 ? '...' : ''),
+                                  equation: editingEquation,
+                                  revisedDate: 'Today'
+                                };
+                              }
+                              return n;
+                            }));
+                            playPreviewChime();
+                            setToastMsg("Changes saved to library! 💾");
+                          }}
+                          className="flex-1 py-3 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 border-0 cursor-pointer"
+                        >
+                          Save Changes
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLibraryNotes(prev => prev.map(n => {
+                              if (n.id === activeLibraryNoteId) {
+                                const newFold = n.folder === 'archived' ? 'all' : 'archived';
+                                setToastMsg(newFold === 'archived' ? "Moved note to archives! 📦" : "Restored note from archives! 📦");
+                                return { ...n, folder: newFold };
+                              }
+                              return n;
+                            }));
+                            playPreviewChime();
+                          }}
+                          className="px-4 py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-900 border border-slate-200/60 dark:border-slate-850 text-slate-700 dark:text-slate-350 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all active:scale-95 cursor-pointer"
+                        >
+                          {activeLibraryNote.folder === 'archived' ? 'Unarchive' : 'Archive'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLibraryNotes(prev => prev.map(n => {
+                              if (n.id === activeLibraryNoteId) {
+                                const newFold = n.folder === 'trash' ? 'all' : 'trash';
+                                setToastMsg(newFold === 'trash' ? "Moved note to trash! 🗑️" : "Restored note from trash! 🗑️");
+                                return { ...n, folder: newFold };
+                              }
+                              return n;
+                            }));
+                            playPreviewChime();
+                          }}
+                          className="p-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-955/40 text-rose-600 dark:text-rose-400 border border-rose-205 rounded-xl transition-all active:scale-95 cursor-pointer animate-fadeIn"
+                          title="Move to Trash"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center space-y-3.5 text-center py-16">
+                      <span className="text-4xl">📝</span>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">No Note Selected</h4>
+                      <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold max-w-[200px]">
+                        Select any saved note from the repository list to edit, format, or preview LaTeX formulas.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Add Custom Folder Modal */}
+              {showAddFolderModal && (
+                <div className="fixed inset-0 bg-slate-955/40 backdrop-blur-xs flex items-center justify-center z-50 animate-fadeIn">
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 w-80 text-left space-y-4 shadow-2xl">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <FolderPlus className="w-4 h-4 text-[var(--clr-primary)]" /> Create Folder
+                      </h4>
+                      <button
+                        onClick={() => {
+                          setShowAddFolderModal(false);
+                          setNewFolderName('');
+                        }}
+                        className="p-1 hover:bg-slate-105 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-slate-650 transition-colors border-0 bg-transparent cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <label className="text-[8.5px] font-black uppercase tracking-widest text-slate-400 font-mono">Folder Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Probability Logic"
+                        value={newFolderName}
+                        onChange={(e) => setNewFolderName(e.target.value)}
+                        className="w-full py-2 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-205 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[var(--clr-primary)]"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            if (newFolderName.trim()) {
+                              setLibraryCustomFolders(prev => [...prev, newFolderName.trim()]);
+                              playPreviewChime();
+                              setToastMsg(`Folder "${newFolderName}" created! 📁`);
+                              setNewFolderName('');
+                              setShowAddFolderModal(false);
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex gap-2.5 pt-2">
+                      <button
+                        onClick={() => {
+                          if (newFolderName.trim()) {
+                            setLibraryCustomFolders(prev => [...prev, newFolderName.trim()]);
+                            playPreviewChime();
+                            setToastMsg(`Folder "${newFolderName}" created! 📁`);
+                            setNewFolderName('');
+                            setShowAddFolderModal(false);
+                          }
+                        }}
+                        className="flex-1 py-2.5 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-[9px] font-black uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer border-0"
+                      >
+                        Create Folder
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAddFolderModal(false);
+                          setNewFolderName('');
+                        }}
+                        className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-350 text-[9px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer border-0"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </motion.div>
+          )}
+
+          {/* ====================================================================
 
           {/* ====================================================================
               5. TAB: LEADERBOARDS
