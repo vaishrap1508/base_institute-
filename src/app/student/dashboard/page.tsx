@@ -4004,7 +4004,7 @@ export default function StudentDashboard() {
                 className="w-full space-y-8 select-none text-left"
               >
                 {/* Header row & selector */}
-                <div className="flex justify-end gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5">
+                <div className="flex justify-start gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5">
                   <div className="flex items-center gap-2.5">
                     <span className="text-[9px] font-black uppercase text-slate-400 font-mono tracking-widest shrink-0">Select Target:</span>
                     <select
