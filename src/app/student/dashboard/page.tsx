@@ -4035,26 +4035,10 @@ export default function StudentDashboard() {
                     <div className="bg-slate-900 text-white rounded-[2rem] p-6 md:p-8 relative overflow-hidden shadow-xl shadow-slate-950/20 text-left border border-slate-800">
                       {/* Background design elements */}
                       <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-tr from-[var(--clr-primary)]/10 to-[var(--clr-primary)]/20 blur-2xl rounded-full pointer-events-none" />
-                      
                       <div className="space-y-4 relative z-10">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-[8.5px] font-mono font-black uppercase tracking-wider bg-[var(--clr-primary)]/20 border border-[var(--clr-primary)]/30 text-[var(--clr-primary)] px-2 py-0.5 rounded-lg">
-                            {currentHub.patternLabel}
-                          </span>
-                          {currentHub.badges.map((b) => (
-                            <span key={b} className="text-[8.5px] font-mono font-black uppercase tracking-wider bg-slate-800 border border-slate-700 text-slate-300 px-2 py-0.5 rounded-lg">
-                              {b}
-                            </span>
-                          ))}
-                        </div>
-
-                        <h3 className="text-2xl font-black uppercase tracking-tight leading-none mt-2">
+                        <h3 className="text-2xl font-black uppercase tracking-tight leading-none">
                           {currentHub.title}
                         </h3>
-
-                        <p className="text-xs text-slate-400 font-medium max-w-2xl leading-relaxed">
-                          {currentHub.desc}
-                        </p>
 
                         <div className="pt-2 flex flex-wrap items-center gap-6 text-slate-350 font-mono text-[10.5px]">
                           <span>Duration: <strong className="text-white font-extrabold">{currentHub.metrics.duration}</strong></span>
