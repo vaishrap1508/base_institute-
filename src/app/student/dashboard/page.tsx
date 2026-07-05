@@ -2955,7 +2955,7 @@ export default function StudentDashboard() {
                 ) : activeSidebarTab === 'learning' ? (
                   <>Progress 🗺️</>
                 ) : activeSidebarTab === 'mockTests' ? (
-                  <>Placement Mock Arena 🏆</>
+                  <>Placement Mock Arena</>
                 ) : activeSidebarTab === 'careerHub' ? (
                   <>Company-Specific Placement Hub 🎯</>
                 ) : activeSidebarTab === 'leaderboards' ? (
@@ -2978,7 +2978,7 @@ export default function StudentDashboard() {
                 ) : activeSidebarTab === 'learning' ? (
                   'Personalized step-by-step preparation path.'
                 ) : activeSidebarTab === 'mockTests' ? (
-                  'Prepare under simulated company timeline checks.'
+                  ''
                 ) : activeSidebarTab === 'careerHub' ? (
                   'Interactive dashboards, exam blueprint weights, focus questions, and direct practice tests.'
                 ) : activeSidebarTab === 'leaderboards' ? (
