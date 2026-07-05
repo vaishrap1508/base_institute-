@@ -1131,6 +1131,8 @@ export default function StudentDashboard() {
       if (tabParam) {
         if (tabParam === 'conceptHub' || tabParam === 'practice') {
           setActiveSidebarTab('domains');
+        } else if (tabParam === 'studyPlanner') {
+          router.replace('/student/study-planner');
         } else if (['dashboard', 'domains', 'learning', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges'].includes(tabParam)) {
           setActiveSidebarTab(tabParam as any);
         }
@@ -1164,7 +1166,7 @@ export default function StudentDashboard() {
   ]);
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
 
   // Concept-Hub Practice Arena Redesign States
@@ -2511,7 +2513,7 @@ export default function StudentDashboard() {
   }, [solvedCount]);
 
   interface SidebarTab {
-    id: 'dashboard' | 'domains' | 'learning' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
+    id: 'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
     label: string;
     icon: any;
     action: 'tab' | 'nav';
@@ -2522,6 +2524,7 @@ export default function StudentDashboard() {
   const sidebarTabs: SidebarTab[] = [
     { id: 'domains', label: 'Domains', icon: LayoutGrid, action: 'tab' },
     { id: 'learning', label: 'Progress', icon: BookOpen, action: 'tab' },
+    { id: 'studyPlanner', label: 'Study Plan', icon: Calendar, action: 'nav', route: '/student/study-planner' },
     { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
     { id: 'careerHub', label: 'Career Hub', icon: Briefcase, action: 'tab', subAction: () => setSelectedOpportunityType('All') },
     { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
@@ -4211,85 +4214,6 @@ export default function StudentDashboard() {
                   className="lg:col-span-4 space-y-6"
                 >
                   
-                  {/* Current Standing Card */}
-                  <motion.div 
-                    variants={rightCardVariants}
-                    className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-5 shadow-xs text-left relative overflow-hidden group/standing hover:border-slate-300 dark:hover:border-slate-750 transition-all duration-300"
-                  >
-                    <div className="absolute -right-6 -bottom-6 w-16 h-16 bg-emerald-500/5 rounded-full blur-xl pointer-events-none group-hover/standing:bg-emerald-500/10 transition-colors" />
-                    <div>
-                      <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-505 font-mono block">
-                        Current Standing
-                      </span>
-                      <div className="flex items-center gap-2.5 mt-1.5">
-                        <span className="text-3xl font-black text-slate-900 dark:text-white font-mono">
-                          {activeLeaderboardPeriod === 'weekly' ? '#1,284' : activeLeaderboardPeriod === 'monthly' ? '#1,052' : '#984'}
-                        </span>
-                        <span className="flex items-center gap-1.5 text-xs font-black text-emerald-600 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-lg border border-emerald-250/50 dark:border-emerald-900/20 font-mono">
-                          <span className="relative flex h-1.5 w-1.5 shrink-0">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                          </span>
-                          ▲ 12
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed mt-2.5">
-                        Top 15% of all active learners globally. Keep pushing!
-                      </p>
-                    </div>
-                  </motion.div>
-
-                  {/* Personal Metrics Card */}
-                  <motion.div 
-                    variants={rightCardVariants}
-                    className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-5 shadow-xs text-left"
-                  >
-                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 font-mono block">
-                      Personal Metrics
-                    </span>
-                    
-                    <div className="space-y-3 mt-3">
-                      {/* Metric 1 - Experience */}
-                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/60 group/metric1">
-                        <div className="flex items-center gap-3">
-                          <div className={isCustomActive ? "w-8 h-8 rounded-xl bg-[var(--clr-primary)]/10 text-[var(--clr-primary)] flex items-center justify-center border border-[var(--clr-primary)]/20 group-hover/metric1:scale-110 transition-transform" : "w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200/20 group-hover/metric1:scale-110 transition-transform"}>
-                            <Trophy className="w-4 h-4" />
-                          </div>
-                          <span className="text-xs font-bold text-slate-650 dark:text-slate-300">Experience</span>
-                        </div>
-                        <span className="text-xs font-black text-slate-900 dark:text-white font-mono">
-                          {animatedXp > 0 ? animatedXp.toLocaleString() : "4,920"} XP
-                        </span>
-                      </div>
-
-                      {/* Metric 2 - Accuracy */}
-                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/60 group/metric2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200/20 group-hover/metric2:scale-110 transition-transform">
-                            <Target className="w-4 h-4" />
-                          </div>
-                          <span className="text-xs font-bold text-slate-650 dark:text-slate-300">Accuracy</span>
-                        </div>
-                        <span className="text-xs font-black text-slate-900 dark:text-white font-mono">
-                          82%
-                        </span>
-                      </div>
-
-                      {/* Metric 3 - Streak */}
-                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-900/60 group/metric3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-650 dark:text-orange-400 flex items-center justify-center border border-orange-200/20 group-hover/metric3:scale-110 transition-transform">
-                            <Flame className="w-4 h-4 animate-[pulse_1.5s_infinite]" />
-                          </div>
-                          <span className="text-xs font-bold text-slate-650 dark:text-slate-300">Streak</span>
-                        </div>
-                        <span className="text-xs font-black text-slate-900 dark:text-white font-mono">
-                          {streak} Days
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-
                   {/* Tier promotion Card */}
                   <motion.div 
                     variants={rightCardVariants}

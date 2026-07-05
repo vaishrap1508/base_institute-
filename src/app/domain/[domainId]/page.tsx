@@ -42,7 +42,8 @@ import {
   Target,
   Settings as SettingsIcon,
   BookOpenCheck,
-  Loader2
+  Loader2,
+  Calendar
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
@@ -1726,6 +1727,7 @@ export default function DomainDetailPage() {
           {[
             { id: 'domains', label: 'Domains', icon: LayoutGrid, route: '/student/dashboard?tab=domains' },
             { id: 'learning', label: 'Progress', route: '/student/dashboard?tab=learning', icon: BookOpen },
+            { id: 'studyPlanner', label: 'Study Plan', route: '/student/study-planner', icon: Calendar },
             { id: 'mockTests', label: 'Mock Tests', route: '/student/dashboard?tab=mockTests', icon: Award },
             { id: 'careerHub', label: 'Career Hub', route: '/student/dashboard?tab=careerHub', icon: Briefcase },
             { id: 'leaderboards', label: 'Leaderboard Rankings', route: '/student/dashboard?tab=leaderboards', icon: Trophy },
