@@ -4004,15 +4004,7 @@ export default function StudentDashboard() {
                 className="w-full space-y-8 select-none text-left"
               >
                 {/* Header row & selector */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5">
-                  <div>
-                    <h2 className="text-xl font-black text-slate-905 dark:text-white uppercase tracking-tight flex items-center gap-2">
-                      <Briefcase className="w-5.5 h-5.5 text-[var(--clr-primary)]" /> Company-Specific Placement Hub
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
-                      Prep tracker, syllabus weightage breakdown, interactive diagnostics, and direct mock exams.
-                    </p>
-                  </div>
+                <div className="flex justify-end gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5">
                   <div className="flex items-center gap-2.5">
                     <span className="text-[9px] font-black uppercase text-slate-400 font-mono tracking-widest shrink-0">Select Target:</span>
                     <select
