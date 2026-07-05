@@ -1163,6 +1163,18 @@ export default function StudentDashboard() {
     { id: 2, title: 'New Badge Earned! 🎖️', message: "Prestige Badge 'Solving Streak' has been added to your credentials.", time: '1 day ago', read: false },
     { id: 3, title: 'Weekly Performance Sync 📊', message: 'Your curriculum readiness index improved by +5.4%.', time: '3 days ago', read: true }
   ]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showNotifications]);
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
@@ -2620,7 +2632,7 @@ export default function StudentDashboard() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-30">
 
         {/* Top Header (Reference 2 style) */}
-        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
+        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none relative z-50">
           <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
             <div className="flex flex-col items-start text-left">
               <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
@@ -2750,58 +2762,6 @@ export default function StudentDashboard() {
                       <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-950" />
                     )}
                   </button>
-
-                  <AnimatePresence>
-                    {showNotifications && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-left"
-                      >
-                        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                          <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">Notifications</span>
-                          {notifications.some(n => !n.read) && (
-                            <button
-                              onClick={() => {
-                                setNotifications(notifications.map(n => ({ ...n, read: true })));
-                              }}
-                              className="text-[9px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer border-0 bg-transparent p-0"
-                            >
-                              Mark all as read
-                            </button>
-                          )}
-                        </div>
-                        <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
-                          {notifications.length === 0 ? (
-                            <div className="p-6 text-center text-slate-400 dark:text-slate-500 text-[10px] font-medium">
-                              No notifications yet.
-                            </div>
-                          ) : (
-                            notifications.map((n) => (
-                              <div
-                                key={n.id}
-                                onClick={() => {
-                                  setNotifications(notifications.map(item => item.id === n.id ? { ...item, read: true } : item));
-                                }}
-                                className={`p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer text-left relative ${!n.read ? 'bg-blue-50/20 dark:bg-blue-950/10' : ''}`}
-                              >
-                                {!n.read && (
-                                  <span className="absolute top-4.5 left-2.5 w-1.5 h-1.5 bg-blue-600 dark:bg-blue-500 rounded-full" />
-                                )}
-                                <div className="pl-3.5 space-y-1">
-                                  <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 leading-tight">{n.title}</h4>
-                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal font-medium">{n.message}</p>
-                                  <span className="text-[8px] text-slate-450 dark:text-slate-500 font-semibold block">{n.time}</span>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
 
                 <button
@@ -3081,7 +3041,7 @@ export default function StudentDashboard() {
                 <div className="lg:col-span-4 space-y-8">
 
                   {/* 1. Activity Calendar Card */}
-                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-7 shadow-xs text-left">
+                  <div id="activity-calendar-container" className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-7 shadow-xs text-left">
                     <div className="flex items-center justify-between mb-4 pb-1 border-b border-slate-100 dark:border-slate-900/60">
                       <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Activity Calendar</h3>
                       <span className="text-xs font-bold text-slate-500">{monthYearName}</span>
@@ -3183,99 +3143,6 @@ export default function StudentDashboard() {
                     </div>
                   </div>
 
-                  {/* 2. Time Tracker Stopwatch widget (Reference 1 style) */}
-                  <div className={`transition-all duration-500 text-white border rounded-3xl p-7 shadow-lg relative overflow-hidden flex flex-col justify-between h-56 group ${
-                    timeTrackerIsRunning
-                      ? "bg-[#0B3A27] dark:bg-[#062418] border-[#0A3322] dark:border-[#041B12]"
-                      : "bg-[#4A1515] dark:bg-[#2D0B0B] border-[#441212] dark:border-[#250707]"
-                  }`}>
-                    {/* Visual pattern overlay */}
-                    <div className={`absolute inset-0 transition-opacity duration-500 pointer-events-none ${
-                      timeTrackerIsRunning
-                        ? "bg-[radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.15),transparent_60%)]"
-                        : "bg-[radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.15),transparent_60%)]"
-                    }`} />
-
-                    <div className="flex items-center justify-between relative z-10">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                          timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
-                        }`} />
-                        <span className={`text-[10px] font-black uppercase tracking-widest font-mono transition-colors duration-500 ${
-                          timeTrackerIsRunning ? "text-[#A7F3D0]" : "text-[#FECACA]"
-                        }`}>Time Tracker</span>
-                      </div>
-                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-colors duration-500 ${
-                        timeTrackerIsRunning ? "bg-[#065F46] text-emerald-200" : "bg-[#991B1B] text-rose-200"
-                      }`}>
-                        {timeTrackerIsRunning ? "Active" : "Paused"}
-                      </span>
-                    </div>
-
-                    <div className="text-center py-2 relative z-10">
-                      <span className="text-4xl font-black font-mono tracking-tight leading-none text-white block">
-                        {formatTimeTracker(timeTrackerSeconds)}
-                      </span>
-                      <span className={`text-[9px] font-semibold mt-1.5 block uppercase tracking-wider transition-colors duration-500 ${
-                        timeTrackerIsRunning ? "text-[#A7F3D0]/60" : "text-[#FECACA]/60"
-                      }`}>
-                        {timeTrackerIsRunning ? "Active Study Session duration" : "Paused Study Session duration"}
-                      </span>
-                    </div>
-
-                    <div className={`flex justify-center gap-4 relative z-10 pt-4 border-t transition-colors duration-500 ${
-                      timeTrackerIsRunning ? "border-[#092B1D]/80" : "border-[#3D0F0F]/80"
-                    }`}>
-
-                      {/* Play Button */}
-                      <button
-                        onClick={() => setTimeTrackerIsRunning(true)}
-                        disabled={timeTrackerIsRunning}
-                        title="Start Study"
-                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          timeTrackerIsRunning
-                            ? "bg-[#061E14] text-emerald-800/40 border border-[#082419] cursor-not-allowed"
-                            : "bg-emerald-600 hover:bg-emerald-500 text-white"
-                        }`}
-                        type="button"
-                      >
-                        <Play className="w-5 h-5 fill-current" />
-                      </button>
-
-                      {/* Pause Button */}
-                      <button
-                        onClick={() => setTimeTrackerIsRunning(false)}
-                        disabled={!timeTrackerIsRunning}
-                        title="Pause Session"
-                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          !timeTrackerIsRunning
-                            ? "bg-[#2D1212] text-rose-900/30 border border-[#3D1414] cursor-not-allowed"
-                            : "bg-rose-800 hover:bg-rose-700 text-white"
-                        }`}
-                        type="button"
-                      >
-                        <Pause className="w-5 h-5" />
-                      </button>
-
-                      {/* Reset Button */}
-                      <button
-                        onClick={() => {
-                          setTimeTrackerIsRunning(false);
-                          setTimeTrackerSeconds(0);
-                        }}
-                        title="Reset Session"
-                        className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          timeTrackerIsRunning
-                            ? "bg-[#092B1D] hover:bg-[#061E14] text-[#A7F3D0] border border-[#082419]"
-                            : "bg-[#3D1414] hover:bg-[#2D1010] text-[#FECACA] border border-[#4A1818]"
-                        }`}
-                        type="button"
-                      >
-                        <RotateCcw className="w-5 h-5" />
-                      </button>
-
-                    </div>
-                  </div>
 
                 </div>
 
@@ -4996,6 +4863,126 @@ export default function StudentDashboard() {
           </div>
         )}
       </motion.div>
+
+      {/* Premium Notification Center Modal */}
+      <AnimatePresence>
+        {showNotifications && (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+            {/* Backdrop blur overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setShowNotifications(false)}
+              className="absolute inset-0 bg-slate-950/40 dark:bg-black/60 backdrop-blur-md cursor-pointer"
+            />
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-[95%] md:w-[80%] sm:max-w-[600px] h-[500px] bg-white/70 dark:bg-[#070b13]/85 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-[20px] shadow-2xl overflow-hidden flex flex-col text-left z-10"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-slate-200/40 dark:border-slate-900/60 flex items-center justify-between shrink-0">
+                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white font-heading">
+                  Notifications
+                </h3>
+                <div className="flex items-center gap-4">
+                  {notifications.some(n => !n.read) && (
+                    <button
+                      onClick={() => {
+                        setNotifications(notifications.map(n => ({ ...n, read: true })));
+                      }}
+                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer border-0 bg-transparent p-0 transition-colors"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowNotifications(false)}
+                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full text-slate-400 hover:text-slate-655 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Notification List */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4">
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center space-y-2 opacity-50">
+                    <Bell className="w-8 h-8 text-slate-400" />
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">No notifications yet.</p>
+                  </div>
+                ) : (
+                  notifications.map((n) => {
+                    let emoji = '🔔';
+                    if (n.title.includes('Milestone') || n.title.includes('🎓')) {
+                      emoji = '🎓';
+                    } else if (n.title.includes('Badge') || n.title.includes('🎖️')) {
+                      emoji = '🏆';
+                    } else if (n.title.includes('Streak') || n.title.includes('🔥')) {
+                      emoji = '🔥';
+                    } else if (n.title.includes('Performance') || n.title.includes('📊') || n.title.includes('Growth') || n.title.includes('📈')) {
+                      emoji = '📈';
+                    } else if (n.title.includes('Goal') || n.title.includes('🎯')) {
+                      emoji = '🎯';
+                    } else if (n.title.includes('Topic') || n.title.includes('📚')) {
+                      emoji = '📚';
+                    } else if (n.title.includes('Achievement') || n.title.includes('⭐')) {
+                      emoji = '⭐';
+                    }
+                    
+                    const cleanTitle = n.title.replace(/[🎓🎖️📊🏆🔥📈🎯📚⭐]/g, '').trim();
+
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => {
+                          setNotifications(notifications.map(item => item.id === n.id ? { ...item, read: true } : item));
+                        }}
+                        className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer flex items-start gap-4 relative hover:-translate-y-0.5 ${
+                          !n.read 
+                            ? 'bg-blue-500/5 border-blue-500/25 dark:bg-blue-500/10 dark:border-blue-900/40 hover:border-blue-500/40 dark:hover:border-blue-500/40 hover:shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
+                            : 'bg-slate-50/50 dark:bg-slate-900/10 border-slate-150 dark:border-slate-900/60 hover:bg-slate-100/50 dark:hover:bg-slate-900/30 hover:border-slate-355 dark:hover:border-slate-700 hover:shadow-[0_0_15px_rgba(255,255,255,0.03)]'
+                        }`}
+                      >
+                        {!n.read && (
+                          <span className="absolute top-4 right-4 w-2 h-2 bg-blue-600 dark:bg-blue-500 rounded-full" />
+                        )}
+
+                        {/* Icon Container */}
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center text-lg shrink-0 border border-slate-200/50 dark:border-white/5 shadow-inner">
+                          {emoji}
+                        </div>
+
+                        {/* Text Content */}
+                        <div className="flex-1 min-w-0 space-y-1 text-left pr-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                              {cleanTitle}
+                            </h4>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider shrink-0">
+                              {n.time}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
+                            {n.message}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

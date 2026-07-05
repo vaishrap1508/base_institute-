@@ -1754,15 +1754,26 @@ export default function LandingPage() {
           {/* Theme Toggle Button (Icon-Only Circular Button) */}
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none relative overflow-hidden"
             title="Toggle theme"
             suppressHydrationWarning
           >
-            {mounted && theme === 'light' ? (
-              <Sun className="w-[18px] h-[18px] text-amber-400 animate-fadeIn" />
-            ) : (
-              <Moon className="w-[18px] h-[18px] text-indigo-400 animate-fadeIn" />
-            )}
+            <span className="relative w-full h-full flex items-center justify-center">
+              <Sun
+                className={`absolute transition-all duration-500 ease-in-out ${
+                  mounted && theme === 'light'
+                    ? 'opacity-100 rotate-0 scale-100'
+                    : 'opacity-0 -rotate-90 scale-50'
+                } w-[18px] h-[18px] text-amber-400`}
+              />
+              <Moon
+                className={`absolute transition-all duration-500 ease-in-out ${
+                  mounted && theme === 'dark'
+                    ? 'opacity-100 rotate-0 scale-100'
+                    : 'opacity-0 rotate-90 scale-50'
+                } w-[18px] h-[18px] text-indigo-400`}
+              />
+            </span>
           </button>
 
           <Link
