@@ -38,6 +38,16 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const pageVariants = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+};
+
+const pageTransition = {
+  duration: 0.85,
+  ease: "easeInOut" as const
+};
+
 const domainTopicsData: Record<string, Array<{ id: string; title: string; category: string; desc: string; isLocked?: boolean }>> = {
   quant: [
     { id: 'num_sys', title: 'Number Systems', category: 'Arithmetic', desc: 'Integers, HCF & LCM, Prime factors' },
@@ -428,7 +438,13 @@ function StudyPlannerContent() {
       </aside>
 
       {/* 2. Main Space Frame */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+      <motion.div 
+        initial="initial"
+        animate="animate"
+        variants={pageVariants}
+        transition={pageTransition}
+        className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10"
+      >
         
         {/* Top Header Navigation Tabs */}
         <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-6 md:px-8 flex items-center bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
@@ -1260,7 +1276,7 @@ function StudyPlannerContent() {
           )}
         </AnimatePresence>
         </main>
-      </div>
+      </motion.div>
 
       {/* Toast feedback */}
       <AnimatePresence>
