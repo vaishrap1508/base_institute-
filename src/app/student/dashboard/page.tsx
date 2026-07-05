@@ -2964,6 +2964,8 @@ export default function StudentDashboard() {
                   <>Achievements & Credentials 🏅</>
                 ) : activeSidebarTab === 'profile' ? (
                   <>Student Credentials ⚙️</>
+                ) : activeSidebarTab === 'library' ? (
+                  <>Bookmarks & Notes Library 📁</>
                 ) : (
                   <>Settings Hub ⚙️</>
                 )}
@@ -2985,6 +2987,8 @@ export default function StudentDashboard() {
                   'Celebrate preparation milestones and dynamic digital badges.'
                 ) : activeSidebarTab === 'profile' ? (
                   'Review onboarding selections and active prep goals.'
+                ) : activeSidebarTab === 'library' ? (
+                  ''
                 ) : (
                   'Configure advanced dashboard properties, themes, and animations.'
                 )}
@@ -4451,15 +4455,7 @@ export default function StudentDashboard() {
               className="w-full h-[calc(100vh-140px)] select-none text-left flex flex-col space-y-6"
             >
               {/* Header section */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5 shrink-0">
-                <div>
-                  <h2 className="text-xl font-black text-slate-905 dark:text-white uppercase tracking-tight flex items-center gap-2">
-                    <BookMarked className="w-5.5 h-5.5 text-[var(--clr-primary)]" /> Bookmark & Notes Library
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1">
-                    Store formulas, core syllogism maps, bookmarks, and edit custom text guides.
-                  </p>
-                </div>
+              <div className="flex justify-end gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5 shrink-0">
                 <button
                   onClick={() => {
                     const newId = `note-${Date.now()}`;
