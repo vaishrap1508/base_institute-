@@ -4455,7 +4455,7 @@ export default function StudentDashboard() {
               className="w-full h-[calc(100vh-140px)] select-none text-left flex flex-col space-y-6"
             >
               {/* Header section */}
-              <div className="flex justify-end gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5 shrink-0">
+              <div className="flex justify-start gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5 shrink-0">
                 <button
                   onClick={() => {
                     const newId = `note-${Date.now()}`;
