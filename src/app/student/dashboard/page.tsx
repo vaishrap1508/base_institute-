@@ -1237,14 +1237,14 @@ const CanvasCelebration = ({ confettiStyle }: { confettiStyle: 'confetti' | 'fir
 };
 
 const tabVariants = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 10 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
+  exit: { opacity: 0, y: -10 },
 };
 
 const tabTransition = {
-  duration: 0.5,
-  ease: [0.34, 1.56, 0.64, 1] as const,
+  duration: 0.85,
+  ease: "easeInOut" as const
 };
 
 const podiumContainerVariants = {
