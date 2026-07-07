@@ -67,6 +67,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
+import { LeaderboardView } from '@/components/student/LeaderboardView';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import PlacementProfile from '@/components/PlacementProfile';
 import DomainsTab from '@/components/DomainsTab';
@@ -1389,6 +1390,18 @@ export default function StudentDashboard() {
     { id: 2, title: 'New Badge Earned! 🎖️', message: "Prestige Badge 'Solving Streak' has been added to your credentials.", time: '1 day ago', read: false },
     { id: 3, title: 'Weekly Performance Sync 📊', message: 'Your curriculum readiness index improved by +5.4%.', time: '3 days ago', read: true }
   ]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showNotifications]);
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges' | 'library'>('dashboard');
@@ -2944,7 +2957,7 @@ export default function StudentDashboard() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-30">
 
         {/* Top Header (Reference 2 style) */}
-        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
+        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none relative z-50">
           <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
             <div className="flex flex-col items-start text-left">
               <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
@@ -2973,6 +2986,9 @@ export default function StudentDashboard() {
             </div>
 
             <div className="flex items-center gap-5">
+
+              {/* User profile popup menu trigger */}
+              {/* User role badge */}
 
               {/* Daily Streak Badge */}
               {activeSidebarTab === 'domains' && (
@@ -3052,58 +3068,6 @@ export default function StudentDashboard() {
                       <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-950" />
                     )}
                   </button>
-
-                  <AnimatePresence>
-                    {showNotifications && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-left"
-                      >
-                        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                          <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">Notifications</span>
-                          {notifications.some(n => !n.read) && (
-                            <button
-                              onClick={() => {
-                                setNotifications(notifications.map(n => ({ ...n, read: true })));
-                              }}
-                              className="text-[9px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer border-0 bg-transparent p-0"
-                            >
-                              Mark all as read
-                            </button>
-                          )}
-                        </div>
-                        <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
-                          {notifications.length === 0 ? (
-                            <div className="p-6 text-center text-slate-400 dark:text-slate-500 text-[10px] font-medium">
-                              No notifications yet.
-                            </div>
-                          ) : (
-                            notifications.map((n) => (
-                              <div
-                                key={n.id}
-                                onClick={() => {
-                                  setNotifications(notifications.map(item => item.id === n.id ? { ...item, read: true } : item));
-                                }}
-                                className={`p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer text-left relative ${!n.read ? 'bg-blue-50/20 dark:bg-blue-950/10' : ''}`}
-                              >
-                                {!n.read && (
-                                  <span className="absolute top-4.5 left-2.5 w-1.5 h-1.5 bg-blue-600 dark:bg-blue-500 rounded-full" />
-                                )}
-                                <div className="pl-3.5 space-y-1">
-                                  <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 leading-tight">{n.title}</h4>
-                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal font-medium">{n.message}</p>
-                                  <span className="text-[8px] text-slate-450 dark:text-slate-500 font-semibold block">{n.time}</span>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
 
                 <button
@@ -3383,7 +3347,7 @@ export default function StudentDashboard() {
                 <div className="lg:col-span-4 space-y-8">
 
                   {/* 1. Activity Calendar Card */}
-                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-7 shadow-xs text-left">
+                  <div id="activity-calendar-container" className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-7 shadow-xs text-left">
                     <div className="flex items-center justify-between mb-4 pb-1 border-b border-slate-100 dark:border-slate-900/60">
                       <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Activity Calendar</h3>
                       <span className="text-xs font-bold text-slate-500">{monthYearName}</span>
@@ -3484,6 +3448,7 @@ export default function StudentDashboard() {
 
                     </div>
                   </div>
+
 
                 </div>
 
@@ -5021,385 +4986,7 @@ export default function StudentDashboard() {
               transition={tabTransition}
               className="w-full text-left"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                {/* Left Columns (8 of 12) - Main Podium & Rankings List */}
-                <div className="lg:col-span-8 space-y-6">
-                  
-                  {/* Period Sub-tabs Selector */}
-                  <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900 w-fit">
-                    {(['weekly', 'monthly', 'global'] as const).map((period) => (
-                      <button
-                        key={period}
-                        onClick={() => setActiveLeaderboardPeriod(period)}
-                        className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${
-                          activeLeaderboardPeriod === period
-                            ? isCustomActive
-                              ? 'bg-[var(--clr-primary)] text-white shadow-md shadow-[var(--clr-primary)]/10'
-                              : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/10'
-                            : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                      >
-                        {period}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Podium Section (Rank 2, 1, 3) */}
-                  <motion.div 
-                    variants={podiumContainerVariants}
-                    initial="initial"
-                    animate="animate"
-                    className="grid grid-cols-3 gap-4 items-end pt-6"
-                  >
-                    
-                    {/* Rank 2 */}
-                    <motion.div 
-                      variants={podiumCardVariants}
-                      className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-4 text-center flex flex-col items-center relative shadow-xs min-h-[220px] hover:-translate-y-1 hover:shadow-md transition-all duration-300 group/podium2"
-                    >
-                      <span className="absolute -top-3.5 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-slate-900 dark:text-slate-400 border border-slate-200 dark:border-slate-850 font-mono">
-                        Rank 2
-                      </span>
-                      <div className="relative w-16 h-16 rounded-full border-2 border-slate-350 dark:border-slate-700 p-0.5 mt-2 transition-transform duration-300 group-hover/podium2:scale-105">
-                        <img
-                           src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].avatarSeed}`}
-                          alt={LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].name}
-                          className="w-full h-full rounded-full object-cover bg-slate-50 dark:bg-slate-950"
-                        />
-                      </div>
-                      <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-3 truncate w-full">
-                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].name}
-                      </span>
-                      <span className="text-[11px] font-black text-emerald-500 font-mono mt-0.5">
-                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].xp} XP
-                      </span>
-                      <div className="grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t border-slate-105 dark:border-slate-900/60 text-[10px]">
-                        <div>
-                          <div className="text-slate-400 dark:text-slate-505 font-bold uppercase text-[8px]">ACC.</div>
-                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].accuracy}</div>
-                        </div>
-                        <div>
-                          <div className="text-slate-400 dark:text-slate-505 font-bold uppercase text-[8px]">STREAK</div>
-                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[1].streak}</div>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Rank 1 - Center Elevated & Glowing */}
-                    <motion.div 
-                      variants={podiumCardVariants}
-                      className={`bg-white dark:bg-slate-900/60 rounded-3xl p-5 text-center flex flex-col items-center relative shadow-lg min-h-[250px] scale-[1.05] z-10 hover:-translate-y-1.5 transition-all duration-300 group/podium1 ${
-                        isCustomActive
-                          ? 'border border-[var(--clr-primary)]/40 shadow-[var(--clr-primary)]/5 dark:shadow-[var(--clr-primary)]/30'
-                          : 'border border-purple-200 dark:border-purple-900/40 shadow-purple-500/5 dark:shadow-purple-950/30'
-                      }`}
-                    >
-                      {/* Floating sparkles graphics */}
-                      <div className="absolute top-2.5 left-2.5 text-xs opacity-50 select-none animate-pulse">✨</div>
-                      <div className="absolute top-4 right-3 text-[9px] opacity-40 select-none animate-bounce delay-100">⭐</div>
-                      <div className="absolute bottom-6 left-3 text-[9px] opacity-40 select-none animate-bounce">⭐</div>
-                      <div className="absolute bottom-3 right-4.5 text-xs opacity-50 select-none animate-pulse">✨</div>
-                      
-                      {/* Purple background glow */}
-                      <div className={`absolute -inset-1 rounded-[28px] opacity-[0.06] blur-xl group-hover/podium1:opacity-15 transition duration-500 pointer-events-none ${
-                        isCustomActive
-                          ? 'bg-[var(--clr-primary)]'
-                          : 'bg-gradient-to-tr from-purple-600 via-indigo-650 to-pink-500'
-                      }`} />
-
-                      <span className={`absolute -top-3.5 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider font-mono ${
-                        isCustomActive
-                          ? 'bg-[var(--clr-primary)] text-white border border-[var(--clr-primary)]/20 shadow-[0_0_12px_rgba(var(--clr-primary-rgb),0.3)]'
-                          : 'bg-gradient-to-r from-purple-600 via-pink-550 to-indigo-600 text-white border border-purple-400/20 shadow-[0_0_12px_rgba(147,51,234,0.3)]'
-                      }`}>
-                        Rank 1
-                      </span>
-                      
-                      <div className="relative mt-2">
-                        {/* Rotating dynamic color halo */}
-                        <span className={`absolute -inset-1.5 rounded-full animate-[spin_8s_linear_infinite] opacity-65 blur-xs group-hover/podium1:opacity-85 ${
-                          isCustomActive
-                            ? 'bg-[var(--clr-primary)]'
-                            : 'bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600'
-                        }`} />
-                        <div className={`relative w-20 h-20 rounded-full p-0.5 bg-slate-900 dark:bg-slate-950 overflow-hidden ${
-                          isCustomActive
-                            ? 'border-2 border-[var(--clr-primary)]'
-                            : 'border-2 border-purple-400 dark:border-purple-450'
-                        }`}>
-                          <img
-                            src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].avatarSeed}`}
-                            alt={LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].name}
-                            className="w-full h-full rounded-full object-cover bg-slate-50 dark:bg-slate-950"
-                          />
-                        </div>
-                      </div>
-
-                      <span className="text-xs sm:text-base font-black text-slate-900 dark:text-white mt-3 truncate w-full">
-                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].name}
-                      </span>
-                      <span className={`text-xs sm:text-sm font-black font-mono mt-0.5 ${
-                        isCustomActive
-                          ? 'text-[var(--clr-primary)]'
-                          : 'text-purple-650 dark:text-purple-400'
-                      }`}>
-                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].xp} XP
-                      </span>
-                      <div className={`grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t text-[10px] ${
-                        isCustomActive
-                          ? 'border-[var(--clr-primary)]/20'
-                          : 'border-purple-100 dark:border-purple-950/30'
-                      }`}>
-                        <div>
-                          <div className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[8px]">ACC.</div>
-                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].accuracy}</div>
-                        </div>
-                        <div>
-                          <div className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[8px]">STREAK</div>
-                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[0].streak}</div>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Rank 3 */}
-                    <motion.div 
-                      variants={podiumCardVariants}
-                      className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-4 text-center flex flex-col items-center relative shadow-xs min-h-[220px] hover:-translate-y-1 hover:shadow-md transition-all duration-300 group/podium3"
-                    >
-                      <span className="absolute -top-3.5 px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-orange-50 text-orange-850 dark:bg-orange-950/20 dark:text-orange-400 border border-orange-200/50 dark:border-orange-900/30 font-mono">
-                        Rank 3
-                      </span>
-                      <div className="relative w-16 h-16 rounded-full border-2 border-orange-350 dark:border-orange-800/50 p-0.5 mt-2 transition-transform duration-300 group-hover/podium3:scale-105">
-                        <img
-                          src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].avatarSeed}`}
-                          alt={LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].name}
-                          className="w-full h-full rounded-full object-cover bg-slate-50 dark:bg-slate-950"
-                        />
-                      </div>
-                      <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-white mt-3 truncate w-full">
-                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].name}
-                      </span>
-                      <span className="text-[11px] font-black text-orange-650 dark:text-orange-400 font-mono mt-0.5">
-                        {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].xp} XP
-                      </span>
-                      <div className="grid grid-cols-2 gap-2 w-full mt-4 pt-3 border-t border-slate-105 dark:border-slate-900/60 text-[10px]">
-                        <div>
-                          <div className="text-slate-400 dark:text-slate-505 font-bold uppercase text-[8px]">ACC.</div>
-                          <div className="font-extrabold text-slate-805 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].accuracy}</div>
-                        </div>
-                        <div>
-                          <div className="text-slate-400 dark:text-slate-505 font-bold uppercase text-[8px]">STREAK</div>
-                          <div className="font-extrabold text-slate-800 dark:text-slate-200">{LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].podium[2].streak}</div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-
-                  {/* Rankings Table */}
-                  <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 shadow-xs overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse text-left min-w-[500px]">
-                        <thead>
-                          <tr className="border-b border-slate-100 dark:border-slate-900/60 text-[10px] text-slate-450 dark:text-slate-500 uppercase font-black font-mono">
-                            <th className="py-3.5 px-4 w-20">Rank</th>
-                            <th className="py-3.5 px-4">Name</th>
-                            <th className="py-3.5 px-4 text-center">XP Score</th>
-                            <th className="py-3.5 px-4 text-center">Accuracy</th>
-                            <th className="py-3.5 px-4 text-center">Streak</th>
-                          </tr>
-                        </thead>
-                        <motion.tbody 
-                          variants={tableContainerVariants}
-                          initial="initial"
-                          animate="animate"
-                          className="divide-y divide-slate-100/50 dark:divide-slate-900/30 text-xs"
-                        >
-                          {LEADERBOARD_PERIOD_DATA[activeLeaderboardPeriod].list.map((row, idx) => {
-                            if (row.isSelf) {
-                              return (
-                                <motion.tr 
-                                  key={idx} 
-                                  variants={tableRowVariants}
-                                  className={isCustomActive
-                                    ? "bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/25 dark:bg-[var(--clr-primary)]/10 dark:border-[var(--clr-primary)]/30 text-[var(--clr-primary)] font-extrabold relative shadow-inner"
-                                    : "bg-purple-500/5 border border-purple-500/25 dark:bg-purple-950/10 dark:border-purple-900/30 text-purple-900 dark:text-purple-300 font-extrabold relative shadow-inner"
-                                  }
-                                >
-                                  <td className={isCustomActive ? "py-4 px-4 font-mono font-black text-[var(--clr-primary)]" : "py-4 px-4 font-mono font-black text-purple-600 dark:text-purple-400"}>
-                                    {row.rank}
-                                  </td>
-                                  <td className="py-4 px-4 flex items-center gap-3">
-                                    <div className={isCustomActive ? "w-7 h-7 rounded-full bg-[var(--clr-primary)]/10 flex items-center justify-center border border-[var(--clr-primary)]/20 shrink-0 overflow-hidden relative" : "w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/45 flex items-center justify-center border border-purple-200 dark:border-purple-800 shrink-0 overflow-hidden relative"}>
-                                      {profile.avatar && profile.avatar !== 'initial' ? (
-                                        <img src={profile.avatar} alt="You" className="w-full h-full object-cover" />
-                                      ) : (
-                                        <User className={isCustomActive ? "w-4 h-4 text-[var(--clr-primary)]" : "w-4 h-4 text-purple-600 dark:text-purple-400"} />
-                                      )}
-                                      <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-slate-950" />
-                                    </div>
-                                    <span className="font-black text-slate-900 dark:text-white flex items-center gap-2">
-                                      {profile.username}
-                                      <span className={isCustomActive ? "text-[9px] font-black uppercase tracking-wider bg-[var(--clr-primary)] text-white px-2 py-0.5 rounded-full shadow-sm animate-pulse" : "text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-2 py-0.5 rounded-full shadow-sm animate-pulse"}>
-                                        YOU
-                                      </span>
-                                    </span>
-                                  </td>
-                                  <td className={isCustomActive ? "py-4 px-4 text-center font-mono font-black text-[var(--clr-primary)]" : "py-4 px-4 text-center font-mono font-black text-purple-600 dark:text-purple-400"}>
-                                    {animatedXp > 0 ? animatedXp.toLocaleString() : row.xp}
-                                  </td>
-                                  <td className="py-4 px-4 text-center font-mono font-black text-emerald-505">
-                                    {row.accuracy}
-                                  </td>
-                                  <td className={isCustomActive ? "py-4 px-4 text-center font-mono font-black text-[var(--clr-primary)]" : "py-4 px-4 text-center font-mono font-black text-purple-500"}>
-                                    {streak}d
-                                  </td>
-                                </motion.tr>
-                              );
-                            }
-                            
-                            return (
-                              <motion.tr 
-                                key={idx} 
-                                variants={tableRowVariants}
-                                className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors"
-                              >
-                                <td className="py-4 px-4 font-mono font-bold text-slate-450 dark:text-slate-500">
-                                  {row.rank}
-                                </td>
-                                <td className="py-4 px-4 font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-3">
-                                  <div className="w-7 h-7 rounded-full bg-slate-105 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0 overflow-hidden">
-                                    <img
-                                      src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${row.avatarSeed}`}
-                                      alt={row.name}
-                                      className="w-full h-full object-cover bg-slate-50 dark:bg-slate-950"
-                                    />
-                                  </div>
-                                  {row.name}
-                                </td>
-                                <td className="py-4 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-350">
-                                  {row.xp}
-                                </td>
-                                <td className="py-4 px-4 text-center font-mono font-extrabold text-emerald-500">
-                                  {row.accuracy}
-                                </td>
-                                <td className="py-4 px-4 text-center font-mono font-bold text-slate-500">
-                                  {row.streak}
-                                </td>
-                              </motion.tr>
-                            );
-                          })}
-                        </motion.tbody>
-                      </table>
-                    </div>
-
-                    <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-900/60 text-center">
-                      <button className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer tracking-wider">
-                        View More Rankings
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column (4 of 12) - Sidebar statistics */}
-                <motion.div 
-                  variants={rightSidebarVariants}
-                  initial="initial"
-                  animate="animate"
-                  className="lg:col-span-4 space-y-6"
-                >
-                  
-                  {/* Tier promotion Card */}
-                  <motion.div 
-                    variants={rightCardVariants}
-                    className={`border rounded-3xl p-5 shadow-xs text-left relative overflow-hidden space-y-4 group/promocard ${
-                      isCustomActive
-                        ? 'bg-gradient-to-br from-[var(--clr-primary)]/20 via-slate-950/90 to-slate-950 border-[var(--clr-primary)]/30'
-                        : 'bg-gradient-to-br from-indigo-950/70 via-purple-950/50 to-slate-950 border border-indigo-900/50'
-                    }`}
-                  >
-                    {/* Glowing effect behind promotion card */}
-                    <div className={`absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-xl pointer-events-none group-hover/promocard:scale-110 transition-transform ${
-                      isCustomActive
-                        ? 'bg-[var(--clr-primary)]/20'
-                        : 'bg-purple-500/15'
-                    }`} />
-                    
-                    <div className={`absolute right-4 top-4 w-7 h-7 rounded-lg flex items-center justify-center text-xs group-hover/promocard:rotate-12 transition-transform duration-300 ${
-                      isCustomActive
-                        ? 'bg-[var(--clr-primary)]/10 border border-[var(--clr-primary)]/30'
-                        : 'bg-indigo-500/15 border border-indigo-500/35'
-                    }`}>
-                      🏆
-                    </div>
-                    
-                    <div className="space-y-1.5 max-w-[85%]">
-                      <h4 className="text-sm font-black text-white uppercase tracking-tight">
-                        Keep it up, {profile.username.split(' ')[0]}!
-                      </h4>
-                      <p className={`text-[10px] leading-relaxed font-semibold ${
-                        isCustomActive
-                          ? 'text-slate-300'
-                          : 'text-indigo-205'
-                      }`}>
-                        You're in the <span className="text-white font-black">top 5%</span> this week! 1,200 more XP to reach the next tier.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => alert("Keep leveling up to advance tier standing!")}
-                      className={`w-full py-2.5 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer text-center active:scale-98 ${
-                        isCustomActive
-                          ? 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)]'
-                          : 'bg-gradient-to-r from-purple-600 to-indigo-600'
-                      }`}
-                    >
-                      View Progress Detail
-                    </button>
-                  </motion.div>
-
-                  {/* Friends Activity Card */}
-                  <motion.div 
-                    variants={rightCardVariants}
-                    className="bg-white/80 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-3xl p-5 shadow-xs space-y-4 text-left"
-                  >
-                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 font-mono block">
-                      Friends Activity
-                    </span>
-                    
-                    <div className="space-y-4 mt-3">
-                      {/* Friend 1 */}
-                      <div className="flex gap-3 text-left group/friend1">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center font-mono font-black text-[9px] text-slate-655 dark:text-slate-350 shrink-0 relative">
-                          ST
-                          <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-slate-950 animate-pulse" />
-                        </div>
-                        <div className="space-y-0.5">
-                          <p className="text-[11px] text-slate-700 dark:text-slate-300 font-semibold leading-snug">
-                            <span className="font-extrabold text-slate-900 dark:text-white transition-colors duration-250 group-hover/friend1:text-blue-500">S. Taylor</span> just climbed 5 spots
-                          </p>
-                          <span className="text-[9px] text-slate-405 font-medium block">2 mins ago</span>
-                        </div>
-                      </div>
-
-                      {/* Friend 2 */}
-                      <div className="flex gap-3 text-left group/friend2">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center font-mono font-black text-[9px] text-slate-655 dark:text-slate-350 shrink-0 relative">
-                          JW
-                          <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-slate-950" />
-                        </div>
-                        <div className="space-y-0.5">
-                          <p className="text-[11px] text-slate-700 dark:text-slate-300 font-semibold leading-snug">
-                            <span className="font-extrabold text-slate-900 dark:text-white transition-colors duration-250 group-hover/friend2:text-purple-500">J. Wu</span> earned 500 XP in <span className="font-extrabold text-slate-900 dark:text-white">'Logic'</span>
-                          </p>
-                          <span className="text-[9px] text-slate-405 font-medium block">1 hour ago</span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                  
-                </motion.div>
-              </div>
+              <LeaderboardView />
             </motion.div>
           )}
 
@@ -6387,6 +5974,126 @@ export default function StudentDashboard() {
             <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
             <span className="text-xs font-black uppercase tracking-wider">{toastMsg}</span>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Premium Notification Center Modal */}
+      <AnimatePresence>
+        {showNotifications && (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+            {/* Backdrop blur overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setShowNotifications(false)}
+              className="absolute inset-0 bg-slate-950/40 dark:bg-black/60 backdrop-blur-md cursor-pointer"
+            />
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-[95%] md:w-[80%] sm:max-w-[600px] h-[500px] bg-white/70 dark:bg-[#070b13]/85 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-[20px] shadow-2xl overflow-hidden flex flex-col text-left z-10"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-slate-200/40 dark:border-slate-900/60 flex items-center justify-between shrink-0">
+                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white font-heading">
+                  Notifications
+                </h3>
+                <div className="flex items-center gap-4">
+                  {notifications.some(n => !n.read) && (
+                    <button
+                      onClick={() => {
+                        setNotifications(notifications.map(n => ({ ...n, read: true })));
+                      }}
+                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer border-0 bg-transparent p-0 transition-colors"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowNotifications(false)}
+                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full text-slate-400 hover:text-slate-655 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Notification List */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4">
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center space-y-2 opacity-50">
+                    <Bell className="w-8 h-8 text-slate-400" />
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">No notifications yet.</p>
+                  </div>
+                ) : (
+                  notifications.map((n) => {
+                    let emoji = '🔔';
+                    if (n.title.includes('Milestone') || n.title.includes('🎓')) {
+                      emoji = '🎓';
+                    } else if (n.title.includes('Badge') || n.title.includes('🎖️')) {
+                      emoji = '🏆';
+                    } else if (n.title.includes('Streak') || n.title.includes('🔥')) {
+                      emoji = '🔥';
+                    } else if (n.title.includes('Performance') || n.title.includes('📊') || n.title.includes('Growth') || n.title.includes('📈')) {
+                      emoji = '📈';
+                    } else if (n.title.includes('Goal') || n.title.includes('🎯')) {
+                      emoji = '🎯';
+                    } else if (n.title.includes('Topic') || n.title.includes('📚')) {
+                      emoji = '📚';
+                    } else if (n.title.includes('Achievement') || n.title.includes('⭐')) {
+                      emoji = '⭐';
+                    }
+                    
+                    const cleanTitle = n.title.replace(/[🎓🎖️📊🏆🔥📈🎯📚⭐]/g, '').trim();
+
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => {
+                          setNotifications(notifications.map(item => item.id === n.id ? { ...item, read: true } : item));
+                        }}
+                        className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer flex items-start gap-4 relative hover:-translate-y-0.5 ${
+                          !n.read 
+                            ? 'bg-blue-500/5 border-blue-500/25 dark:bg-blue-500/10 dark:border-blue-900/40 hover:border-blue-500/40 dark:hover:border-blue-500/40 hover:shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
+                            : 'bg-slate-50/50 dark:bg-slate-900/10 border-slate-150 dark:border-slate-900/60 hover:bg-slate-100/50 dark:hover:bg-slate-900/30 hover:border-slate-355 dark:hover:border-slate-750 hover:shadow-[0_0_15px_rgba(255,255,255,0.03)]'
+                        }`}
+                      >
+                        {!n.read && (
+                          <span className="absolute top-4 right-4 w-2 h-2 bg-blue-600 dark:bg-blue-500 rounded-full" />
+                        )}
+
+                        {/* Icon Container */}
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center text-lg shrink-0 border border-slate-200/50 dark:border-white/5 shadow-inner">
+                          {emoji}
+                        </div>
+
+                        {/* Text Content */}
+                        <div className="flex-1 min-w-0 space-y-1 text-left pr-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                              {cleanTitle}
+                            </h4>
+                            <span className="text-[10px] text-slate-405 dark:text-slate-500 font-bold uppercase tracking-wider shrink-0">
+                              {n.time}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-505 dark:text-slate-400 leading-relaxed font-semibold">
+                            {n.message}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
