@@ -3590,7 +3590,7 @@ export default function StudentDashboard() {
                   { id: 'quant', label: 'Quantitative', icon: '📐' },
                   { id: 'logical', label: 'Logical Reasoning', icon: '🧩' },
                   { id: 'verbal', label: 'Verbal Ability', icon: '📚' },
-                  { id: 'coding', label: 'Coding & CS', icon: '💻' }
+                  { id: 'coding', label: 'Gaming Aptitude', icon: '🎮' }
                 ].map((tab) => (
                   <motion.button
                     key={tab.id}
