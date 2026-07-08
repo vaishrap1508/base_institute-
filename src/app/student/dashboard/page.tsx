@@ -69,6 +69,7 @@ import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { LeaderboardView } from '@/components/student/LeaderboardView';
 import { DailyMotivation } from '@/components/student/DailyMotivation';
+import { DailyPerformanceHub } from '@/components/student/DailyPerformanceHub';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import PlacementProfile from '@/components/PlacementProfile';
 import DomainsTab from '@/components/DomainsTab';
@@ -3452,6 +3453,9 @@ export default function StudentDashboard() {
 
                     </div>
                   </div>
+
+                  {/* 2. Daily Performance Hub */}
+                  <DailyPerformanceHub isCustomActive={isCustomActive} />
 
 
                 </div>
