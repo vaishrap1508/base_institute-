@@ -68,6 +68,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { LeaderboardView } from '@/components/student/LeaderboardView';
+import { DailyMotivation } from '@/components/student/DailyMotivation';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
 import PlacementProfile from '@/components/PlacementProfile';
 import DomainsTab from '@/components/DomainsTab';
@@ -3091,7 +3092,7 @@ export default function StudentDashboard() {
           </div>
         </header>
 
-        <div ref={scrollablePanelRef} className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${
+        <div ref={scrollablePanelRef} className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-start ${
           layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
         }`}>
 
@@ -3108,7 +3109,7 @@ export default function StudentDashboard() {
                 animate="animate"
                 exit="exit"
                 transition={tabTransition}
-                className="w-full max-w-7xl mx-auto space-y-8 text-slate-800 dark:text-slate-200"
+                className="w-full max-w-7xl mx-auto space-y-6 text-slate-800 dark:text-slate-200"
               >
 
               {/* Admin Banner Alert */}
@@ -3116,7 +3117,7 @@ export default function StudentDashboard() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-blue-50/80 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40 text-blue-800 dark:text-blue-400 animate-fadeIn shadow-xs select-none">
                   <div className="flex items-center gap-3">
                     <span className="p-2 rounded-lg bg-blue-600 text-white shadow-xs">
-                      <SettingsIcon className="w-4 h-4 animate-pulse" />
+                      <SettingsIcon className="w-4 h-4" />
                     </span>
                     <div className="text-left">
                       <h4 className="text-xs font-black uppercase tracking-wider leading-none">Editor Mode Activated</h4>
@@ -3136,10 +3137,10 @@ export default function StudentDashboard() {
               )}
 
               {/* Main 12-Column Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
                 {/* Left Column (8 cols): Activities & Progress */}
-                <div className="lg:col-span-8 space-y-8">
+                <div className="lg:col-span-8 space-y-6">
 
                   {/* "Your activities today" Section (Reference 2 style) */}
                   <div className="space-y-4">
@@ -3150,7 +3151,7 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Horizontal/Grid Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                       {/* Card 1: Quantitative Aptitude */}
                       <div className={isCustomActive
@@ -3339,12 +3340,15 @@ export default function StudentDashboard() {
                       </button>
                     </div>
 
+                    {/* Saleem Sir's Daily Motivation card */}
+                    <DailyMotivation setToastMsg={setToastMsg} />
+
                   </div>
 
                 </div>
 
                 {/* Right Column (4 cols): Activity Calendar, Opportunities & Time Tracker */}
-                <div className="lg:col-span-4 space-y-8">
+                <div className="lg:col-span-4 space-y-6">
 
                   {/* 1. Activity Calendar Card */}
                   <div id="activity-calendar-container" className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-7 shadow-xs text-left">
@@ -3558,7 +3562,7 @@ export default function StudentDashboard() {
                 {/* XP Counter Card */}
                 <div className="p-4 flex items-center gap-4 justify-center">
                   <div className="w-11 h-11 rounded-xl bg-amber-500/10 dark:bg-amber-400/5 flex items-center justify-center shrink-0 border border-amber-500/20">
-                    <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />
+                    <Sparkles className="w-5 h-5 text-amber-500" />
                   </div>
                   <div>
                     <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Total Experience</span>
@@ -5289,7 +5293,7 @@ export default function StudentDashboard() {
                       <div className="space-y-2 text-[10.5px] font-medium text-slate-500 mt-3.5">
                         <div className="flex justify-between border-b border-slate-100 dark:border-slate-950 pb-2">
                           <span>Host Connection Status</span>
-                          <span className="text-emerald-500 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Operational</span>
+                          <span className="text-emerald-500 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Operational</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 dark:border-slate-950 pb-2">
                           <span>SSL Sandbox Crypt</span>
@@ -5895,7 +5899,7 @@ export default function StudentDashboard() {
           >
             <Clock className="w-5 h-5 text-white" />
             <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full border border-slate-900 dark:border-slate-950 ${
-              timeTrackerIsRunning ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+              timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
             }`} />
           </button>
         ) : (
@@ -5908,7 +5912,7 @@ export default function StudentDashboard() {
 
             {/* Status Dot */}
             <span className={`w-2 h-2 rounded-full ${
-              timeTrackerIsRunning ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+              timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
             }`} />
 
             {/* Time Readout */}
