@@ -434,8 +434,8 @@ const DOMAINS_CONCEPTS: DomainData[] = [
   },
   {
     id: 'coding',
-    name: 'Coding & DSA',
-    icon: '💻',
+    name: 'Gaming Aptitude',
+    icon: '🎮',
     color: 'var(--clr-primary)',
     bgGlow: 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]',
     btnColor: 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]',

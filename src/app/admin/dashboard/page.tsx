@@ -403,7 +403,7 @@ export default function DashboardPage() {
                       {/* Topic 4 */}
                       <div className="space-y-1.5">
                         <div className="flex justify-between text-xs font-bold">
-                          <span className="text-slate-300">Coding & DSA</span>
+                          <span className="text-slate-300">Gaming Aptitude</span>
                           <span className="text-slate-400 font-black">31%</span>
                         </div>
                         <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
