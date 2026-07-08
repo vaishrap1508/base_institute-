@@ -217,7 +217,7 @@ function StudyPlannerContent() {
         setSelectedTopics(['percentages', 'logical_series', 'data_interpretation']);
       } else if (domainParam === 'coding') {
         setSelectedPack('custom');
-        setPreparingFor('Coding & DSA');
+        setPreparingFor('Gaming Aptitude');
         setSelectedTopics(['coding_arrays']);
       } else if (domainParam === 'verbal') {
         setSelectedPack('custom');
@@ -587,7 +587,7 @@ function StudyPlannerContent() {
                                 setSelectedTopics(['percentages', 'logical_series', 'data_interpretation']);
                               } else if (e.target.value === 'Verbal Ability') {
                                 setSelectedTopics(['percentages']);
-                              } else if (e.target.value === 'Coding & DSA') {
+                              } else if (e.target.value === 'Gaming Aptitude') {
                                 setSelectedTopics(['coding_arrays']);
                               } else if (e.target.value === 'All Domains (Comprehensive)') {
                                 setSelectedTopics(['percentages', 'time_work', 'profit_loss', 'logical_series', 'data_interpretation', 'coding_arrays']);
@@ -599,7 +599,7 @@ function StudyPlannerContent() {
                             <option value="Quantitative Aptitude" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Quantitative Aptitude</option>
                             <option value="Logical Reasoning" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Logical Reasoning</option>
                             <option value="Verbal Ability" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Verbal Ability</option>
-                            <option value="Coding & DSA" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Coding & DSA</option>
+                            <option value="Gaming Aptitude" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Gaming Aptitude</option>
                             <option value="All Domains (Comprehensive)" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">All Domains (Comprehensive)</option>
                           </select>
                         </div>
@@ -898,7 +898,7 @@ function StudyPlannerContent() {
                       <option value="quant" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Quantitative Aptitude</option>
                       <option value="logical" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Logical Reasoning</option>
                       <option value="verbal" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Verbal Ability</option>
-                      <option value="coding" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Coding & DSA</option>
+                      <option value="coding" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Gaming Aptitude</option>
                     </select>
                   </div>                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-3">
                     <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading flex items-center gap-2">

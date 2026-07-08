@@ -166,8 +166,8 @@ export default function DomainsTab({ searchQuery, customColor = 'default' }: Dom
     },
     {
       id: 'coding',
-      title: 'Coding & DSA',
-      subtitle: 'Data Structures, Algorithms & Problem Solving',
+      title: 'Gaming Aptitude',
+      subtitle: 'Logic, Strategy & Interactive Mechanics',
       accent: isCustomActive ? 'var(--clr-primary)' : '#F97316',
       progress: 20,
       topicsLeft: 8,
@@ -175,18 +175,22 @@ export default function DomainsTab({ searchQuery, customColor = 'default' }: Dom
       bgGlow: isCustomActive
         ? 'hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.08)] hover:border-[var(--clr-primary)]/80 dark:hover:border-[var(--clr-primary)]/60 dark:hover:shadow-[0_20px_40px_rgba(var(--clr-primary-rgb),0.12)]'
         : 'hover:shadow-[0_20px_40px_rgba(249,115,22,0.08)] hover:border-orange-200/80 dark:hover:border-orange-900/60 dark:hover:shadow-[0_20px_40px_rgba(249,115,22,0.12)]',
-      description: 'Master binary search trees, search recursion, dynamic array branches, and sorting complexities.',
+      description: 'Master logical grid strategy, speed puzzles, pattern recognition, and game-based reasoning assessments.',
       btnColor: isCustomActive
         ? 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] shadow-[var(--clr-primary)]/20 dark:bg-[var(--clr-primary)] dark:hover:bg-[var(--clr-primary-dark)]'
         : 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20 dark:bg-orange-500 dark:hover:bg-orange-400',
       icon: (
         <svg className="w-16 h-16 transition-transform duration-500 group-hover:scale-110" style={{ color: isCustomActive ? 'var(--clr-primary)' : '#F97316' }} viewBox="0 0 100 100" fill="none">
-          <path d="M 28 32 L 10 50 L 28 68" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M 72 32 L 90 50 L 72 68" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="56" y1="26" x2="44" y2="74" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="3" strokeLinecap="round" />
-          <circle cx="50" cy="16" r="3" fill={isCustomActive ? 'var(--clr-primary)' : '#F97316'} />
-          <circle cx="15" cy="80" r="3" fill={isCustomActive ? 'var(--clr-primary)' : '#F97316'} />
-          <circle cx="85" cy="80" r="3" fill={isCustomActive ? 'var(--clr-primary)' : '#F97316'} />
+          {/* Gamepad controller outline */}
+          <path d="M 22,40 C 22,25 38,20 50,20 C 62,20 78,25 78,40 C 78,55 70,75 58,75 L 42,75 C 30,75 22,55 22,40 Z" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          {/* D-Pad (Left side) */}
+          <path d="M 32,40 L 40,40 M 36,36 L 36,44" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          {/* Action buttons (Right side) */}
+          <circle cx="60" cy="38" r="3" fill={isCustomActive ? 'var(--clr-primary)' : '#F97316'} />
+          <circle cx="68" cy="44" r="3" fill={isCustomActive ? 'var(--clr-primary)' : '#F97316'} />
+          {/* Start/Select buttons (Center) */}
+          <line x1="45" y1="52" x2="49" y2="52" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="51" y1="52" x2="55" y2="52" stroke={isCustomActive ? 'var(--clr-primary)' : '#F97316'} strokeWidth="2.5" strokeLinecap="round" />
         </svg>
       )
     }

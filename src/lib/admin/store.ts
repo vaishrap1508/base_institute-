@@ -84,7 +84,7 @@ export const DOMAINS_DATA: Domain[] = [
   },
   {
     id: 'coding',
-    name: 'Coding & DSA',
+    name: 'Gaming Aptitude',
     subTopics: [
       {
         id: 'arrays',

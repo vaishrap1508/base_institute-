@@ -430,8 +430,8 @@ const DOMAINS_CONCEPTS: DomainData[] = [
   },
   {
     id: 'coding',
-    name: 'Coding & DSA',
-    icon: '💻',
+    name: 'Gaming Aptitude',
+    icon: '🎮',
     color: '#F97316',
     subTopics: [
       {
