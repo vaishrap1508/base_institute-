@@ -34,7 +34,14 @@ export async function GET(request: Request) {
         userRole = profile.role;
       }
 
-      // 2. Check Onboarding Status
+      const isAdmin = userRole === 'ADMIN' || user.email === 'sarah.c@aptitude-ai.com' || user.email === 'marcus.w@aptitude-ai.com';
+      if (isAdmin) {
+        if (user.email === 'marcus.w@aptitude-ai.com') {
+          return NextResponse.redirect(`${origin}/admin/editor`);
+        }
+        return NextResponse.redirect(`${origin}/admin/dashboard`);
+      }
+
       const { data: onboarding } = await supabase
         .from('onboarding_profile')
         .select('onboarding_completed')
@@ -43,9 +50,6 @@ export async function GET(request: Request) {
 
       // Check if we have onboarding completed
       if (onboarding?.onboarding_completed) {
-        if (userRole === 'ADMIN' || user.email === 'sarah.c@aptitude-ai.com' || user.email === 'marcus.w@aptitude-ai.com') {
-          return NextResponse.redirect(`${origin}/admin/dashboard`);
-        }
         return NextResponse.redirect(`${origin}/student/dashboard`);
       } else {
         return NextResponse.redirect(`${origin}/onboarding`);

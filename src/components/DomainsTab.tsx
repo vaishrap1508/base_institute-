@@ -266,7 +266,7 @@ export default function DomainsTab({ searchQuery, customColor = 'default' }: Dom
                  >
                    <AnimatePresence mode="wait">
                      {clickedId === d.id ? (
-                       <motion.div
+                       <motion.span
                          key="loading"
                          initial={{ opacity: 0, y: 10 }}
                          animate={{ opacity: 1, y: 0 }}
@@ -275,9 +275,9 @@ export default function DomainsTab({ searchQuery, customColor = 'default' }: Dom
                        >
                          <Loader2 className="w-3 h-3 animate-spin" />
                          <span>Loading...</span>
-                       </motion.div>
+                       </motion.span>
                      ) : (
-                       <motion.div
+                       <motion.span
                          key="normal"
                          initial={{ opacity: 0, y: -10 }}
                          animate={{ opacity: 1, y: 0 }}
@@ -286,7 +286,7 @@ export default function DomainsTab({ searchQuery, customColor = 'default' }: Dom
                        >
                          <span>Continue</span>
                          <ChevronRight className="w-3.5 h-3.5 stroke-[3] transition-transform duration-300 group-hover:translate-x-1" />
-                       </motion.div>
+                       </motion.span>
                      )}
                    </AnimatePresence>
                  </motion.button>

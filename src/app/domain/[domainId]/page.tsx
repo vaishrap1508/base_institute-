@@ -864,6 +864,19 @@ export default function DomainDetailPage() {
       } else {
         setCodeRunnerStatus('failed');
         setCodeRunnerOutput(`Running Case 1...\nInput: nums = ${activeConcept.coding.testCases[0].input}\nOutput: None\nExpected: ${activeConcept.coding.testCases[0].expected}\n\nError: IndentationError or SyntaxError during interpretation.\nPlease check your solution syntax.`);
+        
+        // Log syntax failure warning alert in real-time backend
+        fetch('/api/admin/alerts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: 'Interpreter Syntax Failure',
+            description: `Student ${userEmail || 'Guest'} encountered a runtime compilation error in concept '${activeConcept.name}'.`,
+            type: 'Runtime Alert',
+            severity: 'warning',
+            icon: 'cpu'
+          })
+        }).catch(err => console.error(err));
       }
     }, 1200);
   };

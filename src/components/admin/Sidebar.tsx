@@ -65,7 +65,7 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
     const isActive = item.id === activeId;
 
     return (
-      <button
+      <button suppressHydrationWarning
         key={item.id}
         onClick={() => handleItemClick(item)}
         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-semibold transition-all duration-200 group text-left relative overflow-hidden select-none cursor-pointer ${
@@ -74,17 +74,17 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
             : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/40 border border-transparent'
         }`}
       >
-        <div className="flex items-center gap-3.5">
+        <span className="flex items-center gap-3.5">
           <IconComponent
             className={`w-4.5 h-4.5 transition-colors duration-200 ${
               isActive ? 'text-purple-400' : 'text-slate-400 group-hover:text-slate-200'
             }`}
           />
           <span className="tracking-wide">{item.label}</span>
-        </div>
+        </span>
         
         {isActive && (
-          <div className="w-1.5 h-6 bg-gradient-to-b from-purple-500 to-indigo-600 rounded-full shadow-[0_0_8px_#8b5cf6] absolute right-0" />
+          <span className="w-1.5 h-6 bg-gradient-to-b from-purple-500 to-indigo-600 rounded-full shadow-[0_0_8px_#8b5cf6] absolute right-0" />
         )}
 
         {item.badge && (
@@ -105,7 +105,7 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
         </div>
         <div className="flex flex-col">
           <span className="font-extrabold text-white tracking-wider text-[16px] leading-tight uppercase font-heading">
-            Lucid Admin
+            BASE INSTITUTE
           </span>
           <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase mt-0.5">
             System Controller
@@ -122,10 +122,7 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
       <div className="px-4 py-4 border-t border-[#151c2f] space-y-1.5 bg-[#070a10]">
         {bottomItems.map(renderNavButton)}
         
-        <div className="pt-4 flex items-center justify-center gap-1.5 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-          <Icons.ShieldCheck className="w-4 h-4 text-emerald-500" />
-          <span>Secured Sandbox v2.4</span>
-        </div>
+
       </div>
     </aside>
   );

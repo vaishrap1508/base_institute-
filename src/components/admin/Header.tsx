@@ -95,10 +95,7 @@ export default function Header({ currentRole, onRoleChange }: HeaderProps) {
             </span>
           </button>
 
-          {/* Grid / Apps Icon */}
-          <button className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-[#151c2f] rounded-lg transition-colors group cursor-pointer">
-            <Grid className="w-5 h-5" />
-          </button>
+
         </div>
 
         <div className="h-5 w-px bg-[#151c2f]" />
