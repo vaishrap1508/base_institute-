@@ -80,11 +80,8 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ setToastMsg })
   };
 
   return (
-    <div className="w-full flex items-center justify-between gap-6 p-8 relative overflow-hidden bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/80 rounded-3xl shadow-sm hover:shadow-xl hover:scale-[1.01] hover:-translate-y-0.5 hover:border-blue-500/10 dark:hover:border-blue-400/10 transition-all duration-355 ease-out select-none text-left group">
+    <div className="w-full flex items-center justify-between gap-6 p-8 relative overflow-hidden bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/80 rounded-3xl shadow-sm select-none text-left group">
       
-      {/* Subtle overlay glow on hover matching other cards */}
-      <div className="absolute inset-0 bg-radial from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0" />
-
       {/* Quote bubble decoration & Text content */}
       <div className="flex items-center gap-5 flex-1 min-w-0 z-10">
         <div className="w-12 h-12 rounded-full bg-amber-500/10 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
@@ -96,7 +93,6 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ setToastMsg })
             <h4 className="text-xs font-black uppercase text-slate-800 dark:text-amber-400 tracking-wider">
               Saleem Sir's Daily Motivation
             </h4>
-            <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 fill-amber-500/10 stroke-[2.5]" />
           </div>
           <p className="text-xs font-medium text-slate-600 dark:text-slate-350 leading-relaxed italic pr-4 sm:pr-8">
             "{quote}"
