@@ -84,8 +84,22 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ setToastMsg })
       
       {/* Quote bubble decoration & Text content */}
       <div className="flex items-center gap-5 flex-1 min-w-0 z-10">
-        <div className="w-12 h-12 rounded-full bg-amber-500/10 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-          <Quote className="w-5 h-5 fill-current" />
+        <div className="w-14 h-14 shrink-0 flex items-center justify-center">
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            {/* Top Speech Bubble (Yellow) */}
+            <path d="M 23 15 H 63 V 45 H 35 L 20 51 L 28 45 H 23 Z" fill="#F3B852" />
+            {/* Left Quote */}
+            <path d="M 31 21 H 37 V 30 L 33 37 H 29 L 31 30 H 30 Z" fill="#E05D44" />
+            {/* Right Quote */}
+            <path d="M 42 21 H 48 V 30 L 44 37 H 40 L 42 30 H 41 Z" fill="#E05D44" />
+
+            {/* Bottom Speech Bubble (Cyan) */}
+            <path d="M 37 45 H 77 V 75 L 83 81 L 75 75 H 37 Z" fill="#5FC8DB" />
+            {/* Left Quote */}
+            <path d="M 45 51 H 51 V 60 L 47 67 H 43 L 45 60 H 44 Z" fill="#E05D44" />
+            {/* Right Quote */}
+            <path d="M 56 51 H 62 V 60 L 58 67 H 54 L 56 60 H 55 Z" fill="#E05D44" />
+          </svg>
         </div>
 
         <div className="flex-1 min-w-0">
