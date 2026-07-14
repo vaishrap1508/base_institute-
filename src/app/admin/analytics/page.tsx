@@ -243,12 +243,7 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
 
-                <div className="p-3 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100/50 dark:border-indigo-900/30 rounded-xl flex items-start gap-2.5 mt-4">
-                  <TrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-                  <span className="text-[11px] text-indigo-900 dark:text-indigo-300 leading-normal font-semibold">
-                    Average student placement accuracy increased by 4.2% since adding dynamic LaTeX previews in Sandbox v2.4.
-                  </span>
-                </div>
+
               </div>
 
             </div>

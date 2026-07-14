@@ -835,21 +835,7 @@ function LoginContent() {
           </p>
         </div>
 
-        {/* Footer: Floating Adaptive Curriculum Panel */}
-        <div className="glassmorphism rounded-2xl p-4 border border-slate-800/80 z-10 shadow-lg flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-950/80 border border-blue-900/40 flex items-center justify-center text-blue-400 shrink-0">
-              <Award className="w-4.5 h-4.5" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-bold text-slate-200">Adaptive Curriculum</span>
-              <span className="text-[9px] text-slate-500 font-bold leading-none mt-0.5 uppercase tracking-wide">Trusted by top-tier faculty</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-          </div>
-        </div>
+
 
       </div>
 
@@ -949,7 +935,7 @@ function LoginContent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     style={{ textTransform: 'none' }}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium selection:bg-blue-100"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl h-12 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium selection:bg-blue-100"
                   />
                 </div>
                 {email && /[A-Z]/.test(email) && (
@@ -963,7 +949,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-xl shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 cursor-pointer font-bold text-xs transition-all active:scale-98 mt-2"
+                className="w-full h-12 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-xl shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 cursor-pointer font-bold text-xs transition-all active:scale-98 mt-2"
               >
                 {loading ? (
                   <>

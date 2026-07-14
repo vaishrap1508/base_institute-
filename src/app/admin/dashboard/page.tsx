@@ -668,37 +668,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Recommendations */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4">
-                  <div className="flex items-center gap-2 border-b border-[#151c2f] pb-3.5">
-                    <Compass className="w-4.5 h-4.5 text-cyan-400" />
-                    <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
-                      Recommendations
-                    </h3>
-                  </div>
 
-                  <div className="space-y-4.5">
-                    {/* Recommendation 1 */}
-                    <div className="space-y-1">
-                      <span className="text-[9px] font-black text-cyan-400 uppercase tracking-wider">
-                        Content Strategy
-                      </span>
-                      <p className="text-xs text-slate-300 leading-normal font-semibold">
-                        Consider subdividing QM-092. Drop-off rate is peaking at the 3-minute mark.
-                      </p>
-                    </div>
-
-                    {/* Recommendation 2 */}
-                    <div className="space-y-1">
-                      <span className="text-[9px] font-black text-purple-400 uppercase tracking-wider">
-                        Marketing Pivot
-                      </span>
-                      <p className="text-xs text-slate-300 leading-normal font-semibold">
-                        Engagement is highest in the 25-34 demographic on Tuesdays. Sync email drips.
-                      </p>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Elite Tier card removed to keep right column clean */}
 
