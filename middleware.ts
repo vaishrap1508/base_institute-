@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
 
   // Admin routing protection: redirect admins to the admin dashboard if they try to access student routes
   if (user) {
-    const isSarah = user.email === 'sarah.c@aptitude-ai.com';
+    const isSarah = user.email === 'sarah.c@aptitude-ai.com' || user.email?.toLowerCase().includes('admin') || user.email?.toLowerCase().includes('abhinav');
     const isMarcus = user.email === 'marcus.w@aptitude-ai.com';
     let userRole = 'STUDENT';
 
@@ -64,7 +64,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const isSarah = user.email === 'sarah.c@aptitude-ai.com';
+    const isSarah = user.email === 'sarah.c@aptitude-ai.com' || user.email?.toLowerCase().includes('admin') || user.email?.toLowerCase().includes('abhinav');
     const isMarcus = user.email === 'marcus.w@aptitude-ai.com';
     const userRole = (profile?.role === 'ADMIN' || isSarah || isMarcus) ? 'ADMIN' : 'STUDENT';
 
