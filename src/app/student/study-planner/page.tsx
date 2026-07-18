@@ -546,83 +546,8 @@ function StudyPlannerContent() {
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
                 <div className="max-w-7xl mx-auto select-text">
-                  <div className="flex flex-col lg:flex-row gap-8 items-start">
-                    
-                    {/* Inner Left Sidebar */}
-                    <div className="w-full lg:w-64 bg-white dark:bg-[#0B0F19] text-slate-800 dark:text-white rounded-[2rem] p-6 flex flex-col justify-between shrink-0 shadow-xl border border-slate-200 dark:border-slate-800/80 min-h-[620px] transition-colors duration-300">
-                      <div className="space-y-8">
-                        {/* Brand Header */}
-                        <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
-                          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                            <Target className="w-4 h-4 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">STUDY ARCHITECT</h3>
-                            <p className="text-[8px] font-bold text-slate-400 dark:text-slate-550 uppercase tracking-widest mt-0.5">Peak Performance</p>
-                          </div>
-                        </div>
-
-                        {/* Menu Options */}
-                        <nav className="space-y-2">
-                          {[
-                            { id: 'goals', label: "Today's Goals", icon: Target, active: true },
-                            { id: 'roadmap', label: 'Weekly Roadmap', icon: Calendar },
-                            { id: 'presets', label: 'Company Presets', icon: Award },
-                            { id: 'resources', label: 'Resources', icon: BookOpen },
-                            { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
-                          ].map((item) => {
-                            const Icon = item.icon;
-                            return (
-                              <button
-                                key={item.id}
-                                onClick={() => setToastMsg(`Switched to ${item.label}`)}
-                                className={`w-full flex items-center gap-3 py-3 rounded-xl text-[11px] font-bold uppercase tracking-wider text-left transition-all border-0 cursor-pointer relative overflow-hidden pl-6 pr-4 ${
-                                  item.active
-                                    ? 'bg-blue-600/10 text-blue-600 dark:text-blue-400 font-extrabold'
-                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/40 bg-transparent'
-                                }`}
-                              >
-                                {item.active && (
-                                  <div className="absolute left-1.5 top-3 bottom-3 w-1 bg-blue-600 dark:bg-blue-500 rounded-full" />
-                                )}
-                                <Icon className="w-4 h-4" />
-                                <span>{item.label}</span>
-                              </button>
-                            );
-                          })}
-                        </nav>
-                      </div>
-
-                      {/* Bottom Actions */}
-                      <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800 mt-8">
-                        <button
-                          onClick={() => setToastMsg("Starting your daily adaptive practice session...")}
-                          className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-550 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer border-0 shadow-md shadow-blue-600/20 active:scale-95 text-center font-bold"
-                        >
-                          Start Daily Session
-                        </button>
-
-                        <div className="space-y-1">
-                          <button
-                            onClick={() => setToastMsg("Contacting premium Support portal.")}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-left text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 bg-transparent border-0 cursor-pointer"
-                          >
-                            <Info className="w-3.5 h-3.5" />
-                            <span>Support</span>
-                          </button>
-                          <button
-                            onClick={() => setToastMsg("Opening archives...")}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-left text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 bg-transparent border-0 cursor-pointer"
-                          >
-                            <BookMarked className="w-3.5 h-3.5" />
-                            <span>Archive</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
                     {/* Main Content Columns */}
-                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                       
                       {/* WIDE COLUMN (Left side - 8 cols) */}
                       <div className="lg:col-span-8 space-y-8">
@@ -1120,7 +1045,6 @@ function StudyPlannerContent() {
                       </div>
                     </div>
                   </div>
-                </div>
             </motion.div>
           ) : (
             <motion.div
