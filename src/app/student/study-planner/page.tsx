@@ -168,13 +168,31 @@ function StudyPlannerContent() {
     return `${yyyy}-${mm}-${dd}`;
   });
   const [dailyCommitment, setDailyCommitment] = useState<number>(3);
-  const [selectedPack, setSelectedPack] = useState<'tcs' | 'infosys' | 'custom'>('custom');
-  const [selectedTopics, setSelectedTopics] = useState<string[]>(['percentages', 'time_work']);
+  const [presets, setPresets] = useState<Record<string, { name: string; topics: string[] }>>({
+    tcs: { name: 'TCS Pack', topics: ['percentages', 'time_work', 'profit_loss'] },
+    infosys: { name: 'Infosys Pack', topics: ['percentages', 'logical_series'] }
+  });
+  const [selectedPack, setSelectedPack] = useState<string>('custom');
+  const [customPresetName, setCustomPresetName] = useState<string>('');
+  const [selectedTopics, setSelectedTopics] = useState<string[]>(['time_work']); // starts with 'time_work' checked in the mockup screenshot
+
+  const handleSaveCustomPreset = () => {
+    if (!customPresetName.trim()) return;
+    const newKey = `custom_${Date.now()}`;
+    setPresets({
+      ...presets,
+      [newKey]: { name: customPresetName.trim(), topics: [...selectedTopics] }
+    });
+    setSelectedPack(newKey);
+    setCustomPresetName('');
+    setToastMsg(`Saved custom preset: ${customPresetName.trim()}!`);
+  };
+
   const [customTopicName, setCustomTopicName] = useState<string>('');
   const [customTopicCategory, setCustomTopicCategory] = useState<string>('CORE');
   const [customTopicSub, setCustomTopicSub] = useState<string>('CUSTOM');
   const [customModules, setCustomModules] = useState<Array<{ id: string; title: string; desc: string; category: string; sub: string; tasks: string[]; companyBadges: string[] }>>([]);
-  const [completedTasks, setCompletedTasks] = useState<string[]>(['streak_checkin']);
+  const [completedTasks, setCompletedTasks] = useState<string[]>(['streak_checkin', 'Percentage Practice', 'Vedic Math Quiz']);
   const [dailyTasks, setDailyTasks] = useState<Array<{ id: string; text: string; isCustom?: boolean }>>([
     { id: 'task_q_tw', text: '10 Questions: Time & Work' },
     { id: 'task_v_rp', text: 'Ratio & Proportions Video' },
@@ -511,34 +529,8 @@ function StudyPlannerContent() {
               </button>
             </div>
 
-            {/* Right side utility icons (Theme, Streaks, Notifications, Profile) */}
-            <div className="flex items-center gap-4">
-              {/* Theme toggle */}
-              <button
-                onClick={toggleTheme}
-                className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-850 flex items-center justify-center text-slate-650 dark:text-slate-450 cursor-pointer transition-colors"
-                title="Theme Toggle"
-              >
-                {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4" />}
-              </button>
-
-              {/* Notification icon */}
-              <button className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-650 dark:text-slate-450 relative cursor-pointer">
-                <Bell className="w-4 h-4" />
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-600" />
-              </button>
-
-              {/* User Avatar */}
-              <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200 dark:border-slate-900">
-                <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-black uppercase border-2 border-white dark:border-slate-950 shadow-md">
-                  VR
-                </div>
-                <div className="text-left hidden lg:block select-none leading-tight">
-                  <span className="text-xs font-black text-slate-900 dark:text-white block">Vaishnavi R.</span>
-                  <span className="text-[9px] font-bold text-slate-400 block font-mono">STUDENT</span>
-                </div>
-              </div>
-            </div>
+            {/* Spacer to balance the layout and keep the center switcher centered */}
+            <div className="w-[180px] hidden md:block" />
 
           </div>
         </header>
@@ -553,272 +545,507 @@ function StudyPlannerContent() {
                 exit={{ opacity: 0, x: 30 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <div className="max-w-7xl mx-auto space-y-8 select-text">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                {/* WIDE COLUMN (Left side - 8 cols) */}
-                <div className="lg:col-span-8 space-y-8">
-                  
-                  {/* CARD 1: Engineer Your Success */}
-                  {plannerView === 'study_plan' && (
-                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-left space-y-6 relative overflow-hidden backdrop-blur-md select-none">
-                      <div>
-                        <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading">
-                          Engineer Your Success
-                        </h2>
-                        <p className="text-[10px] font-extrabold text-slate-400 dark:text-slate-505 uppercase tracking-widest mt-1">
-                          Personalized Study Architecture Planner
-                        </p>
-                      </div>
+                <div className="max-w-7xl mx-auto select-text">
+                    {/* Main Content Columns */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                      
+                      {/* WIDE COLUMN (Left side - 8 cols) */}
+                      <div className="lg:col-span-8 space-y-8">
+                        
+                        {/* CARD 1: Engineer Your Success */}
+                        {plannerView === 'study_plan' && (
+                          <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-left space-y-6 relative overflow-hidden backdrop-blur-md select-none">
+                            <div>
+                              <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading">
+                                Engineer Your Success
+                              </h2>
+                              <p className="text-[10px] font-extrabold text-slate-400 dark:text-slate-505 uppercase tracking-widest mt-1">
+                                Personalized Study Architecture Planner
+                              </p>
+                            </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Goal Select */}
-                        <div className="space-y-2">
-                          <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono">
-                            What are you preparing for?
-                          </label>
-                          <select
-                            value={preparingFor}
-                            onChange={(e) => {
-                              setPreparingFor(e.target.value);
-                              if (e.target.value === 'Quantitative Aptitude') {
-                                setSelectedTopics(['percentages', 'time_work', 'profit_loss']);
-                              } else if (e.target.value === 'Logical Reasoning') {
-                                setSelectedTopics(['percentages', 'logical_series', 'data_interpretation']);
-                              } else if (e.target.value === 'Verbal Ability') {
-                                setSelectedTopics(['percentages']);
-                              } else if (e.target.value === 'Gaming Aptitude') {
-                                setSelectedTopics(['coding_arrays']);
-                              } else if (e.target.value === 'All Domains (Comprehensive)') {
-                                setSelectedTopics(['percentages', 'time_work', 'profit_loss', 'logical_series', 'data_interpretation', 'coding_arrays']);
-                              }
-                            }}
-                            className="w-full py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-205 dark:border-slate-850 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[var(--clr-primary)] cursor-pointer"
-                            style={{ colorScheme: theme }}
-                          >
-                            <option value="Quantitative Aptitude" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Quantitative Aptitude</option>
-                            <option value="Logical Reasoning" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Logical Reasoning</option>
-                            <option value="Verbal Ability" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Verbal Ability</option>
-                            <option value="Gaming Aptitude" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Gaming Aptitude</option>
-                            <option value="All Domains (Comprehensive)" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">All Domains (Comprehensive)</option>
-                          </select>
-                        </div>
-
-                        {/* Target Date */}
-                        <div className="space-y-2">
-                          <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono">
-                            Target Date
-                          </label>
-                          <input
-                            type="date"
-                            value={targetDate}
-                            onChange={(e) => setTargetDate(e.target.value)}
-                            className="w-full py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-205 dark:border-slate-850 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[var(--clr-primary)] cursor-pointer"
-                            style={{ colorScheme: theme }}
-                          />
-                        </div>
-
-                        {/* Daily Commitment Slider */}
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <label className="text-[9px] font-black text-slate-400 dark:text-slate-505 uppercase tracking-widest block font-mono">
-                              Daily Commitment
-                            </label>
-                            <span className="text-xs font-black text-[var(--clr-primary)] font-mono leading-none">
-                              {dailyCommitment} Hours
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3 pt-1.5">
-                            <span className="text-[8px] font-extrabold text-slate-400 dark:text-slate-600 font-mono">1HR</span>
-                            <input
-                              type="range"
-                              min="1"
-                              max="5"
-                              value={dailyCommitment}
-                              onChange={(e) => setDailyCommitment(parseInt(e.target.value))}
-                              className="flex-1 accent-[var(--clr-primary)] h-1 rounded-lg cursor-pointer bg-slate-100 dark:bg-slate-955"
-                            />
-                            <span className="text-[8px] font-extrabold text-slate-400 dark:text-slate-600 font-mono">5HRS</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* WIDGET 2: Today's Tasks (moved to wide column in place of roadmap) */}
-                  <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-left space-y-6 relative overflow-hidden backdrop-blur-md select-none">
-                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-3">
-                      <div>
-                        <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading flex items-center gap-2">
-                          <ListTodo className="w-4 h-4 text-[var(--clr-primary)]" /> Today's Tasks
-                        </h3>
-                        <p className="text-[9.5px] font-semibold text-slate-455 dark:text-slate-505 block leading-tight mt-0.5">
-                          Track your daily study objectives and maintain your learning consistency.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 pt-1">
-                      {dailyTasks.map((task) => {
-                        const isChecked = completedTasks.includes(task.id);
-                        return (
-                          <div
-                            key={task.id}
-                            onClick={() => {
-                              if (isChecked) {
-                                setCompletedTasks(completedTasks.filter(t => t !== task.id));
-                              } else {
-                                setCompletedTasks([...completedTasks, task.id]);
-                              }
-                            }}
-                            className={`w-full py-3.5 px-5 rounded-2xl border text-xs font-bold text-left cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 ${
-                              isChecked
-                                ? 'bg-slate-50 dark:bg-slate-955/20 border-slate-200 dark:border-slate-900 text-slate-455 line-through'
-                                : 'bg-white dark:bg-slate-950/50 border-slate-200/60 dark:border-slate-900 text-slate-700 dark:text-slate-355 hover:bg-slate-100/40 dark:hover:bg-slate-900/30'
-                            }`}
-                          >
-                            <span className="truncate">{task.text}</span>
-                            <div className="flex items-center gap-3 shrink-0">
-                              {task.isCustom && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Avoid toggling checked state
-                                    setDailyTasks(dailyTasks.filter(t => t.id !== task.id));
-                                    setCompletedTasks(completedTasks.filter(id => id !== task.id));
-                                    setToastMsg("Deleted custom daily task!");
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                              {/* Goal Select */}
+                              <div className="space-y-2">
+                                <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono">
+                                  What are you preparing for?
+                                </label>
+                                <select
+                                  value={preparingFor}
+                                  onChange={(e) => {
+                                    setPreparingFor(e.target.value);
+                                    if (e.target.value === 'Quantitative Aptitude') {
+                                      setSelectedTopics(['percentages', 'time_work', 'profit_loss']);
+                                    } else if (e.target.value === 'Logical Reasoning') {
+                                      setSelectedTopics(['percentages', 'logical_series', 'data_interpretation']);
+                                    } else if (e.target.value === 'Verbal Ability') {
+                                      setSelectedTopics(['percentages']);
+                                    } else if (e.target.value === 'Gaming Aptitude') {
+                                      setSelectedTopics(['coding_arrays']);
+                                    } else if (e.target.value === 'All Domains (Comprehensive)') {
+                                      setSelectedTopics(['percentages', 'time_work', 'profit_loss', 'logical_series', 'data_interpretation', 'coding_arrays']);
+                                    }
                                   }}
-                                  className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all border-0 bg-transparent cursor-pointer flex items-center justify-center"
-                                  title="Delete task"
+                                  className="w-full py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-205 dark:border-slate-850 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[var(--clr-primary)] cursor-pointer"
+                                  style={{ colorScheme: theme }}
                                 >
-                                  <X className="w-3.5 h-3.5" />
-                                </button>
-                              )}
-                              <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                                isChecked ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-800'
-                              }`}>
-                                {isChecked && <Check className="w-2.5 h-2.5 stroke-[4.5]" />}
+                                  <option value="Quantitative Aptitude" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Quantitative Aptitude</option>
+                                  <option value="Logical Reasoning" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Logical Reasoning</option>
+                                  <option value="Verbal Ability" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Verbal Ability</option>
+                                  <option value="Gaming Aptitude" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Gaming Aptitude</option>
+                                  <option value="All Domains (Comprehensive)" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">All Domains (Comprehensive)</option>
+                                </select>
+                              </div>
+
+                              {/* Target Date */}
+                              <div className="space-y-2">
+                                <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono">
+                                  Target Date
+                                </label>
+                                <input
+                                  type="date"
+                                  value={targetDate}
+                                  onChange={(e) => setTargetDate(e.target.value)}
+                                  className="w-full py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-205 dark:border-slate-850 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[var(--clr-primary)] cursor-pointer"
+                                  style={{ colorScheme: theme }}
+                                />
+                              </div>
+
+                              {/* Daily Commitment Slider */}
+                              <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <label className="text-[9px] font-black text-slate-400 dark:text-slate-505 uppercase tracking-widest block font-mono">
+                                    Daily Commitment
+                                  </label>
+                                  <span className="text-xs font-black text-[var(--clr-primary)] font-mono leading-none">
+                                    {dailyCommitment} Hours
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-3 pt-1.5">
+                                  <span className="text-[8px] font-extrabold text-slate-400 dark:text-slate-600 font-mono">1HR</span>
+                                  <input
+                                    type="range"
+                                    min="1"
+                                    max="5"
+                                    value={dailyCommitment}
+                                    onChange={(e) => setDailyCommitment(parseInt(e.target.value))}
+                                    className="flex-1 accent-[var(--clr-primary)] h-1 rounded-lg cursor-pointer bg-slate-100 dark:bg-slate-955"
+                                  />
+                                  <span className="text-[8px] font-extrabold text-slate-400 dark:text-slate-600 font-mono">5HRS</span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
+                        )}
 
-                    {/* Add Custom Task Input Row */}
-                    <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-900/60 mt-4 select-none">
-                      <input
-                        type="text"
-                        placeholder="Create your own daily task..."
-                        value={newTaskText}
-                        onChange={(e) => setNewTaskText(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleAddCustomTask();
-                        }}
-                        className="flex-1 py-2 px-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-205 dark:border-slate-850 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      />
-                      <button
-                        onClick={handleAddCustomTask}
-                        className="px-4 py-2 bg-blue-650 hover:bg-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-0 shadow-sm shadow-blue-500/10 hover:shadow-blue-500/20 active:scale-95"
-                      >
-                        Add
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                        {/* CARD 2: Path Builder */}
+                        <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-left space-y-6 relative overflow-hidden backdrop-blur-md select-none">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-4">
+                            <div>
+                              <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading">
+                                Path Builder
+                              </h3>
+                              <p className="text-[9.5px] font-semibold text-slate-455 dark:text-slate-505 block leading-tight mt-0.5">
+                                Select topics or choose a curated industry pack.
+                              </p>
+                            </div>
 
-                {/* NARROW COLUMN (Right side - 4 cols) */}
-                <div className="lg:col-span-4 space-y-8">
-                  
-                  {/* WIDGET 1: Days Until Target */}
-                  <div className="bg-[var(--clr-primary)] text-white rounded-[2rem] p-6 text-left relative overflow-hidden group select-none shadow-xl shadow-[var(--clr-primary-tint)]">
-                    <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-white/5 blur-sm" />
-                    <span className="text-[9px] font-black text-white/80 uppercase tracking-widest block font-mono">
-                      Days Until Target
-                    </span>
-                    <span className="text-4xl font-black font-mono block mt-2.5 leading-none">
-                      {daysRemaining} <span className="text-lg font-bold font-sans">Days</span>
-                    </span>
-                    
-                    <div className="border-t border-white/10 pt-4 mt-5 flex items-center justify-between text-[9px] font-mono font-bold text-white/70">
-                      <span className="uppercase">Next Milestone:</span>
-                      <span className="flex items-center gap-1.5 uppercase">
-                        <Calendar className="w-3.5 h-3.5" />
-                        Mock Exam 🏆
-                      </span>
-                    </div>
-                  </div>
+                            {/* Presets List */}
+                            <div className="flex flex-wrap gap-2">
+                              {Object.keys(presets).map((key) => (
+                                <button
+                                  key={key}
+                                  onClick={() => {
+                                    setSelectedPack(key);
+                                    setSelectedTopics(presets[key].topics);
+                                    setToastMsg(`Loaded preset: ${presets[key].name}!`);
+                                  }}
+                                  className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
+                                    selectedPack === key
+                                      ? 'bg-blue-600 text-white font-bold'
+                                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
+                                  }`}
+                                >
+                                  {presets[key].name}
+                                </button>
+                              ))}
+                              <button
+                                onClick={() => {
+                                  setSelectedPack('custom');
+                                  setToastMsg("Switched to Custom Pack. Toggle topics below.");
+                                }}
+                                className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
+                                  selectedPack === 'custom'
+                                    ? 'bg-blue-600 text-white font-bold'
+                                    : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
+                                }`}
+                              >
+                                Custom Pack
+                              </button>
+                            </div>
+                          </div>
 
-                  {/* WIDGET 3: Learning Pulse Heatmap */}
-                  <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 text-left space-y-4 relative overflow-hidden backdrop-blur-md select-none">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-black uppercase text-slate-905 dark:text-white tracking-widest">
-                        Learning Pulse
-                      </h4>
-                      <div className="flex items-center gap-1 text-[8px] font-bold text-slate-400 font-mono uppercase">
-                        <span>Less</span>
-                        <div className="w-2 h-2 bg-slate-100 dark:bg-slate-955 rounded-xs border border-slate-250 dark:border-slate-800" />
-                        <div className="w-2 h-2 bg-emerald-500/20 rounded-xs border border-emerald-500/40" />
-                        <div className="w-2 h-2 bg-emerald-500 rounded-xs border border-emerald-555" />
-                        <span>More</span>
+                          {/* Topic grid checkboxes */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {[
+                              { id: 'percentages', title: 'Percentages', category: 'CORE ARITHMETIC', sub: 'Foundations' },
+                              { id: 'time_work', title: 'Time & Work', category: 'APPLICATION RATES', sub: 'Application' },
+                              { id: 'profit_loss', title: 'Profit & Loss', category: 'COMMERCIAL MATH', sub: 'Commercial' },
+                              { id: 'logical_series', title: 'Logical Series', category: 'REASONING CORE', sub: 'Logical' }
+                            ].map((topic) => {
+                              const isChecked = selectedTopics.includes(topic.id);
+                              return (
+                                <div
+                                  key={topic.id}
+                                  onClick={() => {
+                                    let nextTopics;
+                                    if (isChecked) {
+                                      nextTopics = selectedTopics.filter(id => id !== topic.id);
+                                    } else {
+                                      nextTopics = [...selectedTopics, topic.id];
+                                    }
+                                    setSelectedTopics(nextTopics);
+                                    setSelectedPack('custom');
+                                  }}
+                                  className={`p-4 rounded-2xl border text-xs font-bold text-left cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 ${
+                                    isChecked
+                                      ? 'bg-blue-50/20 dark:bg-blue-950/10 border-blue-500/30 text-slate-900 dark:text-white'
+                                      : 'bg-slate-50/50 dark:bg-slate-955/30 border-slate-200/60 dark:border-slate-850 text-slate-500 dark:text-slate-400'
+                                  }`}
+                                >
+                                  <div>
+                                    <span className="text-[7.5px] font-black font-mono border px-1.5 py-0.2 rounded uppercase tracking-wider bg-slate-100 border-slate-200 dark:bg-slate-900 dark:border-slate-800 text-slate-455 dark:text-slate-500">
+                                      {topic.category}
+                                    </span>
+                                    <h4 className="text-xs font-black uppercase mt-1 text-slate-800 dark:text-white">
+                                      {topic.title}
+                                    </h4>
+                                    <p className="text-[9px] text-slate-405 dark:text-slate-550 font-medium">
+                                      {topic.sub}
+                                    </p>
+                                  </div>
+
+                                  <div className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 ${
+                                    isChecked ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 dark:border-slate-800'
+                                  }`}>
+                                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Custom preset creator */}
+                          <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-900/60 mt-4">
+                            <input
+                              type="text"
+                              placeholder="Name your custom preset..."
+                              value={customPresetName}
+                              onChange={(e) => setCustomPresetName(e.target.value)}
+                              className="flex-1 py-2 px-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-205 dark:border-slate-850 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <button
+                              onClick={handleSaveCustomPreset}
+                              className="px-4 py-2 bg-blue-600 hover:bg-blue-550 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-0 shadow-sm shadow-blue-500/10 hover:shadow-blue-500/20 active:scale-95"
+                            >
+                              Save Preset
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* CARD 3: Dynamic Roadmap */}
+                        <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-left space-y-6 relative overflow-hidden backdrop-blur-md select-none">
+                          <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-900/60 pb-3">
+                            <div>
+                              <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading">
+                                Dynamic Roadmap
+                              </h3>
+                              <p className="text-[9.5px] font-semibold text-slate-455 dark:text-slate-505 block leading-tight mt-0.5">
+                                Track progress of your learning modules.
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[9.5px] font-black text-emerald-650 dark:text-emerald-450 uppercase tracking-widest font-mono">
+                                ● {roadmapProgress}% COMPLETE
+                              </span>
+                              <div className="w-24 bg-slate-100 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden mt-1 border border-slate-200/20 dark:border-slate-800">
+                                <div className="h-full rounded-full bg-emerald-500 transition-all duration-300" style={{ width: `${roadmapProgress}%` }} />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4 pt-1">
+                            {/* Week 1 foundations */}
+                            {selectedTopics.includes('percentages') && (
+                              <div className="p-4 rounded-2xl border border-slate-200/60 dark:border-slate-850/70 bg-slate-50/30 dark:bg-slate-955/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                <div>
+                                  <span className="text-[8px] font-black uppercase text-emerald-600 dark:text-emerald-405 font-mono tracking-wider">
+                                    Week 1: Foundations
+                                  </span>
+                                  <h4 className="text-xs font-black uppercase text-slate-850 dark:text-white mt-0.5">
+                                    Master Arithmetic Basics
+                                  </h4>
+                                  <p className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium">
+                                    Focus on rapid calculation techniques, percentages, and fractions conversion.
+                                  </p>
+                                </div>
+                                
+                                <div className="flex gap-2">
+                                  <span className="flex items-center gap-1 text-[8.5px] font-bold text-emerald-650 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
+                                    <Check className="w-3 h-3 stroke-[3]" /> Percentage Practice
+                                  </span>
+                                  <span className="flex items-center gap-1 text-[8.5px] font-bold text-emerald-650 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
+                                    <Check className="w-3 h-3 stroke-[3]" /> Vedic Math Quiz
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Week 2 Logical Core */}
+                            {selectedTopics.includes('time_work') && (
+                              <div className="p-4 rounded-2xl border border-blue-500/30 bg-white dark:bg-slate-900/60 shadow-lg shadow-[var(--clr-primary-tint)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                <div>
+                                  <span className="text-[8px] font-black uppercase text-[var(--clr-primary)] font-mono tracking-wider">
+                                    Week 2: Logical Core
+                                  </span>
+                                  <h4 className="text-xs font-black uppercase text-slate-850 dark:text-white mt-0.5">
+                                    Time, Work & Rates
+                                  </h4>
+                                  <p className="text-[9.5px] text-slate-400 dark:text-slate-500 font-medium">
+                                    Master rate equations, combined work ratios, and pipe flow problems.
+                                  </p>
+                                </div>
+                                
+                                <button
+                                  onClick={() => setToastMsg("Resuming Active study session on Time & Work...")}
+                                  className="px-4 py-2 bg-blue-600 hover:bg-blue-505 text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 shadow-sm"
+                                >
+                                  Active Session
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Week 3 Advanced Quants */}
+                            {selectedTopics.includes('profit_loss') && (
+                              <div className="p-4 rounded-2xl border border-slate-200/60 dark:border-slate-850/70 bg-slate-50/10 dark:bg-slate-950/10 opacity-70 flex justify-between items-center gap-4">
+                                <div>
+                                  <span className="text-[8px] font-black uppercase text-slate-400 font-mono tracking-wider">
+                                    Week 3: Advanced Quants
+                                  </span>
+                                  <h4 className="text-xs font-black uppercase text-slate-400 dark:text-slate-550 mt-0.5">
+                                    Complex Applications
+                                  </h4>
+                                  <p className="text-[9.5px] text-slate-405 dark:text-slate-650 font-medium">
+                                    Navigate margins, discount rates, simple and compound interests.
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {/* NARROW COLUMN (Right side - 4 cols) */}
+                      <div className="lg:col-span-4 space-y-8">
+                        
+                        {/* WIDGET 1: Days Until Target */}
+                        <div className="bg-[var(--clr-primary)] text-white rounded-[2rem] p-6 text-left relative overflow-hidden group select-none shadow-xl shadow-[var(--clr-primary-tint)]">
+                          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-white/5 blur-sm" />
+                          <span className="text-[9px] font-black text-white/80 uppercase tracking-widest block font-mono">
+                            Days Until Target
+                          </span>
+                          <span className="text-4xl font-black font-mono block mt-2.5 leading-none">
+                            {daysRemaining} <span className="text-lg font-bold font-sans">Days</span>
+                          </span>
+                          
+                          <div className="border-t border-white/10 pt-4 mt-5 flex items-center justify-between text-[9px] font-mono font-bold text-white/70">
+                            <span className="uppercase">Next Milestone:</span>
+                            <span className="flex items-center gap-1.5 uppercase">
+                              <Calendar className="w-3.5 h-3.5" />
+                              Mock Exam 🏆
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* WIDGET 2: Today's Tasks */}
+                        <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 text-left space-y-6 relative overflow-hidden backdrop-blur-md select-none">
+                          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-3">
+                            <div>
+                              <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading flex items-center gap-2">
+                                <ListTodo className="w-4 h-4 text-[var(--clr-primary)]" /> Today's Tasks
+                              </h3>
+                              <p className="text-[9.5px] font-semibold text-slate-455 dark:text-slate-550 block leading-tight mt-0.5">
+                                Track your daily study objectives.
+                              </p>
+                            </div>
+                            <span className="flex items-center gap-1 text-[9px] font-black text-orange-655 bg-orange-500/10 px-2 py-0.5 rounded-lg border border-orange-500/20">
+                              🔥 120 STREAK
+                            </span>
+                          </div>
+
+                          <div className="space-y-3 pt-1">
+                            {dailyTasks.map((task) => {
+                              const isChecked = completedTasks.includes(task.id);
+                              return (
+                                <div
+                                  key={task.id}
+                                  onClick={() => {
+                                    if (isChecked) {
+                                      setCompletedTasks(completedTasks.filter(t => t !== task.id));
+                                    } else {
+                                      setCompletedTasks([...completedTasks, task.id]);
+                                    }
+                                  }}
+                                  className={`w-full py-3.5 px-5 rounded-2xl border text-xs font-bold text-left cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 ${
+                                    isChecked
+                                      ? 'bg-slate-50 dark:bg-slate-955/20 border-slate-200 dark:border-slate-900 text-slate-455 line-through'
+                                      : 'bg-white dark:bg-slate-950/50 border-slate-200/60 dark:border-slate-905 text-slate-700 dark:text-slate-355 hover:bg-slate-100/40 dark:hover:bg-slate-900/30'
+                                  }`}
+                                >
+                                  <span className="truncate">{task.text}</span>
+                                  <div className="flex items-center gap-3 shrink-0">
+                                    {task.isCustom && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation(); // Avoid toggling checked state
+                                          setDailyTasks(dailyTasks.filter(t => t.id !== task.id));
+                                          setCompletedTasks(completedTasks.filter(id => id !== task.id));
+                                          setToastMsg("Deleted custom daily task!");
+                                        }}
+                                        className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all border-0 bg-transparent cursor-pointer flex items-center justify-center"
+                                        title="Delete task"
+                                      >
+                                        <X className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                                      isChecked ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-800'
+                                    }`}>
+                                      {isChecked && <Check className="w-2.5 h-2.5 stroke-[4.5]" />}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Add Custom Task Input Row */}
+                          <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-900/60 mt-4 select-none">
+                            <input
+                              type="text"
+                              placeholder="Create your own daily task..."
+                              value={newTaskText}
+                              onChange={(e) => setNewTaskText(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleAddCustomTask();
+                              }}
+                              className="flex-1 py-2 px-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-205 dark:border-slate-850 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <button
+                              onClick={handleAddCustomTask}
+                              className="px-4 py-2 bg-blue-650 hover:bg-blue-505 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-0 shadow-sm shadow-blue-500/10 hover:shadow-blue-500/20 active:scale-95"
+                            >
+                              Add
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* WIDGET 3: Learning Pulse Heatmap */}
+                        <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 text-left space-y-4 relative overflow-hidden backdrop-blur-md select-none">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-xs font-black uppercase text-slate-905 dark:text-white tracking-widest">
+                              Learning Pulse
+                            </h4>
+                            <div className="flex items-center gap-1 text-[8px] font-bold text-slate-400 font-mono uppercase">
+                              <span>Less</span>
+                              <div className="w-2 h-2 bg-slate-100 dark:bg-slate-955 rounded-xs border border-slate-250 dark:border-slate-800" />
+                              <div className="w-2 h-2 bg-emerald-500/20 rounded-xs border border-emerald-500/40" />
+                              <div className="w-2 h-2 bg-emerald-500 rounded-xs border border-emerald-555" />
+                              <span>More</span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-8 gap-1.5 pt-1">
+                            {Array.from({ length: 32 }).map((_, idx) => {
+                              // Historical pattern for static days 0-27
+                              const historical = [
+                                1, 0, 0, 2, 0, 1, 0, 2,
+                                0, 1, 1, 0, 2, 0, 0, 1,
+                                0, 0, 2, 1, 0, 0, 1, 2,
+                                0, 1, 0, 1
+                              ];
+
+                              let intensity = 0;
+                              if (idx < 28) {
+                                intensity = historical[idx];
+                              } else if (idx === 28) {
+                                intensity = customRoadmapItems.length > 2 ? 2 : customRoadmapItems.length > 0 ? 1 : 0;
+                              } else if (idx === 29) {
+                                intensity = dailyCommitment >= 4 ? 2 : dailyCommitment >= 2 ? 1 : 0;
+                              } else if (idx === 30) {
+                                intensity = roadmapStarted ? 2 : 1;
+                              } else if (idx === 31) {
+                                const total = dailyTasks.length;
+                                const completedCount = completedTasks.filter(id => dailyTasks.some(t => t.id === id)).length;
+                                const ratio = total > 0 ? completedCount / total : 0;
+                                intensity = ratio >= 0.99 ? 2 : ratio > 0 ? 1 : 0;
+                              }
+
+                              let opacity = 'bg-slate-50 dark:bg-slate-950/20 border-slate-205 dark:border-slate-900';
+                              let label = 'No Study Activity';
+                              if (intensity === 2) {
+                                opacity = 'bg-emerald-500 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]';
+                                label = 'High Study Activity';
+                              } else if (intensity === 1) {
+                                opacity = 'bg-emerald-500/30 border-emerald-500/40';
+                                label = 'Moderate Study Activity';
+                              }
+
+                              return (
+                                <div
+                                  key={idx}
+                                  title={`Day ${idx + 1}: ${label}`}
+                                  className={`aspect-square rounded border ${opacity} transition-all duration-300 hover:scale-110 cursor-pointer`}
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* WIDGET 4: Study Mutuals */}
+                        <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 text-left space-y-4 relative overflow-hidden backdrop-blur-md select-none">
+                          <h4 className="text-xs font-black uppercase text-slate-905 dark:text-white tracking-widest flex items-center gap-2">
+                            <Layers className="w-4.5 h-4.5 text-[var(--clr-primary)]" /> Study Mutuals
+                          </h4>
+                          
+                          <div className="p-4 rounded-2xl border border-slate-200/60 dark:border-slate-855 bg-slate-50/50 dark:bg-slate-950/20 space-y-3">
+                            <div className="flex justify-between items-start">
+                              <span className="text-[8px] font-black font-mono border px-1.5 py-0.2 rounded uppercase tracking-wider bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-405">
+                                PREMIUM RESOURCE
+                              </span>
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-black text-slate-850 dark:text-white uppercase">
+                                The TCS NQT Prime Guide
+                              </h4>
+                              <p className="text-[10px] text-slate-455 dark:text-slate-500 font-medium">
+                                High-yield aptitude questions, coding pattern cheat-sheets, and interview scripts.
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => setToastMsg("Safe Work: Resource unlocked and downloaded to library.")}
+                              className="w-full py-2 bg-slate-800 hover:bg-slate-750 text-white dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0"
+                            >
+                              Safe Work
+                            </button>
+                          </div>
+                        </div>
+
                       </div>
                     </div>
-
-                    <div className="grid grid-cols-8 gap-1.5 pt-1">
-                      {Array.from({ length: 32 }).map((_, idx) => {
-                        // Historical pattern for static days 0-27
-                        const historical = [
-                          1, 0, 0, 2, 0, 1, 0, 2,
-                          0, 1, 1, 0, 2, 0, 0, 1,
-                          0, 0, 2, 1, 0, 0, 1, 2,
-                          0, 1, 0, 1
-                        ];
-
-                        let intensity = 0;
-                        if (idx < 28) {
-                          intensity = historical[idx];
-                        } else if (idx === 28) {
-                          // Day 29: responds to customRoadmapItems length
-                          intensity = customRoadmapItems.length > 2 ? 2 : customRoadmapItems.length > 0 ? 1 : 0;
-                        } else if (idx === 29) {
-                          // Day 30: responds to dailyCommitment hours
-                          intensity = dailyCommitment >= 4 ? 2 : dailyCommitment >= 2 ? 1 : 0;
-                        } else if (idx === 30) {
-                          // Day 31: responds to roadmapStarted
-                          intensity = roadmapStarted ? 2 : 1;
-                        } else if (idx === 31) {
-                          // Day 32 (Today): responds to completed tasks ratio
-                          const total = dailyTasks.length;
-                          const completedCount = completedTasks.filter(id => dailyTasks.some(t => t.id === id)).length;
-                          const ratio = total > 0 ? completedCount / total : 0;
-                          intensity = ratio >= 0.99 ? 2 : ratio > 0 ? 1 : 0;
-                        }
-
-                        let opacity = 'bg-slate-50 dark:bg-slate-950/20 border-slate-205 dark:border-slate-900';
-                        let label = 'No Study Activity';
-                        if (intensity === 2) {
-                          opacity = 'bg-emerald-500 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]';
-                          label = 'High Study Activity';
-                        } else if (intensity === 1) {
-                          opacity = 'bg-emerald-500/30 border-emerald-500/40';
-                          label = 'Moderate Study Activity';
-                        }
-
-                        return (
-                          <div
-                            key={idx}
-                            title={`Day ${idx + 1}: ${label}`}
-                            className={`aspect-square rounded border ${opacity} transition-all duration-300 hover:scale-110 cursor-pointer`}
-                          />
-                        );
-                      })}
-                    </div>
                   </div>
-
-                </div>
-
-            </div>
-          </div>
-          </motion.div>
+            </motion.div>
           ) : (
             <motion.div
               key="roadmap_builder"
@@ -829,8 +1056,8 @@ function StudyPlannerContent() {
             >
               <div className="max-w-7xl mx-auto space-y-8 select-none text-left">
               
-              {/* Roadmap Mode Switcher Toggles (Radio button style) */}
-              <div className="flex justify-center select-none pt-2 pb-2">
+              {/* Roadmap Mode Switcher Toggles (Radio button style) & Overall Completion */}
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-2 pb-2">
                 <div className="inline-flex bg-slate-100 dark:bg-slate-955 p-1.5 rounded-[1.5rem] border border-slate-200 dark:border-slate-850 shadow-inner relative">
                   <button
                     onClick={() => {
@@ -873,6 +1100,19 @@ function StudyPlannerContent() {
                     <span className="relative z-10">Customize Your Own Roadmap</span>
                   </button>
                 </div>
+
+                {/* Overall Completion Progress */}
+                <div className="flex items-center gap-3 self-end md:self-auto">
+                  <span className="text-[9px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest block font-mono">
+                    OVERALL COMPLETION
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-36 bg-slate-100 dark:bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-200/20 dark:border-slate-800">
+                      <div className="h-full rounded-full bg-blue-600" style={{ width: '25%' }} />
+                    </div>
+                    <span className="text-xs font-black text-slate-800 dark:text-white font-mono">25%</span>
+                  </div>
+                </div>
               </div>
 
               {/* Main Grid: Left Topics (Domain Dropdown), Right Timeline */}
@@ -900,7 +1140,9 @@ function StudyPlannerContent() {
                       <option value="verbal" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Verbal Ability</option>
                       <option value="coding" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Gaming Aptitude</option>
                     </select>
-                  </div>                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-3">
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-3">
                     <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading flex items-center gap-2">
                       Available Topics
                     </h3>
@@ -921,18 +1163,18 @@ function StudyPlannerContent() {
                             e.dataTransfer.setData("text/plain", topic.id);
                             e.dataTransfer.effectAllowed = "move";
                           }}
-                          className={`p-4 rounded-2xl border border-slate-200/60 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-955/40 flex items-start justify-between gap-3 group hover:scale-[1.01] transition-all animate-fade-in ${
+                          className={`p-4 rounded-2xl border border-slate-200/60 dark:border-slate-855 bg-slate-50/50 dark:bg-slate-955/40 flex items-start justify-between gap-3 group hover:scale-[1.01] transition-all animate-fade-in ${
                             topic.isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'
                           }`}
                         >
                           <div className="space-y-1">
-                            <span className="text-[8px] font-black font-mono border px-1.5 py-0.5 rounded-md uppercase tracking-wider bg-orange-500/10 border-orange-500/20 text-orange-600 dark:text-orange-400">
+                            <span className="text-[8px] font-black font-mono border px-1.5 py-0.5 rounded-md uppercase tracking-wider bg-orange-500/10 border-orange-500/20 text-orange-605 dark:text-orange-400">
                               {topic.category}
                             </span>
                             <h4 className="text-xs font-black text-slate-800 dark:text-white uppercase mt-2 leading-tight">
                               {topic.title}
                             </h4>
-                            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                            <p className="text-[10px] text-slate-400 dark:text-slate-550 font-medium">
                               {topic.desc}
                             </p>
                           </div>
@@ -969,7 +1211,7 @@ function StudyPlannerContent() {
                                     }}
                                     className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
                                       isAdded
-                                        ? 'bg-red-500/10 text-red-650 dark:text-red-400 hover:bg-red-500/20'
+                                        ? 'bg-red-500/10 text-red-650 dark:text-red-405 hover:bg-red-500/20'
                                         : 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white shadow-sm'
                                     }`}
                                   >
@@ -983,6 +1225,14 @@ function StudyPlannerContent() {
                       );
                     })}
                   </div>
+
+                  {/* VIEW ALL TOPICS button */}
+                  <button
+                    onClick={() => setToastMsg("Opening comprehensive topics catalog...")}
+                    className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-900 dark:hover:bg-slate-850 dark:text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border-0 cursor-pointer mt-4"
+                  >
+                    View All Topics
+                  </button>
                 </div>
 
                 {/* RIGHT AREA: Learning Path Timeline */}
@@ -1000,13 +1250,13 @@ function StudyPlannerContent() {
                       <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider font-heading">
                         Learning Path Timeline
                       </h3>
-                      <p className="text-[9.5px] font-semibold text-slate-455 dark:text-slate-505 block leading-tight mt-0.5">
+                      <p className="text-[9.5px] font-semibold text-slate-455 dark:text-slate-550 block leading-tight mt-0.5">
                         October — December 2023
                       </p>
                     </div>
 
                     {/* Timeline switcher */}
-                    <div className="flex bg-slate-50 dark:bg-slate-950 p-0.5 rounded-full border border-slate-200 dark:border-slate-850 shadow-inner shrink-0">
+                    <div className="flex bg-slate-50 dark:bg-slate-950 p-0.5 rounded-full border border-slate-200 dark:border-slate-855 shadow-inner shrink-0">
                       <button
                         onClick={() => setTimelineTab('timeline')}
                         className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
@@ -1022,7 +1272,7 @@ function StudyPlannerContent() {
                         className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
                           timelineTab === 'list'
                             ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold'
-                            : 'text-slate-405 hover:text-slate-855 dark:text-slate-500 dark:hover:text-slate-300'
+                            : 'text-slate-405 hover:text-slate-855 dark:text-slate-505 dark:hover:text-slate-300'
                         }`}
                       >
                         List View
@@ -1056,7 +1306,7 @@ function StudyPlannerContent() {
                           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 relative">
                             <div>
                               <span className={`text-[8px] font-black uppercase tracking-widest font-mono ${
-                                item.status === 'Completed' ? 'text-emerald-600 dark:text-emerald-400' : item.status === 'In Progress' ? 'text-blue-550 dark:text-blue-400' : 'text-slate-400'
+                                item.status === 'Completed' ? 'text-emerald-650 dark:text-emerald-400' : item.status === 'In Progress' ? 'text-blue-550 dark:text-blue-400' : 'text-slate-400'
                               }`}>
                                 {item.status}
                               </span>
@@ -1091,8 +1341,11 @@ function StudyPlannerContent() {
                             {/* In Progress Status Card */}
                             {item.status === 'In Progress' && (
                               <div className="flex-1 max-w-md p-5 bg-white dark:bg-slate-955 border-2 border-[var(--clr-primary)]/80 rounded-2xl space-y-4 shadow-lg shadow-[var(--clr-primary-tint)] relative">
-                                <button className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer bg-transparent border-0">
-                                  <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-500" />
+                                <button
+                                  onClick={() => setToastMsg("Opening path configurations...")}
+                                  className="absolute right-4 top-4 text-slate-400 hover:text-slate-650 dark:hover:text-slate-205 cursor-pointer bg-transparent border-0 font-bold"
+                                >
+                                  <Sliders className="w-3.5 h-3.5 text-blue-500" />
                                 </button>
 
                                 <div className="space-y-1 text-left">
@@ -1101,7 +1354,7 @@ function StudyPlannerContent() {
                                     <span className="text-[7.5px] font-black uppercase font-mono px-1.5 py-0.2 rounded border bg-[var(--clr-primary-tint)] border-[var(--clr-primary)]/20 text-[var(--clr-primary)] tracking-wider">
                                       Target: Oct 15
                                     </span>
-                                    <span className="text-[7.5px] font-black uppercase font-mono px-1.5 py-0.2 rounded border bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-955/20 dark:border-amber-900/20 dark:text-amber-400 tracking-wider">
+                                    <span className="text-[7.5px] font-black uppercase font-mono px-1.5 py-0.2 rounded border bg-amber-50 border-amber-100 text-amber-705 dark:bg-amber-955/20 dark:border-amber-900/20 dark:text-amber-400 tracking-wider">
                                       Goal: 90% Accuracy
                                     </span>
                                   </div>
@@ -1137,7 +1390,7 @@ function StudyPlannerContent() {
                                   setCustomRoadmapItems(customRoadmapItems.filter(i => i.id !== item.id));
                                   setToastMsg(`Removed ${item.title} from custom path!`);
                                 }}
-                                className="absolute -right-2 -top-2 w-5.5 h-5.5 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition-all cursor-pointer z-10"
+                                className="absolute -right-2 -top-2 w-5.5 h-5.5 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white text-red-550 flex items-center justify-center transition-all cursor-pointer z-10"
                               >
                                 <X className="w-2.5 h-2.5" />
                               </button>
@@ -1165,7 +1418,7 @@ function StudyPlannerContent() {
                       ).map((item) => (
                         <div key={item.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl flex justify-between items-center relative group">
                           <div>
-                            <h4 className="text-xs font-black text-slate-850 dark:text-white uppercase">{item.title}</h4>
+                            <h4 className="text-xs font-black text-slate-855 dark:text-white uppercase">{item.title}</h4>
                             <p className="text-[10px] text-slate-400 dark:text-slate-600 font-mono">{item.duration}</p>
                           </div>
                           <div className="flex items-center gap-3">
@@ -1183,8 +1436,8 @@ function StudyPlannerContent() {
                           {roadmapType === 'custom' && (
                             <button
                               onClick={() => {
-                                setCustomRoadmapItems(customRoadmapItems.filter(i => i.id !== item.id));
-                                setToastMsg(`Removed ${item.title} from custom path!`);
+                                  setCustomRoadmapItems(customRoadmapItems.filter(i => i.id !== item.id));
+                                  setToastMsg(`Removed ${item.title} from custom path!`);
                               }}
                               className="absolute -right-2 -top-2 w-5.5 h-5.5 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white text-red-500 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10"
                             >
@@ -1216,17 +1469,46 @@ function StudyPlannerContent() {
                     <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-955 flex items-center justify-center border border-slate-200 dark:border-slate-900 text-slate-400 group-hover:scale-105 group-hover:text-[var(--clr-primary)] transition-all">
                       <Plus className="w-5 h-5" />
                     </div>
-                    <div>
+                    <div className="text-center">
                       <span className="text-[10.5px] font-black text-slate-800 dark:text-white uppercase tracking-wider block">
                         Drag topics here to schedule
                       </span>
-                      <span className="text-[8px] font-bold text-slate-405 dark:text-slate-600 uppercase tracking-widest block mt-0.5">
-                        Drop topics here or click "+ Add" on the left list to customize your path
+                      <span className="text-[8px] font-extrabold text-slate-400 dark:text-slate-600 uppercase tracking-widest block mt-1 font-mono">
+                        AVAILABLE: 12 MODULES
                       </span>
                     </div>
                   </div>
                 </div>
 
+              </div>
+
+              {/* WIDGET: Predictive Performance */}
+              <div className="bg-slate-950 border border-slate-800 text-white rounded-[2rem] p-6 flex flex-col md:flex-row items-center justify-between gap-6 mt-8 select-none">
+                <div className="space-y-1 max-w-xl text-left">
+                  <h4 className="text-xs font-black uppercase text-[var(--clr-primary)] tracking-widest font-mono">
+                    Predictive Performance
+                  </h4>
+                  <p className="text-xs text-slate-305 font-medium leading-relaxed mt-1">
+                    Based on your current roadmap and velocity, we predict you will achieve <span className="text-blue-405 font-bold">92nd percentile</span> in the upcoming mock exam.
+                  </p>
+                </div>
+                <div className="flex gap-3 shrink-0">
+                  <button
+                    onClick={() => setToastMsg("Simulating adaptive mock evaluation...")}
+                    className="py-3 px-6 bg-slate-900 hover:bg-slate-850 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border border-slate-800"
+                  >
+                    Simulate Test
+                  </button>
+                  <button
+                    onClick={() => {
+                      setRoadmapType('custom');
+                      setToastMsg("Customize mode activated. Adjust your path below.");
+                    }}
+                    className="py-3 px-6 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-0"
+                  >
+                    Adjust Path
+                  </button>
+                </div>
               </div>
 
               {/* Bottom Actions Row */}

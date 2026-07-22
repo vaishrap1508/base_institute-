@@ -13,115 +13,19 @@ export const DailyPerformanceHub = ({ isCustomActive = false }: DailyPerformance
   useEffect(() => setMounted(true), []);
 
   // Mock Dynamic Backend Data
-  const dailyGoalData = {
-    questions_completed: 3,
-    daily_target: 5,
-    goal_percentage: 60,
-    reset_time: "10:45:32"
-  };
-
   const xpData = {
     xp_today: 120,
     xp_growth: 15,
     performance_status: "🚀 Fast Learner Today"
   };
 
-  // SVG Progress Ring calculations
-  const radius = 32;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (dailyGoalData.goal_percentage / 100) * circumference;
-
   if (!mounted) return null;
 
   return (
     <div className="flex flex-col space-y-4 w-full mt-6">
       
-      {/* Top Row: Side-by-side Daily Goal and Today's XP */}
-      <div className="grid grid-cols-2 gap-4">
-        
-        {/* Daily Goal Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          whileHover={{ y: -4, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }}
-          className={`bg-white border border-slate-200 dark:bg-[#0A0F1C] dark:border-slate-800 rounded-[20px] p-4 shadow-sm transition-all duration-300 group flex flex-col relative overflow-hidden ${
-            isCustomActive 
-              ? "hover:border-[rgba(var(--clr-primary-rgb,59,130,246),0.4)]" 
-              : "hover:border-blue-500/30 dark:hover:border-blue-500/40"
-          }`}
-        >
-          <h3 className="text-[10px] font-black tracking-widest text-slate-700 dark:text-slate-300 mb-4 uppercase">Daily Goal</h3>
-          
-          <div className="flex flex-col items-center justify-center space-y-3">
-            <div className="relative flex items-center justify-center w-20 h-20 group-hover:rotate-[3deg] transition-transform duration-500">
-              {/* Background ring */}
-              <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r={radius}
-                  className="stroke-slate-100 dark:stroke-slate-800/50"
-                  strokeWidth="8"
-                  fill="none"
-                />
-                
-                {/* Gradient definition */}
-                <defs>
-                  <linearGradient id="goalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    {isCustomActive ? (
-                      <>
-                        <stop offset="0%" stopColor="var(--clr-primary, #3B82F6)" />   
-                        <stop offset="100%" stopColor="var(--clr-primary-dark, #06B6D4)" /> 
-                      </>
-                    ) : (
-                      <>
-                        <stop offset="0%" stopColor="#3B82F6" />   {/* Blue-500 */}
-                        <stop offset="50%" stopColor="#8B5CF6" />  {/* Purple-500 */}
-                        <stop offset="100%" stopColor="#06B6D4" /> {/* Cyan-500 */}
-                      </>
-                    )}
-                  </linearGradient>
-                  <filter id="glowRing" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                </defs>
-
-                {/* Progress ring */}
-                <motion.circle
-                  cx="50"
-                  cy="50"
-                  r={radius}
-                  stroke="url(#goalGradient)"
-                  strokeWidth="8"
-                  fill="none"
-                  strokeLinecap="round"
-                  filter="url(#glowRing)"
-                  initial={{ strokeDashoffset: circumference }}
-                  animate={{ strokeDashoffset }}
-                  transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
-                  style={{ strokeDasharray: circumference }}
-                />
-              </svg>
-              
-              <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-[17px] font-black text-slate-800 dark:text-white leading-none">
-                  {dailyGoalData.questions_completed}<span className="text-xs text-slate-400">/{dailyGoalData.daily_target}</span>
-                </span>
-                <span className="text-[8px] font-bold text-slate-500 mt-0.5 uppercase tracking-wider leading-tight">Solved</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center text-center space-y-0.5 pt-1">
-              <div className="text-xl font-black text-slate-800 dark:text-white tracking-tight">{dailyGoalData.goal_percentage}%</div>
-              <div className="text-[10px] font-bold text-slate-500">Goal Completed</div>
-            </div>
-          </div>
-        </motion.div>
+      {/* Top Row: Today's XP Card */}
+      <div className="grid grid-cols-1 gap-4">
 
         {/* Today's XP Card */}
         <motion.div
