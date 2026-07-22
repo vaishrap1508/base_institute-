@@ -739,7 +739,7 @@ export default function SettingsPage() {
                 {/* Hybrid Grid Layout: 2-Columns */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
-              {/* Left Column (60% / col-span-2): Identity, Performance Circular gauge, toggles */}
+              {/* Left Column (col-span-2): Admin Profile & Dispatch / Notifications Preferences */}
               <div className="lg:col-span-2 space-y-6">
                 
                 {/* Identity Management Card */}
@@ -782,56 +782,10 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {/* Infrastructure Performance Card (with circular SVG gauge) */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-6">
-                  <span className="text-[10px] font-black text-emerald-400 tracking-wider uppercase leading-none">
-                    Infrastructure Performance
-                  </span>
-                  
-                  <div className="flex items-center justify-center gap-6 bg-[#070a13]/60 p-4.5 border border-[#151c2f]/60 rounded-2xl relative max-w-md mx-auto">
-                    <div className="relative flex flex-col items-center justify-center shrink-0">
-                      <svg className="w-20 h-20 transform -rotate-90">
-                        <circle cx="40" cy="40" r="32" stroke="#1b233a" strokeWidth="4.5" fill="transparent" />
-                        <circle 
-                          cx="40" 
-                          cy="40" 
-                          r="32" 
-                          stroke="url(#storageGrad)" 
-                          strokeWidth="4.5" 
-                          fill="transparent"
-                          strokeDasharray={2 * Math.PI * 32} 
-                          strokeDashoffset={2 * Math.PI * 32 * (1 - (storagePercent / 100))}
-                          strokeLinecap="round" 
-                        />
-                        <defs>
-                          <linearGradient id="storageGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#a855f7" />
-                            <stop offset="100%" stopColor="#6366f1" />
-                          </linearGradient>
-                        </defs>
-                      </svg>
-                      <div className="absolute flex flex-col items-center justify-center">
-                        <span className="text-base font-black text-white leading-none">{storagePercent}%</span>
-                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-0.5">Used</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col text-left">
-                      <span className="text-xs font-extrabold text-white">Storage Capacity</span>
-                      <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-1">Enterprise S3</span>
-                      
-                      <button className="text-[10px] font-bold text-purple-400 hover:text-purple-300 mt-2 flex items-center gap-0.5 uppercase tracking-wider transition-colors cursor-pointer">
-                        <span>Configure Limits</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Dispatch & Alerts Toggles */}
                 <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-6">
                   <span className="text-[10px] font-black text-slate-400 tracking-wider uppercase leading-none">
-                    Dispatch & Alerts
+                    Dispatch & Alert Preferences
                   </span>
                   
                   <div className="space-y-4 pt-2">
@@ -840,7 +794,7 @@ export default function SettingsPage() {
                       <div className="flex flex-col gap-1 pr-4">
                         <span className="text-xs font-bold text-slate-200">Security Alerts</span>
                         <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                          Immediate broadcast for unauthorized access attempts.
+                          Immediate broadcast for unusual login or access attempts.
                         </span>
                       </div>
                       {renderToggle(securityAlerts, () => setSecurityAlerts(!securityAlerts))}
@@ -849,9 +803,9 @@ export default function SettingsPage() {
                     {/* Item 2 */}
                     <div className="flex items-center justify-between p-4 bg-[#070a13] border border-[#151c2f]/80 rounded-xl">
                       <div className="flex flex-col gap-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200">System Health Reports</span>
+                        <span className="text-xs font-bold text-slate-200">Platform Health Summaries</span>
                         <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                          Weekly summaries of infrastructure availability.
+                          Weekly report summarizing platform availability and test attempts.
                         </span>
                       </div>
                       {renderToggle(systemHealthReports, () => setSystemHealthReports(!systemHealthReports))}
@@ -860,9 +814,9 @@ export default function SettingsPage() {
                     {/* Item 3 */}
                     <div className="flex items-center justify-between p-4 bg-[#070a13] border border-[#151c2f]/80 rounded-xl">
                       <div className="flex flex-col gap-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200">User Milestone Updates</span>
+                        <span className="text-xs font-bold text-slate-200">Student Milestone Alerts</span>
                         <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                          Notifications when key platform metrics are exceeded.
+                          Notifications when student enrollment or solved test milestones are achieved.
                         </span>
                       </div>
                       {renderToggle(userMilestoneUpdates, () => setUserMilestoneUpdates(!userMilestoneUpdates))}
@@ -870,54 +824,9 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {/* Compiler Switches (from present screen) */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-6">
-                  <div className="flex items-center gap-2 border-b border-[#151c2f] pb-3.5">
-                    <Settings className="w-4.5 h-4.5 text-purple-400" />
-                    <span className="text-[10px] font-black text-purple-400 tracking-wider uppercase leading-none">
-                      Compiler Switches
-                    </span>
-                  </div>
-
-                  <div className="space-y-4">
-                    {/* Switch 1 */}
-                    <div className="flex items-center justify-between p-4 bg-[#070a13] border border-[#151c2f]/80 rounded-xl">
-                      <div className="flex flex-col gap-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200">Staging Sandbox Telemetry</span>
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                          Enabling telemetry streams mock logs and events to the audit console in real time.
-                        </span>
-                      </div>
-                      {renderToggle(sandboxMode, () => setSandboxMode(!sandboxMode))}
-                    </div>
-
-                    {/* Switch 2 */}
-                    <div className="flex items-center justify-between p-4 bg-[#070a13] border border-[#151c2f]/80 rounded-xl">
-                      <div className="flex flex-col gap-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200">KaTeX Mathematical Render Pipeline</span>
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                          Compiles double dollar signs ($$) into elegant centered equations inside the preview canvas.
-                        </span>
-                      </div>
-                      {renderToggle(latexRenderer, () => setLatexRenderer(!latexRenderer))}
-                    </div>
-
-                    {/* Switch 3 */}
-                    <div className="flex items-center justify-between p-4 bg-[#070a13] border border-[#151c2f]/80 rounded-xl">
-                      <div className="flex flex-col gap-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200">Default Option Shuffling</span>
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                          Automatically enables choice option shuffling on newly instantiated questions inside the studio.
-                        </span>
-                      </div>
-                      {renderToggle(shuffleDefault, () => setShuffleDefault(!shuffleDefault))}
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
-              {/* Right Column (40% / col-span-1): Accounts, Fortress Security, Database Sync Tools */}
+              {/* Right Column (col-span-1): Account Summary & System Overview */}
               <div className="lg:col-span-1 space-y-6">
                 
                 {/* Account Summary */}
@@ -932,8 +841,8 @@ export default function SettingsPage() {
                       <span className="font-bold text-white">{currentRole.name}</span>
                     </div>
                     <div className="flex justify-between items-center py-1 border-t border-[#151c2f]/60">
-                      <span className="text-slate-400 font-semibold">Storage Tier</span>
-                      <span className="font-bold text-white">{accountSummary.storageTier}</span>
+                      <span className="text-slate-400 font-semibold">Environment</span>
+                      <span className="font-bold text-emerald-400">Production Ready</span>
                     </div>
                     <div className="flex justify-between items-center py-1 border-t border-[#151c2f]/60">
                       <span className="text-slate-400 font-semibold">Last Login</span>
@@ -942,155 +851,18 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {/* System Tips */}
+                {/* System Status Overview */}
                 <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4">
                   <div className="flex items-center gap-2 border-b border-[#151c2f] pb-3.5">
-                    <Compass className="w-4.5 h-4.5 text-cyan-400" />
+                    <Shield className="w-4.5 h-4.5 text-emerald-400" />
                     <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
-                      System Tips
+                      Platform Environment
                     </h3>
                   </div>
                   
                   <p className="text-xs text-slate-300 leading-relaxed font-semibold">
-                    You are currently operating in <strong className="text-cyan-400">{currentRole.name} Mode</strong>. Core configuration changes will propagate immediately across the ecosystem.
+                    Operating in <strong className="text-purple-400">{currentRole.name} Mode</strong>. Changes made to onboarding flow and settings persist directly to the production database.
                   </p>
-                  
-                  <button className="text-[10px] font-black text-cyan-400 hover:text-cyan-300 uppercase tracking-widest block pt-1.5 transition-colors cursor-pointer">
-                    READ DOCUMENTATION
-                  </button>
-                </div>
-
-                {/* Stats Row (Latency & Nodes) */}
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Latency */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4 flex items-center gap-3 group hover:border-[#1b233a] transition-all">
-                    <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-                      <Activity className="w-4.5 h-4.5" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Latency</span>
-                      <span className="text-sm font-extrabold text-white">14ms</span>
-                    </div>
-                  </div>
-
-                  {/* Nodes */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4 flex items-center gap-3 group hover:border-[#1b233a] transition-all">
-                    <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-                      <Server className="w-4.5 h-4.5" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Nodes</span>
-                      <span className="text-sm font-extrabold text-white">112/112</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Fortress Security Card */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#151c2f] pb-3.5">
-                    <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
-                      Fortress Security
-                    </h3>
-                    <Lock className="w-4.5 h-4.5 text-purple-400" />
-                  </div>
-
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-relaxed">
-                    Critical access and authentication controls.
-                  </p>
-
-                  <div className="space-y-4.5 pt-2">
-                    <div className="flex justify-between items-center bg-[#070a13] p-3 border border-[#151c2f] rounded-xl">
-                      <span className="text-xs font-bold text-slate-300">Enable 2FA</span>
-                      {renderToggle(enable2fa, () => setEnable2fa(!enable2fa))}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <button className="py-2.5 bg-[#1b233a] hover:bg-[#253254] text-slate-200 border border-[#1b233a] rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer text-center">
-                        View Access Logs
-                      </button>
-                      <button className="py-2.5 bg-[#1b233a] hover:bg-[#253254] text-slate-200 border border-[#1b233a] rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer text-center">
-                        Session Mgmt
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Database Utilities (from present screen) */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4">
-                  <div className="flex items-center gap-2 border-b border-[#151c2f] pb-3.5">
-                    <Database className="w-4.5 h-4.5 text-cyan-400" />
-                    <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
-                      Database Utilities
-                    </h3>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    <button
-                      onClick={handleSeedQuestions}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500/10 hover:bg-blue-500/25 border border-blue-500/30 text-blue-400 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Seed Mock Question</span>
-                    </button>
-
-                    <button
-                      onClick={handleResetCatalog}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold transition-all cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Reset Catalog Defaults</span>
-                    </button>
-
-                    <button
-                      onClick={handleSyncToSupabase}
-                      disabled={isSyncing}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-500/10 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-400 rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                      <span>{isSyncing ? 'Syncing...' : 'Sync Catalog Database'}</span>
-                    </button>
-                  </div>
-
-                  {syncStatus && (
-                    <div className="mt-3 p-3.5 bg-[#070a13] border border-[#151c2f] rounded-xl space-y-3 animate-scaleUp">
-                      <div className="flex items-center justify-between text-[11px] font-bold">
-                        <span className="text-slate-400">Sync Status</span>
-                        <span className={syncStatus.inProgress ? "text-indigo-400 animate-pulse" : "text-emerald-400"}>
-                          {syncStatus.inProgress ? 'In Progress' : 'Completed'}
-                        </span>
-                      </div>
-                      
-                      <div className="w-full bg-[#1b233a] h-1.5 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-indigo-500 h-full transition-all duration-300" 
-                          style={{ width: `${syncStatus.total > 0 ? (syncStatus.completed / syncStatus.total) * 100 : 0}%` }}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-1.5 text-center text-[9px] font-bold uppercase tracking-wider">
-                        <div className="bg-[#0f1322] p-1.5 border border-[#151c2f]/60 rounded-lg">
-                          <div className="text-slate-500">Total</div>
-                          <div className="text-xs text-white mt-0.5">{syncStatus.total}</div>
-                        </div>
-                        <div className="bg-emerald-500/10 p-1.5 border border-emerald-500/20 rounded-lg">
-                          <div className="text-emerald-400">Done</div>
-                          <div className="text-xs text-white mt-0.5">{syncStatus.completed}</div>
-                        </div>
-                        <div className="bg-rose-500/10 p-1.5 border border-rose-500/20 rounded-lg">
-                          <div className="text-rose-400">Fail</div>
-                          <div className="text-xs text-white mt-0.5">{syncStatus.failed}</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="p-3 bg-[#070a13] border border-[#151c2f] rounded-xl flex items-center gap-3 mt-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                    <Shield className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
-                    <div className="flex flex-col">
-                      <span className="text-white">Secure Core v2.4</span>
-                      <span className="text-[9px] font-semibold text-slate-600 mt-0.5">Isolated scope sandbox</span>
-                    </div>
-                  </div>
                 </div>
 
               </div>

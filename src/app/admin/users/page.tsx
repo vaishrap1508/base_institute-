@@ -359,8 +359,8 @@ export default function UsersPage() {
                 <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-[#0f1322] shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
-                <h2 className="text-lg font-black text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <h2 className="text-lg font-black text-white tracking-tight">Admin Access Required</h2>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Base Institute Admin Panel</p>
               </div>
               <div className="w-full bg-[#070a13] border border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-[#151c2f] pb-2">
@@ -406,7 +406,7 @@ export default function UsersPage() {
                   User Management
                 </h1>
                 <p className="text-[11px] font-semibold text-slate-500 mt-1">
-                  Monitor and manage your digital ecosystem inhabitants.
+                  Monitor, manage, and inspect student progress across all courses and practice modules.
                 </p>
               </div>
             </div>

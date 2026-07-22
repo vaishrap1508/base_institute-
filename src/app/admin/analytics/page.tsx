@@ -107,40 +107,40 @@ export default function AnalyticsPage() {
 
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
+    <div className="flex h-screen bg-[#070a13] text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
       <Sidebar activeId="analytics" userRole={currentRole.role} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
 
         {currentRole.role !== 'admin' ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
-            <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
-              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-500 shadow-inner relative">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
+            <div className="w-full max-w-xl bg-[#0f1322] border border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
+              <div className="w-16 h-16 rounded-full bg-rose-950/20 border border-rose-900/30 flex items-center justify-center text-rose-400 shadow-inner relative">
                 <Cpu className="w-7 h-7 animate-pulse" />
-                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">!</span>
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-[#0f1322] shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
-                <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <h2 className="text-lg font-black text-white tracking-tight">Admin Access Required</h2>
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Base Institute Admin Panel</p>
               </div>
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
-                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
+              <div className="w-full bg-[#070a13] border border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-[#151c2f] pb-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-950/35 text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
-                    <span className="text-slate-800 dark:text-slate-100 font-bold">{currentRole.name}</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-white font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
-                    <span className="text-slate-800 dark:text-rose-400 font-bold uppercase tracking-wider text-[11px] text-rose-600">{currentRole.role}</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-rose-400 font-bold uppercase tracking-wider text-[11px]">{currentRole.role}</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
-                    <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/analytics</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-slate-200 font-bold font-mono text-[11px]">/admin/analytics</span>
                   </div>
                 </div>
               </div>
@@ -158,12 +158,12 @@ export default function AnalyticsPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 space-y-6">
+          <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-[#070a13] custom-scrollbar">
             {/* Page Header */}
-            <div className="border-b border-slate-200/60 dark:border-slate-900 pb-5">
-              <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Performance Analytics Console</h1>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
-                Deep-dive diagnostic matrices covering student accuracy distributions, domain completions, and placement ratios.
+            <div className="border-b border-[#151c2f] pb-5">
+              <h1 className="text-2xl font-black text-white tracking-tight uppercase font-heading">Performance Analytics Console</h1>
+              <p className="text-xs font-semibold text-slate-400 mt-1">
+                Student accuracy distributions, domain completions, and company placement mock set diagnostics.
               </p>
             </div>
 
