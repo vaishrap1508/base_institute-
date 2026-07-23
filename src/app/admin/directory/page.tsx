@@ -544,10 +544,10 @@ export default function QuestionDirectoryPage() {
 
             {/* Scalable Table Grid */}
             {isLoading ? (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-[350px] bg-white border border-slate-200/85 rounded-2xl p-12 shadow-xs">
-                <RefreshCw className="w-9 h-9 text-indigo-600 animate-spin" />
-                <span className="text-xs font-bold text-slate-700 mt-3.5 uppercase tracking-wider">Syncing Supabase Schema...</span>
-                <span className="text-[10px] text-slate-400 font-semibold mt-1">Retrieving core taxonomy matrices and placement tags in real time</span>
+              <div className="flex-1 flex flex-col items-center justify-center min-h-[350px] bg-[#0f1322] border border-[#151c2f] rounded-2xl p-12 shadow-xs">
+                <RefreshCw className="w-8 h-8 text-purple-500 animate-spin" />
+                <span className="text-xs font-bold text-slate-200 mt-3.5 uppercase tracking-wider">Loading Question Directory...</span>
+                <span className="text-[10px] text-slate-400 font-semibold mt-1">Retrieving question bank, taxonomy topics, and placement tags</span>
               </div>
             ) : (
               <QuestionTable

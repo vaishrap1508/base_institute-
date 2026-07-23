@@ -29,13 +29,12 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
     { id: 'editor', label: 'Content', icon: 'FileText', href: '/admin/editor' },
     { id: 'directory', label: 'Reports', icon: 'ClipboardList', href: '/admin/directory' },
     { id: 'settings', label: 'Settings', icon: 'Settings', href: '/admin/settings' },
-    { id: 'badges', label: 'Admin Tools', icon: 'ShieldAlert', href: '/admin/badges' },
-    { id: 'documentation', label: 'Logs', icon: 'History', href: '/admin/docs' },
+    { id: 'badges', label: 'Admin Tools', icon: 'Wrench', href: '/admin/badges' },
     { id: 'system-health', label: 'System Health', icon: 'Activity', href: '/admin/system-health' },
   ];
 
   const bottomItems: SidebarItem[] = [
-    { id: 'support', label: 'Support', icon: 'HelpCircle', href: '/admin/dashboard#support' },
+    { id: 'support', label: 'Support', icon: 'HelpCircle', href: '/docs' },
     { id: 'logout', label: 'Logout', icon: 'LogOut', href: '/' }
   ];
 

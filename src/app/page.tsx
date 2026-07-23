@@ -2999,6 +2999,7 @@ export default function LandingPage() {
               {content.cta_btn_primary}
             </Link>
             <button 
+              suppressHydrationWarning
               onClick={() => showNotice("Connecting to support sandbox queue...", "info")}
               className="w-full sm:flex-1 py-3.5 px-8 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs border border-slate-200 dark:border-slate-800 rounded-2xl hover:scale-[1.02] active:scale-98 transition-all duration-300 cursor-pointer uppercase tracking-wider"
             >
@@ -3040,6 +3041,7 @@ export default function LandingPage() {
       <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
         {isAdmin && (
           <button
+            suppressHydrationWarning
             onClick={() => setIsEditorOpen(true)}
             className="flex items-center gap-2.5 px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_25px_rgba(37,99,235,0.6)] cursor-pointer text-xs font-black transition-all active:scale-95 animate-pulse hover:animate-none"
           >
