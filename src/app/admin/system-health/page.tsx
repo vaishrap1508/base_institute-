@@ -1,19 +1,18 @@
 'use client';
 
+import { USER_ROLES } from '@/lib/admin/store';
+import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
 import React, { useState, useEffect } from 'react';
 import { 
   Activity, ShieldAlert, ShieldCheck, Database, RefreshCw, Cpu, Server, 
   AlertTriangle, AlertOctagon, TrendingUp, Clock, HardDrive, Wifi, Eye
 } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
-import { USER_ROLES } from '@/lib/admin/store';
-import { UserRole } from '@/lib/admin/types';
 import { supabase } from '@/lib/supabase';
 
 export default function SystemHealthPage() {
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
-  const [timeFilter, setTimeFilter] = useState<'1H' | '24H'>('24H');
+  const { currentRole, handleRoleChange } = useAdmin();
+const [timeFilter, setTimeFilter] = useState<'1H' | '24H'>('24H');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [metrics, setMetrics] = useState({
     dbLoad: 0,
@@ -53,17 +52,10 @@ export default function SystemHealthPage() {
       try {
         const parsed = JSON.parse(storedRole);
         const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
+        if (matched) handleRoleChange(matched);
+      } catch (e) { localStorage.removeItem('aptitude_current_role'); localStorage.removeItem('aptitude_questions'); }
     }
   }, []);
-
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
-  };
 
   const handleRefreshStats = async () => {
     setIsRefreshing(true);
@@ -72,11 +64,7 @@ export default function SystemHealthPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#070a13] text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      <Sidebar activeId="system-health" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
+    <>
 
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
@@ -408,7 +396,6 @@ export default function SystemHealthPage() {
 
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }

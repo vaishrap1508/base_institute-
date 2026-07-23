@@ -1,19 +1,17 @@
 'use client';
 
+import { USER_ROLES } from '@/lib/admin/store';
+import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   History, RefreshCw, Search, SlidersHorizontal, Trash2, ShieldCheck, 
   Key, Zap, Settings, Award, AlertTriangle, ShieldAlert, CheckCircle2, 
   HelpCircle, Eye, Loader2, Play, ToggleLeft, ToggleRight
 } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
-import { USER_ROLES } from '@/lib/admin/store';
-import { UserRole } from '@/lib/admin/types';
-
 export default function DocsPage() {
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
-  const [logs, setLogs] = useState<any[]>([]);
+  const { currentRole, handleRoleChange } = useAdmin();
+const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
@@ -22,24 +20,6 @@ export default function DocsPage() {
   // Real-time auto polling states
   const [autoPoll, setAutoPoll] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    const storedRole = localStorage.getItem('aptitude_current_role');
-    if (storedRole) {
-      try {
-        const parsed = JSON.parse(storedRole);
-        const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
-    }
-  }, []);
-
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
-  };
 
   // Fetch logs from backend
   const fetchLogs = async (silent = false) => {
@@ -117,11 +97,7 @@ export default function DocsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#070a13] text-slate-100 font-sans overflow-hidden antialiased relative">
-      <Sidebar activeId="documentation" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
+    <>
 
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
@@ -350,7 +326,6 @@ export default function DocsPage() {
           </div>
         )}
 
-      </div>
-    </div>
+      </>
   );
 }

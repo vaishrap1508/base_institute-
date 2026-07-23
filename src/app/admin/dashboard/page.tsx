@@ -7,15 +7,14 @@ import {
   Compass, HelpCircle, LogOut, ArrowUpRight, Check,
   Cpu, Layers, ShieldCheck, Database, FileText, ArrowRight
 } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
 import { USER_ROLES } from '@/lib/admin/store';
 import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
 import { createClient } from '@/utils/supabase/client';
 
 export default function DashboardPage() {
   const supabase = createClient();
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
+  const { currentRole, handleRoleChange } = useAdmin();
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({
     liveUsers: 0,
@@ -178,10 +177,8 @@ export default function DashboardPage() {
       try {
         const parsed = JSON.parse(storedRole);
         const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
+        if (matched) handleRoleChange(matched);
+      } catch (e) { localStorage.removeItem('aptitude_current_role'); localStorage.removeItem('aptitude_questions'); }
     }
 
     const syncSession = async () => {
@@ -191,7 +188,7 @@ export default function DashboardPage() {
         const role = isMarcus ? 'editor' : 'admin';
         const matched = USER_ROLES.find(r => r.role === role);
         if (matched) {
-          setCurrentRole(matched);
+          handleRoleChange(matched);
           localStorage.setItem('aptitude_current_role', JSON.stringify(matched));
         }
       }
@@ -224,10 +221,7 @@ export default function DashboardPage() {
     };
   }, []);
 
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
-  };
+
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -239,13 +233,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#070a13] text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      <Sidebar activeId="dashboard" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
-
-        {currentRole.role !== 'admin' ? (
+    <>
+      {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
             <div className="w-full max-w-xl bg-[#0f1322] border border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               <div className="w-16 h-16 rounded-full bg-rose-950/20 border border-rose-900/30 flex items-center justify-center text-rose-400 shadow-inner relative">
@@ -678,7 +667,6 @@ export default function DashboardPage() {
 
           </div>
         )}
-      </div>
-    </div>
+    </>
   );
 }

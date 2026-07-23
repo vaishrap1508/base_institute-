@@ -582,7 +582,7 @@ const getBadgeProgress = (badgeName: string, isUnlocked: boolean) => {
   const bookmarksCount = typeof window !== 'undefined' ? (() => {
     try {
       const b = localStorage.getItem('aptitude_bookmarks');
-      return b ? JSON.parse(b).length : 1;
+      try { return b ? JSON.parse(b).length : 1; } catch(e) { return 1; }
     } catch (_) { return 1; }
   })() : 1;
   const sectionsVisited = typeof window !== 'undefined' ? Number(localStorage.getItem('aptitude_sections_visited_count') || 2) : 2;
@@ -1240,14 +1240,14 @@ const CanvasCelebration = ({ confettiStyle }: { confettiStyle: 'confetti' | 'fir
 };
 
 const tabVariants = {
-  initial: { opacity: 0, y: 10 },
+  initial: { opacity: 0, y: 15 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -10 },
+  exit: { opacity: 0, y: -15 },
 };
 
 const tabTransition = {
-  duration: 0.85,
-  ease: "easeInOut" as const
+  duration: 0.3,
+  ease: "easeOut" as const
 };
 
 const podiumContainerVariants = {
@@ -2068,7 +2068,7 @@ export default function StudentDashboard() {
           const storedHistory = localStorage.getItem('aptitude_badges_history');
           if (storedHistory) {
             try {
-              finalHistory = JSON.parse(storedHistory);
+              try { finalHistory = JSON.parse(storedHistory); } catch(e) { finalHistory = []; }
             } catch (e) {
               finalHistory = [];
             }
@@ -2129,7 +2129,7 @@ export default function StudentDashboard() {
       let finalHistory = [];
       if (storedHistory) {
         try {
-          finalHistory = JSON.parse(storedHistory);
+          try { finalHistory = JSON.parse(storedHistory); } catch(e) { finalHistory = []; }
         } catch (e) { }
       } else {
         finalHistory = DEFAULT_SEED_HISTORY;
@@ -2142,7 +2142,7 @@ export default function StudentDashboard() {
       const stored = localStorage.getItem('aptitude_unlocked_badges');
       if (stored) {
         try {
-          const parsed = JSON.parse(stored);
+          let parsed = null; try { parsed = JSON.parse(stored); } catch(e) {}
           parsed.forEach((id: string) => {
             if (!uniqueUnlocked.includes(id)) {
               uniqueUnlocked.push(id);
@@ -2420,7 +2420,7 @@ export default function StudentDashboard() {
     const roleStored = localStorage.getItem('aptitude_current_role');
     if (roleStored) {
       try {
-        const parsed = JSON.parse(roleStored);
+        let parsed = null; try { parsed = JSON.parse(roleStored); } catch(e) {}
         setCurrentRole(parsed);
       } catch (e) {
         console.warn(e);
@@ -2454,7 +2454,7 @@ export default function StudentDashboard() {
         const roleStored = localStorage.getItem('aptitude_current_role');
         if (roleStored) {
           try {
-            const parsed = JSON.parse(roleStored);
+            let parsed = null; try { parsed = JSON.parse(roleStored); } catch(e) {}
             roleObj.role = parsed.role;
             roleObj.name = parsed.name || roleObj.name;
           } catch (_) { }
@@ -2493,7 +2493,7 @@ export default function StudentDashboard() {
     const onboardingStored = localStorage.getItem('aptitude_onboarding_data');
     if (onboardingStored) {
       try {
-        const data = JSON.parse(onboardingStored);
+        let data = null; try { data = JSON.parse(onboardingStored); } catch(e) {}
         setProfile((prev: any) => ({
           ...prev,
           username: data.username || prev.username,
@@ -2574,7 +2574,7 @@ export default function StudentDashboard() {
           const stored = localStorage.getItem('aptitude_questions');
           if (stored) {
             try {
-              const parsed = JSON.parse(stored);
+              let parsed = null; try { parsed = JSON.parse(stored); } catch(e) {}
               const parsedIds = new Set(parsed.map((q: any) => q.id));
               const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
               if (missing.length > 0) {
@@ -2597,7 +2597,7 @@ export default function StudentDashboard() {
         const stored = localStorage.getItem('aptitude_questions');
         if (stored) {
           try {
-            const parsed = JSON.parse(stored);
+            let parsed = null; try { parsed = JSON.parse(stored); } catch(e) {}
             const parsedIds = new Set(parsed.map((q: any) => q.id));
             const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
             if (missing.length > 0) {

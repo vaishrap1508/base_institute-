@@ -819,19 +819,8 @@ export default function AdminContentCreator() {
   const activeDomainName = domains.find((d) => d.id === domainId)?.name || 'Quantitative Aptitude';
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      {/* 1. Left Navigation Sidebar */}
-      <Sidebar
-        activeId="editor"
-        userRole={currentRole.role}
-      />
-
-      {/* Main Workspace Frame */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        {/* 2. Top Utility & Role Selection Header */}
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
-
-        {/* Transient banner updates */}
+    <>
+      {/* Transient banner updates */}
         {notification && (
           <div className="absolute top-20 right-8 z-50 animate-slideIn">
             <div className={`px-4.5 py-3.5 rounded-xl border shadow-lg flex items-center gap-3 max-w-md ${
@@ -1013,7 +1002,7 @@ export default function AdminContentCreator() {
             </div>
           </div>
         )}
-      </div>
+
 
       {/* 4. Publication Detail Confirmation Modal */}
       {showPublishModal && (
@@ -1102,6 +1091,6 @@ export default function AdminContentCreator() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

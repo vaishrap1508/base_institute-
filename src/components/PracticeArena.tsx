@@ -372,15 +372,15 @@ export default function PracticeArena({
   useEffect(() => {
     const storedDB = localStorage.getItem('aptitude_revision_db');
     if (storedDB) {
-      setRevisionDB(JSON.parse(storedDB));
+      try { setRevisionDB(JSON.parse(storedDB)); } catch(e) {}
     }
     const storedFolders = localStorage.getItem('aptitude_custom_folders');
     if (storedFolders) {
-      setCustomFolders(JSON.parse(storedFolders));
+      try { setCustomFolders(JSON.parse(storedFolders)); } catch(e) {}
     }
     const storedHard = localStorage.getItem('aptitude_hard_questions');
     if (storedHard) {
-      setHardQuestions(JSON.parse(storedHard));
+      try { setHardQuestions(JSON.parse(storedHard)); } catch(e) {}
     }
   }, []);
 

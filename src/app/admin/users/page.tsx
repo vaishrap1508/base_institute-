@@ -45,9 +45,7 @@ export default function UsersPage() {
         const parsed = JSON.parse(storedRole);
         const matched = USER_ROLES.find(r => r.role === parsed.role);
         if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
+      } catch (e) { localStorage.removeItem('aptitude_current_role'); localStorage.removeItem('aptitude_questions'); }
     }
   }, []);
 
@@ -335,9 +333,7 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#070a13] text-slate-100 font-sans overflow-hidden antialiased relative">
-      <Sidebar activeId="users" userRole={currentRole.role} />
-
+    <>
       {/* Global Toast Alert */}
       {notification && (
         <div className="absolute top-20 right-8 z-50 animate-slideIn">
@@ -347,9 +343,6 @@ export default function UsersPage() {
           </div>
         </div>
       )}
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
 
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
@@ -992,8 +985,7 @@ export default function UsersPage() {
           </div>
         )}
 
-      </div>
-    </div>
+      </>
   );
 }
 

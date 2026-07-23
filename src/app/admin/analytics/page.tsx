@@ -1,31 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, Award, Compass, Users, CheckCircle2, ChevronRight, Activity, Percent, ArrowUpRight, Cpu } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
 import { USER_ROLES } from '@/lib/admin/store';
 import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
+import React, { useState, useEffect } from 'react';
+import { BarChart3, TrendingUp, Award, Compass, Users, CheckCircle2, ChevronRight, Activity, Percent, ArrowUpRight, Cpu } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AnalyticsPage() {
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
-
+  const { currentRole, handleRoleChange } = useAdmin();
   useEffect(() => {
-    const storedRole = localStorage.getItem('aptitude_current_role');
-    if (storedRole) {
-      try {
-        const parsed = JSON.parse(storedRole);
-        const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
-    }
     fetchAnalytics();
   }, []);
-
-  const [domainMetrics, setDomainMetrics] = useState([
+const [domainMetrics, setDomainMetrics] = useState([
     { name: 'Quantitative Aptitude', code: 'QUANT', completion: '0.0%', accuracy: '0.0%', color: 'from-blue-500 to-indigo-500', barColor: 'bg-blue-600' },
     { name: 'Logical Reasoning', code: 'LOGICAL', completion: '0.0%', accuracy: '0.0%', color: 'from-purple-500 to-pink-500', barColor: 'bg-purple-600' },
     { name: 'Verbal Ability', code: 'VERBAL', completion: '0.0%', accuracy: '0.0%', color: 'from-emerald-500 to-teal-500', barColor: 'bg-emerald-600' }
@@ -97,21 +84,12 @@ export default function AnalyticsPage() {
     }
   };
 
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
-  };
-
 
 
 
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      <Sidebar activeId="analytics" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
+    <>
 
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
@@ -249,7 +227,6 @@ export default function AnalyticsPage() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }

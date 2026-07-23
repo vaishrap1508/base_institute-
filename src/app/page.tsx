@@ -621,7 +621,7 @@ export default function LandingPage() {
     const storedRole = localStorage.getItem('aptitude_current_role');
     if (storedRole) {
       try {
-        const parsed = JSON.parse(storedRole);
+        let parsed = null; try { parsed = JSON.parse(storedRole); } catch(e) {}
         setIsAdmin(parsed.role === 'admin');
       } catch (e) {
         console.warn(e);
@@ -1174,7 +1174,7 @@ export default function LandingPage() {
           const localData = localStorage.getItem('aptitude_landing_page_settings');
           if (localData) {
             try {
-              const parsed = JSON.parse(localData);
+              let parsed = null; try { parsed = JSON.parse(localData); } catch(e) {}
               if (Array.isArray(parsed.faq_items) && parsed.faq_items.length < 12) {
                 localStorage.removeItem('aptitude_landing_page_settings');
               } else {
@@ -1188,7 +1188,7 @@ export default function LandingPage() {
         const localData = localStorage.getItem('aptitude_landing_page_settings');
         if (localData) {
           try {
-            const parsed = JSON.parse(localData);
+            let parsed = null; try { parsed = JSON.parse(localData); } catch(e) {}
             if (Array.isArray(parsed.faq_items) && parsed.faq_items.length < 12) {
               localStorage.removeItem('aptitude_landing_page_settings');
             } else {
@@ -1210,7 +1210,7 @@ export default function LandingPage() {
       const storedRole = localStorage.getItem('aptitude_current_role');
       if (storedRole) {
         try {
-          const parsed = JSON.parse(storedRole);
+          let parsed = null; try { parsed = JSON.parse(storedRole); } catch(e) {}
           if (parsed.role === 'admin') {
             setIsAdmin(true);
             showNotice("Clearance Verified: Admin Access Granted. Visual Editor Unlocked.", "info");

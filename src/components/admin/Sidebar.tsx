@@ -2,6 +2,8 @@
 import React from 'react';
 import * as Icons from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface SidebarProps {
   activeId: string;
@@ -42,6 +44,8 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
     ? allItems.filter(item => item.id === 'editor')
     : allItems;
 
+  const router = useRouter();
+
   const handleItemClick = async (item: SidebarItem) => {
     onSelectTab?.(item.id);
     if (item.id === 'logout') {
@@ -56,7 +60,7 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
       return;
     }
     if (item.href) {
-      window.location.href = item.href;
+      router.push(item.href);
     }
   };
 

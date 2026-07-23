@@ -42,7 +42,7 @@ function LoginContent() {
       const localData = localStorage.getItem('aptitude_landing_page_settings');
       if (localData) {
         try {
-          const parsed = JSON.parse(localData);
+          let parsed = null; try { parsed = JSON.parse(localData); } catch(e) {}
           if (parsed.header_logo_text) setLogoText(parsed.header_logo_text);
           if (parsed.header_logo_subtext) setLogoSubtext(parsed.header_logo_subtext);
         } catch (_) {}
@@ -95,7 +95,7 @@ function LoginContent() {
   // Detect if Supabase is offline/placeholder domain to run in Offline Sandbox Mode
   const isOfflineSandbox = typeof window !== 'undefined' && 
     (!process.env.NEXT_PUBLIC_SUPABASE_URL || 
-     process.env.NEXT_PUBLIC_SUPABASE_URL.includes('fxpeswcwjvysarfyquoo') || 
+     process.env.NEXT_PUBLIC_SUPABASE_URL.includes('fxpeswcwjvysarjfyquo') || 
      localStorage.getItem('aptitude_offline_sandbox') === 'true');
 
   // ==========================================
@@ -361,7 +361,7 @@ function LoginContent() {
         const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
         
         const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-        const localProfiles = JSON.parse(localProfilesStr);
+        let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
         const customProfile = localProfiles[normalizedEmail];
 
         const isRegisteredOffline = !!customProfile;
@@ -388,7 +388,7 @@ function LoginContent() {
           const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
           let registeredEmails = [];
           try {
-            registeredEmails = JSON.parse(registeredEmailsStr);
+            try { registeredEmails = JSON.parse(registeredEmailsStr); } catch(e) { registeredEmails = []; }
           } catch (_) {}
           
           const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
@@ -505,11 +505,11 @@ function LoginContent() {
             const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
             let registeredEmails = [];
             try {
-              registeredEmails = JSON.parse(registeredEmailsStr);
+              try { registeredEmails = JSON.parse(registeredEmailsStr); } catch(e) { registeredEmails = []; }
             } catch (_) {}
             
             const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-            const localProfiles = JSON.parse(localProfilesStr);
+            let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
             const customProfile = localProfiles[normalizedEmail];
             const isRegisteredOffline = !!customProfile;
 
@@ -549,7 +549,7 @@ function LoginContent() {
           const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
           
           const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-          const localProfiles = JSON.parse(localProfilesStr);
+          let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
           const customProfile = localProfiles[normalizedEmail];
 
           const isRegisteredOffline = !!customProfile;
@@ -576,7 +576,7 @@ function LoginContent() {
              const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
              let registeredEmails = [];
              try {
-               registeredEmails = JSON.parse(registeredEmailsStr);
+               try { registeredEmails = JSON.parse(registeredEmailsStr); } catch(e) { registeredEmails = []; }
              } catch (_) {}
              
              const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
@@ -661,14 +661,14 @@ function LoginContent() {
         const normalizedEmail = email.trim().toLowerCase();
         
         const existingStr = localStorage.getItem('aptitude_registered_emails');
-        const emails = existingStr ? JSON.parse(existingStr) : [];
+        let emails = []; try { emails = existingStr ? JSON.parse(existingStr) : []; } catch(e) {}
         if (!emails.includes(normalizedEmail)) {
           emails.push(normalizedEmail);
           localStorage.setItem('aptitude_registered_emails', JSON.stringify(emails));
         }
 
         const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-        const localProfiles = JSON.parse(localProfilesStr);
+        let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
         localProfiles[normalizedEmail] = {
           fullName,
           password
@@ -738,14 +738,14 @@ function LoginContent() {
           const normalizedEmail = email.trim().toLowerCase();
           
           const existingStr = localStorage.getItem('aptitude_registered_emails');
-          const emails = existingStr ? JSON.parse(existingStr) : [];
+          let emails = []; try { emails = existingStr ? JSON.parse(existingStr) : []; } catch(e) {}
           if (!emails.includes(normalizedEmail)) {
             emails.push(normalizedEmail);
             localStorage.setItem('aptitude_registered_emails', JSON.stringify(emails));
           }
 
           const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-          const localProfiles = JSON.parse(localProfilesStr);
+          let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
           localProfiles[normalizedEmail] = {
             fullName,
             password
