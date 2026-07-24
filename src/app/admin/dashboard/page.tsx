@@ -35,11 +35,11 @@ export default function DashboardPage() {
     try {
       const { count: profilesCount } = await supabase
         .from('profiles')
-        .select('*', { count: 'exact', head: true });
+        .select('*', { count: 'estimated', head: true });
         
       const { count: solvesCount } = await supabase
         .from('question_attempts')
-        .select('*', { count: 'exact', head: true })
+        .select('*', { count: 'estimated', head: true })
         .eq('is_correct', true);
 
       const totalSolves = solvesCount || 0;
@@ -52,8 +52,8 @@ export default function DashboardPage() {
       // Simple growth logic based on counts (in reality we would compare with yesterday's counts)
       const nowMs = Date.now();
       const yesterday = new Date(nowMs - 24 * 3600 * 1000).toISOString();
-      const { count: usersYesterday } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', yesterday);
-      const { count: solvesYesterday } = await supabase.from('question_attempts').select('*', { count: 'exact', head: true }).gte('created_at', yesterday);
+      const { count: usersYesterday } = await supabase.from('profiles').select('*', { count: 'estimated', head: true }).gte('created_at', yesterday);
+      const { count: solvesYesterday } = await supabase.from('question_attempts').select('*', { count: 'estimated', head: true }).gte('created_at', yesterday);
       
       const newU = usersYesterday || 0;
       const newS = solvesYesterday || 0;
@@ -84,7 +84,7 @@ export default function DashboardPage() {
   const fetchChartData = async () => {
     try {
       // 1. Dynamic User Progression (Strict DB count per day)
-      const { data: weekAtts } = await supabase.from('question_attempts').select('created_at').gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+      const { data: weekAtts } = await supabase.from('question_attempts').select('created_at').gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()).limit(10000);
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       const counts = [0, 0, 0, 0, 0, 0, 0];
       weekAtts?.forEach((a: any) => {
@@ -150,18 +150,37 @@ export default function DashboardPage() {
         });
         
         const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+        const qIds = sorted.map(s => s[0]);
+        
+        const [ { data: qData }, { data: allAttsForQ } ] = await Promise.all([
+          supabase.from('questions').select('id, title, difficulty').in('id', qIds),
+          supabase.from('question_attempts').select('question_id, is_correct').in('question_id', qIds)
+        ]);
         
         setBottlenecks(sorted.map(s => {
-          const qTimes = times[s[0]] || [120];
+          const qId = s[0];
+          const qTimes = times[qId] || [120];
           const avgSecs = Math.floor(qTimes.reduce((a, b) => a + b, 0) / qTimes.length);
           const m = Math.floor(avgSecs / 60);
           const sec = avgSecs % 60;
+          
+          const qMatch = qData?.find((q: any) => q.id === qId);
+          
+          let solveRateStr = '0.0%';
+          if (allAttsForQ) {
+             const qAtts = allAttsForQ.filter((a: any) => a.question_id === qId);
+             if (qAtts.length > 0) {
+               const correct = qAtts.filter((a: any) => a.is_correct).length;
+               solveRateStr = `${((correct / qAtts.length) * 100).toFixed(1)}%`;
+             }
+          }
+
           return {
-            id: `#Q-${s[0].substring(0, 4)}`,
-            name: 'System Designated Complex Problem',
-            difficulty: s[1] > 10 ? 'Lethal' : 'Elite',
+            id: `#Q-${qId.substring(0, 4)}`,
+            name: qMatch?.title || 'Unknown Question',
+            difficulty: qMatch?.difficulty || (s[1] > 10 ? 'Lethal' : 'Elite'),
             time: `${m}m ${sec}s`,
-            solveRate: '0.0%'
+            solveRate: solveRateStr
           };
         }));
       }

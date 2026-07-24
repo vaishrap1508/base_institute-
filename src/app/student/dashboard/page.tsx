@@ -65,6 +65,8 @@ import {
   Link
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import StudyPlannerTab from '@/components/student/StudyPlannerTab';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { LeaderboardView } from '@/components/student/LeaderboardView';
@@ -2860,7 +2862,7 @@ export default function StudentDashboard() {
   const sidebarTabs: SidebarTab[] = [
     { id: 'domains', label: 'Domains', icon: LayoutGrid, action: 'tab' },
     { id: 'learning', label: 'Progress', icon: BookOpen, action: 'tab' },
-    { id: 'studyPlanner', label: 'Study Plan', icon: Calendar, action: 'nav', route: '/student/study-planner' },
+    { id: 'studyPlanner', label: 'Study Plan', icon: Calendar, action: 'tab' },
     { id: 'library', label: 'Study Library', icon: BookMarked, action: 'tab' },
     { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
     { id: 'careerHub', label: 'Placement Hub', icon: Briefcase, action: 'tab' },
@@ -2975,6 +2977,8 @@ export default function StudentDashboard() {
                   <>Company-Specific Placement Hub</>
                 ) : activeSidebarTab === 'leaderboards' ? (
                   <>Placement Leaderboard</>
+                ) : activeSidebarTab === 'studyPlanner' ? (
+                  <>Interactive Study Planner</>
                 ) : activeSidebarTab === 'badges' ? (
                   <>Achievements & Credentials</>
                 ) : activeSidebarTab === 'profile' ? (
@@ -5427,7 +5431,24 @@ export default function StudentDashboard() {
 
             </motion.div>
           )}
-        </AnimatePresence>
+        
+          {/* ====================================================================
+              5. TAB: STUDY PLANNER (Native Integration)
+              ==================================================================== */}
+          {activeSidebarTab === 'studyPlanner' && (
+            <motion.div
+              key="studyPlanner"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full max-w-7xl mx-auto space-y-6 text-slate-800 dark:text-slate-200"
+            >
+              <StudyPlannerTab />
+            </motion.div>
+          )}
+</AnimatePresence>
 
 
 
@@ -6104,6 +6125,9 @@ export default function StudentDashboard() {
           </div>
         )}
       </AnimatePresence>
+
+
+
 
     </div>
   );
