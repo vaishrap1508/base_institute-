@@ -685,7 +685,7 @@ export default function DomainDetailPage() {
     const onboardingStored = localStorage.getItem('aptitude_onboarding_data');
     if (onboardingStored) {
       try {
-        const data = JSON.parse(onboardingStored);
+        let data = null; try { data = JSON.parse(onboardingStored); } catch(e) {}
         setProfile((prev: any) => ({ ...prev, ...data }));
       } catch (_) {}
     }
@@ -699,7 +699,7 @@ export default function DomainDetailPage() {
     const storedRole = localStorage.getItem('aptitude_current_role');
     if (storedRole) {
       try {
-        setCurrentRole(JSON.parse(storedRole));
+        try { setCurrentRole(JSON.parse(storedRole)); } catch(e) {}
       } catch (_) {}
     }
 

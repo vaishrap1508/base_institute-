@@ -25,7 +25,8 @@ export async function updateSession(request: NextRequest) {
         supabaseResponse
       };
     } catch (e) {
-      console.error('Failed to parse mock auth cookie', e);
+      // Silently ignore invalid cookies instead of polluting server logs 
+      // and causing Next.js dev overlay syntax errors
     }
   }
 

@@ -347,19 +347,8 @@ export default function QuestionDirectoryPage() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-100 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      {/* 1. Left Navigation Sidebar */}
-      <Sidebar
-        activeId="directory"
-        userRole={currentRole.role}
-      />
-
-      {/* Main Workspace Frame */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        {/* 2. Top Utility Header */}
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
-
-        {/* Access control check matching Dynamic Content Creator constraints */}
+    <>
+      {/* Access control check matching Dynamic Content Creator constraints */}
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
             <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
@@ -569,7 +558,6 @@ export default function QuestionDirectoryPage() {
 
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }

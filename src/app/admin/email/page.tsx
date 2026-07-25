@@ -1,5 +1,8 @@
 'use client';
 
+import { USER_ROLES } from '@/lib/admin/store';
+import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
 import React, { useState, useEffect } from 'react';
 import { 
   Mail, 
@@ -15,11 +18,6 @@ import {
   ChevronRight,
   Eye
 } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
-import { USER_ROLES } from '@/lib/admin/store';
-import { UserRole } from '@/lib/admin/types';
-
 interface EmailLog {
   id: string;
   recipient: string;
@@ -34,8 +32,8 @@ interface EmailLog {
 }
 
 export default function EmailManagementPage() {
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
-  const [logs, setLogs] = useState<EmailLog[]>([]);
+  const { currentRole, handleRoleChange } = useAdmin();
+const [logs, setLogs] = useState<EmailLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingQueue, setProcessingQueue] = useState(false);
   const [retryingLogId, setRetryingLogId] = useState<string | null>(null);
@@ -46,20 +44,7 @@ export default function EmailManagementPage() {
   const [selectedLog, setSelectedLog] = useState<EmailLog | null>(null);
 
   // Sync role
-  useEffect(() => {
-    const storedRole = localStorage.getItem('aptitude_current_role');
-    if (storedRole) {
-      try {
-        const parsed = JSON.parse(storedRole);
-        const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
-    }
-  }, []);
-
-  // Fetch logs
+// Fetch logs
   const fetchLogs = async () => {
     setLoading(true);
     try {
@@ -135,11 +120,6 @@ export default function EmailManagementPage() {
     }
   };
 
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
-  };
-
   // Metrics calculations
   const totalEmails = logs.length;
   const sentCount = logs.filter(l => l.status === 'sent').length;
@@ -147,11 +127,7 @@ export default function EmailManagementPage() {
   const pendingCount = logs.filter(l => l.status === 'pending').length;
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      <Sidebar activeId="email" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
+    <>
 
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
@@ -457,7 +433,6 @@ export default function EmailManagementPage() {
             
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }

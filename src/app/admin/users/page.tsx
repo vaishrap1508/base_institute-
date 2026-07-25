@@ -45,9 +45,7 @@ export default function UsersPage() {
         const parsed = JSON.parse(storedRole);
         const matched = USER_ROLES.find(r => r.role === parsed.role);
         if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
+      } catch (e) { localStorage.removeItem('aptitude_current_role'); localStorage.removeItem('aptitude_questions'); }
     }
   }, []);
 
@@ -142,18 +140,18 @@ export default function UsersPage() {
         return {
           id: p.id.substring(0, 8).toUpperCase(),
           uuid: p.id,
-          name: p.username || p.name || 'Anonymous Student',
-          email: p.email || 'student@platform.com',
+          name: p.username || p.name || 'Not Specified',
+          email: p.email || 'Not Specified',
           status: p.status || 'ACTIVE',
           streak: streakVal,
           xp: p.xp || 0,
-          college: p.college || 'VIT Vellore',
-          degree: p.degree || 'B.Tech',
-          goal: p.primary_goal || 'Campus Placements',
-          activeDomain: 'Quantitative',
-          activeTopic: 'Arithmetic',
+          college: p.college || 'Not Specified',
+          degree: p.degree || 'Not Specified',
+          goal: p.primary_goal || 'Not Specified',
+          activeDomain: uAttempts[0]?.domain_id || 'Not Specified',
+          activeTopic: 'Not Specified',
           lastActive: lastActiveTime,
-          activeTarget: 'Quantitative - Core Practice',
+          activeTarget: uAttempts[0]?.domain_id ? `${uAttempts[0].domain_id} Practice` : 'Not Specified',
           avatar: p.avatar && p.avatar !== 'initial' ? p.avatar : `https://api.dicebear.com/7.x/adventurer/svg?seed=${p.username || 'student'}`,
           accuracy,
           recentActivity
@@ -335,9 +333,7 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#070a13] text-slate-100 font-sans overflow-hidden antialiased relative">
-      <Sidebar activeId="users" userRole={currentRole.role} />
-
+    <>
       {/* Global Toast Alert */}
       {notification && (
         <div className="absolute top-20 right-8 z-50 animate-slideIn">
@@ -347,9 +343,6 @@ export default function UsersPage() {
           </div>
         </div>
       )}
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
 
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
@@ -394,7 +387,7 @@ export default function UsersPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-[#070a13] custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-8 pb-16 space-y-6 bg-[#070a13] custom-scrollbar">
             
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#151c2f] pb-5">
@@ -761,7 +754,7 @@ export default function UsersPage() {
                     </svg>
 
                     {/* X axis labels */}
-                    <div className="flex justify-between items-center text-[9px] font-bold text-slate-500 uppercase tracking-widest select-none pt-2.5">
+                    <div className="flex justify-between items-center text-[9px] font-bold text-slate-500 uppercase tracking-widest select-none pt-4 pb-2">
                       <span>30 Days Ago</span>
                       <span>15 Days Ago</span>
                       <span>Today</span>
@@ -992,8 +985,7 @@ export default function UsersPage() {
           </div>
         )}
 
-      </div>
-    </div>
+      </>
   );
 }
 

@@ -1,5 +1,8 @@
 'use client';
 
+
+import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
 import React, { useState, useEffect } from 'react';
 import { 
   Settings, Shield, RefreshCw, Server, Lock, Trash2, 
@@ -7,16 +10,12 @@ import {
   MapPin, Target, Edit, Check, ChevronRight, Activity, Bell, Grid, Eye, ShieldAlert,
   Compass, X, Loader2, AlertOctagon, AlertTriangle
 } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
 import { USER_ROLES, SAMPLE_QUESTIONS, DOMAINS_DATA } from '@/lib/admin/store';
-import { UserRole } from '@/lib/admin/types';
 import { supabase } from '@/lib/supabase';
 
 export default function SettingsPage() {
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
-  
-  // Master Tab State
+  const { currentRole, handleRoleChange } = useAdmin();
+// Master Tab State
   const [activeMasterTab, setActiveMasterTab] = useState<'settings' | 'control-centre'>('settings');
 
   // System Overrides States
@@ -253,10 +252,8 @@ export default function SettingsPage() {
       try {
         const parsed = JSON.parse(storedRole);
         const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
+        if (matched) handleRoleChange(matched);
+      } catch (e) { localStorage.removeItem('aptitude_current_role'); localStorage.removeItem('aptitude_questions'); }
     }
 
     const fetchAccountData = async () => {
@@ -286,11 +283,6 @@ export default function SettingsPage() {
     };
     fetchAccountData();
   }, []);
-
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
-  };
 
   const handleResetCatalog = () => {
     localStorage.setItem('aptitude_questions', JSON.stringify(SAMPLE_QUESTIONS));
@@ -629,11 +621,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#070a13] text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      <Sidebar activeId="settings" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
+    <>
 
         {notification && (
           <div className="absolute top-20 right-8 z-50 animate-slideIn">
@@ -1702,7 +1690,6 @@ export default function SettingsPage() {
 
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }
