@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Activity, ShieldCheck, Database, RefreshCw, Cpu, Server, 
-  AlertTriangle, Clock, HardDrive, Wifi, Lock, CheckCircle2, Mail, Layers
+  AlertTriangle, Clock, HardDrive, Wifi, Lock, CheckCircle2, Mail, Layers, Radio, Zap, Terminal
 } from 'lucide-react';
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
@@ -14,6 +14,8 @@ import { supabase } from '@/lib/supabase';
 export default function SystemHealthPage() {
   const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [realtimeStatus, setRealtimeStatus] = useState<'CONNECTING' | 'SUBSCRIBED' | 'CLOSED' | 'CHANNEL_ERROR'>('CONNECTING');
+  const [realtimeEvents, setRealtimeEvents] = useState<Array<{ timestamp: string; table: string; eventType: string; payload: any }>>([]);
   const [metrics, setMetrics] = useState({
     dbLoad: 0,
     apiLatency: 14,
@@ -26,9 +28,12 @@ export default function SystemHealthPage() {
     { name: 'User Auth & Sessions', desc: 'JWT Authentication & Role-Based Access', status: 'Operational', latency: '8ms', icon: Lock, color: 'text-purple-400' },
     { name: 'Media & Asset Storage', desc: 'Badge artwork & explanation attachments', status: 'Operational', latency: '24ms', icon: HardDrive, color: 'text-emerald-400' },
     { name: 'API Gateway & Routes', desc: 'Next.js Serverless API endpoints', status: 'Operational', latency: '14ms', icon: Server, color: 'text-indigo-400' },
-    { name: 'Realtime Subscriptions', desc: 'Supabase WebSockets live stream', status: 'Operational', latency: '6ms', icon: Wifi, color: 'text-amber-400' },
+    { name: 'Realtime Subscriptions', desc: 'Supabase WebSockets live stream', status: realtimeStatus === 'SUBSCRIBED' ? 'Operational' : realtimeStatus, latency: '6ms', icon: Wifi, color: 'text-amber-400' },
     { name: 'Email & Notification Dispatch', desc: 'SMTP & System Notification Queue', status: 'Operational', latency: '18ms', icon: Mail, color: 'text-pink-400' }
   ];
+
+  const [isPinging, setIsPinging] = useState(false);
+  const [pingStatusMsg, setPingStatusMsg] = useState<string | null>(null);
 
   const fetchRealtimeData = async () => {
     try {
@@ -66,6 +71,34 @@ export default function SystemHealthPage() {
         console.warn(e);
       }
     }
+
+    // Subscribe to all postgres changes on public schema across enabled tables
+    const channel = supabase
+      .channel('system-health-db-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: '*' },
+        (payload) => {
+          console.log('Realtime payload received:', payload);
+          const newEvt = {
+            timestamp: new Date().toLocaleTimeString(),
+            table: payload.table,
+            eventType: payload.eventType,
+            payload: payload.new || payload.old || payload
+          };
+          setRealtimeEvents(prev => [newEvt, ...prev.slice(0, 49)]);
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime status changed:', status);
+        if (status === 'SUBSCRIBED') setRealtimeStatus('SUBSCRIBED');
+        else if (status === 'CLOSED') setRealtimeStatus('CLOSED');
+        else if (status === 'CHANNEL_ERROR') setRealtimeStatus('CHANNEL_ERROR');
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleRoleChange = (role: UserRole) => {
@@ -212,6 +245,100 @@ export default function SystemHealthPage() {
                 </div>
               </div>
 
+            </div>
+
+            {/* Real-time Database WebSocket Stream Console */}
+            <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4 hover:border-purple-500/20 transition-all">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[#151c2f] pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                    <Radio className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-black text-white uppercase tracking-wider font-heading flex items-center gap-2">
+                      <span>Live Database WebSocket Stream</span>
+                    </h3>
+                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
+                      Real-time Postgres changes listening on enabled public tables
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 bg-[#070a13] border border-[#151c2f] px-3 py-1.5 rounded-full text-xs font-mono">
+                    <span className={`w-2 h-2 rounded-full ${
+                      realtimeStatus === 'SUBSCRIBED' 
+                        ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]' 
+                        : realtimeStatus === 'CONNECTING' 
+                        ? 'bg-amber-400 animate-ping' 
+                        : 'bg-rose-500'
+                    }`} />
+                    <span className="font-extrabold text-slate-200">{realtimeStatus}</span>
+                  </div>
+
+                  <button
+                    disabled={isPinging}
+                    onClick={async () => {
+                      setIsPinging(true);
+                      setPingStatusMsg("Sending...");
+                      try {
+                        const res = await fetch('/api/admin/ping-db', { method: 'POST' });
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                          setPingStatusMsg("Ping Dispatched! ✅");
+                        } else {
+                          console.error("Ping error:", data);
+                          setPingStatusMsg("Ping Error ❌");
+                        }
+                      } catch (err) {
+                        console.warn("Ping test exception:", err);
+                        setPingStatusMsg("Failed ❌");
+                      } finally {
+                        setIsPinging(false);
+                        setTimeout(() => setPingStatusMsg(null), 3000);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <Zap className={`w-3.5 h-3.5 ${isPinging ? 'animate-bounce text-amber-400' : ''}`} />
+                    <span>{pingStatusMsg || "Test Ping DB"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Event Feed Console */}
+              <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-4 space-y-3 font-mono">
+                <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider border-b border-[#151c2f]/60 pb-2">
+                  <span className="flex items-center gap-1.5">
+                    <Terminal className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Live Change Console Stream</span>
+                  </span>
+                  <span>{realtimeEvents.length} Events Captured</span>
+                </div>
+
+                <div className="max-h-56 overflow-y-auto space-y-2 custom-scrollbar text-xs">
+                  {realtimeEvents.length === 0 ? (
+                    <div className="py-6 text-center text-slate-500 text-[11px] font-sans italic">
+                      WebSocket active. Make a change in Supabase or click "Test Ping DB" to see real-time events appear instantly here.
+                    </div>
+                  ) : (
+                    realtimeEvents.map((evt, idx) => (
+                      <div key={idx} className="p-3 bg-[#0f1322] border border-[#151c2f] rounded-lg space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px]">
+                          <div className="flex items-center gap-2">
+                            <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-extrabold uppercase">{evt.eventType}</span>
+                            <span className="text-slate-300 font-bold">table: <span className="text-cyan-400">{evt.table}</span></span>
+                          </div>
+                          <span className="text-slate-500">{evt.timestamp}</span>
+                        </div>
+                        <pre className="text-[11px] text-emerald-400 overflow-x-auto">
+                          {JSON.stringify(evt.payload, null, 2)}
+                        </pre>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Platform Services Grid */}
