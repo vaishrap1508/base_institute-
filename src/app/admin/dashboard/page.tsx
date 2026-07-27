@@ -309,6 +309,9 @@ export default function DashboardPage() {
                 <h1 className="text-3xl font-extrabold text-white tracking-tight uppercase font-heading mt-1">
                   System Performance
                 </h1>
+                <p className="text-xs text-slate-400 mt-1">
+                  Real-time live operational metrics queried directly from database records.
+                </p>
               </div>
               
               <div className="flex items-center gap-3">
@@ -332,96 +335,130 @@ export default function DashboardPage() {
               <div className="lg:col-span-3 space-y-6 flex flex-col">
                 
                 {/* 5-Column Metrics Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5">
                   
-                  {/* Card 1: Live Users */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4.5 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
-                    <div className="flex items-start justify-between">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-all">
-                        <Monitor className="w-4.5 h-4.5" />
+                  {/* Card 1: Live Registered Students */}
+                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-all shrink-0">
+                        <Monitor className="w-4 h-4" />
                       </div>
-                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        {stats.liveUsersLabel}
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+                        Realtime DB
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-2xl font-extrabold text-white tracking-tight mt-3">
+                      <h3 className="text-2xl font-black text-white tracking-tight mt-2.5 whitespace-nowrap">
                         {stats.liveUsers.toLocaleString()}
                       </h3>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">Live Users</p>
+                      <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider mt-1 whitespace-nowrap truncate" title="LIVE REGISTERED STUDENTS">
+                        LIVE REGISTERED STUDENTS
+                      </p>
                     </div>
-                    {/* Teal indicator bar */}
-                    <div className="w-full h-1 bg-emerald-500/10 rounded-full mt-3 overflow-hidden">
-                      <div className="h-full bg-emerald-400 w-3/4 rounded-full" />
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9.5px] font-bold gap-1">
+                        <span className="text-slate-400 whitespace-nowrap">Active Users</span>
+                        <span className="text-emerald-400 font-extrabold whitespace-nowrap">{stats.liveUsers} Users</span>
+                      </div>
+                      <div className="w-full h-1 bg-emerald-500/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-emerald-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${stats.liveUsers === 0 ? 0 : Math.min(100, Math.max(2, (stats.liveUsers / 100) * 100))}%` }} 
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Card 2: Daily Solves */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4.5 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
-                    <div className="flex items-start justify-between">
-                      <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-all">
-                        <CheckCircle className="w-4.5 h-4.5" />
+                  {/* Card 2: Total Solved Questions */}
+                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-all shrink-0">
+                        <CheckCircle className="w-4 h-4" />
                       </div>
-                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                        {stats.dailySolvesLabel}
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 whitespace-nowrap">
+                        Realtime DB
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-2xl font-extrabold text-white tracking-tight mt-3">
-                        {(stats.dailySolves / 1000).toFixed(1)}k
+                      <h3 className="text-2xl font-black text-white tracking-tight mt-2.5 whitespace-nowrap">
+                        {stats.dailySolves.toLocaleString()}
                       </h3>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">Daily Solves</p>
+                      <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider mt-1 whitespace-nowrap truncate" title="TOTAL SOLVED QUESTIONS">
+                        TOTAL SOLVED QUESTIONS
+                      </p>
                     </div>
-                    {/* Mini horizontal bar representation */}
-                    <div className="flex items-end justify-between gap-1 h-3 mt-3 w-16">
-                      <div className="w-1.5 h-1.5 bg-purple-500/40 rounded-full" />
-                      <div className="w-1.5 h-2 bg-purple-500/60 rounded-full" />
-                      <div className="w-1.5 h-2.5 bg-purple-500/80 rounded-full" />
-                      <div className="w-1.5 h-3 bg-purple-400 rounded-full" />
-                      <div className="w-1.5 h-2 bg-purple-500/60 rounded-full" />
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9.5px] font-bold gap-1">
+                        <span className="text-slate-400 whitespace-nowrap">Solved Count</span>
+                        <span className="text-purple-400 font-extrabold whitespace-nowrap">{stats.dailySolves} Solved</span>
+                      </div>
+                      <div className="w-full h-1 bg-purple-500/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-purple-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${stats.dailySolves === 0 ? 0 : Math.min(100, Math.max(2, (stats.dailySolves / 1000) * 100))}%` }} 
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Card 3: Avg Session Time */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4.5 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
-                    <div className="flex items-start justify-between">
-                      <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-all">
-                        <Clock className="w-4.5 h-4.5" />
+                  {/* Card 3: Avg Solve Duration */}
+                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-all shrink-0">
+                        <Clock className="w-4 h-4" />
                       </div>
-                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-[#151c2f]">
-                        ~0.4s
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 whitespace-nowrap">
+                        Live
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-2xl font-extrabold text-white tracking-tight mt-3">{stats.avgSessionTime}</h3>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">Avg Session Time</p>
+                      <h3 className="text-2xl font-black text-white tracking-tight mt-2.5 whitespace-nowrap">{stats.avgSessionTime}</h3>
+                      <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider mt-1 whitespace-nowrap truncate" title="AVG SOLVE DURATION">
+                        AVG SOLVE DURATION
+                      </p>
                     </div>
-                    <div className="flex items-center gap-1.5 mt-3 text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                      <span>Tracking Active</span>
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9.5px] font-bold gap-1">
+                        <span className="text-slate-400 whitespace-nowrap">Tracking Status</span>
+                        <span className="text-blue-400 font-extrabold whitespace-nowrap">{stats.avgSessionTime}</span>
+                      </div>
+                      <div className="w-full h-1 bg-blue-500/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-blue-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${stats.avgSessionTime === '0m 0s' ? 0 : 50}%` }} 
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Card 4: New Signups */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4.5 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
-                    <div className="flex items-start justify-between">
-                      <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-all">
-                        <UserPlus className="w-4.5 h-4.5" />
+                  {/* Card 4: New Signups (24H) */}
+                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-all shrink-0">
+                        <UserPlus className="w-4 h-4" />
                       </div>
-                      <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                        {stats.newSignupsLabel}
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 whitespace-nowrap">
+                        24h Signups
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-2xl font-extrabold text-white tracking-tight mt-3">
+                      <h3 className="text-2xl font-black text-white tracking-tight mt-2.5 whitespace-nowrap">
                         {stats.newSignups.toLocaleString()}
                       </h3>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">New Signups</p>
+                      <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider mt-1 whitespace-nowrap truncate" title="NEW SIGNUPS (24H)">
+                        NEW SIGNUPS (24H)
+                      </p>
                     </div>
-                    <div className="text-[9px] font-bold text-slate-500 mt-3 flex justify-between items-center w-full">
-                      <span>Target: 2,000</span>
-                      <div className="w-8 h-1 bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-cyan-400 w-2/3" />
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9.5px] font-bold gap-1">
+                        <span className="text-slate-400 whitespace-nowrap">DB Users</span>
+                        <span className="text-cyan-400 font-extrabold whitespace-nowrap">{stats.newSignups} Total</span>
+                      </div>
+                      <div className="w-full h-1 bg-cyan-500/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-cyan-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${stats.newSignups === 0 ? 0 : Math.min(100, Math.max(2, (stats.newSignups / 2000) * 100))}%` }} 
+                        />
                       </div>
                     </div>
                   </div>
