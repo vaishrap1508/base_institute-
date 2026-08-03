@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
+import RoleToggle from '@/components/RoleToggle';
 import { USER_ROLES } from '@/lib/admin/store';
 import { UserRole } from '@/lib/admin/types';
 import { supabase } from '@/lib/supabase';
@@ -375,15 +376,18 @@ export default function UsersPage() {
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  const admin = USER_ROLES.find(r => r.role === 'admin');
-                  if (admin) handleRoleChange(admin);
-                }}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer border-0"
-              >
-                Request Admin Clearance
-              </button>
+              <div className="flex items-center justify-center gap-3 w-full mt-2">
+                <RoleToggle />
+                <button
+                  onClick={() => {
+                    const admin = USER_ROLES.find(r => r.role === 'admin');
+                    if (admin) handleRoleChange(admin);
+                  }}
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer border-0"
+                >
+                  Request Admin Clearance
+                </button>
+              </div>
             </div>
           </div>
         ) : (
@@ -402,6 +406,7 @@ export default function UsersPage() {
                   Monitor, manage, and inspect student progress across all courses and practice modules.
                 </p>
               </div>
+              <RoleToggle />
             </div>
 
             {loading ? (

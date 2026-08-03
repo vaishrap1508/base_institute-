@@ -6,6 +6,7 @@ import { ShieldAlert, CheckCircle2, XCircle, ArrowRight, Database, Eye, Award, L
 // Import Custom Components
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
+import RoleToggle from '@/components/RoleToggle';
 import DomainSelectors from '@/components/admin/DomainSelectors';
 import MetaSelectors from '@/components/admin/MetaSelectors';
 import ResponseMatrix from '@/components/admin/ResponseMatrix';
@@ -891,6 +892,7 @@ export default function AdminContentCreator() {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
@@ -916,6 +918,7 @@ export default function AdminContentCreator() {
                   Synthesize and validate mathematical stems, markdown solutions, and multi-choice response matrices.
                 </p>
               </div>
+              <RoleToggle />
             </div>
 
             {/* A. Domain Selection Grid */}

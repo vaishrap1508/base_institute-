@@ -3,6 +3,7 @@
 
 import { UserRole } from '@/lib/admin/types';
 import { useAdmin } from '@/app/admin/AdminContext';
+import RoleToggle from '@/components/RoleToggle';
 import React, { useState, useEffect } from 'react';
 import { 
   Settings, Shield, RefreshCw, Server, Lock, Trash2, 
@@ -664,6 +665,7 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div className="flex items-center justify-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
@@ -690,8 +692,10 @@ export default function SettingsPage() {
                 </h1>
               </div>
 
-              {/* Master Tab Navigation */}
-              <div className="relative flex bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] shadow-inner select-none self-stretch sm:self-auto w-full sm:w-[320px]">
+              {/* Master Tab Navigation & RoleToggle */}
+              <div className="flex items-center gap-4 self-stretch sm:self-auto">
+                <RoleToggle />
+                <div className="relative flex bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] shadow-inner select-none w-full sm:w-[320px]">
                 {/* Sliding indicator */}
                 <div 
                   className={`absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-2px)] bg-purple-600 rounded-full shadow-[0_0_15px_rgba(147,51,234,0.3)] transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]`}
@@ -720,6 +724,7 @@ export default function SettingsPage() {
                   Control Centre
                 </button>
               </div>
+            </div>
             </div>
 
             {activeMasterTab === 'settings' ? (

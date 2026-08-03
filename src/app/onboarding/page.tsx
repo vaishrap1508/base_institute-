@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
+import RoleToggle from '@/components/RoleToggle';
 import { 
   Layers, 
   User, 
@@ -27,7 +29,6 @@ import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { siteConfig } from '@/config/site';
 import { INDIAN_STATES, INDIAN_COLLEGES } from '@/data/indianColleges';
-import ThemeToggle from '@/components/ThemeToggle';
 
 // Option lists
 const ALL_COUNTRIES = [
@@ -824,6 +825,7 @@ export default function OnboardingPage() {
           </div>
         </Link>
         <div className="flex items-center gap-4">
+          <RoleToggle />
           <ThemeToggle />
         </div>
       </header>

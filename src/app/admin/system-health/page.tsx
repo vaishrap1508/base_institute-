@@ -1,6 +1,9 @@
+'use client';
+
 import { USER_ROLES } from '@/lib/admin/store';
 import { UserRole } from '@/lib/admin/types';
 import { useAdmin } from '@/app/admin/AdminContext';
+import RoleToggle from '@/components/RoleToggle';
 import React, { useState, useEffect } from 'react';
 import { 
   Activity, ShieldAlert, ShieldCheck, Database, RefreshCw, Cpu, Server, 
@@ -138,6 +141,7 @@ export default function SystemHealthPage() {
                 </div>
               </div>
               <div className="flex items-center justify-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
@@ -166,6 +170,7 @@ export default function SystemHealthPage() {
 
               {/* Status Header Badge & Refresh */}
               <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between sm:justify-start">
+                <RoleToggle />
                 <div className="flex items-center gap-2 bg-[#0c1921] border border-emerald-500/20 px-3.5 py-1.5 rounded-full text-xs font-bold text-emerald-400">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span>Operational</span>

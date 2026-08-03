@@ -7,6 +7,7 @@ import { Plus, Download, Library, CheckCircle2, FileText, ShieldAlert, Lock, Ref
 // Custom Components
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
+import RoleToggle from '@/components/RoleToggle';
 import FilterDropdowns from '@/components/admin/directory/FilterDropdowns';
 import QuestionTable from '@/components/admin/directory/QuestionTable';
 
@@ -399,6 +400,7 @@ export default function QuestionDirectoryPage() {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
@@ -437,6 +439,7 @@ export default function QuestionDirectoryPage() {
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3 shrink-0 self-start md:self-center">
+                <RoleToggle />
                 {/* Export Catalog JSON */}
                 <button
                   onClick={handleExportCatalog}

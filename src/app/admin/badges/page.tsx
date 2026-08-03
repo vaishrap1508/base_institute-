@@ -3,6 +3,7 @@
 import { USER_ROLES } from '@/lib/admin/store';
 import { UserRole } from '@/lib/admin/types';
 import { useAdmin } from '@/app/admin/AdminContext';
+import RoleToggle from '@/components/RoleToggle';
 import React, { useState, useEffect } from 'react';
 import { 
   Award, 
@@ -298,6 +299,7 @@ const [badges, setBadges] = useState<any[]>([]);
                 </div>
               </div>
               <div className="flex items-center justify-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
@@ -322,6 +324,7 @@ const [badges, setBadges] = useState<any[]>([]);
                 </p>
               </div>
               <div className="flex items-center gap-3 shrink-0">
+                <RoleToggle />
                 <button
                   onClick={fetchBadgesAndStats}
                   className="px-4 py-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:bg-slate-50"

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
+import RoleToggle from '@/components/RoleToggle';
 import { siteConfig } from '@/config/site';
 import { 
   Layers, 
@@ -1750,7 +1751,10 @@ export default function LandingPage() {
         </nav>
 
         {/* Clearance Sync Dashboard CTA */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
+          {/* Preview/Edit Switcher */}
+          <RoleToggle />
+
           {/* Theme Toggle Button (Icon-Only Circular Button) */}
           <button
             onClick={toggleTheme}

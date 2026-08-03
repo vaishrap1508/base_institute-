@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import RoleToggle from '@/components/RoleToggle';
 import { 
   Check, 
   X, 
@@ -1104,7 +1105,9 @@ export default function PracticeArena({
 
         {/* Right segment: status, momentum, timer & Star bookmark */}
         <div className="flex flex-wrap items-center gap-3 self-end sm:self-auto select-none justify-end">
-          
+          {/* Preview/Edit Switcher */}
+          <RoleToggle />
+
           {/* Solving Momentum Widget */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20 rounded-full text-xs font-bold text-orange-600 dark:text-orange-400 shadow-xs" title="Your current correct answer streak and total solved questions today">
             <span>🔥 {streak} Streak • {solvedCount} Solved</span>

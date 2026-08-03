@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { siteConfig } from '@/config/site';
+import RoleToggle from '@/components/RoleToggle';
 import {
   Layers,
   User,
@@ -3019,47 +3020,7 @@ export default function StudentDashboard() {
               </div>
 
               {/* Preview/Edit Switcher */}
-              <div className="flex bg-slate-100 dark:bg-slate-900 p-0.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner mr-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const studentRole = {
-                      role: 'STUDENT',
-                      name: 'Vaishnavi Raparthy',
-                      email: 'student@aptitude-ai.com',
-                      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
-                    };
-                    localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
-                    setCurrentRole(studentRole);
-                  }}
-                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${(!themeMounted || currentRole?.role !== 'admin')
-                      ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                    }`}
-                >
-                  Preview
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const adminRole = {
-                      role: 'admin',
-                      name: 'SARAH CONNOR',
-                      email: 'sarah.c@aptitude-ai.com',
-                      avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
-                    };
-                    localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
-                    setCurrentRole(adminRole);
-                    router.push('/admin/editor');
-                  }}
-                  className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${(themeMounted && currentRole?.role === 'admin')
-                      ? 'bg-white dark:bg-slate-950 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                    }`}
-                >
-                  Edit / Admin
-                </button>
-              </div>
+              <RoleToggle className="mr-2" onRoleChange={(roleObj) => setCurrentRole(roleObj)} />
 
               {/* Notification & Avatar profile access */}
               <div className="flex items-center gap-3">

@@ -15,6 +15,7 @@ import {
   AlertCircle 
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import RoleToggle from '@/components/RoleToggle';
 import { siteConfig } from '@/config/site';
 import { supabase } from '@/lib/supabase';
 
@@ -341,8 +342,9 @@ function ResetPasswordContent() {
 
       </div>
       
-      {/* Theme Toggle overlay */}
-      <div className="absolute top-6 right-6">
+      {/* Theme & Role Toggle overlay */}
+      <div className="absolute top-6 right-6 flex items-center gap-3">
+        <RoleToggle />
         <ThemeToggle />
       </div>
     </div>

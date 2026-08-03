@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import RoleToggle from '@/components/RoleToggle';
 import {
   Layers,
   ArrowLeft,
@@ -989,6 +990,9 @@ export default function DomainDetailPage() {
             </div>
 
             <div className="flex items-center gap-4">
+              {/* Preview/Edit Switcher */}
+              <RoleToggle />
+
               {/* Notification bell dropdown list */}
               <div className="relative">
                 <button
@@ -1873,7 +1877,8 @@ export default function DomainDetailPage() {
               />
             </div>
 
-            {/* User role badge */}
+            {/* Preview/Edit Switcher */}
+            <RoleToggle />
           </div>
         </header>
 

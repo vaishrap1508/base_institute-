@@ -3,6 +3,8 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import ThemeToggle from '@/components/ThemeToggle';
+import RoleToggle from '@/components/RoleToggle';
 import { 
   Layers, 
   Mail, 
@@ -26,7 +28,6 @@ import {
 import { USER_ROLES } from '@/lib/admin/store';
 import { createClient } from '@/utils/supabase/client';
 import { siteConfig } from '@/config/site';
-import ThemeToggle from '@/components/ThemeToggle';
 
 function LoginContent() {
   const router = useRouter();
@@ -853,8 +854,9 @@ function LoginContent() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
 
-        {/* Theme Toggle in the topmost right corner */}
-        <div className="absolute top-4 right-4 flex items-center">
+        {/* Theme & Role Toggle in the topmost right corner */}
+        <div className="absolute top-4 right-4 flex items-center gap-3">
+          <RoleToggle />
           <ThemeToggle />
         </div>
 
