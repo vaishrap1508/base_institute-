@@ -225,9 +225,9 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
           </thead>
           <tbody className="divide-y divide-slate-150 dark:divide-slate-800">
             {paginatedQuestions.length > 0 ? (
-              paginatedQuestions.map((q) => (
+              paginatedQuestions.map((q, qIdx) => (
                 <tr
-                  key={q.id}
+                  key={`${q.id || 'q'}-${qIdx}`}
                   onClick={() => onEditQuestion(q)}
                   className="hover:bg-slate-50/50 dark:hover:bg-slate-950/40 transition-colors cursor-pointer group"
                 >
@@ -296,9 +296,9 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   {/* Company Tags */}
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1.5 max-w-[160px]">
-                      {q.companyTags.map((tag) => (
+                      {q.companyTags.map((tag, tagIdx) => (
                         <span
-                          key={tag}
+                          key={`${tag}-${tagIdx}`}
                           className="bg-slate-100 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 text-slate-600 px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wide"
                         >
                           {tag}

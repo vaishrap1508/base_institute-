@@ -118,14 +118,12 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
 
       {/* Top Navigation Links */}
       <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
-        {visibleTopItems.map(renderNavButton)}
+        {visibleTopItems.map((item) => renderNavButton(item))}
       </nav>
 
       {/* Bottom Navigation Links */}
       <div className="px-4 py-4 border-t border-slate-200 dark:border-[#151c2f] space-y-1.5 bg-slate-50 dark:bg-[#070a10]">
-        {bottomItems.map(renderNavButton)}
-        
-
+        {bottomItems.map((item) => renderNavButton(item))}
       </div>
     </aside>
   );

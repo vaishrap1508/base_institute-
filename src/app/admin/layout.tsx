@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
 import { usePathname } from 'next/navigation';
 import { AdminContext } from './AdminContext';
 
@@ -45,7 +44,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <Sidebar activeId={activeId} userRole={currentRole.role as 'admin' | 'editor'} />
       
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole as any} onRoleChange={handleRoleChange} />
         <AdminContext.Provider value={{ currentRole, handleRoleChange }}>
           {children}
         </AdminContext.Provider>

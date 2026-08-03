@@ -78,6 +78,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col relative">
         {children}
+        <div className="fixed bottom-6 right-6 z-50">
+          <ThemeToggle floating />
+        </div>
       </body>
     </html>
   );

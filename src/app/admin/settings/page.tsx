@@ -863,21 +863,6 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* System Status Overview */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4">
-                  <div className="flex items-center gap-2 border-b border-[#151c2f] pb-3.5">
-                    <Shield className="w-4.5 h-4.5 text-emerald-400" />
-                    <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
-                      Platform Environment
-                    </h3>
-                  </div>
-                  
-                  <p className="text-xs text-slate-300 leading-relaxed font-semibold">
-                    Operating in <strong className="text-purple-400">{currentRole.role === 'admin' ? 'Administrator' : 'Editor'} Mode</strong>. Changes made to onboarding flow and settings persist directly to the production database.
-                  </p>
-                </div>
-
               </div>
 
             </div>

@@ -13,9 +13,23 @@ export default function ThemeToggle({ floating = false }: ThemeToggleProps) {
 
   useEffect(() => {
     setMounted(true);
-    // Sync current active theme state based on the presence of .dark class
-    const isDark = document.documentElement.classList.contains('dark');
-    setTheme(isDark ? 'dark' : 'light');
+    const syncTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+    syncTheme();
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          syncTheme();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => observer.disconnect();
   }, []);
 
   const toggleTheme = () => {

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface RoleToggleProps {
   className?: string;
@@ -60,9 +61,12 @@ export default function RoleToggle({ className = '', onRoleChange }: RoleToggleP
 
   if (!mounted) {
     return (
-      <div className={`flex bg-[#070a13] dark:bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] dark:border-[#151c2f] shadow-inner select-none ${className}`}>
-        <span className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400">Preview</span>
-        <span className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400">Edit</span>
+      <div className={`flex items-center gap-2.5 ${className}`}>
+        <div className="flex bg-[#070a13] dark:bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] dark:border-[#151c2f] shadow-inner select-none">
+          <span className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400">Preview</span>
+          <span className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400">Edit</span>
+        </div>
+        <ThemeToggle />
       </div>
     );
   }
@@ -70,34 +74,38 @@ export default function RoleToggle({ className = '', onRoleChange }: RoleToggleP
   const isAdmin = role === 'admin';
 
   return (
-    <div className={`flex bg-[#070a13] dark:bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] dark:border-[#151c2f] shadow-inner select-none ${className}`}>
-      {/* Preview Mode */}
-      <button
-        type="button"
-        suppressHydrationWarning
-        onClick={() => handleSetRole('STUDENT')}
-        className={`px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-          !isAdmin
-            ? 'bg-purple-600 text-white shadow-md'
-            : 'text-slate-400 hover:text-slate-200'
-        }`}
-      >
-        Preview
-      </button>
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <div className="flex bg-[#070a13] dark:bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] dark:border-[#151c2f] shadow-inner select-none">
+        {/* Preview Mode */}
+        <button
+          type="button"
+          suppressHydrationWarning
+          onClick={() => handleSetRole('STUDENT')}
+          className={`px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+            !isAdmin
+              ? 'bg-purple-600 text-white shadow-md'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          Preview
+        </button>
 
-      {/* Edit Mode */}
-      <button
-        type="button"
-        suppressHydrationWarning
-        onClick={() => handleSetRole('admin')}
-        className={`px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-          isAdmin
-            ? 'bg-purple-600 text-white shadow-md'
-            : 'text-slate-400 hover:text-slate-200'
-        }`}
-      >
-        Edit
-      </button>
+        {/* Edit Mode */}
+        <button
+          type="button"
+          suppressHydrationWarning
+          onClick={() => handleSetRole('admin')}
+          className={`px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+            isAdmin
+              ? 'bg-purple-600 text-white shadow-md'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          Edit
+        </button>
+      </div>
+
+      <ThemeToggle />
     </div>
   );
 }

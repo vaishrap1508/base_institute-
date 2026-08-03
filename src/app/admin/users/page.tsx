@@ -7,7 +7,6 @@ import {
   KeyRound, Check, X, Activity, ChevronLeft, Plus, Cpu, AlertTriangle, Loader2, Award, Mail
 } from 'lucide-react';
 import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
 import RoleToggle from '@/components/RoleToggle';
 import { USER_ROLES } from '@/lib/admin/store';
 import { UserRole } from '@/lib/admin/types';

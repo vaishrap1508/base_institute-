@@ -337,15 +337,96 @@ export default function QuestionDirectoryPage() {
     router.push('/admin/editor?new=true');
   };
 
-  // Export Catalog Action: JSON Downloader (Enterprise Command Center Feature)
-  const handleExportCatalog = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredQuestions, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `Aptitude_Questions_Catalog_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+  const [showExportMenu, setShowExportMenu] = useState(false);
+
+  // Export Catalog Action: CSV Downloader
+  const handleExportCSV = () => {
+    const headers = [
+      'Question ID',
+      'Domain',
+      'Sub-Topic',
+      'Concept',
+      'Difficulty',
+      'Question Stem',
+      'Response Options',
+      'Correct Answer(s)',
+      'Company Tags',
+      'Status'
+    ];
+
+    const escapeCsv = (val: string) => `"${(val || '').replace(/"/g, '""')}"`;
+
+    const rows = filteredQuestions.map((q) => {
+      const domainName = DOMAINS_DATA.find((d) => d.id === q.domainId)?.name || q.domainId;
+      const subTopicObj = DOMAINS_DATA.flatMap((d) => d.subTopics).find((s) => s.id === q.subTopicId);
+      const subTopicName = subTopicObj?.name || q.subTopicId;
+      const conceptName = DOMAINS_DATA.flatMap((d) => d.subTopics).flatMap((s) => s.concepts).find((c) => c.id === q.conceptId)?.name || q.conceptId;
+
+      const optionsStr = q.options?.map((o) => `[${o.id}] ${o.text}`).join(' | ') || '';
+      const correctAnswers = q.options?.filter((o) => o.isCorrect).map((o) => `[${o.id}] ${o.text}`).join(', ') || '';
+      const companyTagsStr = q.companyTags?.join('; ') || '';
+
+      return [
+        escapeCsv(q.questionBinaryId || q.id),
+        escapeCsv(domainName),
+        escapeCsv(subTopicName),
+        escapeCsv(conceptName),
+        escapeCsv(q.difficulty),
+        escapeCsv(q.questionStem),
+        escapeCsv(optionsStr),
+        escapeCsv(correctAnswers),
+        escapeCsv(companyTagsStr),
+        escapeCsv(q.status || 'Draft')
+      ].join(',');
+    });
+
+    const csvData = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Aptitude_Catalog_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+  };
+
+  // Export Catalog Action: JSON Downloader
+  const handleExportJSON = () => {
+    const exportData = filteredQuestions.map((q) => {
+      const domainName = DOMAINS_DATA.find((d) => d.id === q.domainId)?.name || q.domainId;
+      const subTopicName = DOMAINS_DATA.flatMap((d) => d.subTopics).find((s) => s.id === q.subTopicId)?.name || q.subTopicId;
+      const conceptName = DOMAINS_DATA.flatMap((d) => d.subTopics).flatMap((s) => s.concepts).find((c) => c.id === q.conceptId)?.name || q.conceptId;
+
+      return {
+        id: q.id,
+        binaryId: q.questionBinaryId || q.id,
+        domain: domainName,
+        subTopic: subTopicName,
+        concept: conceptName,
+        difficulty: q.difficulty,
+        questionStem: q.questionStem,
+        hintText: q.hintText,
+        options: q.options,
+        correctAnswers: q.options?.filter((o) => o.isCorrect).map((o) => o.id),
+        companyTags: q.companyTags,
+        videoUrl: q.videoUrl,
+        status: q.status || 'Draft'
+      };
+    });
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Aptitude_Catalog_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
   };
 
   return (
@@ -424,14 +505,6 @@ export default function QuestionDirectoryPage() {
               <div>
                 <div className="flex items-center gap-3">
                   <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Question Directory</h1>
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wide uppercase border dark:border-slate-800 shadow-inner ${
-                    dbSource === 'Supabase Cloud' 
-                      ? 'bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/20 dark:border-indigo-900/30 dark:text-indigo-400' 
-                      : 'bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-950/20 dark:border-amber-900/30 dark:text-amber-400'
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${dbSource === 'Supabase Cloud' ? 'bg-indigo-600 animate-pulse' : 'bg-amber-500'}`} />
-                    {dbSource}
-                  </span>
                 </div>
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
                   Manage, search, organize, and monitor all platform questions.
@@ -441,15 +514,41 @@ export default function QuestionDirectoryPage() {
               {/* Action Buttons */}
               <div className="flex items-center gap-3 shrink-0 self-start md:self-center">
                 <RoleToggle />
-                {/* Export Catalog JSON */}
-                <button
-                  onClick={handleExportCatalog}
-                  disabled={filteredQuestions.length === 0}
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200/90 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-xs active:scale-98 cursor-pointer dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-200"
-                >
-                  <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                  <span>Export Catalog</span>
-                </button>
+                
+                {/* Export Catalog Menu Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    disabled={filteredQuestions.length === 0}
+                    className="px-4 py-2.5 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200/90 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-xs active:scale-98 cursor-pointer dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-200"
+                  >
+                    <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                    <span>Export Catalog</span>
+                  </button>
+
+                  {showExportMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 animate-fadeIn">
+                      <button
+                        onClick={handleExportCSV}
+                        className="w-full px-4 py-2.5 text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between cursor-pointer border-0 bg-transparent"
+                      >
+                        <span>Export as CSV</span>
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/30 font-mono">
+                          .CSV
+                        </span>
+                      </button>
+                      <button
+                        onClick={handleExportJSON}
+                        className="w-full px-4 py-2.5 text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between cursor-pointer border-0 bg-transparent"
+                      >
+                        <span>Export as JSON</span>
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30 font-mono">
+                          .JSON
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {/* Add Question Primary Button */}
                 <button
