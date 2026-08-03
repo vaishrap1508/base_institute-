@@ -96,28 +96,28 @@ const [domainMetrics, setDomainMetrics] = useState([
             <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-500 shadow-inner relative">
                 <Cpu className="w-7 h-7 animate-pulse" />
-                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">!</span>
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-slate-900 dark:text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
               <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
                     <span className="text-slate-800 dark:text-slate-100 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
                     <span className="text-slate-800 dark:text-rose-400 font-bold uppercase tracking-wider text-[11px] text-rose-600">{currentRole.role}</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/analytics</span>
                   </div>
                 </div>
@@ -128,7 +128,7 @@ const [domainMetrics, setDomainMetrics] = useState([
                     const admin = USER_ROLES.find(r => r.role === 'admin');
                     if (admin) handleRoleChange(admin);
                   }}
-                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer"
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer"
                 >
                   <span>Request Admin Clearance</span>
                 </button>
@@ -154,9 +154,14 @@ const [domainMetrics, setDomainMetrics] = useState([
                   <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
                     <div className="flex items-center gap-2">
                       <Compass className="w-5 h-5 text-blue-600" />
-                      <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight">Taxonomy Diagnostics</h3>
+                      <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight">Domain Performance</h3>
                     </div>
-                    <span className="text-[10px] font-extrabold px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100/50 dark:border-blue-900/30 uppercase tracking-wider">COHORT B</span>
+                    <span 
+                      className="text-[10px] font-extrabold px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100/50 dark:border-blue-900/30 uppercase tracking-wider cursor-help"
+                      title="Aggregated data from all registered students across the platform"
+                    >
+                      ALL STUDENTS
+                    </span>
                   </div>
 
                   <div className="space-y-4">
@@ -164,19 +169,19 @@ const [domainMetrics, setDomainMetrics] = useState([
                       <div key={domain.code} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl space-y-3.5 hover:shadow-xs transition-shadow duration-150">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className={`text-[10px] font-black text-white px-2 py-0.5 rounded bg-gradient-to-r ${domain.color} tracking-wider`}>
+                            <span className={`text-[10px] font-black text-slate-900 dark:text-white px-2 py-0.5 rounded bg-gradient-to-r ${domain.color} tracking-wider`}>
                               {domain.code}
                             </span>
                             <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{domain.name}</span>
                           </div>
                           <div className="flex items-center gap-4 text-xs font-bold text-slate-700 dark:text-slate-300">
                             <div className="flex flex-col items-end">
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">COMPLETED</span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">COMPLETED</span>
                               <span>{domain.completion}</span>
                             </div>
                             <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
                             <div className="flex flex-col items-end">
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">ACCURACY</span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">ACCURACY</span>
                               <span className="text-blue-600 dark:text-blue-400">{domain.accuracy}</span>
                             </div>
                           </div>

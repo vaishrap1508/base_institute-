@@ -63,7 +63,7 @@ export default function MetaSelectors({
     <div className="flex flex-col gap-6 bg-white dark:bg-slate-900 p-5 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm h-full">
       {/* Difficulty Level Selector */}
       <div className="flex flex-col gap-2.5">
-        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">
           Difficulty Level
         </label>
         <div className="grid grid-cols-3 gap-2">
@@ -110,7 +110,7 @@ export default function MetaSelectors({
 
       {/* Company Tag Autocomplete System */}
       <div className="flex flex-col gap-2.5 relative" ref={dropdownRef}>
-        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">
           Company Tags
         </label>
 
@@ -126,10 +126,10 @@ export default function MetaSelectors({
             onFocus={() => setIsDropdownOpen(true)}
             onKeyDown={handleKeyDown}
             placeholder="Add companies (e.g. TCS, Amazon)"
-            className="w-full px-3.5 py-2 pr-9 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            className="w-full px-3.5 py-2 pr-9 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
           />
           <ChevronDown
-            className="w-4 h-4 text-slate-400 absolute right-3 cursor-pointer"
+            className="w-4 h-4 text-slate-500 dark:text-slate-400 absolute right-3 cursor-pointer"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           />
         </div>
@@ -145,7 +145,7 @@ export default function MetaSelectors({
                 className="w-full flex items-center justify-between px-3.5 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-left font-medium"
               >
                 <span>{company}</span>
-                <span className="text-[9px] text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-950 px-1.5 py-0.5 rounded font-mono">
+                <span className="text-[9px] text-slate-500 dark:text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-950 px-1.5 py-0.5 rounded font-mono">
                   Database
                 </span>
               </button>
@@ -163,7 +163,7 @@ export default function MetaSelectors({
             )}
 
             {filteredSuggestions.length === 0 && !inputValue.trim() && (
-              <div className="px-3.5 py-2 text-xs text-slate-400 dark:text-slate-500 text-center font-medium">
+              <div className="px-3.5 py-2 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 text-center font-medium">
                 No suggestions remaining
               </div>
             )}
@@ -175,20 +175,20 @@ export default function MetaSelectors({
           {selectedTags.map((tag) => (
             <span
               key={tag}
-              className="flex items-center gap-1 px-2.5 py-1 bg-slate-100/90 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-200/80 dark:hover:bg-slate-700 border border-slate-200/50 dark:border-slate-700/50 rounded-full text-xs font-semibold tracking-tight transition-colors duration-100 cursor-default"
+              className="flex items-center gap-1 px-2.5 py-1 bg-slate-100/90 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-900 dark:text-slate-100 hover:bg-slate-200/80 dark:hover:bg-slate-700 border border-slate-200/50 dark:border-slate-700/50 rounded-full text-xs font-semibold tracking-tight transition-colors duration-100 cursor-default"
             >
               {tag}
               <button
                 type="button"
                 onClick={() => onRemoveTag(tag)}
-                className="hover:bg-slate-300/80 dark:hover:bg-slate-700/80 p-0.5 rounded-full text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="hover:bg-slate-300/80 dark:hover:bg-slate-700/80 p-0.5 rounded-full text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
               >
                 <X className="w-3 h-3" />
               </button>
             </span>
           ))}
           {selectedTags.length === 0 && (
-            <span className="text-xs text-slate-400 dark:text-slate-500 italic flex items-center">
+            <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 italic flex items-center">
               No target tags selected. Added questions will target general exams.
             </span>
           )}

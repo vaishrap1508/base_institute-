@@ -34,7 +34,7 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
   ];
 
   const bottomItems: SidebarItem[] = [
-    { id: 'support', label: 'Support', icon: 'HelpCircle', href: '/docs' },
+    { id: 'docs', label: 'Support', icon: 'HelpCircle', href: '/admin/docs' },
     { id: 'logout', label: 'Logout', icon: 'LogOut', href: '/' }
   ];
 
@@ -73,14 +73,14 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
         onClick={() => handleItemClick(item)}
         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-semibold transition-all duration-200 group text-left relative overflow-hidden select-none cursor-pointer ${
           isActive
-            ? 'bg-[#151c2f] text-white shadow-md shadow-purple-500/5 border border-purple-500/20'
-            : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/40 border border-transparent'
+            ? 'bg-slate-100 dark:bg-[#151c2f] text-slate-900 dark:text-white shadow-md shadow-purple-500/5 border border-purple-500/20'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 hover:bg-slate-800/40 border border-transparent'
         }`}
       >
         <span className="flex items-center gap-3.5">
           <IconComponent
             className={`w-4.5 h-4.5 transition-colors duration-200 ${
-              isActive ? 'text-purple-400' : 'text-slate-400 group-hover:text-slate-200'
+              isActive ? 'text-purple-400' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:text-slate-200'
             }`}
           />
           <span className="tracking-wide">{item.label}</span>
@@ -100,14 +100,14 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
   };
 
   return (
-    <aside className="w-64 bg-[#090d16] border-r border-[#151c2f] flex flex-col h-screen shrink-0 transition-colors duration-300 z-30">
+    <aside className="w-64 bg-white dark:bg-[#090d16] border-r border-slate-200 dark:border-[#151c2f] flex flex-col h-screen shrink-0 transition-colors duration-300 z-30">
       {/* Brand Header */}
-      <div className="p-6 border-b border-[#151c2f] flex items-center gap-3.5">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+      <div className="p-6 border-b border-slate-200 dark:border-[#151c2f] flex items-center gap-3.5">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-slate-900 dark:text-white shadow-lg shadow-indigo-500/20">
           <Icons.Layers className="w-5.5 h-5.5" />
         </div>
         <div className="flex flex-col">
-          <span className="font-extrabold text-white tracking-wider text-[16px] leading-tight uppercase font-heading">
+          <span className="font-extrabold text-slate-900 dark:text-white tracking-wider text-[16px] leading-tight uppercase font-heading">
             BASE INSTITUTE
           </span>
           <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase mt-0.5">
@@ -122,7 +122,7 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
       </nav>
 
       {/* Bottom Navigation Links */}
-      <div className="px-4 py-4 border-t border-[#151c2f] space-y-1.5 bg-[#070a10]">
+      <div className="px-4 py-4 border-t border-slate-200 dark:border-[#151c2f] space-y-1.5 bg-slate-50 dark:bg-[#070a10]">
         {bottomItems.map(renderNavButton)}
         
 

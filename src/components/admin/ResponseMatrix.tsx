@@ -29,9 +29,9 @@ export default function ResponseMatrix({
     <div className="bg-white dark:bg-slate-900 p-5 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm flex flex-col gap-4 h-full">
       {/* Response Matrix Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
           Response Matrix
-          <HelpCircle className="w-3.5 h-3.5 text-slate-300 dark:text-slate-500 hover:text-slate-400 cursor-help" />
+          <HelpCircle className="w-3.5 h-3.5 text-slate-300 dark:text-slate-500 hover:text-slate-500 dark:text-slate-400 cursor-help" />
         </label>
 
         {/* Header Actions */}
@@ -113,7 +113,7 @@ export default function ResponseMatrix({
                       className={`p-1 rounded transition-colors ${
                         isCorrect
                           ? 'hover:bg-blue-100/80 dark:hover:bg-blue-950/50 text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'
-                          : 'hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-500'
+                          : 'hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-500'
                       }`}
                       title={`Remove Option ${option.id}`}
                     >
@@ -143,7 +143,7 @@ export default function ResponseMatrix({
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50/50 dark:bg-slate-950/20 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl min-h-[180px]">
           <Sparkles className="w-6 h-6 text-slate-300 dark:text-slate-700 mb-2 animate-pulse" />
           <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">No Choices Added</span>
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium max-w-[240px] mt-1 leading-relaxed">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-medium max-w-[240px] mt-1 leading-relaxed">
             Click the <strong>Add Option</strong> button in the header to start building your multiple choice options matrix.
           </p>
         </div>

@@ -26,12 +26,15 @@ const [logs, setLogs] = useState<any[]>([]);
     if (!silent) setIsRefreshing(true);
     try {
       const res = await fetch('/api/admin/logs');
-      const data = await res.json();
+      if (!res.ok) return;
+      const text = await res.text();
+      if (!text) return;
+      const data = JSON.parse(text);
       if (data?.success && data?.logs) {
         setLogs(data.logs);
       }
     } catch (err) {
-      console.error("Failed to load logs:", err);
+      console.warn("Failed to load logs:", err);
     } finally {
       setIsRefreshing(false);
       setLoading(false);
@@ -92,7 +95,7 @@ const [logs, setLogs] = useState<any[]>([]);
       case 'OVERRIDE':
         return <Play className="w-4 h-4 text-pink-400" />;
       default:
-        return <History className="w-4 h-4 text-slate-400" />;
+        return <History className="w-4 h-4 text-slate-500 dark:text-slate-400" />;
     }
   };
 
@@ -100,25 +103,25 @@ const [logs, setLogs] = useState<any[]>([]);
     <>
 
         {currentRole.role !== 'admin' ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
-            <div className="w-full max-w-xl bg-[#0f1322] border border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#070a13]">
+            <div className="w-full max-w-xl bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-455 shadow-inner relative">
                 <Loader2 className="w-7 h-7 animate-spin" />
-                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-[#0f1322] shadow">!</span>
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-slate-900 dark:text-white flex items-center justify-center border-2 border-[#0f1322] shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
-                <h2 className="text-lg font-black text-white tracking-tight">Clearance Protocol Violation</h2>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-[#070a13] border border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-[#151c2f] pb-2">
+              <div className="w-full bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-2">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold text-slate-350">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-slate-500 uppercase">Attempted User</span>
-                    <span className="text-white font-bold">{currentRole.name}</span>
+                    <span className="text-slate-900 dark:text-white font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-slate-500 uppercase">Clearance Role</span>
@@ -135,22 +138,22 @@ const [logs, setLogs] = useState<any[]>([]);
                   const admin = USER_ROLES.find(r => r.role === 'admin');
                   if (admin) handleRoleChange(admin);
                 }}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer border-0"
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer border-0"
               >
                 Request Admin Clearance
               </button>
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-[#070a13] custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50 dark:bg-[#070a13] custom-scrollbar">
             
             {/* Page Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#151c2f] pb-5">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-[#151c2f] pb-5">
               <div>
                 <span className="text-[10px] font-black text-purple-400 tracking-wider uppercase leading-none">
                   Telemetry logs
                 </span>
-                <h1 className="text-2xl font-black text-white tracking-tight uppercase font-heading mt-1">
+                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase font-heading mt-1">
                   Activity Audit Logs
                 </h1>
                 <p className="text-[11px] font-semibold text-slate-500 mt-1">
@@ -162,7 +165,7 @@ const [logs, setLogs] = useState<any[]>([]);
               <div className="flex items-center gap-3 select-none">
                 <button
                   onClick={() => setAutoPoll(prev => !prev)}
-                  className="flex items-center gap-2 px-3 py-2 bg-[#0f1322] border border-[#151c2f] hover:border-slate-800 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-200 transition-all cursor-pointer"
+                  className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] hover:border-slate-800 rounded-xl text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200 transition-all cursor-pointer"
                 >
                   {autoPoll ? (
                     <>
@@ -179,7 +182,7 @@ const [logs, setLogs] = useState<any[]>([]);
 
                 <button
                   onClick={() => fetchLogs()}
-                  className="p-2.5 bg-[#0f1322] border border-[#151c2f] hover:border-slate-800 rounded-xl text-slate-400 hover:text-white transition-all cursor-pointer flex items-center justify-center"
+                  className="p-2.5 bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] hover:border-slate-800 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-all cursor-pointer flex items-center justify-center"
                 >
                   <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-purple-450' : ''}`} />
                 </button>
@@ -187,7 +190,7 @@ const [logs, setLogs] = useState<any[]>([]);
             </div>
 
             {/* Logs filtering widget */}
-            <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-4.5 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-4.5 flex flex-col md:flex-row gap-4 items-center justify-between">
               
               <div className="relative w-full md:max-w-xs">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -196,17 +199,17 @@ const [logs, setLogs] = useState<any[]>([]);
                   placeholder="Filter logs by keyword or user..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#070a13] border border-[#151c2f] rounded-xl pl-9.5 pr-4 py-2.5 text-xs text-white placeholder-slate-550 focus:outline-none focus:border-purple-550/50"
+                  className="w-full bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl pl-9.5 pr-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-550 focus:outline-none focus:border-purple-550/50"
                 />
               </div>
 
               <div className="flex flex-wrap items-center gap-3.5 self-stretch md:self-auto justify-between">
-                <div className="flex items-center gap-1.5 border border-[#151c2f] bg-[#070a13] rounded-xl px-3 py-1">
+                <div className="flex items-center gap-1.5 border border-slate-200 dark:border-[#151c2f] bg-slate-50 dark:bg-[#070a13] rounded-xl px-3 py-1">
                   <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Category</span>
                   <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="bg-transparent border-none text-slate-200 text-xs focus:outline-none cursor-pointer py-1.5 font-bold"
+                    className="bg-transparent border-none text-slate-800 dark:text-slate-200 text-xs focus:outline-none cursor-pointer py-1.5 font-bold"
                   >
                     <option value="ALL">ALL CATEGORIES</option>
                     <option value="AUTHENTICATION">AUTHENTICATION</option>
@@ -219,12 +222,12 @@ const [logs, setLogs] = useState<any[]>([]);
                   </select>
                 </div>
 
-                <div className="flex items-center gap-1.5 border border-[#151c2f] bg-[#070a13] rounded-xl px-3 py-1">
+                <div className="flex items-center gap-1.5 border border-slate-200 dark:border-[#151c2f] bg-slate-50 dark:bg-[#070a13] rounded-xl px-3 py-1">
                   <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Severity</span>
                   <select
                     value={severityFilter}
                     onChange={(e) => setSeverityFilter(e.target.value)}
-                    className="bg-transparent border-none text-slate-200 text-xs focus:outline-none cursor-pointer py-1.5 font-bold"
+                    className="bg-transparent border-none text-slate-800 dark:text-slate-200 text-xs focus:outline-none cursor-pointer py-1.5 font-bold"
                   >
                     <option value="ALL">ALL SEVERITY</option>
                     <option value="info">INFO</option>
@@ -246,9 +249,9 @@ const [logs, setLogs] = useState<any[]>([]);
             </div>
 
             {/* Logs List Container */}
-            <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-[#151c2f] bg-[#070a13]/30 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-slate-400">
+            <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-[#151c2f] bg-slate-50 dark:bg-[#070a13]/30 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                   <History className="w-4 h-4" />
                   <span className="text-xs font-bold uppercase tracking-wider">Chronological Operations Log</span>
                 </div>
@@ -265,9 +268,9 @@ const [logs, setLogs] = useState<any[]>([]);
               ) : filteredLogs.length > 0 ? (
                 <div className="divide-y divide-[#151c2f]">
                   {filteredLogs.map((log) => (
-                    <div key={log.id} className="p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-[#070a13]/40 transition-colors">
+                    <div key={log.id} className="p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:bg-slate-50 dark:bg-[#070a13]/40 transition-colors">
                       <div className="flex items-start gap-4">
-                        <div className="w-9 h-9 rounded-xl bg-[#070a13] border border-[#151c2f] flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] flex items-center justify-center shrink-0 mt-0.5">
                           {getCategoryIcon(log.category)}
                         </div>
                         
@@ -276,7 +279,7 @@ const [logs, setLogs] = useState<any[]>([]);
                             <span className="text-[9px] font-black text-slate-550 tracking-wider font-mono">
                               [{log.id}]
                             </span>
-                            <span className="text-xs font-bold text-white">
+                            <span className="text-xs font-bold text-slate-900 dark:text-white">
                               {log.title}
                             </span>
                             <span className={`text-[8px] font-black px-1.5 py-0.5 rounded border uppercase tracking-wider ${
@@ -304,7 +307,7 @@ const [logs, setLogs] = useState<any[]>([]);
                         </div>
                       </div>
 
-                      <div className="text-[9.5px] font-bold text-slate-500 uppercase tracking-widest px-3 py-1.5 bg-[#070a13] border border-[#151c2f] rounded-xl self-end md:self-auto select-none">
+                      <div className="text-[9.5px] font-bold text-slate-500 uppercase tracking-widest px-3 py-1.5 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl self-end md:self-auto select-none">
                         {log.category}
                       </div>
                     </div>
@@ -314,7 +317,7 @@ const [logs, setLogs] = useState<any[]>([]);
                 <div className="py-24 text-center space-y-2">
                   <CheckCircle2 className="w-10 h-10 text-slate-650 mx-auto" />
                   <div className="space-y-1">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">No Telemetry Events</h4>
+                    <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">No Telemetry Events</h4>
                     <p className="text-[9px] text-slate-600 font-semibold uppercase tracking-widest">
                       Try clearing filters or check back later.
                     </p>

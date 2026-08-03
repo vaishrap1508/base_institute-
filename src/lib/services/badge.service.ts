@@ -324,7 +324,8 @@ export class BadgeService {
         // Return system-wide stats if no user is specified (for admin view)
         const { data: allUserBadges } = await supabaseAdmin
           .from('user_badges')
-          .select('id, is_completed, badge_id');
+          .select('id, is_completed, badge_id')
+          .limit(5000);
         
         const totalCompleted = allUserBadges?.filter(ub => ub.is_completed).length || 0;
         const completionRate = totalAvailable > 0 ? (totalCompleted / (totalAvailable * 100)) * 100 : 0; // rough metric

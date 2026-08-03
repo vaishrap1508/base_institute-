@@ -81,12 +81,15 @@ export default function SettingsPage() {
   const fetchAlerts = async () => {
     try {
       const res = await fetch('/api/admin/alerts');
-      const data = await res.json();
+      if (!res.ok) return;
+      const text = await res.text();
+      if (!text) return;
+      const data = JSON.parse(text);
       if (data?.success && data?.alerts) {
         setSystemAlerts(data.alerts);
       }
     } catch (err) {
-      console.error("Failed to load real-time alerts:", err);
+      console.warn("Failed to load real-time alerts:", err);
     }
   };
 
@@ -96,7 +99,7 @@ export default function SettingsPage() {
       setNotification(successMsg);
       fetchAlerts();
     } catch (err) {
-      console.error(err);
+      console.warn(err);
     }
   };
 
@@ -228,7 +231,7 @@ export default function SettingsPage() {
       postLog('Onboarding Flow Synced', logDesc, 'CATALOG');
       fetchAlerts();
     } catch (err: any) {
-      console.error(err);
+      console.warn(err);
       setNotification(`Error: Failed to save onboarding configurations: ${err.message || err}`);
     } finally {
       setSavingOnboarding(false);
@@ -698,8 +701,7 @@ export default function SettingsPage() {
                 <div className="relative flex bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] shadow-inner select-none w-full sm:w-[320px]">
                 {/* Sliding indicator */}
                 <div 
-                  className={`absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-2px)] bg-purple-600 rounded-full shadow-[0_0_15px_rgba(147,51,234,0.3)] transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]`}
-                  style={{ transform: activeMasterTab === 'settings' ? 'translateX(0)' : 'translateX(100%)' }}
+                  className={`absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-2px)] bg-purple-600 rounded-full shadow-[0_0_15px_rgba(147,51,234,0.3)] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${activeMasterTab === 'settings' ? 'translate-x-0' : 'translate-x-full'}`}
                 />
                 <button
                   type="button"
@@ -776,38 +778,56 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Dispatch & Alerts Toggles */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-6">
-                  <span className="text-[10px] font-black text-slate-400 tracking-wider uppercase leading-none">
-                    Dispatch & Alert Preferences
-                  </span>
+                {/* Dispatch & Alerts Toggles */}
+                <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 space-y-6">
+                  <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-3.5">
+                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 tracking-wider uppercase leading-none">
+                      Dispatch & Alert Preferences
+                    </span>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                      Necessity-Based Routing
+                    </span>
+                  </div>
                   
                   <div className="space-y-4 pt-2">
-                    {/* Item 1 */}
-                    <div className="flex items-center justify-between p-4 bg-[#070a13] border border-[#151c2f]/80 rounded-xl">
-                      <div className="flex flex-col gap-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200">Security Alerts</span>
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                    {/* Item 1 - CRITICAL */}
+                    <div className="flex items-center justify-between p-4 bg-rose-50/40 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 rounded-xl relative overflow-hidden group">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-rose-500 rounded-l-xl"></div>
+                      <div className="flex flex-col gap-1 pr-4 pl-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-900 dark:text-rose-100">Security Alerts</span>
+                          <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-rose-500 text-white uppercase tracking-wider">Critical</span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 dark:text-rose-200/60 font-bold uppercase tracking-wider">
                           Immediate broadcast for unusual login or access attempts.
                         </span>
                       </div>
                       {renderToggle(securityAlerts, () => setSecurityAlerts(!securityAlerts))}
                     </div>
 
-                    {/* Item 2 */}
-                    <div className="flex items-center justify-between p-4 bg-[#070a13] border border-[#151c2f]/80 rounded-xl">
-                      <div className="flex flex-col gap-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200">Platform Health Summaries</span>
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                    {/* Item 2 - RECOMMENDED */}
+                    <div className="flex items-center justify-between p-4 bg-blue-50/40 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30 rounded-xl relative overflow-hidden group">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-l-xl"></div>
+                      <div className="flex flex-col gap-1 pr-4 pl-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-900 dark:text-blue-100">Platform Health Summaries</span>
+                          <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-blue-500 text-white uppercase tracking-wider">Recommended</span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 dark:text-blue-200/60 font-bold uppercase tracking-wider">
                           Weekly report summarizing platform availability and test attempts.
                         </span>
                       </div>
                       {renderToggle(systemHealthReports, () => setSystemHealthReports(!systemHealthReports))}
                     </div>
 
-                    {/* Item 3 */}
-                    <div className="flex items-center justify-between p-4 bg-[#070a13] border border-[#151c2f]/80 rounded-xl">
-                      <div className="flex flex-col gap-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200">Student Milestone Alerts</span>
+                    {/* Item 3 - OPTIONAL */}
+                    <div className="flex items-center justify-between p-4 bg-slate-50/80 dark:bg-[#0a0d18] border border-slate-200 dark:border-[#151c2f]/80 rounded-xl relative overflow-hidden group">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-400 dark:bg-slate-600 rounded-l-xl"></div>
+                      <div className="flex flex-col gap-1 pr-4 pl-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Student Milestone Alerts</span>
+                          <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase tracking-wider">Optional</span>
+                        </div>
                         <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                           Notifications when student enrollment or solved test milestones are achieved.
                         </span>
@@ -854,7 +874,7 @@ export default function SettingsPage() {
                   </div>
                   
                   <p className="text-xs text-slate-300 leading-relaxed font-semibold">
-                    Operating in <strong className="text-purple-400">{currentRole.name} Mode</strong>. Changes made to onboarding flow and settings persist directly to the production database.
+                    Operating in <strong className="text-purple-400">{currentRole.role === 'admin' ? 'Administrator' : 'Editor'} Mode</strong>. Changes made to onboarding flow and settings persist directly to the production database.
                   </p>
                 </div>
 
@@ -863,7 +883,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Bottom Section: Onboarding Journey Customizer */}
-            <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-6">
+            <div className="mt-6 bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#151c2f] pb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
@@ -1111,7 +1131,7 @@ export default function SettingsPage() {
                       {/* Add Timeline Form */}
                       <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
                         <div className="flex-1 space-y-1.5">
-                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Timeline Metric Option</label>
+                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Timeline Metric Option <span className="text-rose-500">*</span></label>
                           <input
                             type="text"
                             placeholder="e.g. Within 2 Weeks"
@@ -1159,7 +1179,7 @@ export default function SettingsPage() {
                       {/* Add Commitment Form */}
                       <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
                         <div className="flex-1 space-y-1.5">
-                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Weekly Commitment Option</label>
+                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Commitment Metric Option <span className="text-rose-500">*</span></label>
                           <input
                             type="text"
                             placeholder="e.g. 20+ Hours per Week"
@@ -1207,7 +1227,7 @@ export default function SettingsPage() {
                       {/* Add Learning Preference Form */}
                       <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
                         <div className="flex-1 space-y-1.5">
-                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Pedagogical Learning Preference</label>
+                          <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Pedagogical Learning Preference <span className="text-rose-500">*</span></label>
                           <input
                             type="text"
                             placeholder="e.g. Concept-oriented Interactive Lectures"

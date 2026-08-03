@@ -190,7 +190,7 @@ export default function LivePreview({
       case 'mobile':
         return 'w-[340px] max-w-full';
       case 'tablet':
-        return 'w-[520px] max-w-full';
+        return 'max-w-md w-full';
       case 'desktop':
       default:
         return 'w-full';
@@ -225,7 +225,7 @@ export default function LivePreview({
             type="button"
             onClick={() => setDeviceLayout('desktop')}
             className={`p-1.5 rounded transition-all cursor-pointer ${
-              deviceLayout === 'desktop' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+              deviceLayout === 'desktop' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
             title="Desktop Mode"
           >
@@ -235,7 +235,7 @@ export default function LivePreview({
             type="button"
             onClick={() => setDeviceLayout('tablet')}
             className={`p-1.5 rounded transition-all cursor-pointer ${
-              deviceLayout === 'tablet' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+              deviceLayout === 'tablet' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
             title="Tablet Mode"
           >
@@ -245,7 +245,7 @@ export default function LivePreview({
             type="button"
             onClick={() => setDeviceLayout('mobile')}
             className={`p-1.5 rounded transition-all cursor-pointer ${
-              deviceLayout === 'mobile' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+              deviceLayout === 'mobile' ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
             title="Mobile Mode"
           >
@@ -276,7 +276,7 @@ export default function LivePreview({
                 </div>
                 {companyTags && companyTags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 items-center border-l border-slate-200 dark:border-slate-800 pl-3 ml-1">
-                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Asked by:</span>
+                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">Asked by:</span>
                     {companyTags.map((tag) => (
                       <span
                         key={tag}
@@ -288,7 +288,7 @@ export default function LivePreview({
                   </div>
                 )}
               </div>
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase font-mono" title={`Original ID: ${questionId}`}>
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 tracking-wider uppercase font-mono" title={`Original ID: ${questionId}`}>
                 {(() => {
                   if (trackingId) return trackingId;
                   if (domainId && subTopicId && conceptId && questionId) {
@@ -303,13 +303,13 @@ export default function LivePreview({
             </div>
 
             {/* Question Stem Prompt (Rendered beautifully with ReactMarkdown + Katex support) */}
-            <div className="text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed font-normal antialiased prose max-w-none prose-slate dark:prose-invert prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-code:text-slate-700 dark:prose-code:text-slate-300 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-50 dark:prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-100 dark:prose-pre:border-slate-800 break-all">
+            <div className="text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed font-normal antialiased prose max-w-none prose-slate dark:prose-invert prose-headings:text-slate-900 dark:prose-headings:text-slate-900 dark:text-slate-100 prose-code:text-slate-700 dark:prose-code:text-slate-300 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-50 dark:prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-100 dark:prose-pre:border-slate-800 break-all">
               {questionStem ? (
                 <div className="prose max-w-none prose-slate dark:prose-invert break-all">
                   <SafeHtmlWithMath html={markdownToHtml(questionStem)} />
                 </div>
               ) : (
-                <p className="text-slate-400 dark:text-slate-500 italic font-sans">
+                <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 italic font-sans">
                   The formatted question text will render here as you type in the editor...
                 </p>
               )}
@@ -353,7 +353,7 @@ export default function LivePreview({
                       <div
                         className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                           isSelected
-                            ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/10'
+                            ? 'bg-blue-600 text-slate-900 dark:text-white shadow-sm shadow-blue-500/10'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'
                         }`}
                       >
@@ -366,7 +366,7 @@ export default function LivePreview({
 
                     {/* Verification checkmark if option is correct & verified */}
                     {isSelected && (
-                      <span className="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center text-white text-[9px] font-bold shadow-sm shrink-0 mt-1">
+                      <span className="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center text-slate-900 dark:text-white text-[9px] font-bold shadow-sm shrink-0 mt-1">
                         ✓
                       </span>
                     )}
@@ -379,8 +379,8 @@ export default function LivePreview({
           {/* Video Walkthrough Embed Box */}
           {videoUrl && (
             <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm p-5 flex flex-col gap-3">
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Video className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" /> Video Walkthrough
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Video className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 dark:text-slate-500" /> Video Walkthrough
               </span>
 
               {/* Mock Video Container */}
@@ -397,7 +397,7 @@ export default function LivePreview({
                       e.stopPropagation();
                       setIsVideoPlaying(false);
                     }}
-                    className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-black/60 hover:bg-black/85 text-white hover:text-rose-400 transition-colors shadow-md flex items-center justify-center cursor-pointer"
+                    className="absolute top-3 right-3 z-10 p-1.5 rounded-lg bg-black/60 hover:bg-black/85 text-slate-900 dark:text-white hover:text-rose-400 transition-colors shadow-md flex items-center justify-center cursor-pointer"
                     title="Close Player"
                   >
                     <XCircle className="w-4 h-4" />
@@ -424,7 +424,7 @@ export default function LivePreview({
                     onClick={() => setIsVideoPlaying(false)}
                     className="w-full h-full flex flex-col items-center justify-center bg-black/95 text-center px-4 relative cursor-pointer"
                   >
-                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-red-600 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded tracking-wide animate-pulse">
+                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-red-600 text-slate-900 dark:text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded tracking-wide animate-pulse">
                       LIVE STREAM
                     </div>
                     
@@ -432,14 +432,14 @@ export default function LivePreview({
                     <div className="w-12 h-12 rounded-full bg-slate-800/80 flex items-center justify-center mb-3">
                       <Play className="w-6 h-6 text-blue-500 animate-spin" />
                     </div>
-                    <span className="text-xs font-bold text-slate-200 tracking-tight leading-normal">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-tight leading-normal">
                       Loading Sandbox Video Player...
                     </span>
                     <a
                       href={videoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[10px] font-bold text-slate-400 mt-2 hover:text-white flex items-center gap-1 underline transition-colors"
+                      className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 hover:text-slate-900 dark:text-white flex items-center gap-1 underline transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
                       Open in YouTube <ExternalLink className="w-2.5 h-2.5" />
@@ -459,13 +459,13 @@ export default function LivePreview({
 
                     {/* Central Play Button */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-white/95 group-hover:bg-blue-600 shadow-md group-hover:shadow-blue-500/20 text-slate-900 group-hover:text-white flex items-center justify-center transform group-hover:scale-110 transition-all duration-200">
+                      <div className="w-12 h-12 rounded-full bg-white/95 group-hover:bg-blue-600 shadow-md group-hover:shadow-blue-500/20 text-slate-900 group-hover:text-slate-900 dark:text-white flex items-center justify-center transform group-hover:scale-110 transition-all duration-200">
                         <Play className="w-5 h-5 fill-current ml-0.5" />
                       </div>
                     </div>
 
                     {/* Thumbnail Footer info */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white drop-shadow-md">
+                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-slate-900 dark:text-white drop-shadow-md">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-bold tracking-wider uppercase opacity-80">
                           Mastery Course
