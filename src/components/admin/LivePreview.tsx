@@ -192,7 +192,7 @@ export default function LivePreview({
           label: 'Mobile',
           dimensions: '375×812',
           ratio: '9:19.5',
-          containerClass: 'w-[375px] max-w-full border-[8px] border-slate-800 dark:border-slate-950 rounded-[36px] shadow-2xl p-4 bg-slate-900/90 relative pt-7',
+          containerClass: 'w-[375px] max-w-full border-[8px] border-slate-300 dark:border-slate-950 rounded-[36px] shadow-2xl p-4 bg-slate-100 dark:bg-slate-900/90 relative pt-7',
           hasNotch: true,
           hasBrowserBar: false
         };
@@ -201,7 +201,7 @@ export default function LivePreview({
           label: 'Tablet',
           dimensions: '768×1024',
           ratio: '3:4',
-          containerClass: 'w-[640px] max-w-full border-[10px] border-slate-800 dark:border-slate-950 rounded-[28px] shadow-2xl p-5 bg-slate-900/90 relative pt-7',
+          containerClass: 'w-[640px] max-w-full border-[10px] border-slate-300 dark:border-slate-950 rounded-[28px] shadow-2xl p-5 bg-slate-100 dark:bg-slate-900/90 relative pt-7',
           hasNotch: true,
           hasBrowserBar: false
         };
@@ -294,9 +294,9 @@ export default function LivePreview({
           
           {/* Simulated Notch / Camera Pill for Mobile & Tablet */}
           {deviceInfo.hasNotch && (
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-3 bg-slate-800 dark:bg-slate-950 rounded-full flex items-center justify-center gap-1 z-20">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-700 dark:bg-slate-800" />
-              <span className="w-1 h-1 rounded-full bg-slate-600 dark:bg-slate-700" />
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-3 bg-slate-300 dark:bg-slate-950 rounded-full flex items-center justify-center gap-1 z-20">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-800" />
+              <span className="w-1 h-1 rounded-full bg-slate-400 dark:bg-slate-700" />
             </div>
           )}
 

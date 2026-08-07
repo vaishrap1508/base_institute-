@@ -337,7 +337,7 @@ export default function UsersPage() {
       {/* Global Toast Alert */}
       {notification && (
         <div className="absolute top-20 right-8 z-50 animate-slideIn">
-          <div className="px-4.5 py-3.5 rounded-xl border bg-[#0f1322] border-purple-500/20 text-slate-200 shadow-xl flex items-center gap-3 max-w-md">
+          <div className="px-4.5 py-3.5 rounded-xl border bg-white dark:bg-[#0f1322] border-purple-500/20 text-slate-200 shadow-xl flex items-center gap-3 max-w-md">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
             <span className="text-xs font-semibold leading-normal">{notification}</span>
           </div>
@@ -345,8 +345,8 @@ export default function UsersPage() {
       )}
 
         {currentRole.role !== 'admin' ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
-            <div className="w-full max-w-xl bg-[#0f1322] border border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#070a13]">
+            <div className="w-full max-w-xl bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-455 shadow-inner relative">
                 <Cpu className="w-7 h-7 animate-pulse" />
                 <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-[#0f1322] shadow">!</span>
@@ -355,8 +355,8 @@ export default function UsersPage() {
                 <h2 className="text-lg font-black text-white tracking-tight">Admin Access Required</h2>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Base Institute Admin Panel</p>
               </div>
-              <div className="w-full bg-[#070a13] border border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-[#151c2f] pb-2">
+              <div className="w-full bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-2">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase tracking-wide">DENIED</span>
                 </div>
@@ -390,15 +390,15 @@ export default function UsersPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 pb-16 space-y-6 bg-[#070a13] custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-8 pb-16 space-y-6 bg-slate-50 dark:bg-[#070a13] custom-scrollbar">
             
             {/* Page Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#151c2f] pb-5">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-[#151c2f] pb-5">
               <div>
                 <span className="text-[10px] font-black text-purple-400 tracking-wider uppercase leading-none">
                   Admin Panel
                 </span>
-                <h1 className="text-2xl font-black text-white tracking-tight uppercase font-heading mt-1">
+                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase font-heading mt-1">
                   User Management
                 </h1>
                 <p className="text-[11px] font-semibold text-slate-500 mt-1">
@@ -418,11 +418,11 @@ export default function UsersPage() {
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {/* Stat 1 */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-5 relative overflow-hidden group hover:border-[#151c2f]/80 transition-all">
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-5 relative overflow-hidden group hover:border-slate-200 dark:border-[#151c2f]/80 transition-all">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block leading-none">Total Students</span>
-                        <span className="text-2xl font-black text-white tracking-tight block">{analytics.totalStudents.toLocaleString()}</span>
+                        <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight block">{analytics.totalStudents.toLocaleString()}</span>
                       </div>
                       <span className="text-[9px] font-black px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wide flex items-center gap-0.5">
                         {analytics.studentGrowth.startsWith('+') ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
@@ -432,11 +432,11 @@ export default function UsersPage() {
                   </div>
 
                   {/* Stat 2 */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-5 relative overflow-hidden group hover:border-[#151c2f]/80 transition-all">
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-5 relative overflow-hidden group hover:border-slate-200 dark:border-[#151c2f]/80 transition-all">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block leading-none">Active Solvers</span>
-                        <span className="text-2xl font-black text-white tracking-tight block">{analytics.activeSolvers.toLocaleString()}</span>
+                        <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight block">{analytics.activeSolvers.toLocaleString()}</span>
                       </div>
                       <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                         Currently Online
@@ -445,11 +445,11 @@ export default function UsersPage() {
                   </div>
 
                   {/* Stat 3 */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-5 relative overflow-hidden group hover:border-[#151c2f]/80 transition-all">
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-5 relative overflow-hidden group hover:border-slate-200 dark:border-[#151c2f]/80 transition-all">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block leading-none">Newcomers</span>
-                        <span className="text-2xl font-black text-white tracking-tight block">{analytics.newcomers.toLocaleString()}</span>
+                        <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight block">{analytics.newcomers.toLocaleString()}</span>
                       </div>
                       <span className="text-[9px] font-black px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 uppercase tracking-wide">
                         {analytics.newcomersTodayLabel}
@@ -458,11 +458,11 @@ export default function UsersPage() {
                   </div>
 
                   {/* Stat 4 */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-5 relative overflow-hidden group hover:border-[#151c2f]/80 transition-all">
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-5 relative overflow-hidden group hover:border-slate-200 dark:border-[#151c2f]/80 transition-all">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block leading-none">Session Depth</span>
-                        <span className="text-2xl font-black text-white tracking-tight block">{analytics.sessionDepth}</span>
+                        <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight block">{analytics.sessionDepth}</span>
                       </div>
                       <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                         Avg. Per User
@@ -477,10 +477,10 @@ export default function UsersPage() {
                   {/* Left Panel (col-span-2) - Search & Table */}
                   <div className="lg:col-span-2 space-y-6">
                     
-                    <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl overflow-hidden">
+                    <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl overflow-hidden">
                       
                       {/* Search and filter controls */}
-                      <div className="p-4 border-b border-[#151c2f] flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="p-4 border-b border-slate-200 dark:border-[#151c2f] flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="relative w-full sm:max-w-xs">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                           <input
@@ -488,7 +488,7 @@ export default function UsersPage() {
                             placeholder="Search by name, ID or email..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-[#070a13] border border-[#151c2f] rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-550 focus:outline-none focus:border-purple-500/50"
+                            className="w-full bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-550 focus:outline-none focus:border-purple-500/50"
                           />
                         </div>
 
@@ -497,7 +497,7 @@ export default function UsersPage() {
                           <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value as any)}
-                            className="bg-[#070a13] border border-[#151c2f] text-slate-300 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-purple-500/50 cursor-pointer animate-none"
+                            className="bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] text-slate-300 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-purple-500/50 cursor-pointer animate-none"
                           >
                             <option value="ALL">All Status</option>
                             <option value="ACTIVE">Active</option>
@@ -511,29 +511,29 @@ export default function UsersPage() {
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-left">
                           <thead>
-                            <tr className="bg-[#070a13] border-b border-[#151c2f] text-[10px] font-black text-slate-500 uppercase tracking-widest select-none">
+                            <tr className="bg-slate-50 dark:bg-[#070a13] border-b border-slate-200 dark:border-[#151c2f] text-[10px] font-black text-slate-500 uppercase tracking-widest select-none">
                               <th className="px-6 py-4">User Identity</th>
                               <th className="px-6 py-4">Status</th>
                               <th className="px-6 py-4">Streak & XP</th>
                               <th className="px-6 py-4">Persistence</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-[#151c2f] text-xs font-semibold text-slate-300">
+                          <tbody className="divide-y divide-slate-200 dark:divide-[#151c2f] text-xs font-semibold text-slate-300">
                             {filteredStudents.length > 0 ? (
                               filteredStudents.map((student) => (
                                 <tr 
                                   key={student.id} 
                                   onClick={() => setSelectedStudent(student)}
-                                  className="hover:bg-[#070a13]/60 transition-colors cursor-pointer"
+                                  className="hover:bg-slate-50 dark:bg-[#070a13]/60 transition-colors cursor-pointer"
                                 >
                                   <td className="px-6 py-4.5 flex items-center gap-3">
                                     <img 
                                       src={student.avatar} 
                                       alt={student.name} 
-                                      className="w-9 h-9 rounded-full object-cover border border-[#151c2f] shadow-inner" 
+                                      className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-[#151c2f] shadow-inner" 
                                     />
                                     <div className="flex flex-col text-left">
-                                      <span className="font-bold text-white leading-tight">{student.name}</span>
+                                      <span className="font-bold text-slate-900 dark:text-white leading-tight">{student.name}</span>
                                       <span className="text-[9px] font-bold text-slate-550 uppercase mt-0.5 tracking-wider">
                                         {student.id} · {student.email}
                                       </span>
@@ -552,7 +552,7 @@ export default function UsersPage() {
                                   </td>
                                   <td className="px-6 py-4.5 text-left">
                                     <div className="flex flex-col">
-                                      <span className="text-white font-bold flex items-center gap-1">
+                                      <span className="text-slate-900 dark:text-white font-bold flex items-center gap-1">
                                         <Zap className="w-3.5 h-3.5 text-amber-450 fill-current" />
                                         {student.streak} Days
                                       </span>
@@ -563,7 +563,7 @@ export default function UsersPage() {
                                   </td>
                                   <td className="px-6 py-4.5 text-left">
                                     <div className="flex flex-col">
-                                      <span className="text-slate-200 font-bold">{student.lastActive}</span>
+                                      <span className="text-slate-800 dark:text-slate-200 font-bold">{student.lastActive}</span>
                                       <span className="text-[9px] text-slate-500 font-semibold uppercase mt-0.5 tracking-wider">
                                         {student.activeTarget}
                                       </span>
@@ -583,18 +583,18 @@ export default function UsersPage() {
                       </div>
 
                       {/* Pagination Footer */}
-                      <div className="px-6 py-4 border-t border-[#151c2f] bg-[#070a13]/30 flex items-center justify-between">
+                      <div className="px-6 py-4 border-t border-slate-200 dark:border-[#151c2f] bg-slate-50 dark:bg-[#070a13]/30 flex items-center justify-between">
                         <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                           Showing 1-{filteredStudents.length} of {students.length} students
                         </span>
                         <div className="flex items-center gap-1.5 select-none">
-                          <button className="p-1 rounded-lg bg-slate-900 border border-[#151c2f] text-slate-500 hover:text-white cursor-pointer">
+                          <button className="p-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#151c2f] text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer">
                             <ChevronLeft className="w-4 h-4" />
                           </button>
                           <button className="w-7 h-7 flex items-center justify-center rounded-full bg-purple-600 text-white text-[10px] font-bold shadow-md cursor-pointer border-0">
                             1
                           </button>
-                          <button className="p-1 rounded-lg bg-slate-900 border border-[#151c2f] text-slate-500 hover:text-white cursor-pointer">
+                          <button className="p-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-[#151c2f] text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer">
                             <ChevronRight className="w-4 h-4" />
                           </button>
                         </div>
@@ -608,11 +608,11 @@ export default function UsersPage() {
                   <div className="lg:col-span-1 space-y-6">
                     
                     {/* Performance Peaks Leaderboard */}
-                    <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-5 space-y-4 text-left">
-                      <div className="flex justify-between items-center border-b border-[#151c2f] pb-3">
+                    <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-5 space-y-4 text-left">
+                      <div className="flex justify-between items-center border-b border-slate-200 dark:border-[#151c2f] pb-3">
                         <div className="flex items-center gap-2">
                           <Trophy className="w-4.5 h-4.5 text-amber-400" />
-                          <h3 className="text-xs font-black text-white uppercase tracking-widest font-heading">
+                          <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest font-heading">
                             Performance Peaks
                           </h3>
                         </div>
@@ -621,15 +621,15 @@ export default function UsersPage() {
 
                       <div className="space-y-3">
                         {students.slice(0, 3).map((stu, index) => (
-                          <div key={stu.id} className="flex items-center justify-between p-2.5 bg-[#070a13]/70 border border-[#151c2f] rounded-xl hover:border-purple-550/20 transition-all">
+                          <div key={stu.id} className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-[#070a13]/70 border border-slate-200 dark:border-[#151c2f] rounded-xl hover:border-purple-550/20 transition-all">
                             <div className="flex items-center gap-3">
                               <img 
                                 src={stu.avatar} 
                                 alt={stu.name} 
-                                className="w-7.5 h-7.5 rounded-full object-cover border border-[#151c2f]" 
+                                className="w-7.5 h-7.5 rounded-full object-cover border border-slate-200 dark:border-[#151c2f]" 
                               />
                               <div className="flex flex-col text-left">
-                                <span className="text-xs font-bold text-white leading-tight truncate max-w-[100px]">{stu.name}</span>
+                                <span className="text-xs font-bold text-slate-900 dark:text-white leading-tight truncate max-w-[100px]">{stu.name}</span>
                                 <span className="text-[9px] text-slate-550 font-bold uppercase tracking-wide">{stu.xp.toLocaleString()} XP</span>
                               </div>
                             </div>
@@ -648,11 +648,11 @@ export default function UsersPage() {
                     </div>
 
                     {/* Churn / Streak Break Risk Alert */}
-                    <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-5 space-y-4 text-left">
-                      <div className="flex justify-between items-center border-b border-[#151c2f] pb-3">
+                    <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-5 space-y-4 text-left">
+                      <div className="flex justify-between items-center border-b border-slate-200 dark:border-[#151c2f] pb-3">
                         <div className="flex items-center gap-2">
                           <AlertTriangle className="w-4.5 h-4.5 text-rose-500 animate-pulse" />
-                          <h3 className="text-xs font-black text-white uppercase tracking-widest font-heading">
+                          <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest font-heading">
                             Streak Break Risk
                           </h3>
                         </div>
@@ -678,10 +678,10 @@ export default function UsersPage() {
                 </div>
 
                 {/* Bottom Section - Active Solver Curves SVG dynamics */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 text-left">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#151c2f] pb-4">
+                <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 text-left">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-[#151c2f] pb-4">
                     <div>
-                      <h3 className="text-xs font-black text-white uppercase tracking-widest font-heading">
+                      <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest font-heading">
                         Active Student Solver Dynamics
                       </h3>
                       <p className="text-[10px] text-slate-500 font-semibold uppercase mt-0.5 tracking-wider">
@@ -774,13 +774,13 @@ export default function UsersPage() {
         {/* Detailed Student Profile Inspector Modal */}
         {selectedStudent && (
           <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4">
-            <div className="w-full max-w-2xl bg-[#0f1322] border border-[#151c2f] rounded-2xl shadow-2xl overflow-hidden animate-scaleUp max-h-[90vh] flex flex-col">
+            <div className="w-full max-w-2xl bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl shadow-2xl overflow-hidden animate-scaleUp max-h-[90vh] flex flex-col">
               
               {/* Header */}
-              <div className="px-6 py-4.5 border-b border-[#151c2f] flex justify-between items-center bg-[#070a13]/40">
+              <div className="px-6 py-4.5 border-b border-slate-200 dark:border-[#151c2f] flex justify-between items-center bg-slate-50 dark:bg-[#070a13]/40">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-5 h-5 text-purple-400" />
-                  <span className="text-xs font-black uppercase text-white tracking-widest font-heading">
+                  <span className="text-xs font-black uppercase text-slate-900 dark:text-white tracking-widest font-heading">
                     Student Profile Inspector
                   </span>
                 </div>
@@ -796,7 +796,7 @@ export default function UsersPage() {
               <div className="p-6 overflow-y-auto space-y-6 custom-scrollbar flex-1">
                 
                 {/* Profile Identity grid */}
-                <div className="flex flex-col md:flex-row gap-6 border-b border-[#151c2f] pb-6">
+                <div className="flex flex-col md:flex-row gap-6 border-b border-slate-200 dark:border-[#151c2f] pb-6">
                   
                   <div className="flex flex-col items-center gap-3 shrink-0">
                     <img 
@@ -830,11 +830,11 @@ export default function UsersPage() {
                     </div>
                     <div className="space-y-1">
                       <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Institutional Origin</span>
-                      <span className="text-slate-350 block font-semibold">{selectedStudent.college} ({selectedStudent.degree})</span>
+                      <span className="text-slate-800 dark:text-slate-350 block font-semibold">{selectedStudent.college} ({selectedStudent.degree})</span>
                     </div>
                     <div className="space-y-1 col-span-1 sm:col-span-2">
                       <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Target Learning Goal</span>
-                      <span className="text-purple-400 font-bold block uppercase tracking-wide">{selectedStudent.goal}</span>
+                      <span className="text-purple-700 dark:text-purple-400 font-bold block uppercase tracking-wide">{selectedStudent.goal}</span>
                     </div>
                   </div>
 
@@ -842,51 +842,51 @@ export default function UsersPage() {
 
                 {/* Accuracy & Mastery Rates */}
                 <div className="space-y-3.5 text-left">
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-[#151c2f] pb-2">
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 dark:border-[#151c2f] pb-2">
                     Subject Accuracy & Mastery Rates
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Quant */}
-                    <div className="bg-[#070a13] p-3 border border-[#151c2f] rounded-xl">
+                    <div className="bg-slate-50 dark:bg-[#070a13] p-3 border border-slate-200 dark:border-[#151c2f] rounded-xl">
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className="text-slate-300">Quantitative Aptitude</span>
                         <span className="text-purple-400 font-extrabold">{selectedStudent.accuracy.quant}%</span>
                       </div>
-                      <div className="h-2 bg-slate-900 border border-[#151c2f] rounded-full overflow-hidden mt-2">
+                      <div className="h-2 bg-slate-900 border border-slate-200 dark:border-[#151c2f] rounded-full overflow-hidden mt-2">
                         <div className="h-full bg-purple-550 rounded-full" style={{ width: `${selectedStudent.accuracy.quant}%` }} />
                       </div>
                     </div>
 
                     {/* Logical */}
-                    <div className="bg-[#070a13] p-3 border border-[#151c2f] rounded-xl">
+                    <div className="bg-slate-50 dark:bg-[#070a13] p-3 border border-slate-200 dark:border-[#151c2f] rounded-xl">
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className="text-slate-300">Logical Reasoning</span>
                         <span className="text-purple-400 font-extrabold">{selectedStudent.accuracy.logical}%</span>
                       </div>
-                      <div className="h-2 bg-slate-900 border border-[#151c2f] rounded-full overflow-hidden mt-2">
+                      <div className="h-2 bg-slate-900 border border-slate-200 dark:border-[#151c2f] rounded-full overflow-hidden mt-2">
                         <div className="h-full bg-purple-550 rounded-full" style={{ width: `${selectedStudent.accuracy.logical}%` }} />
                       </div>
                     </div>
 
                     {/* Verbal */}
-                    <div className="bg-[#070a13] p-3 border border-[#151c2f] rounded-xl">
+                    <div className="bg-slate-50 dark:bg-[#070a13] p-3 border border-slate-200 dark:border-[#151c2f] rounded-xl">
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className="text-slate-300">Verbal Ability</span>
                         <span className="text-purple-400 font-extrabold">{selectedStudent.accuracy.verbal}%</span>
                       </div>
-                      <div className="h-2 bg-slate-900 border border-[#151c2f] rounded-full overflow-hidden mt-2">
+                      <div className="h-2 bg-slate-900 border border-slate-200 dark:border-[#151c2f] rounded-full overflow-hidden mt-2">
                         <div className="h-full bg-purple-550 rounded-full" style={{ width: `${selectedStudent.accuracy.verbal}%` }} />
                       </div>
                     </div>
 
                     {/* Coding */}
-                    <div className="bg-[#070a13] p-3 border border-[#151c2f] rounded-xl">
+                    <div className="bg-slate-50 dark:bg-[#070a13] p-3 border border-slate-200 dark:border-[#151c2f] rounded-xl">
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className="text-slate-300">Coding & DSA</span>
                         <span className="text-purple-400 font-extrabold">{selectedStudent.accuracy.coding}%</span>
                       </div>
-                      <div className="h-2 bg-slate-900 border border-[#151c2f] rounded-full overflow-hidden mt-2">
+                      <div className="h-2 bg-slate-900 border border-slate-200 dark:border-[#151c2f] rounded-full overflow-hidden mt-2">
                         <div className="h-full bg-purple-550 rounded-full" style={{ width: `${selectedStudent.accuracy.coding}%` }} />
                       </div>
                     </div>
@@ -895,16 +895,16 @@ export default function UsersPage() {
 
                 {/* Timeline activity logs */}
                 <div className="space-y-3 text-left">
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-[#151c2f] pb-2">
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 dark:border-[#151c2f] pb-2">
                     Recent Activity Timeline
                   </h4>
 
                   <div className="space-y-2.5">
                     {selectedStudent.recentActivity.map((act: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between p-2.5 bg-[#070a13]/70 border border-[#151c2f] rounded-xl">
+                      <div key={i} className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-[#070a13]/70 border border-slate-200 dark:border-[#151c2f] rounded-xl">
                         <div className="flex items-center gap-2.5">
                           <Activity className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="text-[11px] text-slate-200 font-semibold">{act.text}</span>
+                          <span className="text-[11px] text-slate-800 dark:text-slate-200 font-semibold">{act.text}</span>
                         </div>
                         <span className="text-[9px] text-slate-500 font-bold uppercase">{act.time}</span>
                       </div>
@@ -913,7 +913,7 @@ export default function UsersPage() {
                 </div>
 
                 {/* Admin quick actions */}
-                <div className="bg-[#070a13]/70 border border-[#151c2f] rounded-2xl p-4.5 space-y-4 text-left">
+                <div className="bg-slate-50 dark:bg-[#070a13]/70 border border-slate-200 dark:border-[#151c2f] rounded-2xl p-4.5 space-y-4 text-left">
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                     Administrative Command Center Actions
                   </h4>
@@ -921,7 +921,7 @@ export default function UsersPage() {
                   <div className="flex flex-wrap items-center gap-3">
                     
                     {/* Status switcher */}
-                    <div className="flex items-center gap-1 bg-[#070a13] p-0.5 rounded-xl border border-[#151c2f] shadow-inner select-none">
+                    <div className="flex items-center gap-1 bg-slate-50 dark:bg-[#070a13] p-0.5 rounded-xl border border-slate-200 dark:border-[#151c2f] shadow-inner select-none">
                       <button
                         onClick={() => toggleStudentStatus(selectedStudent.id, selectedStudent.uuid, 'ACTIVE')}
                         className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
@@ -947,13 +947,13 @@ export default function UsersPage() {
                     {/* Reset Password */}
                     <button
                       onClick={() => triggerToast(`Password reset credentials link dispatched to ${selectedStudent.email}`)}
-                      className="px-3.5 py-2.5 bg-[#1b233a] hover:bg-[#253254] border border-[#151c2f] text-slate-200 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                      className="px-3.5 py-2.5 bg-[#1b233a] hover:bg-[#253254] border border-slate-200 dark:border-[#151c2f] text-slate-200 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer"
                     >
                       Reset Password
                     </button>
 
                     {/* Award Badge */}
-                    <div className="flex items-center gap-1.5 border border-[#151c2f] bg-[#070a13] rounded-xl pl-2.5 pr-1 py-1">
+                    <div className="flex items-center gap-1.5 border border-slate-200 dark:border-[#151c2f] bg-slate-50 dark:bg-[#070a13] rounded-xl pl-2.5 pr-1 py-1">
                       <Award className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                       <input
                         type="text"
@@ -976,7 +976,7 @@ export default function UsersPage() {
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-4.5 border-t border-[#151c2f] bg-[#070a13]/30 flex justify-end gap-3 shrink-0">
+              <div className="px-6 py-4.5 border-t border-slate-200 dark:border-[#151c2f] bg-slate-50 dark:bg-[#070a13]/30 flex justify-end gap-3 shrink-0">
                 <button
                   onClick={() => setSelectedStudent(null)}
                   className="px-6 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs font-bold rounded-xl shadow-lg cursor-pointer border-0"

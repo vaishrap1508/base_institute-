@@ -789,6 +789,7 @@ export default function OnboardingPage() {
       <AnimatePresence>
         {notification && (
           <motion.div 
+            key="notification-toast"
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}

@@ -273,16 +273,19 @@ export default function PlacementProfile({
   };
 
   // Pre-configured achievements with Rarity & Progress bars
-  const achievements = useMemo(() => [
-    { id: 'p1', title: 'TCS Crusher', req: 'Solve 50 TCS level practice sets', category: 'placement', icon: '💻', unlocked: true, rarity: 'Common', currentProgress: 50, targetProgress: 50 },
-    { id: 'p2', title: 'Infosys Champion', req: 'Unlock 8 Infosys test sets', category: 'placement', icon: '🛡️', unlocked: true, rarity: 'Rare', currentProgress: 8, targetProgress: 8 },
-    { id: 'p3', title: 'Amazon Tag Master', req: 'Solve 15 Amazon tagged hard items', category: 'placement', icon: '📦', unlocked: false, rarity: 'Epic', currentProgress: 11, targetProgress: 15 },
-    { id: 'p4', title: 'Accenture Expert', req: 'Attain 90% accuracy in Accenture mocks', category: 'placement', icon: '💎', unlocked: false, rarity: 'Legendary', currentProgress: 86, targetProgress: 90 },
-    { id: 'l1', title: 'Arithmetic Apprentice', req: 'Solve 20 Arithmetic questions', category: 'learning', icon: '📐', unlocked: true, rarity: 'Common', currentProgress: 20, targetProgress: 20 },
-    { id: 'l2', title: 'Ratio Master', req: 'Attain 100% ratios solving speed', category: 'learning', icon: '🧩', unlocked: true, rarity: 'Rare', currentProgress: 100, targetProgress: 100 },
-    { id: 'l3', title: 'Geometry Ninja', req: 'Complete 30 geometry sets', category: 'learning', icon: '🎯', unlocked: false, rarity: 'Epic', currentProgress: 12, targetProgress: 30 },
-    { id: 'l4', title: 'Logic Legend', req: 'Reach Level 25 in Logical puzzles', category: 'learning', icon: '👑', unlocked: true, rarity: 'Legendary', currentProgress: 27, targetProgress: 25 }
-  ], []);
+  const achievements = useMemo(() => {
+    const base = [
+      { id: 'p1', title: 'TCS Crusher', req: 'Solve 50 TCS level practice sets', category: 'placement', icon: '💻', rarity: 'Common', currentProgress: 50, targetProgress: 50 },
+      { id: 'p2', title: 'Infosys Champion', req: 'Unlock 8 Infosys test sets', category: 'placement', icon: '🛡️', rarity: 'Rare', currentProgress: 8, targetProgress: 8 },
+      { id: 'p3', title: 'Amazon Tag Master', req: 'Solve 15 Amazon tagged hard items', category: 'placement', icon: '📦', rarity: 'Epic', currentProgress: 11, targetProgress: 15 },
+      { id: 'p4', title: 'Accenture Expert', req: 'Attain 90% accuracy in Accenture mocks', category: 'placement', icon: '💎', rarity: 'Legendary', currentProgress: 86, targetProgress: 90 },
+      { id: 'l1', title: 'Arithmetic Apprentice', req: 'Solve 20 Arithmetic questions', category: 'learning', icon: '📐', rarity: 'Common', currentProgress: 20, targetProgress: 20 },
+      { id: 'l2', title: 'Ratio Master', req: 'Attain 100% ratios solving speed', category: 'learning', icon: '🧩', rarity: 'Rare', currentProgress: 100, targetProgress: 100 },
+      { id: 'l3', title: 'Geometry Ninja', req: 'Complete 30 geometry sets', category: 'learning', icon: '🎯', rarity: 'Epic', currentProgress: 12, targetProgress: 30 },
+      { id: 'l4', title: 'Logic Legend', req: 'Reach Level 25 in Logical puzzles', category: 'learning', icon: '👑', rarity: 'Legendary', currentProgress: 27, targetProgress: 25 }
+    ];
+    return base.map(b => ({ ...b, unlocked: b.currentProgress >= b.targetProgress }));
+  }, []);
 
   const getRarityStyle = (rarity: string) => {
     switch (rarity) {
@@ -340,6 +343,7 @@ export default function PlacementProfile({
       <AnimatePresence>
         {customToast && (
           <motion.div
+            key="custom-toast"
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
@@ -497,7 +501,7 @@ export default function PlacementProfile({
           </div>
 
           {/* Preset selector panel & Mode Toggles */}
-          <div className={`${stylePreset.cardBg} rounded-2xl p-5 md:p-6 flex flex-col justify-between w-full sm:w-60 min-h-[170px] gap-6`}>
+          <div className={`${stylePreset.cardBg} rounded-2xl p-5 md:p-6 flex flex-col justify-center w-full sm:w-60 min-h-[170px] gap-6`}>
             {/* Custom Brand Color Palette */}
             <div className="space-y-2.5 text-left">
               <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">COLOR PALETTE</span>
@@ -529,34 +533,6 @@ export default function PlacementProfile({
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* Dark/Light mode switch */}
-            <div className="space-y-2.5 text-left">
-              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Viewport Mode</span>
-              <div className="grid grid-cols-3 gap-1 bg-slate-50 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200/50 dark:border-slate-900">
-                {[
-                  { id: 'light', icon: Sun, label: 'Light' },
-                  { id: 'dark', icon: Moon, label: 'Dark' },
-                  { id: 'system', icon: Laptop, label: 'Sys' }
-                ].map((item) => {
-                  const Icon = item.icon;
-                  const isActive = themeMode === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleThemeChange(item.id as any)}
-                      className={`py-2 px-1 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-300 ${isActive 
-                        ? 'bg-white dark:bg-slate-800 text-[var(--clr-primary)] shadow-md'
-                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-slate-900/50'
-                      }`}
-                      title={item.label}
-                    >
-                      <Icon className={`w-5.5 h-5.5 transition-transform duration-300 ${isActive ? 'scale-110 stroke-[2.5]' : 'stroke-[2]'}`} />
-                    </button>
-                  );
-                })}
               </div>
             </div>
           </div>
@@ -721,42 +697,42 @@ export default function PlacementProfile({
               {/* Rich Heatmap Tooltip */}
               {activeHeatmapTooltip && (
                 <div 
-                  className="absolute z-20 px-3 py-2 bg-slate-950/95 dark:bg-slate-900/95 border border-slate-800 text-white rounded-xl text-[10.5px] font-bold flex flex-col pointer-events-none shadow-xl min-w-44 text-left"
+                  className="absolute z-20 px-3 py-2 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl text-[10.5px] font-bold flex flex-col pointer-events-none shadow-xl min-w-44 text-left"
                   style={{ 
                     left: `${activeHeatmapTooltip.x}px`, 
                     top: `${activeHeatmapTooltip.y + 20}px`, 
                     transform: 'translate(-50%, 0)' 
                   }}
                 >
-                  <span className="text-slate-400 font-extrabold text-[9.5px] tracking-wide block border-b border-slate-800 pb-1">{activeHeatmapTooltip.date}</span>
+                  <span className="text-slate-500 dark:text-slate-400 font-extrabold text-[9.5px] tracking-wide block border-b border-slate-200 dark:border-slate-800 pb-1">{activeHeatmapTooltip.date}</span>
                   {activeHeatmapTooltip.solves > 0 ? (
                     <div className="space-y-1 mt-1 leading-normal">
                       <div className="flex justify-between font-mono">
                         <span>Solved:</span>
-                        <span className="text-blue-400 font-black">{activeHeatmapTooltip.solves} Qs</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-black">{activeHeatmapTooltip.solves} Qs</span>
                       </div>
                       <div className="flex justify-between font-mono">
                         <span>Accuracy:</span>
-                        <span className="text-emerald-400 font-black">{activeHeatmapTooltip.acc}%</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-black">{activeHeatmapTooltip.acc}%</span>
                       </div>
                       <div className="flex justify-between font-mono">
                         <span>Duration:</span>
-                        <span className="text-amber-400 font-black">{activeHeatmapTooltip.timeSpent}</span>
+                        <span className="text-amber-600 dark:text-amber-400 font-black">{activeHeatmapTooltip.timeSpent}</span>
                       </div>
                       <div className="flex justify-between font-mono">
                         <span>XP Earned:</span>
-                        <span className="text-purple-400 font-black">+{activeHeatmapTooltip.solves * 15} XP</span>
+                        <span className="text-purple-600 dark:text-purple-400 font-black">+{activeHeatmapTooltip.solves * 15} XP</span>
                       </div>
                       <div className="flex justify-between font-mono">
                         <span>Streak:</span>
-                        <span className="text-orange-400 font-black">Active 🔥</span>
+                        <span className="text-orange-600 dark:text-orange-400 font-black">Active 🔥</span>
                       </div>
-                      <div className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold pt-1 border-t border-slate-800">
+                      <div className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold pt-1 border-t border-slate-200 dark:border-slate-800">
                         Topics: {activeHeatmapTooltip.topics.join(', ')}
                       </div>
                     </div>
                   ) : (
-                    <span className="italic text-slate-505 font-mono mt-1 text-[9.5px]">No activity commits</span>
+                    <span className="italic text-slate-500 dark:text-slate-400 font-mono mt-1 text-[9.5px]">No activity commits</span>
                   )}
                 </div>
               )}
@@ -816,35 +792,10 @@ export default function PlacementProfile({
 
       {/* NEW SECTION: Company Matches & Weekly Performance Widget */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 select-none">
-        {/* Left Card: Company Matches (7 columns) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-7 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-start space-y-6`}>
-          <div>
-            <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Best Company Matches</h4>
-          </div>
 
-          <div className="space-y-3.5">
-            {[
-              { company: 'TCS', percent: 94, color: 'bg-emerald-500' },
-              { company: 'Infosys', percent: 89, color: 'bg-blue-500' },
-              { company: 'Accenture', percent: 86, color: 'bg-indigo-500' },
-              { company: 'Amazon', percent: 61, color: 'bg-amber-500' },
-              { company: 'Google', percent: 44, color: 'bg-rose-500' }
-            ].map((match) => (
-              <div key={match.company} className="space-y-1">
-                <div className="flex justify-between items-center text-[10.5px] font-bold font-mono">
-                  <span className="text-slate-700 dark:text-slate-350">{match.company}</span>
-                  <span className="text-slate-800 dark:text-white font-extrabold">{match.percent}% Match</span>
-                </div>
-                <div className="w-full bg-slate-50 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-100 dark:border-slate-900">
-                  <div className={`h-full rounded-full ${match.color}`} style={{ width: `${match.percent}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Right Card: Weekly Performance Activity Spark Chart */}
-        <div className={`${stylePreset.cardBg} lg:col-span-5 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-4`}>
+        {/* Weekly Performance Activity Spark Chart */}
+        <div className={`${stylePreset.cardBg} lg:col-span-12 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-4`}>
           <div className="flex items-center justify-between select-none">
             <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Weekly Solves Activity</h4>
             <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-505 uppercase">Streak: 14 Days 🔥</span>
@@ -979,71 +930,7 @@ export default function PlacementProfile({
 
       </section>
 
-      {/* LOWER SECTION: Achievements */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 select-none">
-        
-        {/* Trophy Case (Full width) */}
-        <div className={`${stylePreset.cardBg} lg:col-span-12 rounded-3xl p-6 backdrop-blur-md text-left flex flex-col justify-between space-y-5`}>
-          
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
-            <div>
-              <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">Placement Achievements</h4>
-            </div>
-            
-            <button 
-              onClick={() => setShowAllAchievementsModal(true)}
-              className="py-1 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-[9.5px] font-black uppercase text-slate-600 dark:text-slate-350 cursor-pointer"
-            >
-              View All
-            </button>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {achievements.filter((_, idx) => idx < 6).map((item) => (
-              <div
-                key={item.id}
-                className={`p-3 rounded-2xl border text-left flex items-start gap-3 transition-all relative overflow-hidden group ${
-                  item.unlocked
-                    ? 'bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800 hover:border-blue-500/55'
-                    : 'bg-slate-100/30 dark:bg-slate-950/5 border-slate-200/40 dark:border-slate-900 opacity-60'
-                }`}
-              >
-                {/* Big emoji icon */}
-                <div className="text-2xl pt-0.5 shrink-0 group-hover:scale-105 transition-transform">
-                  {item.icon}
-                </div>
-
-                <div className="flex-1 space-y-1 text-left min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <h5 className="text-[10.5px] font-black uppercase text-slate-800 dark:text-white tracking-wide truncate">
-                      {item.title}
-                    </h5>
-                    <span className={`text-[7.5px] font-extrabold px-1.5 py-0.2 rounded border font-mono uppercase shrink-0 ${getRarityStyle(item.rarity)}`}>
-                      {item.rarity}
-                    </span>
-                  </div>
-
-                  <p className="text-[9.5px] font-semibold text-slate-400 dark:text-slate-500 leading-tight">
-                    {item.req}
-                  </p>
-
-                  <div className="pt-1.5 space-y-1">
-                    <div className="flex justify-between text-[8px] font-mono font-bold text-slate-400 uppercase">
-                      <span>Progress</span>
-                      <span>{item.currentProgress} / {item.targetProgress}</span>
-                    </div>
-                    <div className="w-full bg-slate-200/50 dark:bg-slate-950 h-1 rounded-full overflow-hidden border border-slate-200/10 dark:border-slate-900">
-                      <div className={`h-full rounded-full ${item.unlocked ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${(item.currentProgress / item.targetProgress) * 100}%` }} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-      </section>
       {/* ====================================================================
           MODALS & DRAWERS OVERLAYS (AnimatePresence)
           ==================================================================== */}
@@ -1051,7 +938,7 @@ export default function PlacementProfile({
         
         {/* Modal 1: Customize Style Modal */}
         {showCustomizeModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs select-none">
+          <div key="customize-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs select-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -1193,7 +1080,7 @@ export default function PlacementProfile({
 
         {/* Modal 2: Edit Credentials Modal */}
         {showEditProfileModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
+          <div key="edit-profile-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -1335,7 +1222,7 @@ export default function PlacementProfile({
 
         {/* Modal 3: Privacy & Visibility Drawer */}
         {showPrivacyModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs select-none">
+          <div key="privacy-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs select-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -1397,7 +1284,7 @@ export default function PlacementProfile({
 
         {/* Modal 4: Shareable Rank Card Modal (relocated generator) */}
         {showRankCardModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
+          <div key="rank-card-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -1561,7 +1448,7 @@ export default function PlacementProfile({
 
         {/* Modal 5: View All Achievements Modal */}
         {showAllAchievementsModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
+          <div key="achievements-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -1614,7 +1501,7 @@ export default function PlacementProfile({
                           <span>{item.currentProgress} / {item.targetProgress}</span>
                         </div>
                         <div className="w-full bg-slate-200/50 dark:bg-slate-900 h-1 rounded-full overflow-hidden border border-slate-200/10 dark:border-slate-900">
-                          <div className={`h-full rounded-full ${item.unlocked ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${(item.currentProgress / item.targetProgress) * 100}%` }} />
+                          <div className={`h-full rounded-full ${item.unlocked ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${Math.min(100, (item.currentProgress / item.targetProgress) * 100)}%` }} />
                         </div>
                       </div>
                     </div>

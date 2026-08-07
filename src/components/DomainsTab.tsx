@@ -221,7 +221,7 @@ export default function DomainsTab({ searchQuery, customColor = 'default' }: Dom
                   'coding': 'coding-dsa'
                 };
                 const slug = slugMap[d.id] || d.id;
-                router.push(`/domain/${slug}`);
+                router.push(`/domain/${slug}?resume=true`);
               }}
               className={`group bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[24px] p-6 flex flex-col gap-6 transition-all duration-300 ease-out cursor-pointer hover:scale-[1.02] shadow-[0_8px_30px_rgba(0,0,0,0.015)] ${d.bgGlow}`}
             >

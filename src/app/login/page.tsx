@@ -810,12 +810,12 @@ function LoginContent() {
       {/* ==========================================
           LEFT COLUMN: CURATED DARK VISUAL DECK
           ========================================== */}
-      <div className="hidden lg:flex lg:col-span-5 bg-slate-950 text-white flex-col justify-between p-12 h-full min-h-screen relative overflow-hidden border-r border-slate-900">
+      <div className="hidden lg:flex lg:col-span-5 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex-col justify-between p-12 h-full min-h-screen relative overflow-hidden border-r border-slate-200 dark:border-slate-900 transition-colors duration-300">
         
         {/* Background decorative layers */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-35 pointer-events-none" />
-        <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-blue-600/10 blur-[130px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-indigo-600/10 blur-[150px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-60 dark:opacity-35 pointer-events-none transition-colors duration-300" />
+        <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-blue-600/5 dark:bg-blue-600/10 blur-[130px] pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-300" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-indigo-600/5 dark:bg-indigo-600/10 blur-[150px] pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-300" />
 
         {/* Brand Header */}
         <Link href="/" className="flex items-center gap-3 self-start z-10 hover:opacity-90 transition-opacity">
@@ -823,15 +823,15 @@ function LoginContent() {
             <Layers className="w-4.5 h-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold tracking-tight text-xs text-white">{logoText}</span>
+            <span className="font-extrabold tracking-tight text-xs text-slate-900 dark:text-white">{logoText}</span>
             <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">{logoSubtext}</span>
           </div>
         </Link>
 
         {/* Center Mission Statements */}
         <div className="space-y-6 z-10 my-auto">
-          <h2 className="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight uppercase">
-            Master your <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Aptitude</span> with editorial precision.
+          <h2 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight uppercase">
+            Master your <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">Aptitude</span> with editorial precision.
           </h2>
 
         </div>
@@ -854,10 +854,9 @@ function LoginContent() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
 
-        {/* Theme & Role Toggle in the topmost right corner */}
-        <div className="absolute top-4 right-4 flex items-center gap-3">
+        {/* RoleToggle & Theme Toggle */}
+        <div className="absolute top-8 right-8 z-[60] flex items-center gap-4 animate-fade-in-down" style={{ animationDelay: '0.4s' }}>
           <RoleToggle />
-          <ThemeToggle />
         </div>
 
         {/* The Card Form container */}

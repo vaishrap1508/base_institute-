@@ -7,7 +7,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   
   if (pathname?.startsWith('/admin')) {
-    return <div className="contents">{children}</div>;
+    return <div key={pathname || 'admin'} className="contents">{children}</div>;
   }
   
   return (

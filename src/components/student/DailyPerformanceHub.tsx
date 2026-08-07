@@ -15,7 +15,7 @@ export const DailyPerformanceHub = ({ isCustomActive = false }: DailyPerformance
   // Mock Dynamic Backend Data
   const xpData = {
     xp_today: 120,
-    xp_growth: 15,
+    xp_growth: 50,
     performance_status: "🚀 Fast Learner Today"
   };
 

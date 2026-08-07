@@ -617,19 +617,19 @@ export default function SettingsPage() {
       <button 
         type="button"
         onClick={onChange}
-        className={`w-10 h-5.5 flex items-center rounded-full p-0.5 cursor-pointer transition-all duration-200 shrink-0 ${checked ? 'bg-[#00ffcc]' : 'bg-[#1b233a]'}`}
+        className={`w-10 h-5.5 flex items-center rounded-full p-0.5 cursor-pointer transition-all duration-200 shrink-0 ${checked ? 'bg-emerald-400 dark:bg-[#00ffcc]' : 'bg-slate-200 dark:bg-[#1b233a]'}`}
       >
-        <div className={`bg-slate-900 w-4.5 h-4.5 rounded-full shadow-md transform transition-all duration-200 ${checked ? 'translate-x-4.5 bg-slate-950' : 'translate-x-0 bg-slate-400'}`} />
+        <div className={`w-4.5 h-4.5 rounded-full shadow-md transform transition-all duration-200 ${checked ? 'translate-x-4.5 bg-white dark:bg-slate-950' : 'translate-x-0 bg-white dark:bg-slate-400'}`} />
       </button>
     );
   };
 
   return (
-    <>
+    <div className="flex-1 flex flex-col w-full h-full relative">
 
         {notification && (
           <div className="absolute top-20 right-8 z-50 animate-slideIn">
-            <div className="px-4.5 py-3.5 rounded-xl border bg-[#0f1322] border-purple-500/20 text-slate-200 shadow-xl flex items-center gap-3 max-w-md">
+            <div className="px-4.5 py-3.5 rounded-xl border bg-white dark:bg-[#0f1322] border-purple-500/20 text-slate-200 shadow-xl flex items-center gap-3 max-w-md">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
               <span className="text-xs font-semibold leading-normal">{notification}</span>
             </div>
@@ -637,18 +637,18 @@ export default function SettingsPage() {
         )}
 
         {currentRole.role !== 'admin' ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#070a13]">
-            <div className="w-full max-w-xl bg-[#0f1322] border border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#070a13]">
+            <div className="w-full max-w-xl bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               <div className="w-16 h-16 rounded-full bg-rose-950/20 border border-rose-900/30 flex items-center justify-center text-rose-400 shadow-inner relative">
                 <Cpu className="w-7 h-7 animate-pulse" />
                 <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-[#0f1322] shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
-                <h2 className="text-lg font-black text-white uppercase tracking-wider font-heading">Clearance Protocol Violation</h2>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider font-heading">Clearance Protocol Violation</h2>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-[#070a13] border border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-[#151c2f] pb-2">
+              <div className="w-full bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-2">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-950/45 text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
@@ -682,15 +682,15 @@ export default function SettingsPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-[#070a13] custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50 dark:bg-[#070a13] custom-scrollbar">
             
             {/* Page Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#151c2f] pb-5">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-[#151c2f] pb-5">
               <div>
                 <span className="text-[10px] font-black text-purple-400 tracking-wider uppercase leading-none">
                   Admin Panel
                 </span>
-                <h1 className="text-2xl font-black text-white tracking-tight uppercase font-heading mt-1">
+                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase font-heading mt-1">
                   {activeMasterTab === 'settings' ? 'System Settings' : 'Control Centre'}
                 </h1>
               </div>
@@ -698,7 +698,7 @@ export default function SettingsPage() {
               {/* Master Tab Navigation & RoleToggle */}
               <div className="flex items-center gap-4 self-stretch sm:self-auto">
                 <RoleToggle />
-                <div className="relative flex bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] shadow-inner select-none w-full sm:w-[320px]">
+                <div className="relative flex bg-slate-50 dark:bg-[#070a13] p-0.5 rounded-full border border-slate-200 dark:border-[#151c2f] shadow-inner select-none w-full sm:w-[320px]">
                 {/* Sliding indicator */}
                 <div 
                   className={`absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-2px)] bg-purple-600 rounded-full shadow-[0_0_15px_rgba(147,51,234,0.3)] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${activeMasterTab === 'settings' ? 'translate-x-0' : 'translate-x-full'}`}
@@ -738,7 +738,7 @@ export default function SettingsPage() {
               <div className="lg:col-span-2 space-y-6">
                 
                 {/* Identity Management Card */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-6 relative overflow-hidden group">
+                <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 space-y-6 relative overflow-hidden group">
                   <span className="text-[10px] font-black text-cyan-400 tracking-wider uppercase leading-none">
                     Identity Management
                   </span>
@@ -750,7 +750,7 @@ export default function SettingsPage() {
                         alt="Julian Draxler Avatar" 
                         className="w-20 h-20 rounded-xl object-cover border border-[#1b233a] shadow-lg"
                       />
-                      <button className="absolute -bottom-1.5 -right-1.5 bg-[#00ffcc] text-slate-900 p-1.5 rounded-lg border-2 border-[#0f1322] shadow hover:scale-105 transition-all cursor-pointer">
+                      <button className="absolute -bottom-1.5 -right-1.5 bg-emerald-400 dark:bg-[#00ffcc] text-slate-900 p-1.5 rounded-lg border-2 border-white dark:border-[#0f1322] shadow hover:scale-105 transition-all cursor-pointer">
                         <Edit className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -758,17 +758,17 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 flex-1">
                       <div className="flex flex-col">
                         <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Admin Name</span>
-                        <span className="text-sm font-bold text-white mt-1">Julian Draxler</span>
+                        <span className="text-sm font-bold text-slate-900 dark:text-white mt-1">Julian Draxler</span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Admin Email</span>
-                        <span className="text-sm font-bold text-white mt-1">j.draxler@lucid.io</span>
+                        <span className="text-sm font-bold text-slate-900 dark:text-white mt-1">j.draxler@lucid.io</span>
                       </div>
                       
                       <div className="sm:col-span-2 pt-1.5">
                         <button 
                           onClick={handlePasswordChange}
-                          className="px-4 py-2 bg-[#1b233a] hover:bg-[#253254] text-slate-200 border border-[#1b233a] rounded-xl text-xs font-bold transition-all cursor-pointer"
+                          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#1b233a] dark:hover:bg-[#253254] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-[#1b233a] rounded-xl text-xs font-bold transition-all cursor-pointer"
                         >
                           Change Password
                         </button>
@@ -843,21 +843,21 @@ export default function SettingsPage() {
               <div className="lg:col-span-1 space-y-6">
                 
                 {/* Account Summary */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4">
-                  <h3 className="text-sm font-extrabold text-white uppercase tracking-wider border-b border-[#151c2f] pb-3.5 font-heading">
+                <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 space-y-4">
+                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-[#151c2f] pb-3.5 font-heading">
                     Account Summary
                   </h3>
                   
                   <div className="space-y-3.5 text-xs">
                     <div className="flex justify-between items-center py-1">
                       <span className="text-slate-400 font-semibold">Current Role</span>
-                      <span className="font-bold text-white">{currentRole.name}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{currentRole.name}</span>
                     </div>
-                    <div className="flex justify-between items-center py-1 border-t border-[#151c2f]/60">
+                    <div className="flex justify-between items-center py-1 border-t border-slate-200 dark:border-[#151c2f]/60">
                       <span className="text-slate-400 font-semibold">Environment</span>
                       <span className="font-bold text-emerald-400">Production Ready</span>
                     </div>
-                    <div className="flex justify-between items-center py-1 border-t border-[#151c2f]/60">
+                    <div className="flex justify-between items-center py-1 border-t border-slate-200 dark:border-[#151c2f]/60">
                       <span className="text-slate-400 font-semibold">Last Login</span>
                       <span className="font-bold text-slate-300">{accountSummary.lastLogin}</span>
                     </div>
@@ -868,14 +868,14 @@ export default function SettingsPage() {
             </div>
 
             {/* Bottom Section: Onboarding Journey Customizer */}
-            <div className="mt-6 bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#151c2f] pb-4">
+            <div className="mt-6 bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-[#151c2f] pb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
                     <Target className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
+                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-heading">
                       Onboarding Journey Customizer
                     </h3>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
@@ -895,7 +895,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Tab Toggles */}
-              <div className="flex flex-wrap gap-2 border-b border-[#151c2f] pb-3 text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <div className="flex flex-wrap gap-2 border-b border-slate-200 dark:border-[#151c2f] pb-3 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <button
                   onClick={() => setActiveTab('goals')}
                   className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2 border ${
@@ -976,10 +976,10 @@ export default function SettingsPage() {
                     <div className="space-y-5 animate-scaleUp">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                         {goalOptions.map((goal, idx) => (
-                          <div key={goal.id || idx} className="p-4 bg-[#070a13] border border-[#151c2f] rounded-xl flex items-start justify-between gap-3 text-xs">
+                          <div key={goal.id || idx} className="p-4 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl flex items-start justify-between gap-3 text-xs">
                             <div className="flex flex-col gap-1 min-w-0">
                               <span className="text-[#00ffcc] font-black uppercase tracking-wider text-[9px]">{goal.id}</span>
-                              <span className="text-white font-extrabold text-sm tracking-tight">{goal.label}</span>
+                              <span className="text-slate-900 dark:text-white font-extrabold text-sm tracking-tight">{goal.label}</span>
                               <p className="text-slate-400 font-semibold leading-relaxed mt-1">{goal.desc}</p>
                             </div>
                             <button
@@ -993,7 +993,7 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add Goal Option Form */}
-                      <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-5 space-y-4">
+                      <div className="bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl p-5 space-y-4">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Add Custom Onboarding Goal</span>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1004,7 +1004,7 @@ export default function SettingsPage() {
                               placeholder="e.g. machine-learning"
                               value={newGoalId}
                               onChange={e => setNewGoalId(e.target.value)}
-                              className="bg-[#0f1322] border border-[#151c2f] rounded-xl p-3 text-xs text-white font-bold focus:outline-none focus:border-purple-500/50"
+                              className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-xl p-3 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-purple-500/50"
                             />
                           </div>
                           
@@ -1015,7 +1015,7 @@ export default function SettingsPage() {
                               placeholder="e.g. Machine Learning Prep"
                               value={newGoalLabel}
                               onChange={e => setNewGoalLabel(e.target.value)}
-                              className="bg-[#0f1322] border border-[#151c2f] rounded-xl p-3 text-xs text-white font-bold focus:outline-none focus:border-purple-500/50"
+                              className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-xl p-3 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-purple-500/50"
                             />
                           </div>
                           
@@ -1026,7 +1026,7 @@ export default function SettingsPage() {
                               placeholder="e.g. Master classification, regression models, and model tuning."
                               value={newGoalDesc}
                               onChange={e => setNewGoalDesc(e.target.value)}
-                              className="bg-[#0f1322] border border-[#151c2f] rounded-xl p-3 text-xs text-white font-bold focus:outline-none focus:border-purple-500/50"
+                              className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-xl p-3 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-purple-500/50"
                             />
                           </div>
                         </div>
@@ -1066,7 +1066,7 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add State Form */}
-                      <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
+                      <div className="bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
                         <div className="flex-1 space-y-1.5">
                           <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Indian State / Union Territory</label>
                           <input
@@ -1074,7 +1074,7 @@ export default function SettingsPage() {
                             placeholder="e.g. Telangana"
                             value={newState}
                             onChange={e => setNewState(e.target.value)}
-                            className="w-full bg-[#0f1322] border border-[#151c2f] rounded-xl p-3 text-xs text-white font-bold focus:outline-none focus:border-purple-500/50"
+                            className="w-full bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-xl p-3 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-purple-500/50"
                           />
                         </div>
                         <button
@@ -1098,7 +1098,7 @@ export default function SettingsPage() {
                     <div className="space-y-5 animate-scaleUp">
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4.5 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                         {timelineOptions.map((time, idx) => (
-                          <div key={time || idx} className="p-3 bg-[#070a13] border border-[#151c2f] rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-200">
+                          <div key={time || idx} className="p-3 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-200">
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4.5 h-4.5 text-slate-500" />
                               <span>{time}</span>
@@ -1114,7 +1114,7 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add Timeline Form */}
-                      <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
+                      <div className="bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
                         <div className="flex-1 space-y-1.5">
                           <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Timeline Metric Option <span className="text-rose-500">*</span></label>
                           <input
@@ -1122,7 +1122,7 @@ export default function SettingsPage() {
                             placeholder="e.g. Within 2 Weeks"
                             value={newTimeline}
                             onChange={e => setNewTimeline(e.target.value)}
-                            className="w-full bg-[#0f1322] border border-[#151c2f] rounded-xl p-3 text-xs text-white font-bold focus:outline-none focus:border-purple-500/50"
+                            className="w-full bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-xl p-3 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-purple-500/50"
                           />
                         </div>
                         <button
@@ -1146,7 +1146,7 @@ export default function SettingsPage() {
                     <div className="space-y-5 animate-scaleUp">
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4.5 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                         {commitmentOptions.map((commit, idx) => (
-                          <div key={commit || idx} className="p-3 bg-[#070a13] border border-[#151c2f] rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-200">
+                          <div key={commit || idx} className="p-3 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-200">
                             <div className="flex items-center gap-2">
                               <Clock className="w-4.5 h-4.5 text-slate-500" />
                               <span>{commit}</span>
@@ -1162,7 +1162,7 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add Commitment Form */}
-                      <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
+                      <div className="bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
                         <div className="flex-1 space-y-1.5">
                           <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Commitment Metric Option <span className="text-rose-500">*</span></label>
                           <input
@@ -1170,7 +1170,7 @@ export default function SettingsPage() {
                             placeholder="e.g. 20+ Hours per Week"
                             value={newCommitment}
                             onChange={e => setNewCommitment(e.target.value)}
-                            className="w-full bg-[#0f1322] border border-[#151c2f] rounded-xl p-3 text-xs text-white font-bold focus:outline-none focus:border-purple-500/50"
+                            className="w-full bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-xl p-3 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-purple-500/50"
                           />
                         </div>
                         <button
@@ -1194,7 +1194,7 @@ export default function SettingsPage() {
                     <div className="space-y-5 animate-scaleUp">
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4.5 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                         {preferenceOptions.map((pref, idx) => (
-                          <div key={pref || idx} className="p-3 bg-[#070a13] border border-[#151c2f] rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-200">
+                          <div key={pref || idx} className="p-3 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl flex items-center justify-between gap-3 text-xs font-bold text-slate-200">
                             <div className="flex items-center gap-2">
                               <BookOpen className="w-4.5 h-4.5 text-slate-500" />
                               <span>{pref}</span>
@@ -1210,7 +1210,7 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Add Learning Preference Form */}
-                      <div className="bg-[#070a13] border border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
+                      <div className="bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl p-5 flex flex-col sm:flex-row gap-4 items-end">
                         <div className="flex-1 space-y-1.5">
                           <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Add Pedagogical Learning Preference <span className="text-rose-500">*</span></label>
                           <input
@@ -1218,7 +1218,7 @@ export default function SettingsPage() {
                             placeholder="e.g. Concept-oriented Interactive Lectures"
                             value={newPreference}
                             onChange={e => setNewPreference(e.target.value)}
-                            className="w-full bg-[#0f1322] border border-[#151c2f] rounded-xl p-3 text-xs text-white font-bold focus:outline-none focus:border-purple-500/50"
+                            className="w-full bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-xl p-3 text-xs text-slate-900 dark:text-white font-bold focus:outline-none focus:border-purple-500/50"
                           />
                         </div>
                         <button
@@ -1242,12 +1242,12 @@ export default function SettingsPage() {
             </div>
 
             {/* Premium Discard / Save Changes Button Row at very bottom */}
-            <div className="flex items-center justify-end border-t border-[#151c2f] pt-6 pb-2">
+            <div className="flex items-center justify-end border-t border-slate-200 dark:border-[#151c2f] pt-6 pb-2">
 
               <div className="flex items-center gap-3">
                 <a 
                   href="/admin/dashboard" 
-                  className="px-5 py-2.5 bg-[#0d1323] hover:bg-[#1b233a] border border-[#151c2f] text-slate-400 hover:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                  className="px-5 py-2.5 bg-[#0d1323] hover:bg-[#1b233a] border border-slate-200 dark:border-[#151c2f] text-slate-400 hover:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
                 >
                   Discard
                 </a>
@@ -1264,11 +1264,11 @@ export default function SettingsPage() {
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-forwards">
                 
                 {/* Warnings & Alerts */}
-                <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#151c2f] pb-3">
+                <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-3">
                     <div className="flex items-center gap-2">
                       <ShieldAlert className="w-5 h-5 text-rose-500 animate-pulse" />
-                      <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
+                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-heading">
                         Warnings & Alerts
                       </h3>
                     </div>
@@ -1279,14 +1279,14 @@ export default function SettingsPage() {
 
                   <div className="space-y-3">
                     {systemAlerts.length > 0 ? (
-                      systemAlerts.map((alert) => (
-                        <div key={alert.id} className="flex items-start gap-4 p-4 bg-[#070a13]/85 border border-[#151c2f] rounded-xl relative group hover:border-[#151c2f] hover:border-rose-500/25 transition-all duration-200">
+                      systemAlerts.map((alert, idx) => (
+                        <div key={alert.id || `alert-${idx}`} className="flex items-start gap-4 p-4 bg-slate-50 dark:bg-[#070a13]/85 border border-slate-200 dark:border-[#151c2f] rounded-xl relative group hover:border-slate-200 dark:border-[#151c2f] hover:border-rose-500/25 transition-all duration-200">
                           <div className="w-8.5 h-8.5 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
                             {renderAlertIcon(alert.icon)}
                           </div>
                           <div className="flex-1 min-w-0 pr-24 text-left">
                             <div className="flex items-baseline gap-2">
-                              <span className="text-xs font-bold text-white">{alert.title}</span>
+                              <span className="text-xs font-bold text-slate-900 dark:text-white">{alert.title}</span>
                               <span className="text-[9px] font-semibold text-slate-500">{alert.time}</span>
                             </div>
                             <p className="text-[10px] text-slate-400 leading-normal mt-1 font-semibold">
@@ -1321,11 +1321,11 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
                   {/* Reset User Data */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 flex flex-col justify-between min-h-[220px]">
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 flex flex-col justify-between min-h-[220px]">
                     <div className="space-y-3.5 text-left">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 flex items-center justify-center rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 font-extrabold text-[12px]">!</span>
-                        <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
+                        <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-heading">
                           Reset Leaderboards & Streaks
                         </h3>
                       </div>
@@ -1343,12 +1343,12 @@ export default function SettingsPage() {
                   </div>
 
                   {/* Moderate Content */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 flex flex-col justify-between min-h-[220px]">
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 flex flex-col justify-between min-h-[220px]">
                     <div className="space-y-3.5 text-left">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <BookOpen className="w-4.5 h-4.5 text-indigo-400" />
-                          <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
+                          <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-heading">
                             Moderate Content
                           </h3>
                         </div>
@@ -1390,11 +1390,11 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   
                   {/* Flagged Questions */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 flex flex-col justify-between min-h-[220px]">
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 flex flex-col justify-between min-h-[220px]">
                     <div className="space-y-3.5 text-left">
                       <div className="flex items-center gap-2">
                         <ShieldAlert className="w-4.5 h-4.5 text-emerald-400" />
-                        <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
+                        <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-heading">
                           Flagged Questions
                         </h3>
                       </div>
@@ -1410,7 +1410,7 @@ export default function SettingsPage() {
                         <p className="text-[9px] font-semibold text-slate-500 mt-1 text-left">
                           {flagStats.q} Quantitative, {flagStats.l} Logical, {flagStats.c} Coding & DSA
                         </p>
-                        <div className="h-2 bg-[#070a13] border border-[#151c2f] rounded-full overflow-hidden mt-2">
+                        <div className="h-2 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-full overflow-hidden mt-2">
                           <div 
                             className="h-full bg-emerald-400 rounded-full transition-all duration-1000" 
                             style={{ width: `${Math.min(100, pendingItemsCount > 0 ? (pendingItemsCount / 100) * 100 : 0)}%` }}
@@ -1428,16 +1428,16 @@ export default function SettingsPage() {
                   </div>
 
                   {/* System Overrides */}
-                  <div className="bg-[#0f1322] border border-[#151c2f] rounded-2xl p-6 space-y-4.5">
-                    <div className="flex items-center justify-between border-b border-[#151c2f] pb-3">
-                      <h3 className="text-sm font-extrabold text-white uppercase tracking-wider font-heading">
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 space-y-4.5">
+                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-3">
+                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-heading">
                         System Overrides
                       </h3>
                     </div>
 
                     <div className="space-y-3.5">
                       {/* Item 1 */}
-                      <div className="flex items-center justify-between p-3.5 bg-[#070a13] border border-[#151c2f] rounded-xl">
+                      <div className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl">
                         <div className="flex flex-col gap-0.5 pr-4 text-left">
                           <span className="text-xs font-bold text-slate-200">Platform Read-Only Mode</span>
                           <span className="text-[9px] text-slate-500 font-semibold uppercase">Disable submissions during DB syncs</span>
@@ -1452,7 +1452,7 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Item 2 */}
-                      <div className="flex items-center justify-between p-3.5 bg-[#070a13] border border-[#151c2f] rounded-xl">
+                      <div className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl">
                         <div className="flex flex-col gap-0.5 pr-4 text-left">
                           <span className="text-xs font-bold text-slate-200">AI Mentor Rate Limiting</span>
                           <span className="text-[9px] text-slate-500 font-semibold uppercase">Throttle ELI5 requests by 50%</span>
@@ -1467,7 +1467,7 @@ export default function SettingsPage() {
                       </div>
 
                       {/* Item 3 */}
-                      <div className="flex items-center justify-between p-3.5 bg-[#070a13] border border-[#151c2f] rounded-xl">
+                      <div className="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl">
                         <div className="flex flex-col gap-0.5 pr-4 text-left">
                           <span className="text-xs font-bold text-slate-200">Gamified Streaks Engine v2</span>
                           <span className="text-[9px] text-slate-500 font-semibold uppercase">Enable daily quest UI for students</span>
@@ -1491,8 +1491,8 @@ export default function SettingsPage() {
             {/* Modals & Dialogs overlays */}
             {showPurgeModal && (
               <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4">
-                <div className="w-full max-w-md bg-[#0f1322] border border-rose-500/20 p-6 rounded-2xl shadow-2xl space-y-5 animate-scaleUp">
-                  <div className="flex items-center justify-between border-b border-[#151c2f] pb-3">
+                <div className="w-full max-w-md bg-white dark:bg-[#0f1322] border border-rose-500/20 p-6 rounded-2xl shadow-2xl space-y-5 animate-scaleUp">
+                  <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-3">
                     <div className="flex items-center gap-2 text-rose-400">
                       <AlertOctagon className="w-5 h-5 animate-pulse" />
                       <span className="text-sm font-extrabold uppercase tracking-wider font-heading">Purge Protocol Authorization</span>
@@ -1520,7 +1520,7 @@ export default function SettingsPage() {
                         placeholder="CONFIRM-PURGE"
                         value={purgeInput}
                         onChange={(e) => setPurgeInput(e.target.value)}
-                        className="w-full bg-[#070a13] border border-[#151c2f] rounded-xl p-3 text-xs text-white font-mono tracking-widest focus:outline-none focus:border-rose-500/50"
+                        className="w-full bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-xl p-3 text-xs text-slate-900 dark:text-white font-mono tracking-widest focus:outline-none focus:border-rose-500/50"
                       />
                     </div>
                   </div>
@@ -1528,7 +1528,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={() => { setShowPurgeModal(false); setPurgeInput(''); }}
-                      className="flex-1 py-2.5 bg-[#0d1323] hover:bg-[#1b233a] border border-[#151c2f] text-slate-400 hover:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      className="flex-1 py-2.5 bg-[#0d1323] hover:bg-[#1b233a] border border-slate-200 dark:border-[#151c2f] text-slate-400 hover:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -1574,8 +1574,8 @@ export default function SettingsPage() {
 
             {showModModal && (
               <div className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4">
-                <div className="w-full max-w-lg bg-[#0f1322] border border-[#151c2f] p-6 rounded-2xl shadow-2xl space-y-5 animate-scaleUp">
-                  <div className="flex items-center justify-between border-b border-[#151c2f] pb-3">
+                <div className="w-full max-w-lg bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] p-6 rounded-2xl shadow-2xl space-y-5 animate-scaleUp">
+                  <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-3">
                     <div className="flex items-center gap-2 text-indigo-400">
                       <BookOpen className="w-4.5 h-4.5" />
                       <span className="text-sm font-extrabold uppercase tracking-wider font-heading">Content Moderation Queue</span>
@@ -1590,10 +1590,10 @@ export default function SettingsPage() {
 
                   {modStep < modQueue.length ? (
                     <div className="space-y-4 text-left">
-                      <div className="flex justify-between items-center bg-[#070a13] p-3 border border-[#151c2f] rounded-xl text-[10px] font-bold uppercase tracking-wider">
+                      <div className="flex justify-between items-center bg-slate-50 dark:bg-[#070a13] p-3 border border-slate-200 dark:border-[#151c2f] rounded-xl text-[10px] font-bold uppercase tracking-wider">
                         <div className="flex items-center gap-2">
                           <span className="text-slate-500">Item:</span>
-                          <span className="text-white">{modQueue[modStep].id}</span>
+                          <span className="text-slate-900 dark:text-white">{modQueue[modStep].id}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-slate-500">Flag Type:</span>
@@ -1608,7 +1608,7 @@ export default function SettingsPage() {
 
                       <div className="space-y-2">
                         <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">Flagged Content Preview</span>
-                        <div className="bg-[#070a13] border border-[#151c2f] p-3.5 rounded-xl font-mono text-[11px] text-slate-300 leading-relaxed whitespace-pre-wrap">
+                        <div className="bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] p-3.5 rounded-xl font-mono text-[11px] text-slate-300 leading-relaxed whitespace-pre-wrap">
                           {modQueue[modStep].content}
                         </div>
                       </div>
@@ -1683,7 +1683,7 @@ export default function SettingsPage() {
                     <div className="py-8 flex flex-col items-center justify-center gap-3 text-center">
                       <Check className="w-10 h-10 text-emerald-400 bg-emerald-400/10 border border-emerald-400/25 p-2 rounded-full" />
                       <div className="space-y-1 mt-1">
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">Queue Cleared</h4>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Queue Cleared!</h4>
                         <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest">No remaining flagged queue tasks found.</p>
                       </div>
                       <button
@@ -1700,6 +1700,6 @@ export default function SettingsPage() {
 
           </div>
         )}
-      </>
+      </div>
   );
 }

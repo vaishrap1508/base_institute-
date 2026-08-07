@@ -971,6 +971,7 @@ export default function PracticeArena({
       <AnimatePresence>
         {toastMessage && (
           <motion.div
+            key="toast-message"
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
@@ -986,6 +987,7 @@ export default function PracticeArena({
 
         {reportConfirmation && (
           <motion.div
+            key="report-conf"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
@@ -2100,7 +2102,7 @@ export default function PracticeArena({
         
         {/* 0. LaTeX Formula Sheet Drawer */}
         {isFormulaDrawerOpen && (
-          <>
+          <React.Fragment key="formula-drawer">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -2200,12 +2202,12 @@ export default function PracticeArena({
 
               </div>
             </motion.div>
-          </>
+          </React.Fragment>
         )}
 
         {/* 1. Quick Save Drawer (Slide-in from right, 380px wide) */}
         {isSaveDrawerOpen && (
-          <>
+          <React.Fragment key="save-drawer">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -2318,12 +2320,12 @@ export default function PracticeArena({
               </div>
 
             </motion.div>
-          </>
+          </React.Fragment>
         )}
 
         {/* 2. Revision Library Bottom Sheet (70% Height Overlay) */}
         {isLibraryOpen && (
-          <>
+          <React.Fragment key="library-drawer">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -2602,12 +2604,12 @@ export default function PracticeArena({
               </div>
 
             </motion.div>
-          </>
+          </React.Fragment>
         )}
 
         {/* 3. Discussion Drawer layout (Slide-in from right) */}
         {isDiscussionOpen && (
-          <>
+          <React.Fragment key="discussion-drawer">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.4 }}
@@ -2773,12 +2775,12 @@ export default function PracticeArena({
               )}
 
             </motion.div>
-          </>
+          </React.Fragment>
         )}
 
         {/* 5. Notes Drawer layout (Slide-in from right) */}
         {isQuickNotesOpen && (
-          <>
+          <React.Fragment key="quick-notes-drawer">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.4 }}
@@ -2858,7 +2860,7 @@ export default function PracticeArena({
               </div>
 
             </motion.div>
-          </>
+          </React.Fragment>
         )}
 
         {/* 4. Report Error modal */}

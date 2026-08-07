@@ -722,6 +722,7 @@ export default function ConceptHubTab({
       <AnimatePresence>
         {selectedConcept && (
           <motion.div
+            key="selected-concept"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}

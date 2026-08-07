@@ -16,7 +16,6 @@ export default function Header({ currentRole, onRoleChange }: HeaderProps) {
       {/* Utilities: ONLY the Preview / Edit Toggle Button & Theme Toggle */}
       <div className="flex items-center gap-4">
         <RoleToggle onRoleChange={onRoleChange} />
-        <ThemeToggle />
       </div>
     </header>
   );

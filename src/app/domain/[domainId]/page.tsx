@@ -589,6 +589,13 @@ export default function DomainDetailPage() {
   // Concepts Workspace States
   // ---------------------------------------------------------
   const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('resume=true')) {
+      setIsWorkspaceOpen(true);
+    }
+  }, []);
+
   const [profile, setProfile] = useState<any>({
     username: 'Vaishnavi Raparthy',
     college: 'Vellore Institute of Technology',
@@ -1009,6 +1016,7 @@ export default function DomainDetailPage() {
                 <AnimatePresence>
                   {showNotifications && (
                     <motion.div
+                      key="notifications-dropdown"
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -1092,6 +1100,7 @@ export default function DomainDetailPage() {
                         <AnimatePresence initial={false}>
                           {isExpanded && (
                             <motion.div
+                              key="nested-concepts"
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: 'auto', opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
@@ -1480,6 +1489,7 @@ export default function DomainDetailPage() {
                   <AnimatePresence>
                     {celebrateSubmit && (
                       <motion.div
+                        key="celebrate-submit"
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
@@ -1668,6 +1678,7 @@ export default function DomainDetailPage() {
                         <AnimatePresence mode="wait">
                           {mcqCheckStatus !== 'idle' && (
                             <motion.div
+                              key="mcq-status"
                               initial={{ opacity: 0, y: 5 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: 5 }}

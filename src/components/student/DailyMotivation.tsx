@@ -40,7 +40,22 @@ const MOTIVATION_QUOTES = [
   "If you understand the basics, the advanced questions will naturally fall into place.",
   "You have the talent, the drive, and the resources. Now just add a little daily consistency!",
   "Take a minute to stretch and drink some water. Your brain cells will thank you with faster calculations!",
-  "We are all in this together. Keep supporting your peers, and let's cross the placement finish line as a team!"
+  "We are all in this together. Keep supporting your peers, and let's cross the placement finish line as a team!",
+  "A missing bracket can ruin a code, just like a missed day can ruin a habit. Keep your practice streak alive!",
+  "Why do we practice mock interviews? Because the only bug you can't debug later is a missed opportunity!",
+  "Think of probability as your chances of getting placed. The more you practice, the closer it gets to 100%!",
+  "Your brain is like a muscle. Today's tough reasoning puzzle is tomorrow's quick mental warm-up.",
+  "Don't fear the tricky questions. They are just stepping stones to a higher salary package!",
+  "A true coder doesn't just write code; they write the future. Keep building your logic one block at a time.",
+  "Why did the database administrator leave his job? Because he had one-to-many relationships! Just kidding, stay focused!",
+  "Aptitude tests don't measure your worth; they just measure your current practice level. Keep leveling up!",
+  "When in doubt, draw it out. A quick diagram can solve even the trickiest arrangement puzzles.",
+  "Remember: the interviewer wants you to succeed just as much as you do. Walk in with confidence and a smile.",
+  "Solving a puzzle is like debugging life. It might take a few tries, but the 'Aha!' moment is totally worth it.",
+  "A little progress each day adds up to big results. Your placement offer letter is getting closer with every solved question.",
+  "Why did the programmer quit his job? Because he didn't get arrays! Keep your basics strong.",
+  "Treat every mock test like the real deal, so the real deal feels just like a mock test.",
+  "You are capable of mastering anything you set your mind to. Keep pushing, keep learning, and keep growing!"
 ];
 
 interface DailyMotivationProps {
@@ -151,6 +166,7 @@ export const DailyMotivation: React.FC<DailyMotivationProps> = ({ setToastMsg })
           <AnimatePresence>
             {copied && (
               <motion.div
+                key="copied-tooltip"
                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.9 }}

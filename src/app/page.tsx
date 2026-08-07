@@ -1752,8 +1752,7 @@ export default function LandingPage() {
 
         {/* Clearance Sync Dashboard CTA */}
         <div className="flex items-center gap-4 sm:gap-6">
-          {/* Preview/Edit Switcher */}
-          <RoleToggle />
+          <RoleToggle hideThemeToggle={true} />
 
           {/* Theme Toggle Button (Icon-Only Circular Button) */}
           <button

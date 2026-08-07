@@ -74,13 +74,13 @@ export default function Sidebar({ activeId, onSelectTab, userRole }: SidebarProp
         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-semibold transition-all duration-200 group text-left relative overflow-hidden select-none cursor-pointer ${
           isActive
             ? 'bg-slate-100 dark:bg-[#151c2f] text-slate-900 dark:text-white shadow-md shadow-purple-500/5 border border-purple-500/20'
-            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 hover:bg-slate-800/40 border border-transparent'
+            : 'text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-500/10 border border-transparent'
         }`}
       >
         <span className="flex items-center gap-3.5">
           <IconComponent
             className={`w-4.5 h-4.5 transition-colors duration-200 ${
-              isActive ? 'text-purple-400' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:text-slate-200'
+              isActive ? 'text-purple-400' : 'text-slate-500 dark:text-slate-400 group-hover:text-sky-500 dark:group-hover:text-sky-400'
             }`}
           />
           <span className="tracking-wide">{item.label}</span>

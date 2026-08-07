@@ -1,0 +1,23 @@
+// System Overrides States
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [emergencyThrottle, setEmergencyThrottle] = useState(false);
+  const [betaLabAccess, setBetaLabAccess] = useState(false);
+
+  // Modals States
+  const [showPurgeModal, setShowPurgeModal] = useState(false);
+  const [purgeInput, setPurgeInput] = useState('');
+  const [isPurging, setIsPurging] = useState(false);
+
+  const [showModModal, setShowModModal] = useState(false);
+  const [pendingItemsCount, setPendingItemsCount] = useState(0);
+  const [modStep, setModStep] = useState(0);
+  const [flagStats, setFlagStats] = useState({ q: 0, l: 0, c: 0 });
+
+  const [modQueue, setModQueue] = useState<any[]>([]);
+  const [storagePercent, setStoragePercent] = useState(0);
+  // Compiler Settings Toggles
+// Dynamic Real-time System Alerts
+  const [systemAlerts, setSystemAlerts] = useState<any[]>([]);
+
+  // Fetch real-time alerts from backend API
+  

@@ -7,9 +7,10 @@ import ThemeToggle from '@/components/ThemeToggle';
 interface RoleToggleProps {
   className?: string;
   onRoleChange?: (roleData: any) => void;
+  hideThemeToggle?: boolean;
 }
 
-export default function RoleToggle({ className = '', onRoleChange }: RoleToggleProps) {
+export default function RoleToggle({ className = '', onRoleChange, hideThemeToggle = false }: RoleToggleProps) {
   const router = useRouter();
   const [role, setRole] = useState<'admin' | 'STUDENT' | 'editor'>('admin');
   const [mounted, setMounted] = useState(false);
@@ -62,11 +63,11 @@ export default function RoleToggle({ className = '', onRoleChange }: RoleToggleP
   if (!mounted) {
     return (
       <div className={`flex items-center gap-2.5 ${className}`}>
-        <div className="flex bg-[#070a13] dark:bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] dark:border-[#151c2f] shadow-inner select-none">
-          <span className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400">Preview</span>
-          <span className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400">Edit</span>
+        <div className="flex bg-slate-100 dark:bg-[#070a13] p-0.5 rounded-full border border-slate-200 dark:border-[#151c2f] shadow-inner select-none">
+          <span className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Preview</span>
+          <span className="px-3.5 py-1 text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Edit</span>
         </div>
-        <ThemeToggle />
+        {!hideThemeToggle && <ThemeToggle />}
       </div>
     );
   }
@@ -75,7 +76,7 @@ export default function RoleToggle({ className = '', onRoleChange }: RoleToggleP
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      <div className="flex bg-[#070a13] dark:bg-[#070a13] p-0.5 rounded-full border border-[#151c2f] dark:border-[#151c2f] shadow-inner select-none">
+      <div className="flex bg-slate-100 dark:bg-[#070a13] p-0.5 rounded-full border border-slate-200 dark:border-[#151c2f] shadow-inner select-none">
         {/* Preview Mode */}
         <button
           type="button"
@@ -84,7 +85,7 @@ export default function RoleToggle({ className = '', onRoleChange }: RoleToggleP
           className={`px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
             !isAdmin
               ? 'bg-purple-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-slate-200'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Preview
@@ -98,14 +99,14 @@ export default function RoleToggle({ className = '', onRoleChange }: RoleToggleP
           className={`px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
             isAdmin
               ? 'bg-purple-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-slate-200'
+              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           Edit
         </button>
       </div>
 
-      <ThemeToggle />
+      {!hideThemeToggle && <ThemeToggle />}
     </div>
   );
 }
