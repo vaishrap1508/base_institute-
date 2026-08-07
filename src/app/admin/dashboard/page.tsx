@@ -1,17 +1,195 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Layers, ShieldCheck, Activity, Users, Database, FileText, CheckCircle2, TrendingUp, ArrowRight, Server, Clock, Cpu } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
-import { USER_ROLES, SAMPLE_QUESTIONS } from '@/lib/admin/store';
-import { UserRole, Question } from '@/lib/admin/types';
+import { 
+  Monitor, CheckCircle, Clock, UserPlus, Activity, 
+  TrendingUp, MoreHorizontal, ChevronDown, Sparkles, 
+  Compass, HelpCircle, LogOut, ArrowUpRight, Check,
+  Cpu, Layers, ShieldCheck, Database, FileText, ArrowRight
+} from 'lucide-react';
+import { USER_ROLES } from '@/lib/admin/store';
+import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
 import { createClient } from '@/utils/supabase/client';
+import Link from 'next/link';
+import RoleToggle from '@/components/RoleToggle';
 
 export default function DashboardPage() {
   const supabase = createClient();
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const { currentRole, handleRoleChange } = useAdmin();
+  const [refreshing, setRefreshing] = useState(false);
+  const [stats, setStats] = useState({
+    liveUsers: 0,
+    liveUsersLabel: '+0%',
+    dailySolves: 0,
+    dailySolvesLabel: '+0%',
+    newSignups: 0,
+    newSignupsLabel: '+0',
+    activeSolvers: 0,
+    avgSessionTime: '0m 0s'
+  });
+
+  const [progressionData, setProgressionData] = useState<Array<{day: string, value: number, height: string, isHigh: boolean}>>([]);
+  const [saturationData, setSaturationData] = useState<Array<{topic: string, percent: number, color: string, shadow: string}>>([]);
+  const [bottlenecks, setBottlenecks] = useState<Array<{id: string, name: string, difficulty: string, time: string, solveRate: string}>>([]);
+
+  const fetchStats = async () => {
+    try {
+      const { count: profilesCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'estimated', head: true });
+        
+      const { count: solvesCount } = await supabase
+        .from('question_attempts')
+        .select('*', { count: 'estimated', head: true })
+        .eq('is_correct', true);
+
+      const totalSolves = solvesCount || 0;
+      const totalUsers = profilesCount || 1;
+      
+      // Calculate a dynamic session time based on attempts (assuming ~2.5 mins per attempt)
+      const avgMinutes = Math.floor((totalSolves * 2.5) / totalUsers);
+      const avgSeconds = Math.floor(((totalSolves * 2.5) / totalUsers - avgMinutes) * 60);
+
+      // Simple growth logic based on counts (in reality we would compare with yesterday's counts)
+      const nowMs = Date.now();
+      const yesterday = new Date(nowMs - 24 * 3600 * 1000).toISOString();
+      const { count: usersYesterday } = await supabase.from('profiles').select('*', { count: 'estimated', head: true }).gte('created_at', yesterday);
+      const { count: solvesYesterday } = await supabase.from('question_attempts').select('*', { count: 'estimated', head: true }).gte('created_at', yesterday);
+      
+      const newU = usersYesterday || 0;
+      const newS = solvesYesterday || 0;
+      
+      const uGrowth = Math.max(1, totalUsers - newU);
+      const sGrowth = Math.max(1, totalSolves - newS);
+
+      const liveLabel = `+${Math.round((newU / uGrowth) * 100)}%`;
+      const solveLabel = `+${Math.round((newS / sGrowth) * 100)}%`;
+      const signLabel = `+${newU}`;
+
+      setStats(prev => ({
+        ...prev,
+        liveUsers: profilesCount || 0,
+        liveUsersLabel: liveLabel,
+        dailySolves: totalSolves,
+        dailySolvesLabel: solveLabel,
+        newSignups: totalUsers,
+        newSignupsLabel: signLabel,
+        activeSolvers: profilesCount || 0,
+        avgSessionTime: `${avgMinutes}m ${avgSeconds}s`
+      }));
+    } catch (e) {
+      console.warn("Error fetching live stats", e);
+    }
+  };
+
+  const fetchChartData = async () => {
+    try {
+      // 1. Dynamic User Progression (Strict DB count per day)
+      const { data: weekAtts } = await supabase.from('question_attempts').select('created_at').gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()).limit(1000);
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const counts = [0, 0, 0, 0, 0, 0, 0];
+      weekAtts?.forEach((a: any) => {
+        const d = new Date(a.created_at).getDay();
+        counts[d]++;
+      });
+      
+      const maxCount = Math.max(...counts, 1);
+      
+      // Shift so today is the last element
+      const todayIdx = new Date().getDay();
+      const prog = [];
+      for (let i = 6; i >= 0; i--) {
+        const idx = (todayIdx - i + 7) % 7;
+        const val = counts[idx];
+        prog.push({
+          day: days[idx],
+          value: val,
+          height: `${Math.max(14, Math.floor((val / maxCount) * 100))}%`,
+          isHigh: i === 0
+        });
+      }
+      
+      setProgressionData(prog);
+
+      // 2. Domain Saturation
+      const { data: atts } = await supabase.from('question_attempts').select('domain_id, is_correct').limit(500);
+      const domMap: Record<string, { t: number, c: number }> = {};
+      atts?.forEach((a: any) => {
+        const id = a.domain_id || 'general';
+        if (!domMap[id]) domMap[id] = { t: 0, c: 0 };
+        domMap[id].t++;
+        if (a.is_correct) domMap[id].c++;
+      });
+      
+      const getSat = (keys: string[]) => {
+        let t = 0; keys.forEach(k => t += domMap[k]?.t || 0);
+        return t > 0 ? Math.floor((t / (atts?.length || 1)) * 100) : 0;
+      };
+
+      setSaturationData([
+        { topic: 'Quantitative Aptitude', percent: getSat(['q', 'quantitative']), color: 'bg-[#00ffcc]', shadow: 'shadow-[0_0_8px_#00ffcc]' },
+        { topic: 'Logical Reasoning', percent: getSat(['l', 'logical']), color: 'bg-purple-500', shadow: 'shadow-[0_0_8px_#a855f7]' },
+        { topic: 'Verbal Ability', percent: getSat(['v', 'verbal']), color: 'bg-indigo-500', shadow: 'shadow-[0_0_8px_#6366f1]' },
+        { topic: 'Coding & DSA', percent: getSat(['c', 'coding']), color: 'bg-slate-500', shadow: '' }
+      ].sort((a, b) => b.percent - a.percent));
+
+      // 3. Bottlenecks (Worst questions)
+      // Real DB query for most failed questions
+      const { data: failedAtts } = await supabase.from('question_attempts').select('question_id, time_taken_seconds').eq('is_correct', false).limit(100);
+      if (!failedAtts || failedAtts.length === 0) {
+        setBottlenecks([]);
+      } else {
+        const counts: Record<string, number> = {};
+        const times: Record<string, number[]> = {};
+        failedAtts.forEach((a: any) => {
+          if (!a.question_id) return;
+          counts[a.question_id] = (counts[a.question_id] || 0) + 1;
+          if (a.time_taken_seconds) {
+            if (!times[a.question_id]) times[a.question_id] = [];
+            times[a.question_id].push(a.time_taken_seconds);
+          }
+        });
+        
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+        const qIds = sorted.map(s => s[0]);
+        
+        const [ { data: qData }, { data: allAttsForQ } ] = await Promise.all([
+          supabase.from('questions').select('id, title, difficulty').in('id', qIds),
+          supabase.from('question_attempts').select('question_id, is_correct').in('question_id', qIds)
+        ]);
+        
+        setBottlenecks(sorted.map(s => {
+          const qId = s[0];
+          const qTimes = times[qId] || [120];
+          const avgSecs = Math.floor(qTimes.reduce((a, b) => a + b, 0) / qTimes.length);
+          const m = Math.floor(avgSecs / 60);
+          const sec = avgSecs % 60;
+          
+          const qMatch = qData?.find((q: any) => q.id === qId);
+          
+          let solveRateStr = '0.0%';
+          if (allAttsForQ) {
+             const qAtts = allAttsForQ.filter((a: any) => a.question_id === qId);
+             if (qAtts.length > 0) {
+               const correct = qAtts.filter((a: any) => a.is_correct).length;
+               solveRateStr = `${((correct / qAtts.length) * 100).toFixed(1)}%`;
+             }
+          }
+
+          return {
+            id: `#Q-${qId.substring(0, 4)}`,
+            name: qMatch?.title || 'Unknown Question',
+            difficulty: qMatch?.difficulty || (s[1] > 10 ? 'Lethal' : 'Elite'),
+            time: `${m}m ${sec}s`,
+            solveRate: solveRateStr
+          };
+        }));
+      }
+    } catch (e) {
+      console.warn('Error fetching chart data', e);
+    }
+  };
 
   useEffect(() => {
     // Sync current role from localStorage
@@ -20,10 +198,8 @@ export default function DashboardPage() {
       try {
         const parsed = JSON.parse(storedRole);
         const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
+        if (matched) handleRoleChange(matched);
+      } catch (e) { localStorage.removeItem('aptitude_current_role'); localStorage.removeItem('aptitude_questions'); }
     }
 
     const syncSession = async () => {
@@ -33,80 +209,91 @@ export default function DashboardPage() {
         const role = isMarcus ? 'editor' : 'admin';
         const matched = USER_ROLES.find(r => r.role === role);
         if (matched) {
-          setCurrentRole(matched);
+          handleRoleChange(matched);
           localStorage.setItem('aptitude_current_role', JSON.stringify(matched));
         }
       }
     };
     syncSession();
+    fetchStats();
+    fetchChartData();
 
-    // Sync questions
-    const storedQuestions = localStorage.getItem('aptitude_questions');
-    if (storedQuestions) {
-      try {
-        setQuestions(JSON.parse(storedQuestions));
-      } catch (e) {
-        setQuestions(SAMPLE_QUESTIONS);
-      }
-    } else {
-      setQuestions(SAMPLE_QUESTIONS);
-    }
+    // Set up Supabase Realtime subscriptions
+    const channel = supabase.channel('dashboard-metrics')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'question_attempts' }, (payload: any) => {
+        // Increment daily solves live
+        setStats(prev => ({
+          ...prev,
+          dailySolves: prev.dailySolves + 1
+        }));
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, (payload: any) => {
+        // Increment users live
+        setStats(prev => ({
+          ...prev,
+          liveUsers: prev.liveUsers + 1,
+          newSignups: prev.newSignups + 1
+        }));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
+
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    Promise.all([fetchStats(), fetchChartData()]).then(() => {
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 500);
+    });
   };
 
-  const totalQuestions = questions.length;
-  const publishedQuestions = questions.filter(q => q.status === 'Published').length;
-  const draftQuestions = questions.filter(q => q.status === 'Draft' || !q.status).length;
-
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      <Sidebar activeId="dashboard" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
-
-        {currentRole.role !== 'admin' ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
-            <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
-              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-400 shadow-inner relative">
+    <>
+      {currentRole.role !== 'admin' ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#070a13]">
+            <div className="w-full max-w-xl bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
+              <div className="w-16 h-16 rounded-full bg-rose-950/20 border border-rose-900/30 flex items-center justify-center text-rose-400 shadow-inner relative">
                 <Cpu className="w-7 h-7 animate-pulse" />
-                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">!</span>
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-slate-900 dark:text-white flex items-center justify-center border-2 border-[#0f1322] shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
-                <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider font-heading">Clearance Protocol Violation</h2>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Secured Sandbox v2.4</p>
               </div>
-              <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
-                <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
-                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
+              <div className="w-full bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] p-4 rounded-xl space-y-3.5 text-xs text-left">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#151c2f] pb-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-950/45 text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
-                    <span className="text-slate-800 dark:text-slate-100 font-bold">{currentRole.name}</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
-                    <span className="text-slate-800 dark:text-rose-400 font-bold uppercase tracking-wider text-[11px] text-rose-600">{currentRole.role}</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-rose-400 font-bold uppercase tracking-wider text-[11px]">{currentRole.role}</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
-                    <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/dashboard</span>
+                    <span className="text-[10px] text-slate-500 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-slate-300 font-bold font-mono text-[11px]">/admin/dashboard</span>
                   </div>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
                     if (admin) handleRoleChange(admin);
                   }}
-                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer"
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-slate-900 dark:text-white rounded-xl text-xs font-bold shadow-md hover:shadow-purple-500/20 active:scale-98 transition-all cursor-pointer"
                 >
                   <span>Request Admin Clearance</span>
                 </button>
@@ -114,194 +301,301 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-8 space-y-6">
-            {/* Page Title */}
-            <div className="border-b border-slate-200/60 dark:border-slate-900 pb-5">
-              <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Enterprise Command Dashboard</h1>
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
-                Real-time operational status, taxonomy growth metrics, and global analytics overview.
-              </p>
-            </div>
-
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm dark:hover:shadow-blue-900/5 transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
-                  <Database className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Total Stored Questions</span>
-                  <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">{totalQuestions}</span>
-                </div>
+          <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50 dark:bg-[#070a13] custom-scrollbar">
+            
+            {/* Top Overview and Title Bar */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 dark:border-[#151c2f] pb-5">
+              <div>
+                <span className="text-[10px] font-black text-cyan-400 tracking-widest uppercase leading-none">
+                  Executive Overview
+                </span>
+                <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase font-heading mt-1">
+                  System Performance
+                </h1>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Real-time live operational metrics queried directly from database records.
+                </p>
               </div>
-
-              <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm dark:hover:shadow-emerald-900/5 transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Published Questions</span>
-                  <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight mt-1">{publishedQuestions}</span>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm dark:hover:shadow-amber-900/5 transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-                  <Activity className="w-5 h-5 animate-pulse" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Active Student Sessions</span>
-                  <span className="text-2xl font-black text-amber-700 dark:text-amber-400 tracking-tight mt-1">1,482</span>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm dark:hover:shadow-purple-900/5 transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
-                  <Server className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">System Latency</span>
-                  <span className="text-2xl font-black text-purple-700 dark:text-purple-400 tracking-tight mt-1">14ms</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Visual Panels */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Operational Metrics Panel */}
-              <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs p-6 space-y-6">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight">System Performance Curve</h3>
-                  </div>
-                  <span className="text-[10px] font-extrabold px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100/50 dark:border-blue-900/30 uppercase tracking-wider">LIVE TELEMETRY</span>
-                </div>
-
-                 {/* Aesthetic Inline Graph */}
-                <div className="h-72 pt-10 flex items-end justify-between gap-2 px-4 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-200/50 dark:border-slate-800 rounded-xl p-4 relative overflow-visible">
-                  {/* Grid Lines */}
-                  <div className="absolute inset-0 flex flex-col justify-between py-4 pointer-events-none opacity-40">
-                    <div className="border-b border-slate-200 dark:border-slate-800 w-full" />
-                    <div className="border-b border-slate-200 dark:border-slate-800 w-full" />
-                    <div className="border-b border-slate-200 dark:border-slate-800 w-full" />
-                    <div className="border-b border-slate-200 dark:border-slate-800 w-full" />
-                  </div>
-
-                  {/* High Fidelity Bars representing growth */}
-                  <div className="w-full flex items-end justify-around h-full z-10">
-                    <div className="flex flex-col items-center gap-1.5 w-8">
-                      <div className="bg-gradient-to-t from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all rounded-t-md w-full h-16 shadow-md shadow-blue-500/10 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">24%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500">MON</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1.5 w-8">
-                      <div className="bg-gradient-to-t from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all rounded-t-md w-full h-28 shadow-md shadow-blue-500/10 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">42%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500">TUE</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1.5 w-8">
-                      <div className="bg-gradient-to-t from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all rounded-t-md w-full h-36 shadow-md shadow-blue-500/10 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">55%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500">WED</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1.5 w-8">
-                      <div className="bg-gradient-to-t from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all rounded-t-md w-full h-44 shadow-md shadow-blue-500/10 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">70%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500">THU</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1.5 w-8">
-                      <div className="bg-gradient-to-t from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all rounded-t-md w-full h-52 shadow-md shadow-blue-500/15 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">85%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500">FRI</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1.5 w-8">
-                      <div className="bg-gradient-to-t from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all rounded-t-md w-full h-48 shadow-md shadow-blue-500/15 cursor-pointer group relative">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">78%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500">SAT</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-1.5 w-8">
-                      <div className="bg-gradient-to-t from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all rounded-t-md w-full h-56 shadow-md shadow-emerald-500/15 cursor-pointer group relative animate-pulse">
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-900 text-white text-[10px] rounded px-2 py-0.5 font-bold shadow-md border border-slate-800 whitespace-nowrap">98%</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-slate-500">SUN</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Activity Log Feed */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-xs p-6 space-y-6">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-slate-500 dark:text-slate-400" />
-                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-tight">Staging Audit Logs</h3>
-                  </div>
-                  <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 tracking-wider">REALTIME</span>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                    <div className="flex flex-col text-xs leading-normal">
-                      <span className="font-bold text-slate-800 dark:text-slate-100">Sarah Connor (Admin)</span>
-                      <span className="text-slate-500 dark:text-slate-400">Synced question catalog to localStorage.</span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">2 minutes ago</span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                    <div className="flex flex-col text-xs leading-normal">
-                      <span className="font-bold text-slate-800 dark:text-slate-100">System Compiler</span>
-                      <span className="text-slate-500 dark:text-slate-400">Recompiled LaTeX formula engine successfully.</span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">15 minutes ago</span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-                    <div className="flex flex-col text-xs leading-normal">
-                      <span className="font-bold text-slate-800 dark:text-slate-100">Marcus Wright (Editor)</span>
-                      <span className="text-slate-500 dark:text-slate-400">Saved draft for percentage sequence V-4432-E.</span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">45 minutes ago</span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                    <div className="flex flex-col text-xs leading-normal">
-                      <span className="font-bold text-slate-800 dark:text-slate-100">Security Guard</span>
-                      <span className="text-slate-500 dark:text-slate-400">Completed full sandbox workspace build encryption.</span>
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">2 hours ago</span>
-                    </div>
-                  </div>
-                </div>
-
-                <a
-                  href="/admin/directory"
-                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold transition-all mt-4 cursor-pointer"
+              
+              <div className="flex items-center gap-3">
+                <RoleToggle />
+                <button className="flex items-center gap-2 px-4 py-2 bg-[#0d1323] hover:bg-slate-100 dark:bg-[#151c2f] text-slate-300 border border-slate-200 dark:border-[#151c2f] rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer">
+                  <span>Download Report</span>
+                </button>
+                <button 
+                  onClick={handleRefresh}
+                  className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-slate-900 dark:text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-purple-500/10 cursor-pointer ${refreshing ? 'opacity-85 animate-pulse' : ''}`}
                 >
-                  <span>Go to Question Directory</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                </a>
+                  <Activity className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+                  <span>System Refresh</span>
+                </button>
               </div>
             </div>
+
+            {/* Layout Grid: 1-Column */}
+            <div className="grid grid-cols-1 gap-6">
+              
+              {/* Left Column: Metrics Row + Row 2 (Charts) + Table (width: 100%) */}
+              <div className="space-y-6 flex flex-col">
+                
+                {/* 4-Column Metrics Grid */}
+                <div className="grid grid-cols-2 xl:grid-cols-4 gap-3.5">
+                  
+                  {/* Card 1: Live Registered Students */}
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-all shrink-0">
+                        <Monitor className="w-4 h-4" />
+                      </div>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+                        Realtime DB
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-2.5 whitespace-nowrap">
+                        {stats.liveUsers.toLocaleString()}
+                      </h3>
+                      <p className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1 whitespace-nowrap truncate" title="REGISTERED STUDENTS">
+                        REGISTERED STUDENTS
+                      </p>
+                    </div>
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9.5px] font-bold gap-1">
+                        <span className="text-slate-500 dark:text-slate-400 whitespace-nowrap">Active Users</span>
+                        <span className="text-emerald-400 font-extrabold whitespace-nowrap">{stats.liveUsers} Users</span>
+                      </div>
+                      <div className="w-full h-1 bg-emerald-500/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-emerald-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${stats.liveUsers === 0 ? 0 : Math.min(100, Math.max(2, (stats.liveUsers / 100) * 100))}%` }} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Total Solved Questions */}
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-all shrink-0">
+                        <CheckCircle className="w-4 h-4" />
+                      </div>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 whitespace-nowrap">
+                        Realtime DB
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-2.5 whitespace-nowrap">
+                        {stats.dailySolves.toLocaleString()}
+                      </h3>
+                      <p className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1 whitespace-nowrap truncate" title="TOTAL SOLVED QUESTIONS">
+                        TOTAL SOLVED QUESTIONS
+                      </p>
+                    </div>
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9.5px] font-bold gap-1">
+                        <span className="text-slate-500 dark:text-slate-400 whitespace-nowrap">Solved Count</span>
+                        <span className="text-purple-400 font-extrabold whitespace-nowrap">{stats.dailySolves} Solved</span>
+                      </div>
+                      <div className="w-full h-1 bg-purple-500/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-purple-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${stats.dailySolves === 0 ? 0 : Math.min(100, Math.max(2, (stats.dailySolves / 1000) * 100))}%` }} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Avg Solve Duration */}
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-all shrink-0">
+                        <Clock className="w-4 h-4" />
+                      </div>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 whitespace-nowrap">
+                        Live
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-2.5 whitespace-nowrap">{stats.avgSessionTime}</h3>
+                      <p className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1 whitespace-nowrap truncate" title="AVG SOLVE DURATION">
+                        AVG SOLVE DURATION
+                      </p>
+                    </div>
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9.5px] font-bold gap-1">
+                        <span className="text-slate-500 dark:text-slate-400 whitespace-nowrap">Tracking Status</span>
+                        <span className="text-blue-400 font-extrabold whitespace-nowrap">{stats.avgSessionTime}</span>
+                      </div>
+                      <div className="w-full h-1 bg-blue-500/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-blue-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${stats.avgSessionTime === '0m 0s' ? 0 : 50}%` }} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 4: New Signups (24H) */}
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-4 flex flex-col justify-between min-h-[140px] hover:border-purple-500/30 transition-all duration-200 group">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-all shrink-0">
+                        <UserPlus className="w-4 h-4" />
+                      </div>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 whitespace-nowrap">
+                        24h Signups
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-2.5 whitespace-nowrap">
+                        {stats.newSignups.toLocaleString()}
+                      </h3>
+                      <p className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1 whitespace-nowrap truncate" title="NEW SIGNUPS (24H)">
+                        NEW SIGNUPS (24H)
+                      </p>
+                    </div>
+                    <div className="mt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9.5px] font-bold gap-1">
+                        <span className="text-slate-500 dark:text-slate-400 whitespace-nowrap">DB Users</span>
+                        <span className="text-cyan-400 font-extrabold whitespace-nowrap">{stats.newSignups} Total</span>
+                      </div>
+                      <div className="w-full h-1 bg-cyan-500/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-cyan-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${stats.newSignups === 0 ? 0 : Math.min(100, Math.max(2, (stats.newSignups / 2000) * 100))}%` }} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Row 2: User Progression */}
+                <div className="grid grid-cols-1 gap-6">
+                  
+                  {/* User Progression Card (Bar Chart) */}
+                  <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 flex flex-col justify-between h-96">
+                    <div className="flex justify-between items-center border-b border-slate-200 dark:border-[#151c2f] pb-4">
+                      <div>
+                        <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-heading">
+                          User Progression
+                        </h3>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+                          Monthly growth trajectory
+                        </p>
+                      </div>
+                      <button className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-[#070a13] border border-slate-200 dark:border-[#151c2f] rounded-lg text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200 cursor-pointer">
+                        <span>Last 30 Days</span>
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Chart visual */}
+                    <div className="flex-1 flex items-end justify-between gap-3 pt-6 relative">
+                      {/* Grid guideline horizontal lines */}
+                      <div className="absolute inset-0 flex flex-col justify-between py-2 pointer-events-none opacity-10">
+                        <div className="border-b border-slate-200 w-full" />
+                        <div className="border-b border-slate-200 w-full" />
+                        <div className="border-b border-slate-200 w-full" />
+                        <div className="border-b border-slate-200 w-full" />
+                      </div>
+
+                      {progressionData.length > 0 ? progressionData.map((d, dIdx) => (
+                        <div key={`${d.day}-${dIdx}`} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+                          <div 
+                            className={`w-full rounded-lg transition-all duration-500 relative ${
+                              d.isHigh 
+                                ? 'bg-gradient-to-t from-purple-500 to-indigo-600 shadow-[0_0_15px_rgba(139,92,246,0.3)] border border-purple-400/40' 
+                                : 'bg-slate-100 dark:bg-[#151c2f] hover:bg-slate-700'
+                            }`}
+                            style={{ height: d.height }}
+                          >
+                            <span className={`absolute -top-7 left-1/2 -translate-x-1/2 hidden group-hover:block text-[9px] font-bold py-0.5 px-1.5 rounded whitespace-nowrap shadow-md ${
+                              d.isHigh 
+                                ? 'bg-white dark:bg-[#090d16] border border-purple-500/40 text-purple-300' 
+                                : 'bg-slate-900 border border-slate-200 dark:border-[#151c2f] text-slate-900 dark:text-white'
+                            }`}>
+                              {d.value}%
+                            </span>
+                          </div>
+                          <span className={`text-[9px] uppercase ${d.isHigh ? 'font-black text-purple-400' : 'font-extrabold text-slate-500'}`}>
+                            {d.day}
+                          </span>
+                        </div>
+                      )) : (
+                        <div className="w-full flex items-center justify-center text-slate-500 text-xs font-bold animate-pulse">Loading trajectory...</div>
+                      )}
+
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Bottom Row: Bottleneck Finder Table */}
+                <div className="bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-6 space-y-4">
+                  <div className="flex justify-between items-center border-b border-slate-200 dark:border-[#151c2f] pb-4">
+                    <div>
+                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider font-heading">
+                        Bottleneck Finder
+                      </h3>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+                        Low-performing curriculum segments
+                      </p>
+                    </div>
+                    
+                    <Link 
+                      href="/admin/directory" 
+                      className="flex items-center gap-1 text-[11px] font-black text-emerald-400 hover:text-emerald-300 uppercase tracking-wider transition-colors"
+                    >
+                      <span>View Full Audit</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+
+                  {/* Responsive Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-200 dark:border-[#151c2f]">
+                          <th className="py-3 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider w-24">ID</th>
+                          <th className="py-3 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Question Description</th>
+                          <th className="py-3 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider w-28">Difficulty</th>
+                          <th className="py-3 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider w-28 text-center">Avg. Time</th>
+                          <th className="py-3 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider w-28 text-center">Solve %</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#151c2f]">
+                        {bottlenecks.length > 0 ? bottlenecks.map((b, i) => (
+                          <tr key={i} className="hover:bg-slate-100 dark:bg-[#151c2f]/20 transition-colors duration-150">
+                            <td className="py-4 text-xs font-semibold text-slate-500">{b.id}</td>
+                            <td className="py-4 text-xs font-bold text-slate-800 dark:text-slate-200">{b.name}</td>
+                            <td className="py-4">
+                              <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded border ${
+                                b.difficulty === 'Lethal' 
+                                  ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' 
+                                  : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                              }`}>
+                                {b.difficulty}
+                              </span>
+                            </td>
+                            <td className="py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 text-center">{b.time}</td>
+                            <td className="py-4 text-xs font-extrabold text-orange-400 text-center">{b.solveRate}</td>
+                          </tr>
+                        )) : (
+                          <tr>
+                            <td colSpan={5} className="py-8 text-center text-xs font-bold text-slate-500 animate-pulse">Loading bottlenecks...</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
         )}
-      </div>
-    </div>
+    </>
   );
 }

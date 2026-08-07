@@ -1,0 +1,69 @@
+  const fetchAlerts = async () => {
+    try {
+      const res = await fetch('/api/admin/alerts');
+      const data = await res.json();
+      if (data?.success && data?.alerts) {
+        setSystemAlerts(data.alerts);
+      }
+    } catch (err) {
+      console.error("Failed to load real-time alerts:", err);
+    }
+  };
+
+  const resolveAlert = async (id: string, successMsg: string) => {
+    try {
+      await fetch(`/api/admin/alerts?id=${id}`, { method: 'DELETE' });
+      setNotification(successMsg);
+      fetchAlerts();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const postLog = async (title: string, description: string, category: string = 'SYSTEM', severity: string = 'info') => {
+    try {
+      await fetch('/api/admin/logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, category, user: currentRole.name || 'System Admin', severity })
+      });
+    } catch (err) {
+      console.warn("Failed to post system log event:", err);
+    }
+  };
+
+  const fetchRealtimeData = async () => {
+    // We try to pull from the 'moderation_queue' if it exists, otherwise it stays empty.
+    const { data: qData } = await supabase.from('moderation_queue').select('*').limit(100);
+    if (qData) {
+      setModQueue(qData);
+      setPendingItemsCount(qData.length);
+      let q = 0, l = 0, c = 0;
+      qData.forEach(item => {
+         const domain = String(item.domain || item.domain_id || '').toLowerCase();
+         if (domain.includes('q') || domain.includes('quant')) q++;
+         else if (domain.includes('l') || domain.includes('logic')) l++;
+         else c++;
+      });
+      setFlagStats({ q, l, c });
+    } else {
+      setModQueue([]);
+      setPendingItemsCount(0);
+      setFlagStats({ q: 0, l: 0, c: 0 });
+    }
+    
+    // Simulate checking actual storage based on some dynamic DB factor or we can just query a settings table.
+    // For now, since there isn't a direct DB API for storage byte size on JS client, we set 0% or base it on row count
+    const { count } = await supabase.from('questions').select('*', { count: 'exact', head: true });
+    setStoragePercent(count && count > 0 ? Math.min(100, Math.floor((count / 100000) * 100)) : 0);
+  };
+
+  useEffect(() => {
+    fetchAlerts();
+    fetchRealtimeData();
+    const interval = setInterval(() => {
+      fetchAlerts();
+      fetchRealtimeData();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);

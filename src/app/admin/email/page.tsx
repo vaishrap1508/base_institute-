@@ -1,5 +1,8 @@
 'use client';
 
+import { USER_ROLES } from '@/lib/admin/store';
+import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
 import React, { useState, useEffect } from 'react';
 import { 
   Mail, 
@@ -15,11 +18,6 @@ import {
   ChevronRight,
   Eye
 } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
-import { USER_ROLES } from '@/lib/admin/store';
-import { UserRole } from '@/lib/admin/types';
-
 interface EmailLog {
   id: string;
   recipient: string;
@@ -34,8 +32,8 @@ interface EmailLog {
 }
 
 export default function EmailManagementPage() {
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
-  const [logs, setLogs] = useState<EmailLog[]>([]);
+  const { currentRole, handleRoleChange } = useAdmin();
+const [logs, setLogs] = useState<EmailLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingQueue, setProcessingQueue] = useState(false);
   const [retryingLogId, setRetryingLogId] = useState<string | null>(null);
@@ -46,20 +44,7 @@ export default function EmailManagementPage() {
   const [selectedLog, setSelectedLog] = useState<EmailLog | null>(null);
 
   // Sync role
-  useEffect(() => {
-    const storedRole = localStorage.getItem('aptitude_current_role');
-    if (storedRole) {
-      try {
-        const parsed = JSON.parse(storedRole);
-        const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
-    }
-  }, []);
-
-  // Fetch logs
+// Fetch logs
   const fetchLogs = async () => {
     setLoading(true);
     try {
@@ -135,11 +120,6 @@ export default function EmailManagementPage() {
     }
   };
 
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
-  };
-
   // Metrics calculations
   const totalEmails = logs.length;
   const sentCount = logs.filter(l => l.status === 'sent').length;
@@ -147,39 +127,35 @@ export default function EmailManagementPage() {
   const pendingCount = logs.filter(l => l.status === 'pending').length;
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      <Sidebar activeId="email" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
+    <>
 
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
             <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-400 shadow-inner relative">
                 <Cpu className="w-7 h-7 animate-pulse" />
-                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">!</span>
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-slate-900 dark:text-white flex items-center justify-center border-2 border-white dark:border-slate-900 shadow">!</span>
               </div>
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Secured Sandbox v2.4</p>
               </div>
               <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">Clearance Status</span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/35 text-rose-700 dark:text-rose-400 uppercase tracking-wide">DENIED</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
                     <span className="text-slate-800 dark:text-slate-100 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
                     <span className="text-slate-800 dark:text-rose-400 font-bold uppercase tracking-wider text-[11px] text-rose-600">{currentRole.role}</span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/email</span>
                   </div>
                 </div>
@@ -190,7 +166,7 @@ export default function EmailManagementPage() {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
                     if (admin) handleRoleChange(admin);
                   }}
-                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer"
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer"
                 >
                   <span>Request Admin Clearance</span>
                 </button>
@@ -219,7 +195,7 @@ export default function EmailManagementPage() {
                 <button
                   onClick={handleProcessQueue}
                   disabled={processingQueue}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-blue-500/10 flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-slate-900 dark:text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-blue-500/10 flex items-center gap-1.5 cursor-pointer"
                 >
                   {processingQueue ? (
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -238,7 +214,7 @@ export default function EmailManagementPage() {
                   <Mail className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Total Logs Loaded</span>
+                  <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Total Logs Loaded</span>
                   <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">{totalEmails}</span>
                 </div>
               </div>
@@ -248,7 +224,7 @@ export default function EmailManagementPage() {
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Delivered Emails</span>
+                  <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Delivered Emails</span>
                   <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight mt-1">{sentCount}</span>
                 </div>
               </div>
@@ -258,7 +234,7 @@ export default function EmailManagementPage() {
                   <AlertCircle className="w-5 h-5 animate-pulse" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Failed Deliveries</span>
+                  <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Failed Deliveries</span>
                   <span className="text-2xl font-black text-rose-600 dark:text-rose-400 tracking-tight mt-1">{failedCount}</span>
                 </div>
               </div>
@@ -268,7 +244,7 @@ export default function EmailManagementPage() {
                   <Clock className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Pending Queue</span>
+                  <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">Pending Queue</span>
                   <span className="text-2xl font-black text-amber-600 dark:text-amber-400 tracking-tight mt-1">{pendingCount}</span>
                 </div>
               </div>
@@ -280,7 +256,7 @@ export default function EmailManagementPage() {
               {/* Search form & filters */}
               <div className="flex flex-col sm:flex-row gap-4 justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800">
                 <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-xs">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400" />
                   <input
                     type="text"
                     placeholder="Search recipient / subject..."
@@ -292,7 +268,7 @@ export default function EmailManagementPage() {
                 </form>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Status:</label>
+                  <label className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status:</label>
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
@@ -310,21 +286,21 @@ export default function EmailManagementPage() {
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
                   <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-                  <span className="text-xs font-bold text-slate-400 uppercase">Retrieving log registry...</span>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Retrieving log registry...</span>
                 </div>
               ) : logs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
                   <Inbox className="w-10 h-10 text-slate-300 dark:text-slate-700" />
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No logs found</p>
-                    <p className="text-xs text-slate-400">There are no logs matching the current criteria.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">There are no logs matching the current criteria.</p>
                   </div>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse text-left text-xs font-medium">
                     <thead>
-                      <tr className="border-b border-slate-200/80 dark:border-slate-800 text-slate-400 uppercase tracking-wider text-[10px] font-extrabold">
+                      <tr className="border-b border-slate-200/80 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px] font-extrabold">
                         <th className="pb-3 pl-3">Recipient</th>
                         <th className="pb-3">Subject</th>
                         <th className="pb-3">Status</th>
@@ -356,7 +332,7 @@ export default function EmailManagementPage() {
                           <td className="py-4 text-center font-mono font-bold">
                             {log.attempts}/3
                           </td>
-                          <td className="py-4 text-slate-400">
+                          <td className="py-4 text-slate-500 dark:text-slate-400">
                             {log.status === 'sent' 
                               ? new Date(log.sent_at || log.created_at).toLocaleString()
                               : new Date(log.last_attempt_at || log.created_at).toLocaleString()
@@ -366,7 +342,7 @@ export default function EmailManagementPage() {
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => setSelectedLog(log)}
-                                className="p-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg cursor-pointer"
+                                className="p-1.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg cursor-pointer"
                                 title="Inspect Error Details"
                               >
                                 <Eye className="w-3.5 h-3.5" />
@@ -375,7 +351,7 @@ export default function EmailManagementPage() {
                                 <button
                                   onClick={() => handleRetryLog(log.id)}
                                   disabled={retryingLogId === log.id}
-                                  className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all active:scale-98"
+                                  className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-slate-900 dark:text-white rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all active:scale-98"
                                 >
                                   {retryingLogId === log.id ? (
                                     <RefreshCw className="w-3 h-3 animate-spin" />
@@ -406,7 +382,7 @@ export default function EmailManagementPage() {
                     </h3>
                     <button 
                       onClick={() => setSelectedLog(null)}
-                      className="text-slate-400 hover:text-slate-600 text-xs font-bold p-1 hover:bg-slate-100 rounded cursor-pointer"
+                      className="text-slate-500 dark:text-slate-400 hover:text-slate-600 text-xs font-bold p-1 hover:bg-slate-100 rounded cursor-pointer"
                     >
                       Close
                     </button>
@@ -414,16 +390,16 @@ export default function EmailManagementPage() {
                   
                   <div className="space-y-3.5 text-xs">
                     <div className="grid grid-cols-3 gap-y-2.5 border-b border-slate-50 dark:border-slate-950 pb-3 font-semibold">
-                      <span className="text-slate-400">LOG ID:</span>
+                      <span className="text-slate-500 dark:text-slate-400">LOG ID:</span>
                       <span className="col-span-2 font-mono text-slate-800 dark:text-slate-200 select-all">{selectedLog.id}</span>
                       
-                      <span className="text-slate-400">Recipient:</span>
+                      <span className="text-slate-500 dark:text-slate-400">Recipient:</span>
                       <span className="col-span-2 text-slate-800 dark:text-slate-200">{selectedLog.recipient}</span>
                       
-                      <span className="text-slate-400">Subject:</span>
+                      <span className="text-slate-500 dark:text-slate-400">Subject:</span>
                       <span className="col-span-2 text-slate-800 dark:text-slate-200">{selectedLog.subject}</span>
                       
-                      <span className="text-slate-400">Status:</span>
+                      <span className="text-slate-500 dark:text-slate-400">Status:</span>
                       <span className="col-span-2">
                         <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wide border ${
                           selectedLog.status === 'sent' 
@@ -436,7 +412,7 @@ export default function EmailManagementPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Failure/Error Message:</span>
+                      <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Failure/Error Message:</span>
                       <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 rounded-lg font-mono text-[11px] text-rose-600 dark:text-rose-400 break-words max-h-40 overflow-y-auto">
                         {selectedLog.error_message || 'None logged. Delivery reported success.'}
                       </div>
@@ -457,7 +433,6 @@ export default function EmailManagementPage() {
             
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }

@@ -15,6 +15,31 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Admin routing protection: redirect admins to the admin dashboard if they try to access student routes
+  if (user) {
+    const isSarah = user.email === 'sarah.c@aptitude-ai.com' || user.email?.toLowerCase().includes('admin') || user.email?.toLowerCase().includes('abhinav');
+    const isMarcus = user.email === 'marcus.w@aptitude-ai.com';
+    let userRole = 'STUDENT';
+
+    if (isSarah || isMarcus || user.user_metadata?.role === 'ADMIN') {
+      userRole = 'ADMIN';
+    } else {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (profile?.role === 'ADMIN') {
+        userRole = 'ADMIN';
+      }
+    }
+
+    const isStudentRoute = path.startsWith('/student') || path.startsWith('/onboarding') || path.startsWith('/domain');
+    if (userRole === 'ADMIN' && isStudentRoute) {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+  }
+
   if (isLoginRoute && user) {
     if ('isMock' in user && (user as any).isMock) {
       const isSarah = user.email === 'sarah.c@aptitude-ai.com';
@@ -39,7 +64,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const isSarah = user.email === 'sarah.c@aptitude-ai.com';
+    const isSarah = user.email === 'sarah.c@aptitude-ai.com' || user.email?.toLowerCase().includes('admin') || user.email?.toLowerCase().includes('abhinav');
     const isMarcus = user.email === 'marcus.w@aptitude-ai.com';
     const userRole = (profile?.role === 'ADMIN' || isSarah || isMarcus) ? 'ADMIN' : 'STUDENT';
 

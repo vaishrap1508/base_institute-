@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { siteConfig } from '@/config/site';
+import RoleToggle from '@/components/RoleToggle';
 import {
   Layers,
   User,
@@ -53,16 +54,28 @@ import {
   FileText,
   Send,
   Video,
-  Plus
+  Plus,
+  GripVertical,
+  LayoutGrid,
+  Archive,
+  Trash2,
+  Folder,
+  FolderPlus,
+  Bold,
+  Italic,
+  Link
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import StudyPlannerTab from '@/components/student/StudyPlannerTab';
 import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
+import { LeaderboardView } from '@/components/student/LeaderboardView';
+import { DailyMotivation } from '@/components/student/DailyMotivation';
+import { DailyPerformanceHub } from '@/components/student/DailyPerformanceHub';
 import { DOMAINS_DATA, SAMPLE_QUESTIONS } from '@/lib/admin/store';
-import PracticeArena from '@/components/PracticeArena';
 import PlacementProfile from '@/components/PlacementProfile';
 import DomainsTab from '@/components/DomainsTab';
-import ConceptHubTab from '@/components/ConceptHubTab';
 
 const getYouTubeId = (url: string): string | null => {
   if (!url) return null;
@@ -194,6 +207,224 @@ const DOMAIN_ROADMAPS: Record<string, any[]> = {
   ]
 };
 
+const COMPANY_PREP_HUBS: Record<string, {
+  title: string;
+  desc: string;
+  probability: number;
+  probabilityLabel: string;
+  probabilitySub: string;
+  patternLabel: string;
+  badges: string[];
+  metrics: {
+    duration: string;
+    questionsCount: number;
+    difficulty: string;
+  };
+  insights: {
+    weightage: Array<{ category: string; value: number; color: string }>;
+    difficulty: Array<{ level: string; value: number; color: string }>;
+  };
+  focusFeed: Array<{ id: string; category: string; question: string; options: string[]; correctIndex: number; solution?: string }>;
+  directMocks: Array<{ id: string; title: string; desc: string; questions: number; duration: number; status: 'Open' | 'Planned' | 'Locked' }>;
+}> = {
+  tcs: {
+    title: 'TCS NQT Preparation Hub',
+    desc: 'Analyzing historical trends from 2021-2026. The current pattern emphasizes Advanced Quantitative Analysis and Psychometric Evaluation.',
+    probability: 75,
+    probabilityLabel: 'OPTIMAL',
+    probabilitySub: 'Based on 142 past questions solved correctly.',
+    patternLabel: 'Advanced Quantitative & Psychometric Focus',
+    badges: ['Priority Target', 'Luminex Pulse Active', 'Top Candidate'],
+    metrics: { duration: '90 Mins', questionsCount: 60, difficulty: 'Medium-High' },
+    insights: {
+      weightage: [
+        { category: 'Numerical Ability', value: 85, color: 'bg-blue-500' },
+        { category: 'Verbal Ability', value: 70, color: 'bg-emerald-500' },
+        { category: 'Logical Reasoning', value: 75, color: 'bg-amber-500' },
+        { category: 'Coding (Advanced)', value: 60, color: 'bg-rose-500' }
+      ],
+      difficulty: [
+        { level: 'Easy', value: 20, color: 'bg-emerald-500' },
+        { level: 'Medium', value: 60, color: 'bg-blue-500' },
+        { level: 'Hard', value: 20, color: 'bg-rose-500' }
+      ]
+    },
+    focusFeed: [
+      {
+        id: 'tcs_q1',
+        category: 'Numerical Ability',
+        question: 'The ratio of profit to investment in a partnership scheme is 3:5. If total investment is $25,000 and the duration is 1 year, what is the total profit?',
+        options: ['$15,000', '$10,000', '$7,500', '$12,500'],
+        correctIndex: 0,
+        solution: 'Investment ratio is 5 units = $25,000, so 1 unit = $5,000. Profit ratio is 3 units = $15,000.'
+      },
+      {
+        id: 'tcs_q2',
+        category: 'Verbal Ability',
+        question: 'Choose the correct preposition: She has been working at the office ____ five years.',
+        options: ['since', 'for', 'from', 'during'],
+        correctIndex: 1,
+        solution: "'for' is used for a duration/period of time (five years)."
+      },
+      {
+        id: 'tcs_q3',
+        category: 'Logical Reasoning',
+        question: 'In a row of 60 students, Raj is 15th from the left. What is his position from the right end of the row?',
+        options: ['45th', '46th', '44th', '47th'],
+        correctIndex: 1,
+        solution: 'Right position = (Total - Left position) + 1 = (60 - 15) + 1 = 46th.'
+      }
+    ],
+    directMocks: [
+      { id: 'tcs_m1', title: 'TCS Mock #12 (Advanced)', desc: 'August 2026 pattern with new psychometric items.', questions: 60, duration: 90, status: 'Open' },
+      { id: 'tcs_m2', title: 'TCS Mock #11 (Standard)', desc: 'Full length quant and reasoning test framework.', questions: 60, duration: 90, status: 'Open' },
+      { id: 'tcs_m3', title: 'TCS Mock #10 (Diagnostic)', desc: 'Historical benchmark assessment.', questions: 60, duration: 90, status: 'Open' },
+      { id: 'tcs_m4', title: 'TCS Mock #13 (Locked)', desc: 'High stakes exam simulator.', questions: 60, duration: 90, status: 'Locked' }
+    ]
+  },
+  infosys: {
+    title: 'Infosys SP/DSE Prep Hub',
+    desc: 'Focuses heavily on algorithmic design, programming constructs, object-oriented concepts, and puzzles.',
+    probability: 64,
+    probabilityLabel: 'IMPROVING',
+    probabilitySub: 'Based on 89 custom database queries executed.',
+    patternLabel: 'Advanced Coding & Puzzle Solving',
+    badges: ['Secondary Goal', 'Practice Mode Active'],
+    metrics: { duration: '180 Mins', questionsCount: 5, difficulty: 'High' },
+    insights: {
+      weightage: [
+        { category: 'Data Structures & Algos', value: 90, color: 'bg-rose-500' },
+        { category: 'Mathematical Puzzles', value: 80, color: 'bg-amber-500' },
+        { category: 'DBMS & Query Design', value: 70, color: 'bg-blue-500' },
+        { category: 'System Architecture', value: 45, color: 'bg-emerald-500' }
+      ],
+      difficulty: [
+        { level: 'Easy', value: 10, color: 'bg-emerald-500' },
+        { level: 'Medium', value: 40, color: 'bg-blue-500' },
+        { level: 'Hard', value: 50, color: 'bg-rose-500' }
+      ]
+    },
+    focusFeed: [
+      {
+        id: 'info_q1',
+        category: 'Data Structures',
+        question: 'What is the time complexity to search an element in a balanced Binary Search Tree?',
+        options: ['O(1)', 'O(n)', 'O(log n)', 'O(n log n)'],
+        correctIndex: 2,
+        solution: 'A balanced BST splits the search space in half at each level, taking logarithmic time O(log n).'
+      },
+      {
+        id: 'info_q2',
+        category: 'Puzzles',
+        question: 'A clock shows 3:15. What is the angle between the hour hand and the minute hand?',
+        options: ['0°', '7.5°', '15°', '12.5°'],
+        correctIndex: 1,
+        solution: 'At 3:00, hands are 90 deg apart. In 15 minutes, hour hand moves 15 * 0.5 = 7.5 deg. So angle is 7.5°.'
+      }
+    ],
+    directMocks: [
+      { id: 'info_m1', title: 'Infosys Specialist Mock #1', desc: 'Coding-heavy test case scenarios.', questions: 3, duration: 180, status: 'Open' },
+      { id: 'info_m2', title: 'Infosys DSE Standard Test', desc: 'Syllabus alignment with recent hiring tests.', questions: 5, duration: 180, status: 'Open' },
+      { id: 'info_m3', title: 'Infosys Specialist Mock #2', desc: 'Graph algorithm simulation tests.', questions: 3, duration: 180, status: 'Locked' }
+    ]
+  },
+  accenture: {
+    title: 'Accenture Masterclass Prep',
+    desc: 'Emphasizes analytical skills, critical reasoning, and common applications of technical aptitude.',
+    probability: 88,
+    probabilityLabel: 'EXCELLENT',
+    probabilitySub: 'Outstanding marks across 5 active test sets.',
+    patternLabel: 'Analytical & Technical Integration',
+    badges: ['High Match', 'Top Tier Candidate'],
+    metrics: { duration: '90 Mins', questionsCount: 75, difficulty: 'Medium' },
+    insights: {
+      weightage: [
+        { category: 'Cognitive Assessment', value: 80, color: 'bg-emerald-500' },
+        { category: 'Technical & Pseudo-code', value: 85, color: 'bg-blue-500' },
+        { category: 'Network Security Basics', value: 70, color: 'bg-purple-500' },
+        { category: 'MS Office Applications', value: 90, color: 'bg-amber-500' }
+      ],
+      difficulty: [
+        { level: 'Easy', value: 30, color: 'bg-emerald-500' },
+        { level: 'Medium', value: 50, color: 'bg-blue-500' },
+        { level: 'Hard', value: 20, color: 'bg-rose-500' }
+      ]
+    },
+    focusFeed: [
+      {
+        id: 'acc_q1',
+        category: 'Pseudo-code',
+        question: 'What is the value of: Integer a = 10, b = 20; a = a + b; b = a - b; a = a - b; print a, b;',
+        options: ['10, 20', '20, 10', '30, -10', '10, 10'],
+        correctIndex: 1,
+        solution: 'This is the standard arithmetic XOR swap: a becomes 30, b becomes 10 (30 - 20), a becomes 20 (30 - 10).'
+      },
+      {
+        id: 'acc_q2',
+        category: 'Cognitive',
+        question: 'Complete the sequence: 2, 6, 12, 20, 30, ____',
+        options: ['40', '42', '36', '44'],
+        correctIndex: 1,
+        solution: 'Differences are 4, 6, 8, 10, 12. Next is 30 + 12 = 42.'
+      }
+    ],
+    directMocks: [
+      { id: 'acc_m1', title: 'Accenture Masterclass Mock #1', desc: 'Complete assessment with pseudo-code analysis.', questions: 75, duration: 90, status: 'Open' },
+      { id: 'acc_m2', title: 'Accenture Cognitive Prep #1', desc: 'Timed reasoning speed drill.', questions: 50, duration: 60, status: 'Open' }
+    ]
+  },
+  amazon: {
+    title: 'Amazon AWS/SDE Prep Hub',
+    desc: 'Targeted preparation for SDE-1, specializing in algorithmic complexity, concurrency, system scale, and leadership principles.',
+    probability: 52,
+    probabilityLabel: 'CRITICAL ZONE',
+    probabilitySub: 'Requires additional hard item completions.',
+    patternLabel: 'DSA Mastery & Leadership Behavior',
+    badges: ['Dream Target', 'Elite Tier Challenging'],
+    metrics: { duration: '120 Mins', questionsCount: 4, difficulty: 'Expert' },
+    insights: {
+      weightage: [
+        { category: 'Algorithms & Optimizations', value: 95, color: 'bg-rose-500' },
+        { category: 'System Architecture & Scale', value: 85, color: 'bg-purple-500' },
+        { category: 'Object-Oriented Design', value: 75, color: 'bg-blue-500' },
+        { category: 'Leadership Principles', value: 90, color: 'bg-amber-500' }
+      ],
+      difficulty: [
+        { level: 'Easy', value: 5, color: 'bg-emerald-500' },
+        { level: 'Medium', value: 25, color: 'bg-blue-500' },
+        { level: 'Hard', value: 70, color: 'bg-rose-500' }
+      ]
+    },
+    focusFeed: [
+      {
+        id: 'amzn_q1',
+        category: 'Algorithms',
+        question: 'Which scheduling approach is optimal for sorting massive datasets that do not fit in RAM?',
+        options: ['Quick Sort', 'Merge Sort (External)', 'Heap Sort', 'Radix Sort'],
+        correctIndex: 1,
+        solution: 'External Merge Sort is a key algorithm for external sorting because it manages chunked disk IO efficiently.'
+      },
+      {
+        id: 'amzn_q2',
+        category: 'Leadership Principles',
+        question: 'If you disagree with your manager on a technical architecture decision, what should you do?',
+        options: [
+          'Acquiesce to avoid conflict',
+          'Respectfully disagree, explain your data, and commit to the final decision',
+          'Escalate to the director immediately',
+          'Implement your choice secretly'
+        ],
+        correctIndex: 1,
+        solution: "Amazon's principle is: Have Backbone; Disagree and Commit."
+      }
+    ],
+    directMocks: [
+      { id: 'amzn_m1', title: 'Amazon Online Assessment #1', desc: 'Two coding items and behavioral queries.', questions: 12, duration: 120, status: 'Open' },
+      { id: 'amzn_m2', title: 'Amazon System Design Simulation', desc: 'High level design mock evaluation.', questions: 2, duration: 90, status: 'Planned' }
+    ]
+  }
+};
+
 const AVATAR_PRESETS = [
   'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack',     // Female
   'https://api.dicebear.com/7.x/adventurer/svg?seed=Liliana',  // Female
@@ -223,6 +454,48 @@ const MOCK_BADGES_DATA = [
   { id: 'gs_on_track', name: 'On Track', level: 1, description: 'Awarded after reaching 25% completion of the first learning path.', image_url: '/badges/stage1/08.png', category: 'getting_started' },
   { id: 'gs_not_stopping', name: 'Not Stopping', level: 1, description: 'Awarded after completing 10 learning activities.', image_url: '/badges/stage1/09.png', category: 'getting_started' }
 ];
+
+const LEADERBOARD_PERIOD_DATA = {
+  weekly: {
+    podium: [
+      { rank: 1, name: 'Elena Rodriguez', xp: '28,120', accuracy: '98%', streak: '42d', avatarSeed: 'Elena' },
+      { rank: 2, name: 'Marcus Chen', xp: '24,850', accuracy: '94%', streak: '18d', avatarSeed: 'Marcus' },
+      { rank: 3, name: 'Julian Thorne', xp: '21,400', accuracy: '91%', streak: '12d', avatarSeed: 'Julian' }
+    ],
+    list: [
+      { rank: '#04', name: 'Sarah Jenkins', xp: '19,820', accuracy: '89%', streak: '9d', avatarSeed: 'Sarah' },
+      { rank: '#05', name: 'David Miller', xp: '18,150', accuracy: '87%', streak: '14d', avatarSeed: 'David' },
+      { rank: '#1,284', name: 'You', xp: '4,920', accuracy: '82%', streak: '5d', isSelf: true },
+      { rank: '#1,285', name: 'Leo Vance', xp: '4,890', accuracy: '79%', streak: '2d', avatarSeed: 'Leo' }
+    ]
+  },
+  monthly: {
+    podium: [
+      { rank: 1, name: 'Rohan Sharma', xp: '98,400', accuracy: '95%', streak: '60d', avatarSeed: 'Rohan' },
+      { rank: 2, name: 'Elena Rodriguez', xp: '92,120', accuracy: '97%', streak: '45d', avatarSeed: 'Elena' },
+      { rank: 3, name: 'Marcus Chen', xp: '88,500', accuracy: '93%', streak: '22d', avatarSeed: 'Marcus' }
+    ],
+    list: [
+      { rank: '#04', name: 'Kunal Kapoor', xp: '84,200', accuracy: '90%', streak: '15d', avatarSeed: 'Kunal' },
+      { rank: '#05', name: 'Ananya Roy', xp: '79,800', accuracy: '88%', streak: '30d', avatarSeed: 'Ananya' },
+      { rank: '#1,052', name: 'You', xp: '18,450', accuracy: '84%', streak: '12d', isSelf: true },
+      { rank: '#1,053', name: 'Sriram Neppalli', xp: '17,900', accuracy: '86%', streak: '8d', avatarSeed: 'Sriram' }
+    ]
+  },
+  global: {
+    podium: [
+      { rank: 1, name: 'Sriram Neppalli', xp: '245,000', accuracy: '96%', streak: '150d', avatarSeed: 'Sriram' },
+      { rank: 2, name: 'Rohan Sharma', xp: '210,000', accuracy: '94%', streak: '90d', avatarSeed: 'Rohan' },
+      { rank: 3, name: 'Elena Rodriguez', xp: '195,000', accuracy: '97%', streak: '85d', avatarSeed: 'Elena' }
+    ],
+    list: [
+      { rank: '#04', name: 'Aditya Sen', xp: '180,400', accuracy: '92%', streak: '40d', avatarSeed: 'Aditya' },
+      { rank: '#05', name: 'Marcus Chen', xp: '174,200', accuracy: '93%', streak: '25d', avatarSeed: 'Marcus' },
+      { rank: '#984', name: 'You', xp: '45,920', accuracy: '86%', streak: '15d', isSelf: true },
+      { rank: '#985', name: 'Kunal Kapoor', xp: '42,500', accuracy: '89%', streak: '18d', avatarSeed: 'Kunal' }
+    ]
+  }
+};
 
 const getCategoryEmoji = (cat: string) => {
   switch (cat) {
@@ -256,6 +529,15 @@ const adjustColorBrightness = (hex: string, percent: number): string => {
 const applyBrandColor = (color: string) => {
   if (typeof window === 'undefined') return;
   const root = document.documentElement;
+  if (color === 'default') {
+    root.classList.remove('custom-color-active');
+    root.style.removeProperty('--clr-primary');
+    root.style.removeProperty('--clr-primary-dark');
+    root.style.removeProperty('--clr-primary-tint');
+    root.style.removeProperty('--clr-primary-rgb');
+    return;
+  }
+  root.classList.add('custom-color-active');
   root.style.setProperty('--clr-primary', color);
   root.style.setProperty('--clr-primary-dark', adjustColorBrightness(color, -15));
   root.style.setProperty('--clr-primary-tint', color + '20'); // 12% opacity in hex
@@ -289,7 +571,7 @@ const getHexColor = (colorId: string) => {
     case 'teal': return '#14B8A6';
     case 'indigo': return '#6366F1';
     case 'blue':
-    default: return '#3B82F6';
+    default: return '#7075F4';
   }
 };
 
@@ -303,7 +585,7 @@ const getBadgeProgress = (badgeName: string, isUnlocked: boolean) => {
   const bookmarksCount = typeof window !== 'undefined' ? (() => {
     try {
       const b = localStorage.getItem('aptitude_bookmarks');
-      return b ? JSON.parse(b).length : 1;
+      try { return b ? JSON.parse(b).length : 1; } catch(e) { return 1; }
     } catch (_) { return 1; }
   })() : 1;
   const sectionsVisited = typeof window !== 'undefined' ? Number(localStorage.getItem('aptitude_sections_visited_count') || 2) : 2;
@@ -961,14 +1243,82 @@ const CanvasCelebration = ({ confettiStyle }: { confettiStyle: 'confetti' | 'fir
 };
 
 const tabVariants = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 15 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
+  exit: { opacity: 0, y: -15 },
 };
 
 const tabTransition = {
-  duration: 0.5,
-  ease: [0.34, 1.56, 0.64, 1] as const,
+  duration: 0.3,
+  ease: "easeOut" as const
+};
+
+const podiumContainerVariants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.08
+    }
+  }
+};
+
+const podiumCardVariants = {
+  initial: { opacity: 0, y: 35, scale: 0.96 },
+  animate: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 14
+    }
+  }
+};
+
+const tableContainerVariants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.04
+    }
+  }
+};
+
+const tableRowVariants = {
+  initial: { opacity: 0, x: -15 },
+  animate: { 
+    opacity: 1, 
+    x: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 90,
+      damping: 15
+    }
+  }
+};
+
+const rightSidebarVariants = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.06
+    }
+  }
+};
+
+const rightCardVariants = {
+  initial: { opacity: 0, x: 20, scale: 0.97 },
+  animate: { 
+    opacity: 1, 
+    x: 0, 
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 110,
+      damping: 15
+    }
+  }
 };
 
 export default function StudentDashboard() {
@@ -1009,8 +1359,14 @@ export default function StudentDashboard() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
-      if (tabParam && ['dashboard', 'domains', 'conceptHub', 'learning', 'practice', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges'].includes(tabParam)) {
-        setActiveSidebarTab(tabParam as any);
+      if (tabParam) {
+        if (tabParam === 'conceptHub' || tabParam === 'practice') {
+          setActiveSidebarTab('domains');
+        } else if (tabParam === 'studyPlanner') {
+          router.replace('/student/study-planner');
+        } else if (['dashboard', 'domains', 'learning', 'mockTests', 'careerHub', 'leaderboards', 'profile', 'settings', 'badges', 'library'].includes(tabParam)) {
+          setActiveSidebarTab(tabParam as any);
+        }
       }
     }
   }, []);
@@ -1019,6 +1375,7 @@ export default function StudentDashboard() {
     document.documentElement.classList.add('theme-transitioning');
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(nextTheme);
+    setThemeMode(nextTheme);
     if (nextTheme === 'dark') {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -1032,10 +1389,39 @@ export default function StudentDashboard() {
   };
 
   const [solvedCount, setSolvedCount] = useState(12);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Syllabus Milestone Reached! 🎓', message: 'You completed the Arithmetic & Algebra core challenges.', time: '2 hours ago', read: false },
+    { id: 2, title: 'New Badge Earned! 🎖️', message: "Prestige Badge 'Solving Streak' has been added to your credentials.", time: '1 day ago', read: false },
+    { id: 3, title: 'Weekly Performance Sync 📊', message: 'Your curriculum readiness index improved by +5.4%.', time: '3 days ago', read: true }
+  ]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showNotifications]);
   const [streak, setStreak] = useState(14); // Simulated active streak
   const [bookmarks, setBookmarks] = useState<string[]>(['Q-8029-X']);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'conceptHub' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges'>('dashboard');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'profile' | 'settings' | 'badges' | 'library'>('dashboard');
+  const [activeCompanyHub, setActiveCompanyHub] = useState<string>('tcs');
+  const [answeredFeedQuestions, setAnsweredFeedQuestions] = useState<Record<string, number>>({});
+  const [selectedHubInsightTab, setSelectedHubInsightTab] = useState<'breakdown' | 'pattern'>('breakdown');
   const [roadmapFilter, setRoadmapFilter] = useState<'all' | 'quant' | 'logical' | 'verbal' | 'coding'>('all');
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (toastMsg) {
+      const timer = setTimeout(() => setToastMsg(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMsg]);
 
   // Concept-Hub Practice Arena Redesign States
   const [selectedCollection, setSelectedCollection] = useState<string>('all');
@@ -1069,12 +1455,97 @@ export default function StudentDashboard() {
       { id: 'fc1', user: 'Admin Instructor', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', comment: 'Be sure to post any clarifications here. Standard response turnaround is within 4 hours.', time: 'Just now' }
     ];
   }, [activeQuestion, activeQuestionComments]);
+  const currentHub = useMemo(() => {
+    return COMPANY_PREP_HUBS[activeCompanyHub] || COMPANY_PREP_HUBS.tcs;
+  }, [activeCompanyHub]);
 
+  // STUDY LIBRARY DATASETS AND STATES
+  const [libraryNotes, setLibraryNotes] = useState<any[]>([
+    {
+      id: 'note-842',
+      category: 'aptitude',
+      tag: 'APTITUDE • #842',
+      title: 'Successive Percentage Change',
+      snippet: 'Remember the formula: x + y + xy/100. Crucial for discount chains...',
+      content: 'When two successive percentage changes of x% and y% occur, the effective change is given by the formula below. Remember to use negative values for percentage decreases or discounts.',
+      addedDate: 'Oct 24',
+      revisedDate: '2 days ago',
+      folder: 'all',
+      equation: 'Net\\ Change = \\left(x + y + \\frac{xy}{100}\\right)\\%',
+      keyPoints: [
+        'Compound Interest calculations.',
+        'Successive discounts in retail (Profit & Loss).',
+        'Population growth or depreciation over years.'
+      ]
+    },
+    {
+      id: 'note-1204',
+      category: 'logic',
+      tag: 'LOGIC • #1,204',
+      title: 'Syllogism: All A are B, Some B are C',
+      snippet: 'Draw Venn diagrams always. The \'Some\' case is tricky for \'All\'...',
+      content: 'Standard syllogistic reasoning. The relation between A and C is not directly defined; draw Euler circles to map overlap bounds. Remember that "Some B are C" does not guarantee "Some A are C".',
+      addedDate: 'Oct 22',
+      revisedDate: 'Today',
+      folder: 'all',
+      equation: 'A \\cap B = A \\implies A \\subseteq B',
+      keyPoints: [
+        'Verify negative statements first.',
+        'Check Venn intersections for "Some B are C" boundary limits.',
+        'Differentiate between possibilities and definite conclusions.'
+      ]
+    },
+    {
+      id: 'note-451',
+      category: 'data',
+      tag: 'DATA • #451',
+      title: 'Time & Distance Ratio Methods',
+      snippet: 'When distance is constant, speed is inversely proportional to time...',
+      content: 'If distance is kept constant, speed and time vary inversely. This means that if the ratio of speeds is a:b, then the ratio of time taken will be b:a.',
+      addedDate: 'Oct 20',
+      revisedDate: '1 week ago',
+      folder: 'all',
+      equation: 'Distance = Speed \\times Time \\implies S_1 T_1 = S_2 T_2',
+      keyPoints: [
+        'Useful for early/late arrival problems.',
+        'Applicable to train passing speed calculations.',
+        'Simplifies relative speed ratios in circular tracks.'
+      ]
+    }
+  ]);
+  const [selectedLibraryFolder, setSelectedLibraryFolder] = useState<string>('all');
+  const [activeLibraryNoteId, setActiveLibraryNoteId] = useState<string>('note-842');
+  const [librarySearchQuery, setLibrarySearchQuery] = useState<string>('');
+  const [libraryCustomFolders, setLibraryCustomFolders] = useState<string[]>([
+    'Arithmetic Shortcuts',
+    'TCS NQT Prep (24)',
+    'Geometry Formulas'
+  ]);
+  const [showAddFolderModal, setShowAddFolderModal] = useState<boolean>(false);
+  const [newFolderName, setNewFolderName] = useState<string>('');
 
+  const activeLibraryNote = useMemo(() => {
+    return libraryNotes.find(n => n.id === activeLibraryNoteId) || null;
+  }, [libraryNotes, activeLibraryNoteId]);
 
+  const [editingTitle, setEditingTitle] = useState('');
+  const [editingContent, setEditingContent] = useState('');
+  const [editingEquation, setEditingEquation] = useState('');
+
+  useEffect(() => {
+    if (activeLibraryNote) {
+      setEditingTitle(activeLibraryNote.title);
+      setEditingContent(activeLibraryNote.content);
+      setEditingEquation(activeLibraryNote.equation || '');
+    } else {
+      setEditingTitle('');
+      setEditingContent('');
+      setEditingEquation('');
+    }
+  }, [activeLibraryNoteId, activeLibraryNote]);
   // Increment practice time spent
   useEffect(() => {
-    if (activeSidebarTab !== 'practice') return;
+    if ((activeSidebarTab as string) !== 'practice') return;
     const interval = setInterval(() => {
       setPracticeTimeSpent(prev => prev + 1);
     }, 1000);
@@ -1083,7 +1554,7 @@ export default function StudentDashboard() {
 
   // Sticky video player scroll checker
   useEffect(() => {
-    if (activeSidebarTab !== 'practice' || !activeQuestion) {
+    if ((activeSidebarTab as string) !== 'practice' || !activeQuestion) {
       setIsMiniPlayerActive(false);
       return;
     }
@@ -1326,6 +1797,8 @@ export default function StudentDashboard() {
   const [unlockedBadgeIds, setUnlockedBadgeIds] = useState<string[]>([]);
   const [justUnlockedBadge, setJustUnlockedBadge] = useState<any | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<any | null>(null);
+  const [dayBadgesToShow, setDayBadgesToShow] = useState<any[] | null>(null);
+  const [badgesToShowDateStr, setBadgesToShowDateStr] = useState<string>('');
   const [currentYear, setCurrentYear] = useState<number>(2026);
   const [currentMonth, setCurrentMonth] = useState<number>(5); // 0-indexed, 5 is June
   const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(9);
@@ -1380,55 +1853,101 @@ export default function StudentDashboard() {
     return Array.from(days);
   }, [earnedBadgesHistory, currentYear, currentMonth]);
 
+  // Compute badges earned on each day of the current month
+  const badgesByDay: Record<number, Array<{ badge: any; count: number }>> = useMemo(() => {
+    const map: Record<number, Array<{ badge: any; count: number }>> = {};
+    for (let d = 1; d <= 31; d++) {
+      map[d] = [];
+    }
+
+    earnedBadgesHistory.forEach(item => {
+      if (!item.earned_at) return;
+      const dateObj = new Date(item.earned_at);
+      if (dateObj.getFullYear() === currentYear && dateObj.getMonth() === currentMonth) {
+        const dayNum = dateObj.getDate();
+        const badgeDetail = badges.find(b => b.id === item.badge_id) || MOCK_BADGES_DATA.find(b => b.id === item.badge_id);
+        if (badgeDetail) {
+          const existing = map[dayNum]?.find(x => x.badge.id === badgeDetail.id);
+          if (existing) {
+            existing.count += 1;
+          } else {
+            if (!map[dayNum]) {
+              map[dayNum] = [];
+            }
+            map[dayNum].push({ badge: badgeDetail, count: 1 });
+          }
+        }
+      }
+    });
+    return map;
+  }, [earnedBadgesHistory, badges, currentYear, currentMonth]);
+
   // Compute badges earned on selected calendar day with multipliers for duplicate earnings
   const badgesEarnedOnSelectedDay: Array<{ badge: any; count: number }> = useMemo(() => {
-    const dayHistory = earnedBadgesHistory.filter(item => {
-      if (!item.earned_at) return false;
-      const d = new Date(item.earned_at);
-      return d.getFullYear() === currentYear && d.getMonth() === currentMonth && d.getDate() === selectedCalendarDay;
-    });
-
-    const badgeCounts: Record<string, number> = {};
-    dayHistory.forEach(item => {
-      badgeCounts[item.badge_id] = (badgeCounts[item.badge_id] || 0) + 1;
-    });
-
-    return Object.entries(badgeCounts).map(([badgeId, count]: [string, number]) => {
-      const badgeDetail = badges.find(b => b.id === badgeId) || MOCK_BADGES_DATA.find(b => b.id === badgeId);
-      return {
-        badge: badgeDetail,
-        count
-      };
-    }).filter((item): item is { badge: any; count: number } => item.badge !== undefined);
-  }, [earnedBadgesHistory, selectedCalendarDay, badges, currentYear, currentMonth]);
+    return badgesByDay[selectedCalendarDay] || [];
+  }, [badgesByDay, selectedCalendarDay]);
 
   // Custom Settings States
   const [dailyXpGoal, setDailyXpGoal] = useState<number>(100);
   const [tiltEnabled, setTiltEnabled] = useState<boolean>(true);
   const [confettiStyle, setConfettiStyle] = useState<'confetti' | 'fireworks' | 'none'>('confetti');
   const [soundWaveActive, setSoundWaveActive] = useState<boolean>(false);
-  const [accentColor, setAccentColor] = useState<string>('blue');
-  const [customColor, setCustomColor] = useState<string>('#3B82F6');
+  const [accentColor, setAccentColor] = useState<string>('default');
+  const [customColor, setCustomColor] = useState<string>('default');
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('dark');
   const [layoutDensity, setLayoutDensity] = useState<'compact' | 'normal' | 'spacious'>('normal');
   const [celebrationActive, setCelebrationActive] = useState<boolean>(false);
+
+  const isCustomActive = customColor !== 'default';
 
   // Time Tracker State (Reference 1 style)
   const [timeTrackerSeconds, setTimeTrackerSeconds] = useState<number>(5048); // Start at 01:24:08 (5048 seconds)
   const [timeTrackerIsRunning, setTimeTrackerIsRunning] = useState<boolean>(false);
+  const [timerCollapsed, setTimerCollapsed] = useState<boolean>(false);
+  const mainContainerRef = useRef<HTMLDivElement>(null);
 
+  // Sync stopwatch to localStorage
   useEffect(() => {
     let interval = null;
     if (timeTrackerIsRunning) {
       interval = setInterval(() => {
-        setTimeTrackerSeconds((prev) => prev + 1);
+        setTimeTrackerSeconds((prev) => {
+          const nextVal = prev + 1;
+          localStorage.setItem('aptitude_stopwatch_seconds', nextVal.toString());
+          localStorage.setItem('aptitude_stopwatch_last_time', Date.now().toString());
+          return nextVal;
+        });
       }, 1000);
     } else {
       if (interval) clearInterval(interval);
     }
+    localStorage.setItem('aptitude_stopwatch_running', timeTrackerIsRunning ? 'true' : 'false');
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [timeTrackerIsRunning]);
+
+  // Load stopwatch state from localStorage on mount
+  useEffect(() => {
+    const savedSeconds = localStorage.getItem('aptitude_stopwatch_seconds');
+    const savedRunning = localStorage.getItem('aptitude_stopwatch_running');
+    const savedLastTime = localStorage.getItem('aptitude_stopwatch_last_time');
+
+    let initialSeconds = 5048;
+    if (savedSeconds) {
+      initialSeconds = parseInt(savedSeconds, 10);
+    }
+
+    if (savedRunning === 'true' && savedLastTime) {
+      const elapsedMs = Date.now() - parseInt(savedLastTime, 10);
+      const elapsedSec = Math.floor(elapsedMs / 1000);
+      setTimeTrackerSeconds(initialSeconds + Math.max(0, elapsedSec));
+      setTimeTrackerIsRunning(true);
+    } else {
+      setTimeTrackerSeconds(initialSeconds);
+      setTimeTrackerIsRunning(savedRunning === 'true');
+    }
+  }, []);
 
   // Listen for Escape key to close badge modal
   useEffect(() => {
@@ -1465,6 +1984,7 @@ export default function StudentDashboard() {
 
   // Leaderboard state
   const [activeLeaderboardTab, setActiveLeaderboardTab] = useState<'global' | 'friends'>('global');
+  const [activeLeaderboardPeriod, setActiveLeaderboardPeriod] = useState<'weekly' | 'monthly' | 'global'>('weekly');
 
   // Interactive Quiz state
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
@@ -1551,7 +2071,7 @@ export default function StudentDashboard() {
           const storedHistory = localStorage.getItem('aptitude_badges_history');
           if (storedHistory) {
             try {
-              finalHistory = JSON.parse(storedHistory);
+              try { finalHistory = JSON.parse(storedHistory); } catch(e) { finalHistory = []; }
             } catch (e) {
               finalHistory = [];
             }
@@ -1579,27 +2099,36 @@ export default function StudentDashboard() {
         // Also extract unique unlocked badge IDs for unlockedBadgeIds state
         const uniqueUnlocked: string[] = Array.from(new Set(finalHistory.map((h: any) => h.badge_id as string)));
 
-        // Retrospectively unlock Getting Started if onboarding is completed
-        const hasOnboarding = localStorage.getItem('aptitude_onboarding_completed') === 'true';
-        const gettingStartedBadge = mappedBadges.find(b => b.name === 'Getting Started');
-        if (hasOnboarding && gettingStartedBadge && !uniqueUnlocked.includes(gettingStartedBadge.id)) {
-          uniqueUnlocked.push(gettingStartedBadge.id);
-          const nowStr = new Date().toISOString();
-          finalHistory.push({ badge_id: gettingStartedBadge.id, earned_at: nowStr });
+        // Retrospectively unlock any badge that has hit 100% progress
+        let newlyUnlocked = false;
+        for (const badge of mappedBadges) {
+          if (!uniqueUnlocked.includes(badge.id)) {
+            const progressInfo = getBadgeProgress(badge.name, false);
+            if (progressInfo.current >= progressInfo.target && progressInfo.target > 0) {
+              uniqueUnlocked.push(badge.id);
+              const nowStr = new Date().toISOString();
+              finalHistory.push({ badge_id: badge.id, earned_at: nowStr });
+              newlyUnlocked = true;
+              
+              try {
+                await supabase.from('user_badges').insert({
+                  user_id: userId,
+                  badge_id: badge.id,
+                  earned_at: nowStr,
+                  progress_percentage: 100,
+                  is_completed: true,
+                  current_value: progressInfo.current,
+                  target_value: progressInfo.target,
+                  has_seen_popup: false
+                });
+              } catch (e) { }
+            }
+          }
+        }
+
+        if (newlyUnlocked) {
           setEarnedBadgesHistory([...finalHistory]);
           localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
-          try {
-            await supabase.from('user_badges').insert({
-              user_id: userId,
-              badge_id: gettingStartedBadge.id,
-              earned_at: nowStr,
-              progress_percentage: 100,
-              is_completed: true,
-              current_value: 1,
-              target_value: 1,
-              has_seen_popup: false
-            });
-          } catch (e) { }
         }
 
         setUnlockedBadgeIds(uniqueUnlocked);
@@ -1612,7 +2141,7 @@ export default function StudentDashboard() {
       let finalHistory = [];
       if (storedHistory) {
         try {
-          finalHistory = JSON.parse(storedHistory);
+          try { finalHistory = JSON.parse(storedHistory); } catch(e) { finalHistory = []; }
         } catch (e) { }
       } else {
         finalHistory = DEFAULT_SEED_HISTORY;
@@ -1625,7 +2154,7 @@ export default function StudentDashboard() {
       const stored = localStorage.getItem('aptitude_unlocked_badges');
       if (stored) {
         try {
-          const parsed = JSON.parse(stored);
+          let parsed = null; try { parsed = JSON.parse(stored); } catch(e) {}
           parsed.forEach((id: string) => {
             if (!uniqueUnlocked.includes(id)) {
               uniqueUnlocked.push(id);
@@ -1637,6 +2166,25 @@ export default function StudentDashboard() {
         if (hasOnboarding && !uniqueUnlocked.includes('gs_getting_started')) {
           uniqueUnlocked.push('gs_getting_started');
         }
+      }
+
+      // Retrospectively unlock any badge that has hit 100% progress (fallback)
+      let newlyUnlocked = false;
+      for (const badge of MOCK_BADGES_DATA) {
+        if (!uniqueUnlocked.includes(badge.id)) {
+          const progressInfo = getBadgeProgress(badge.name, false);
+          if (progressInfo.current >= progressInfo.target && progressInfo.target > 0) {
+            uniqueUnlocked.push(badge.id);
+            const nowStr = new Date().toISOString();
+            finalHistory.push({ badge_id: badge.id, earned_at: nowStr });
+            newlyUnlocked = true;
+          }
+        }
+      }
+
+      if (newlyUnlocked) {
+        setEarnedBadgesHistory([...finalHistory]);
+        localStorage.setItem('aptitude_badges_history', JSON.stringify(finalHistory));
       }
 
       setUnlockedBadgeIds(uniqueUnlocked);
@@ -1770,7 +2318,15 @@ export default function StudentDashboard() {
   };
 
   const handleAccentColorChange = (color: string) => {
-    if (color.startsWith('#')) {
+    if (color === 'default') {
+      setAccentColor('default');
+      setCustomColor('default');
+      applyBrandColor('default');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('aptitude_accent_color');
+        localStorage.removeItem('aptitude_custom_brand_color');
+      }
+    } else if (color.startsWith('#')) {
       setCustomColor(color);
       applyBrandColor(color);
       setAccentColor('custom');
@@ -1783,6 +2339,40 @@ export default function StudentDashboard() {
       applyBrandColor(presetHex);
       localStorage.setItem('aptitude_accent_color', color);
       localStorage.setItem('aptitude_custom_brand_color', presetHex);
+    }
+  };
+
+  const changeCustomColor = (color: string) => {
+    handleAccentColorChange(color);
+  };
+
+  const handleThemeChange = (mode: 'light' | 'dark' | 'system') => {
+    setThemeMode(mode);
+    if (typeof window !== 'undefined') {
+      document.documentElement.classList.add('theme-transitioning');
+      if (mode === 'system') {
+        localStorage.removeItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (systemPrefersDark) {
+          document.documentElement.classList.add('dark');
+          setTheme('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          setTheme('light');
+        }
+      } else {
+        localStorage.setItem('theme', mode);
+        if (mode === 'dark') {
+          document.documentElement.classList.add('dark');
+          setTheme('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          setTheme('light');
+        }
+      }
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 500);
     }
   };
 
@@ -1832,14 +2422,26 @@ export default function StudentDashboard() {
     if (savedConfettiStyle) setConfettiStyle(savedConfettiStyle as any);
 
     const savedAccentColor = localStorage.getItem('aptitude_accent_color');
-    if (savedAccentColor) setAccentColor(savedAccentColor);
+    if (savedAccentColor) {
+      setAccentColor(savedAccentColor);
+    } else {
+      setAccentColor('default');
+    }
 
     const savedCustomColor = localStorage.getItem('aptitude_custom_brand_color');
     if (savedCustomColor) {
       setCustomColor(savedCustomColor);
       applyBrandColor(savedCustomColor);
     } else {
-      applyBrandColor('#3B82F6');
+      setCustomColor('default');
+      applyBrandColor('default');
+    }
+
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+      setThemeMode(storedTheme);
+    } else {
+      setThemeMode('system');
     }
 
     const savedDensity = localStorage.getItem('aptitude_layout_density');
@@ -1849,7 +2451,7 @@ export default function StudentDashboard() {
     const roleStored = localStorage.getItem('aptitude_current_role');
     if (roleStored) {
       try {
-        const parsed = JSON.parse(roleStored);
+        let parsed = null; try { parsed = JSON.parse(roleStored); } catch(e) {}
         setCurrentRole(parsed);
       } catch (e) {
         console.warn(e);
@@ -1868,7 +2470,7 @@ export default function StudentDashboard() {
           .eq('id', session.user.id)
           .maybeSingle();
 
-        const isSarah = session.user.email === 'sarah.c@aptitude-ai.com';
+        const isSarah = session.user.email === 'sarah.c@aptitude-ai.com' || session.user.email?.toLowerCase().includes('admin') || session.user.email?.toLowerCase().includes('abhinav');
         const isMarcus = session.user.email === 'marcus.w@aptitude-ai.com';
         const userRole = (profileObj?.role === 'ADMIN' || isSarah || isMarcus) ? 'admin' : 'STUDENT';
 
@@ -1883,7 +2485,7 @@ export default function StudentDashboard() {
         const roleStored = localStorage.getItem('aptitude_current_role');
         if (roleStored) {
           try {
-            const parsed = JSON.parse(roleStored);
+            let parsed = null; try { parsed = JSON.parse(roleStored); } catch(e) {}
             roleObj.role = parsed.role;
             roleObj.name = parsed.name || roleObj.name;
           } catch (_) { }
@@ -1922,7 +2524,7 @@ export default function StudentDashboard() {
     const onboardingStored = localStorage.getItem('aptitude_onboarding_data');
     if (onboardingStored) {
       try {
-        const data = JSON.parse(onboardingStored);
+        let data = null; try { data = JSON.parse(onboardingStored); } catch(e) {}
         setProfile((prev: any) => ({
           ...prev,
           username: data.username || prev.username,
@@ -1999,19 +2601,46 @@ export default function StudentDashboard() {
           });
           setQuestions(mapped);
         } else {
-          // Local storage fallback
+          // Local storage fallback with self-healing auto-merge
           const stored = localStorage.getItem('aptitude_questions');
           if (stored) {
-            setQuestions(JSON.parse(stored));
+            try {
+              let parsed = null; try { parsed = JSON.parse(stored); } catch(e) {}
+              const parsedIds = new Set(parsed.map((q: any) => q.id));
+              const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+              if (missing.length > 0) {
+                const merged = [...parsed, ...missing];
+                localStorage.setItem('aptitude_questions', JSON.stringify(merged));
+                setQuestions(merged);
+              } else {
+                setQuestions(parsed);
+              }
+            } catch (e) {
+              setQuestions(SAMPLE_QUESTIONS);
+            }
           } else {
             setQuestions(SAMPLE_QUESTIONS);
+            localStorage.setItem('aptitude_questions', JSON.stringify(SAMPLE_QUESTIONS));
           }
         }
       } catch (err) {
         console.warn('Student Dashboard Supabase Sync error:', err);
         const stored = localStorage.getItem('aptitude_questions');
         if (stored) {
-          setQuestions(JSON.parse(stored));
+          try {
+            let parsed = null; try { parsed = JSON.parse(stored); } catch(e) {}
+            const parsedIds = new Set(parsed.map((q: any) => q.id));
+            const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+            if (missing.length > 0) {
+              const merged = [...parsed, ...missing];
+              localStorage.setItem('aptitude_questions', JSON.stringify(merged));
+              setQuestions(merged);
+            } else {
+              setQuestions(parsed);
+            }
+          } catch (e) {
+            setQuestions(SAMPLE_QUESTIONS);
+          }
         } else {
           setQuestions(SAMPLE_QUESTIONS);
         }
@@ -2251,7 +2880,7 @@ export default function StudentDashboard() {
   }, [solvedCount]);
 
   interface SidebarTab {
-    id: 'dashboard' | 'domains' | 'conceptHub' | 'learning' | 'practice' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges';
+    id: 'dashboard' | 'domains' | 'learning' | 'studyPlanner' | 'mockTests' | 'careerHub' | 'leaderboards' | 'badges' | 'library';
     label: string;
     icon: any;
     action: 'tab' | 'nav';
@@ -2260,19 +2889,18 @@ export default function StudentDashboard() {
   }
 
   const sidebarTabs: SidebarTab[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: Compass, action: 'tab' },
-    { id: 'domains', label: 'Domains', icon: Layers, action: 'tab' },
-    { id: 'conceptHub', label: 'Concept Hub', icon: GraduationCap, action: 'tab' },
-    { id: 'learning', label: 'Learning Roadmap', icon: BookOpen, action: 'tab' },
-    { id: 'practice', label: 'Practice Arena', icon: BookOpenCheck, action: 'tab' },
+    { id: 'domains', label: 'Domains', icon: LayoutGrid, action: 'tab' },
+    { id: 'learning', label: 'Progress', icon: BookOpen, action: 'tab' },
+    { id: 'studyPlanner', label: 'Study Plan', icon: Calendar, action: 'tab' },
+    { id: 'library', label: 'Study Library', icon: BookMarked, action: 'tab' },
     { id: 'mockTests', label: 'Mock Tests', icon: Award, action: 'tab' },
-    { id: 'careerHub', label: 'Career Hub', icon: Briefcase, action: 'tab', subAction: () => setSelectedOpportunityType('All') },
+    { id: 'careerHub', label: 'Placement Hub', icon: Briefcase, action: 'tab' },
     { id: 'leaderboards', label: 'Leaderboard Rankings', icon: Trophy, action: 'tab' },
     { id: 'badges', label: 'Badges & Achievements', icon: Sparkles, action: 'tab' }
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
+    <div ref={mainContainerRef} className="flex h-screen bg-slate-50 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased relative transition-colors duration-300">
 
       {/* Glow Backdrops */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[var(--clr-primary)]/5 blur-[120px] pointer-events-none" />
@@ -2280,10 +2908,22 @@ export default function StudentDashboard() {
 
       {/* 1. Left Navigation Sidebar (Reference 2 style) */}
       <aside className="w-[76px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 flex flex-col items-center py-6 h-screen shrink-0 z-20 relative backdrop-blur-xl transition-colors duration-300">
-        {/* Top Logo Button */}
-        <div className="w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-transform" title={siteConfig.name}>
-          <Layers className="w-5 h-5" />
-        </div>
+        {/* Top Logo Button / Dashboard Trigger */}
+        <button
+          onClick={() => setActiveSidebarTab('dashboard')}
+          className={`w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white flex items-center justify-center shadow-md mb-8 cursor-pointer hover:scale-105 transition-all duration-300 relative group/logo border-0 outline-none`}
+          title="Dashboard"
+          type="button"
+        >
+          {activeSidebarTab === 'dashboard' && (
+            <motion.div
+              layoutId="activeLogoGlow"
+              className="absolute -inset-1 rounded-full border-2 border-[var(--clr-primary)] opacity-40 blur-xs"
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            />
+          )}
+          <Layers className="w-5 h-5 relative z-10" />
+        </button>
 
         {/* Sidebar Tabs */}
         <nav className="flex-1 flex flex-col gap-4 items-center w-full overflow-y-auto scrollbar-none py-2">
@@ -2324,7 +2964,7 @@ export default function StudentDashboard() {
           })}
 
           {/* Admin Tools Section */}
-          {currentRole?.role === 'admin' && (
+          {themeMounted && currentRole?.role === 'admin' && (
             <div className="pt-3 border-t border-slate-100 dark:border-slate-900 w-full flex flex-col gap-3 items-center">
               <button
                 onClick={() => router.push('/admin/editor')}
@@ -2350,165 +2990,105 @@ export default function StudentDashboard() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-30">
 
         {/* Top Header (Reference 2 style) */}
-        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center justify-between bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none">
-          <div className="flex flex-col items-start text-left">
-            <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
-              {activeSidebarTab === 'dashboard' ? (
-                <>Welcome back, {profile.username.split(' ')[0]} 👋</>
-              ) : activeSidebarTab === 'domains' ? (
-                <>Learning Domains 🌐</>
-              ) : activeSidebarTab === 'conceptHub' ? (
-                <>Concept Hub 🎓</>
-              ) : activeSidebarTab === 'learning' ? (
-                <>Learning Roadmap 🗺️</>
-              ) : activeSidebarTab === 'practice' ? (
-                <>Practice Arena 🎯</>
-              ) : activeSidebarTab === 'mockTests' ? (
-                <>Placement Mock Arena 🏆</>
-              ) : activeSidebarTab === 'careerHub' ? (
-                <>Career Opportunity Hub 💼</>
-              ) : activeSidebarTab === 'leaderboards' ? (
-                <>Placement Leaderboard 📊</>
-              ) : activeSidebarTab === 'badges' ? (
-                <>Achievements & Credentials 🏅</>
-              ) : activeSidebarTab === 'profile' ? (
-                <>Student Credentials ⚙️</>
-              ) : (
-                <>Settings Hub ⚙️</>
-              )}
-            </h1>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
-              {activeSidebarTab === 'dashboard' ? (
-                'Here is your activities overview for today.'
-              ) : activeSidebarTab === 'domains' ? (
-                'Select a syllabus domain to view lessons and progress.'
-              ) : activeSidebarTab === 'conceptHub' ? (
-                'Review formulas, cheat sheets, and examples across syllabus domains.'
-              ) : activeSidebarTab === 'learning' ? (
-                'Personalized step-by-step preparation path.'
-              ) : activeSidebarTab === 'practice' ? (
-                'Solve categorized aptitude questions to build your skills.'
-              ) : activeSidebarTab === 'mockTests' ? (
-                'Prepare under simulated company timeline checks.'
-              ) : activeSidebarTab === 'careerHub' ? (
-                'Live portal access drives, internships, government exams, hackathons, and placement updates.'
-              ) : activeSidebarTab === 'leaderboards' ? (
-                'Compare progress, metrics, and speeds with peers globally.'
-              ) : activeSidebarTab === 'badges' ? (
-                'Celebrate preparation milestones and dynamic digital badges.'
-              ) : activeSidebarTab === 'profile' ? (
-                'Review onboarding selections and active prep goals.'
-              ) : (
-                'Configure advanced dashboard properties, themes, and animations.'
-              )}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-5">
-
-            {/* Daily Streak Badge */}
-            {activeSidebarTab === 'domains' && (
-              <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0 animate-fadeIn">
-                <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
-                  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
-                  {streak}
-                </span>
-              </div>
-            )}
-
-            {/* Search Input Box */}
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search something..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2 w-60 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
-              />
+        <header className="h-20 border-b border-slate-200 dark:border-slate-900 px-8 flex items-center bg-white/70 dark:bg-slate-950/50 backdrop-blur-xl transition-colors duration-300 shrink-0 select-none relative z-50">
+          <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+            <div className="flex flex-col items-start text-left">
+              <h1 className="text-xl font-bold font-heading text-slate-800 dark:text-white flex items-center gap-2">
+                {activeSidebarTab === 'dashboard' ? (
+                  <>Welcome back, {profile.username.split(' ')[0]}</>
+                ) : activeSidebarTab === 'domains' ? (
+                  <>Learning Domains</>
+                ) : activeSidebarTab === 'learning' ? (
+                  <>Progress</>
+                ) : activeSidebarTab === 'mockTests' ? (
+                  <>Placement Mock Arena</>
+                ) : activeSidebarTab === 'careerHub' ? (
+                  <>Company-Specific Placement Hub</>
+                ) : activeSidebarTab === 'leaderboards' ? (
+                  <>Placement Leaderboard</>
+                ) : activeSidebarTab === 'studyPlanner' ? (
+                  <>Interactive Study Planner</>
+                ) : activeSidebarTab === 'badges' ? (
+                  <>Achievements & Credentials</>
+                ) : activeSidebarTab === 'profile' ? (
+                  <>Student Credentials</>
+                ) : activeSidebarTab === 'library' ? (
+                  <>Bookmarks & Notes Library</>
+                ) : (
+                  <>Settings Hub</>
+                )}
+              </h1>
             </div>
 
-            {/* Preview/Edit Switcher */}
-            <div className="flex bg-slate-100 dark:bg-slate-900 p-0.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-inner mr-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const studentRole = {
-                    role: 'STUDENT',
-                    name: 'Vaishnavi Raparthy',
-                    email: 'student@aptitude-ai.com',
-                    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
-                  };
-                  localStorage.setItem('aptitude_current_role', JSON.stringify(studentRole));
-                  setCurrentRole(studentRole);
-                }}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role !== 'admin'
-                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                  }`}
-              >
-                Preview
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const adminRole = {
-                    role: 'admin',
-                    name: 'SARAH CONNOR',
-                    email: 'sarah.c@aptitude-ai.com',
-                    avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Jack'
-                  };
-                  localStorage.setItem('aptitude_current_role', JSON.stringify(adminRole));
-                  setCurrentRole(adminRole);
-                  router.push('/admin/editor');
-                }}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${currentRole?.role === 'admin'
-                    ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/5 dark:border-white/5 font-extrabold'
-                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
-                  }`}
-              >
-                Edit / Admin
-              </button>
-            </div>
+            <div className="flex items-center gap-5">
 
-            {/* User profile popup menu trigger */}
-            {/* User role badge */}
-            {currentRole && (
-              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 select-none mr-2">
-                {currentRole.role === 'admin' || currentRole.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'}
+              {/* User profile popup menu trigger */}
+              {/* User role badge */}
+
+              {/* Daily Streak Badge */}
+              {activeSidebarTab === 'domains' && (
+                <div className="flex items-center gap-2.5 bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/25 px-4 py-2 rounded-2xl shadow-[0_4px_12px_rgba(99,102,241,0.03)] select-none shrink-0 animate-fadeIn">
+                  <span className="text-xl font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2 leading-none">
+                    <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="flame" className="w-6 h-6 object-contain" />
+                    {streak}
+                  </span>
+                </div>
+              )}
+
+              {/* Search Input Box */}
+              <div className="relative hidden md:block">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder={activeSidebarTab === 'leaderboards' ? "Search topics, questions, or concepts..." : "Search something..."}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-4 py-2 w-60 md:w-80 text-xs font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                />
               </div>
-            )}
 
-            {/* User profile button (No dropdown, redirects directly to profile tab) */}
-            {activeSidebarTab === 'dashboard' && (
-              <div className="relative shrink-0">
+              {/* Preview/Edit Switcher */}
+              <RoleToggle className="mr-2" onRoleChange={(roleObj) => setCurrentRole(roleObj)} />
+
+              {/* Notification & Avatar profile access */}
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    title="System Notifications"
+                    className={`w-10 h-10 rounded-full flex items-center justify-center bg-slate-100/50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-900 text-slate-550 dark:text-slate-400 relative hover:scale-105 active:scale-95 transition-all cursor-pointer ${showNotifications ? 'ring-2 ring-blue-500' : ''}`}
+                  >
+                    <Bell className="w-4.5 h-4.5" />
+                    {notifications.some(n => !n.read) && (
+                      <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-950" />
+                    )}
+                  </button>
+                </div>
+
                 <button
                   onClick={() => setActiveSidebarTab('profile')}
-                  title="User Profile"
-                  className="w-10 h-10 rounded-full bg-slate-850 dark:bg-slate-900 hover:bg-slate-800 dark:hover:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-100 transition-all cursor-pointer relative"
+                  title="View Student Profile"
+                  className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 flex items-center justify-center bg-slate-100 dark:bg-slate-900 hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   {profile.avatar && profile.avatar !== 'initial' ? (
                     <img
                       src={profile.avatar}
-                      alt="User Avatar"
-                      className="w-full h-full object-cover rounded-full"
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <User className="w-5 h-5" />
                   )}
-
-                  {/* Red dot notification badge */}
-                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 border border-white dark:border-slate-950 z-10" />
                 </button>
               </div>
-            )}
 
+            </div>
           </div>
         </header>
 
-        {/* Scrollable Panel Area */}
-        <div ref={scrollablePanelRef} className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-between ${layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
-          }`}>
+        <div ref={scrollablePanelRef} className={`flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-start ${
+          layoutDensity === 'compact' ? 'p-4' : layoutDensity === 'spacious' ? 'p-10' : 'p-6 sm:p-8'
+        }`}>
 
 
           {/* ====================================================================
@@ -2523,15 +3103,15 @@ export default function StudentDashboard() {
                 animate="animate"
                 exit="exit"
                 transition={tabTransition}
-                className="w-full space-y-8 text-slate-800 dark:text-slate-200"
+                className="w-full max-w-7xl mx-auto space-y-6 text-slate-800 dark:text-slate-200"
               >
 
               {/* Admin Banner Alert */}
-              {currentRole?.role === 'admin' && (
+              {themeMounted && currentRole?.role === 'admin' && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-blue-50/80 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40 text-blue-800 dark:text-blue-400 animate-fadeIn shadow-xs select-none">
                   <div className="flex items-center gap-3">
                     <span className="p-2 rounded-lg bg-blue-600 text-white shadow-xs">
-                      <SettingsIcon className="w-4 h-4 animate-pulse" />
+                      <SettingsIcon className="w-4 h-4" />
                     </span>
                     <div className="text-left">
                       <h4 className="text-xs font-black uppercase tracking-wider leading-none">Editor Mode Activated</h4>
@@ -2551,10 +3131,10 @@ export default function StudentDashboard() {
               )}
 
               {/* Main 12-Column Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
                 {/* Left Column (8 cols): Activities & Progress */}
-                <div className="lg:col-span-8 space-y-8">
+                <div className="lg:col-span-8 space-y-6">
 
                   {/* "Your activities today" Section (Reference 2 style) */}
                   <div className="space-y-4">
@@ -2565,19 +3145,21 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* Horizontal/Grid Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                      {/* Card 1: Quant Aptitude */}
-                      <div className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group">
+                      {/* Card 1: Quantitative Aptitude */}
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between h-48 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                        : "bg-[#E6F4F8] dark:bg-[#0B303E]/30 border border-[#CDE5EE] dark:border-[#1E4E5D]/30 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between h-48 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                      }>
                         <div className="flex justify-between items-start gap-4">
-                          <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
-                            Quant Aptitude
+                          <h3 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
+                            Quantitative<br />Aptitude
                           </h3>
                           {/* Diagonal Arrow button */}
                           <button
                             onClick={() => {
-                              setActiveSidebarTab('practice');
-                              setSelectedDomain('quant');
+                              router.push('/domain/quantitative-aptitude?resume=true');
                             }}
                             className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
                           >
@@ -2588,10 +3170,12 @@ export default function StudentDashboard() {
                         <div className="flex justify-start items-end mt-auto">
                           <button
                             onClick={() => {
-                              setActiveSidebarTab('practice');
-                              setSelectedDomain('quant');
+                              router.push('/domain/quantitative-aptitude?resume=true');
                             }}
-                            className="px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            className={isCustomActive
+                              ? "px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                              : "px-4 py-2 bg-[#1E4E5D] hover:bg-[#153A45] text-white dark:bg-[#38BDF8] dark:hover:bg-[#0EA5E9] dark:text-[#0B303E] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            }
                           >
                             Continue Last Topic
                           </button>
@@ -2599,15 +3183,17 @@ export default function StudentDashboard() {
                       </div>
 
                       {/* Card 2: Logical Reasoning */}
-                      <div className="bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between h-40 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group">
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between h-48 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                        : "bg-[#FDF2F8] dark:bg-[#3B1229]/20 border border-[#FBCFE8] dark:border-[#652047]/20 rounded-3xl p-8 relative overflow-hidden flex flex-col justify-between h-48 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl transition-all duration-355 ease-out group"
+                      }>
                         <div className="flex justify-between items-start gap-4">
-                          <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
-                            Logical Reasoning
+                          <h3 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white uppercase tracking-tight font-heading leading-tight">
+                            Logical<br />Reasoning
                           </h3>
                           <button
                             onClick={() => {
-                              setActiveSidebarTab('practice');
-                              setSelectedDomain('logical');
+                              router.push('/domain/logical-reasoning?resume=true');
                             }}
                             className="w-10 h-10 rounded-full bg-white text-slate-900 shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
                           >
@@ -2618,10 +3204,12 @@ export default function StudentDashboard() {
                         <div className="flex justify-start items-end mt-auto">
                           <button
                             onClick={() => {
-                              setActiveSidebarTab('practice');
-                              setSelectedDomain('logical');
+                              router.push('/domain/logical-reasoning?resume=true');
                             }}
-                            className="px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            className={isCustomActive
+                              ? "px-4 py-2 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                              : "px-4 py-2 bg-[#9D174D] hover:bg-[#83103F] text-white dark:bg-[#F472B6] dark:hover:bg-[#EC4899] dark:text-[#500724] rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            }
                           >
                             Continue Last Topic
                           </button>
@@ -2635,56 +3223,83 @@ export default function StudentDashboard() {
                   <div className="space-y-4 pt-2">
                     <h2 className="text-lg font-bold text-slate-800 dark:text-white font-heading">Learning progress</h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                       {/* Completed Stat */}
-                      <div className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
-                        <div className="space-y-1 text-left">
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Completed</span>
-                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">{solvedCount} Modules</span>
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/20 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#E6F4F1] dark:bg-[#112F28]/30 border border-[#C7E9E1] dark:border-[#205D4F]/30 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                      }>
+                        <div className="space-y-1.5 text-left">
+                          <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Completed</span>
+                          <span className={isCustomActive ? "text-2xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-2xl font-black text-[#065F46] dark:text-[#34D399] font-mono leading-none"}>{solvedCount} Modules</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/20 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
-                          <ChevronRight className="w-4 h-4" />
+                        <div className={isCustomActive
+                          ? "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/20 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[#C7E9E1] dark:border-[#205D4F]/30 flex items-center justify-center text-[#065F46] dark:text-[#34D399] -rotate-45 group-hover:scale-105 transition-transform"
+                        }>
+                          <ChevronRight className="w-5 h-5" />
                         </div>
                       </div>
 
                       {/* Your Streak Stat */}
-                      <div className="bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
-                        <div className="space-y-1 text-left">
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Your Streak</span>
-                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">{streak} Days</span>
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/8 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#FEF3C7] dark:bg-[#3D2C08]/20 border border-[#FDE68A] dark:border-[#6B4E0E]/20 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                      }>
+                        <div className="space-y-1.5 text-left">
+                          <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Your Streak</span>
+                          <span className={isCustomActive ? "text-2xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-2xl font-black text-[#92400E] dark:text-[#FBBF24] font-mono leading-none"}>{streak} Days</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/15 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
-                          <ChevronRight className="w-4 h-4" />
+                        <div className={isCustomActive
+                          ? "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/15 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[#FDE68A] dark:border-[#6B4E0E]/20 flex items-center justify-center text-[#92400E] dark:text-[#FBBF24] -rotate-45 group-hover:scale-105 transition-transform"
+                        }>
+                          <ChevronRight className="w-5 h-5" />
                         </div>
                       </div>
 
                       {/* Active Stat */}
-                      <div className="bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-5 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group">
-                        <div className="space-y-1 text-left">
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Level</span>
-                          <span className="text-xl font-black text-[var(--clr-primary)] font-mono leading-none">Lvl 12 (#14)</span>
+                      <div className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/10 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                        : "bg-[#F3E8FF] dark:bg-[#2A154D]/20 border border-[#E9D5FF] dark:border-[#53289E]/20 p-8 h-36 rounded-2xl flex items-center justify-between hover:scale-[1.02] hover:-translate-y-1 hover:shadow-lg transition-all duration-355 ease-out group"
+                      }>
+                        <div className="space-y-1.5 text-left">
+                          <span className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Active Level</span>
+                          <span className={isCustomActive ? "text-2xl font-black text-[var(--clr-primary)] font-mono leading-none" : "text-2xl font-black text-[#6B21A8] dark:text-[#C084FC] font-mono leading-none"}>Lvl 12 (#14)</span>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/10 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform">
-                          <ChevronRight className="w-4 h-4" />
+                        <div className={isCustomActive
+                          ? "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[var(--clr-primary)]/10 flex items-center justify-center text-[var(--clr-primary)] -rotate-45 group-hover:scale-105 transition-transform"
+                          : "w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-[#E9D5FF] dark:border-[#53289E]/20 flex items-center justify-center text-[#6B21A8] dark:text-[#C084FC] -rotate-45 group-hover:scale-105 transition-transform"
+                        }>
+                          <ChevronRight className="w-5 h-5" />
                         </div>
                       </div>
 
                     </div>
 
                     {/* Large Yellow Active concept banner (Reference 2 style) */}
-                    <div className="bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out">
+                    <div 
+                      className={isCustomActive
+                        ? "bg-[var(--clr-primary)]/5 dark:bg-[var(--clr-primary)]/5 border border-[var(--clr-primary)]/15 rounded-3xl p-8 md:py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out cursor-pointer"
+                        : "bg-[#FFFBEB] dark:bg-[#251E0E]/40 border border-[#FEF3C7] dark:border-[#4B3B18]/30 rounded-3xl p-8 md:py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-355 ease-out cursor-pointer"
+                      }
+                      onClick={() => router.push('/domain/quantitative-aptitude?resume=true')}
+                    >
                       <div className="space-y-3 text-left flex-1 w-full">
                         <div className="flex items-center gap-2">
-                          <span className="bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/10 border border-[var(--clr-primary)]/20 text-[var(--clr-primary)] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                          <span className={isCustomActive
+                            ? "bg-[var(--clr-primary)]/10 dark:bg-[var(--clr-primary)]/10 border border-[var(--clr-primary)]/20 text-[var(--clr-primary)] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md"
+                            : "bg-amber-100 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md"
+                          }>
                             Active Track Unit
                           </span>
-                          <span className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold">QUANT APTITUDE</span>
+                          <span className="text-slate-400 dark:text-slate-500 text-[10px] font-semibold">QUANTITATIVE APTITUDE</span>
                         </div>
-                        <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase leading-snug">
+                        <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white uppercase leading-snug">
                           Percentages → Profit & Loss
                         </h3>
-
+ 
                         {/* Progress Bar */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
@@ -2693,35 +3308,42 @@ export default function StudentDashboard() {
                           </div>
                           <div className="w-full bg-slate-200/60 dark:bg-slate-850 h-2.5 rounded-full overflow-hidden">
                             <div
-                              className="bg-[var(--clr-primary)] h-full rounded-full transition-all duration-500"
+                              className={isCustomActive ? "bg-[var(--clr-primary)] h-full rounded-full transition-all duration-500" : "bg-amber-500 h-full rounded-full transition-all duration-500"}
                               style={{ width: `${(challengeCompletedCount / 15) * 100}%` }}
                             />
                           </div>
                         </div>
                       </div>
-
+ 
                       {/* Large diagonal arrow button */}
                       <button
-                        onClick={() => {
-                          setActiveSidebarTab('learning');
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push('/domain/quantitative-aptitude?resume=true');
                         }}
-                        className="w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
+                        className={isCustomActive
+                          ? "w-12 h-12 rounded-full bg-[var(--clr-primary)] text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
+                          : "w-12 h-12 rounded-full bg-amber-500 text-white shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer self-end md:self-center"
+                        }
                       >
                         <ChevronRight className="w-6 h-6 text-white -rotate-45" />
                       </button>
                     </div>
 
+                    {/* Saleem Sir's Daily Motivation card */}
+                    <DailyMotivation setToastMsg={setToastMsg} />
+
                   </div>
 
                 </div>
 
-                {/* Right Column (4 cols): Lesson Schedule Calendar, Opportunities & Time Tracker */}
-                <div className="lg:col-span-4 space-y-8">
+                {/* Right Column (4 cols): Activity Calendar, Opportunities & Time Tracker */}
+                <div className="lg:col-span-4 space-y-6">
 
-                  {/* 1. Lesson Schedule Calendar Card */}
-                  <div className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-5 shadow-xs text-left">
+                  {/* 1. Activity Calendar Card */}
+                  <div id="activity-calendar-container" className="bg-white border border-slate-200 dark:bg-slate-900/10 dark:border-slate-900/60 rounded-3xl p-7 shadow-xs text-left">
                     <div className="flex items-center justify-between mb-4 pb-1 border-b border-slate-100 dark:border-slate-900/60">
-                      <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Lesson schedule</h3>
+                      <h3 className="text-sm font-bold text-slate-800 dark:text-white font-heading">Activity Calendar</h3>
                       <span className="text-xs font-bold text-slate-500">{monthYearName}</span>
                     </div>
 
@@ -2738,10 +3360,10 @@ export default function StudentDashboard() {
                       </div>
 
                       {/* Dates grid for current month/year */}
-                      <div className="grid grid-cols-7 gap-y-2.5 gap-x-1 text-center text-xs font-bold text-slate-700 dark:text-slate-400">
+                      <div className="grid grid-cols-7 gap-y-3.5 gap-x-2 text-center text-xs font-bold text-slate-700 dark:text-slate-400">
                         {/* Padding days */}
                         {[...Array(paddingDays)].map((_, i) => (
-                          <div key={`pad-${i}`} className="w-7 h-7" />
+                          <div key={`pad-${i}`} className="w-10 h-10" />
                         ))}
                         {/* Actual days */}
                         {[...Array(daysInMonth)].map((_, i) => {
@@ -2752,7 +3374,7 @@ export default function StudentDashboard() {
                           const isToday = dateNum === todayDay;
                           const isSelected = selectedCalendarDay === dateNum;
 
-                          let dateStyles = "w-7 h-7 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
+                          let dateStyles = "w-10 h-10 flex items-center justify-center mx-auto rounded-full transition-all cursor-pointer focus:outline-none ";
 
                           if (isToday) {
                             dateStyles += "bg-[#111827] dark:bg-white text-white dark:text-slate-900 font-black shadow-sm ";
@@ -2766,171 +3388,64 @@ export default function StudentDashboard() {
                             dateStyles += "ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-slate-900 ";
                           }
 
+                          const dayBadges = badgesByDay[dateNum] || [];
+                          const distinctBadgeCount = dayBadges.length;
+
+                          const hasBadges = distinctBadgeCount > 0;
                           return (
                             <button
                               key={dateNum}
-                              onClick={() => setSelectedCalendarDay(dateNum)}
-                              className="relative focus:outline-none"
+                              suppressHydrationWarning
+                              onClick={() => {
+                                setSelectedCalendarDay(dateNum);
+                                if (hasBadges) {
+                                  setDayBadgesToShow(dayBadges);
+                                  setBadgesToShowDateStr(`${monthYearName} ${dateNum}`);
+                                }
+                              }}
+                              title={hasBadges 
+                                ? `${monthYearName} ${dateNum}: ${dayBadges.map(db => db.badge.name).join(', ')}`
+                                : `${monthYearName} ${dateNum}${isStreakDay ? ' (Practice Completed)' : ''}`
+                              }
+                              className="relative focus:outline-none w-10 h-10 mx-auto flex items-center justify-center cursor-pointer group"
                               type="button"
                             >
-                              <span className={dateStyles}>{dateNum}</span>
-                              {isStreakDay && (
-                                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-500" />
+                              <span suppressHydrationWarning className={`${dateStyles} relative overflow-hidden flex items-center justify-center`}>
+                                {hasBadges ? (
+                                  dayBadges[0].badge.image_url ? (
+                                    <TransparentBadgeImage 
+                                      src={dayBadges[0].badge.image_url} 
+                                      alt="" 
+                                      className="w-8 h-8 object-contain rounded-full" 
+                                    />
+                                  ) : (
+                                    <span className="text-xl">{getCategoryEmoji(dayBadges[0].badge.category)}</span>
+                                  )
+                                ) : (
+                                  dateNum
+                                )}
+                              </span>
+                              {isStreakDay && !hasBadges && (
+                                <span suppressHydrationWarning className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              )}
+                              {hasBadges && distinctBadgeCount > 1 && (
+                                <span suppressHydrationWarning className="absolute -bottom-1 -right-1.5 flex items-center justify-center bg-blue-600 dark:bg-blue-500 text-white rounded-full text-[7.5px] font-black px-1.5 h-3.5 shadow-md border border-white dark:border-slate-900 select-none">
+                                  x{distinctBadgeCount}
+                                </span>
                               )}
                             </button>
                           );
                         })}
                       </div>
 
-                      {/* Badges Earned Section */}
-                      <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-900/60">
-                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pb-1">
-                          <span>Badges Earned • {selectedMonthName} {selectedCalendarDay}</span>
-                          <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-black uppercase">
-                            {badgesEarnedOnSelectedDay.reduce((acc: number, item: any) => acc + item.count, 0)} Badges
-                          </span>
-                        </div>
 
-                        {badgesEarnedOnSelectedDay.length > 0 ? (
-                          <div className="grid grid-cols-1 gap-2">
-                            {badgesEarnedOnSelectedDay.map(({ badge, count }: { badge: any; count: number }) => (
-                              <button
-                                key={badge.id}
-                                onClick={() => setSelectedBadge(badge)}
-                                className="w-full text-left bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/40 dark:hover:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between transition-all group cursor-pointer focus:outline-none"
-                                type="button"
-                              >
-                                <div className="flex items-center gap-2.5">
-                                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
-                                    {badge.image_url ? (
-                                      <img src={badge.image_url} alt={badge.name} className="w-6 h-6 object-contain" />
-                                    ) : (
-                                      <span className="text-base">{getCategoryEmoji(badge.category)}</span>
-                                    )}
-                                  </div>
-                                  <div className="leading-tight">
-                                    <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                      {badge.name}
-                                    </h4>
-                                    <p className="text-[9.5px] text-slate-400 mt-0.5 line-clamp-1">{badge.description}</p>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  {count > 1 && (
-                                    <span className="bg-blue-600 text-white dark:bg-blue-500 text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                                      x{count}
-                                    </span>
-                                  )}
-                                  <span className="text-[10px] text-blue-500 dark:text-blue-400 font-extrabold group-hover:translate-x-0.5 transition-transform">
-                                    →
-                                  </span>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="border border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-5 text-center flex items-center justify-center">
-                            <span className="text-xs text-slate-400 dark:text-slate-500 italic font-medium">No badges earned on this day</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2. Time Tracker Stopwatch widget (Reference 1 style) */}
-                  <div className={`transition-all duration-500 text-white border rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between h-48 group ${
-                    timeTrackerIsRunning
-                      ? "bg-[#0B3A27] dark:bg-[#062418] border-[#0A3322] dark:border-[#041B12]"
-                      : "bg-[#4A1515] dark:bg-[#2D0B0B] border-[#441212] dark:border-[#250707]"
-                  }`}>
-                    {/* Visual pattern overlay */}
-                    <div className={`absolute inset-0 transition-opacity duration-500 pointer-events-none ${
-                      timeTrackerIsRunning
-                        ? "bg-[radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.15),transparent_60%)]"
-                        : "bg-[radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.15),transparent_60%)]"
-                    }`} />
-
-                    <div className="flex items-center justify-between relative z-10">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                          timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
-                        }`} />
-                        <span className={`text-[10px] font-black uppercase tracking-widest font-mono transition-colors duration-500 ${
-                          timeTrackerIsRunning ? "text-[#A7F3D0]" : "text-[#FECACA]"
-                        }`}>Time Tracker</span>
-                      </div>
-                      <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-colors duration-500 ${
-                        timeTrackerIsRunning ? "bg-[#065F46] text-emerald-200" : "bg-[#991B1B] text-rose-200"
-                      }`}>
-                        {timeTrackerIsRunning ? "Active" : "Paused"}
-                      </span>
-                    </div>
-
-                    <div className="text-center py-2 relative z-10">
-                      <span className="text-3xl font-black font-mono tracking-tight leading-none text-white block">
-                        {formatTimeTracker(timeTrackerSeconds)}
-                      </span>
-                      <span className={`text-[9px] font-semibold mt-1.5 block uppercase tracking-wider transition-colors duration-500 ${
-                        timeTrackerIsRunning ? "text-[#A7F3D0]/60" : "text-[#FECACA]/60"
-                      }`}>
-                        {timeTrackerIsRunning ? "Active Study Session duration" : "Paused Study Session duration"}
-                      </span>
-                    </div>
-
-                    <div className={`flex justify-center gap-4 relative z-10 pt-3 border-t transition-colors duration-500 ${
-                      timeTrackerIsRunning ? "border-[#092B1D]/80" : "border-[#3D0F0F]/80"
-                    }`}>
-
-                      {/* Play Button */}
-                      <button
-                        onClick={() => setTimeTrackerIsRunning(true)}
-                        disabled={timeTrackerIsRunning}
-                        title="Start Study"
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          timeTrackerIsRunning
-                            ? "bg-[#061E14] text-emerald-800/40 border border-[#082419] cursor-not-allowed"
-                            : "bg-emerald-600 hover:bg-emerald-500 text-white"
-                        }`}
-                        type="button"
-                      >
-                        <Play className="w-4 h-4 fill-current" />
-                      </button>
-
-                      {/* Pause Button */}
-                      <button
-                        onClick={() => setTimeTrackerIsRunning(false)}
-                        disabled={!timeTrackerIsRunning}
-                        title="Pause Session"
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          !timeTrackerIsRunning
-                            ? "bg-[#2D1212] text-rose-900/30 border border-[#3D1414] cursor-not-allowed"
-                            : "bg-rose-800 hover:bg-rose-700 text-white"
-                        }`}
-                        type="button"
-                      >
-                        <Pause className="w-4 h-4" />
-                      </button>
-
-                      {/* Reset Button */}
-                      <button
-                        onClick={() => {
-                          setTimeTrackerIsRunning(false);
-                          setTimeTrackerSeconds(0);
-                        }}
-                        title="Reset Session"
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md ${
-                          timeTrackerIsRunning
-                            ? "bg-[#092B1D] hover:bg-[#061E14] text-[#A7F3D0] border border-[#082419]"
-                            : "bg-[#3D1414] hover:bg-[#2D1010] text-[#FECACA] border border-[#4A1818]"
-                        }`}
-                        type="button"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                      </button>
 
                     </div>
                   </div>
+
+                  {/* 2. Daily Performance Hub */}
+                  <DailyPerformanceHub isCustomActive={isCustomActive} />
+
 
                 </div>
 
@@ -2949,28 +3464,11 @@ export default function StudentDashboard() {
               transition={tabTransition}
               className="w-full"
             >
-              <DomainsTab searchQuery={searchQuery} />
+              <DomainsTab searchQuery={searchQuery} customColor={customColor} />
             </motion.div>
           )}
 
-          {activeSidebarTab === 'conceptHub' && (
-            <motion.div
-              key="conceptHub"
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={tabTransition}
-              className="w-full"
-            >
-              <ConceptHubTab 
-                searchQuery={searchQuery}
-                setActiveSidebarTab={setActiveSidebarTab}
-                setSelectedDomain={setSelectedDomain}
-                setActiveQuestion={setActiveQuestion}
-              />
-            </motion.div>
-          )}
+
 
           {activeSidebarTab === 'learning' && (
             <motion.div
@@ -2980,7 +3478,7 @@ export default function StudentDashboard() {
               animate="animate"
               exit="exit"
               transition={tabTransition}
-              className="w-full relative py-12 px-4 sm:px-8 rounded-[2.5rem] bg-[#0A0F1C] border border-[#1E293B] shadow-2xl transition-all duration-300"
+              className="w-full relative py-12 px-4 sm:px-8 rounded-[2.5rem] bg-white border border-slate-200 dark:bg-[#0A0F1C] dark:border-[#1E293B] shadow-2xl transition-all duration-300"
             >
 
               {/* Ambient Background Particles and Orbs */}
@@ -3057,7 +3555,7 @@ export default function StudentDashboard() {
                 {/* XP Counter Card */}
                 <div className="p-4 flex items-center gap-4 justify-center">
                   <div className="w-11 h-11 rounded-xl bg-amber-500/10 dark:bg-amber-400/5 flex items-center justify-center shrink-0 border border-amber-500/20">
-                    <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" />
+                    <Sparkles className="w-5 h-5 text-amber-500" />
                   </div>
                   <div>
                     <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider block">Total Experience</span>
@@ -3085,7 +3583,7 @@ export default function StudentDashboard() {
                   { id: 'quant', label: 'Quantitative', icon: '📐' },
                   { id: 'logical', label: 'Logical Reasoning', icon: '🧩' },
                   { id: 'verbal', label: 'Verbal Ability', icon: '📚' },
-                  { id: 'coding', label: 'Coding & CS', icon: '💻' }
+                  { id: 'coding', label: 'Gaming Aptitude', icon: '🎮' }
                 ].map((tab) => (
                   <motion.button
                     key={tab.id}
@@ -3205,7 +3703,7 @@ export default function StudentDashboard() {
                           d={seg.d}
                           strokeWidth="28"
                           strokeLinecap="round"
-                          className="stroke-[#0B1221]/80 translate-y-4"
+                          className="stroke-slate-200 dark:stroke-[#0B1221]/80 translate-y-4"
                         />
                       ))}
 
@@ -3226,7 +3724,7 @@ export default function StudentDashboard() {
                           key={`base-path-${i}`}
                           d={seg.d}
                           fill="none"
-                          stroke="#1E293B"
+                          stroke={theme === 'light' ? '#CBD5E1' : '#1E293B'}
                           strokeWidth="28"
                           strokeLinecap="round"
                         />
@@ -3407,7 +3905,7 @@ export default function StudentDashboard() {
                           </motion.button>
 
                           {/* Minimalist Dark Info Card matching Screenshot */}
-                          <div className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center bg-[#0B1221] px-4 py-2.5 rounded-xl border border-[#1E293B] shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all text-center min-w-[140px] max-w-[160px] pointer-events-none ${
+                          <div className={`absolute left-1/2 -translate-x-1/2 flex flex-col items-center bg-white dark:bg-[#0B1221] px-4 py-2.5 rounded-xl border border-slate-200 dark:border-[#1E293B] shadow-lg dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all text-center min-w-[140px] max-w-[160px] pointer-events-none ${
                             cardPlacement === 'top'
                               ? 'bottom-[calc(100%+12px)] lg:bottom-[calc(100%+16px)]'
                               : `top-[calc(100%+12px)] lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 ${
@@ -3416,8 +3914,8 @@ export default function StudentDashboard() {
                                     : 'lg:left-[calc(100%+16px)] lg:right-auto'
                                 }`
                           } ${isActive ? 'ring-2 ring-[var(--clr-primary)]/50 shadow-[0_0_20px_rgba(var(--clr-primary-rgb),0.2)]' : ''}`}>
-                            <span className="text-[10px] font-black text-white block uppercase tracking-wider leading-none mb-1">{node.title}</span>
-                            <span className="text-[8px] text-slate-400 font-semibold block leading-tight">{node.desc}</span>
+                            <span className="text-[10px] font-black text-slate-800 dark:text-white block uppercase tracking-wider leading-none mb-1">{node.title}</span>
+                            <span className="text-[8px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight">{node.desc}</span>
                             {isActive && (
                               <span className="text-[7.5px] text-[var(--clr-primary)] font-black block mt-0.5">75% Complete</span>
                             )}
@@ -3425,9 +3923,9 @@ export default function StudentDashboard() {
 
                           {/* Locked node warning tooltip */}
                           {isLocked && (
-                            <div className="absolute top-16 text-center bg-slate-950 text-white p-2 rounded-xl border border-slate-800 shadow-md w-36 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
+                            <div className="absolute top-16 text-center bg-white dark:bg-slate-950 text-slate-800 dark:text-white p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-md w-36 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
                               <span className="text-[9px] font-black block uppercase tracking-wide">Locked Unit</span>
-                              <span className="text-[7.5px] text-slate-400 font-semibold block leading-tight mt-0.5">Complete previous unit to unlock</span>
+                              <span className="text-[7.5px] text-slate-500 dark:text-slate-400 font-semibold block leading-tight mt-0.5">Complete previous unit to unlock</span>
                             </div>
                           )}
 
@@ -3458,36 +3956,7 @@ export default function StudentDashboard() {
             </motion.div>
           )}
 
-          {/* ====================================================================
-              3. TAB: PRACTICE ARENA (Curated Hub redesign layout)
-              ==================================================================== */}
-          {activeSidebarTab === 'practice' && (
-            <motion.div
-              key="practice"
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={tabTransition}
-              className="w-full"
-            >
-              <PracticeArena
-                questions={questions}
-                activeQuestion={activeQuestion}
-                setActiveQuestion={setActiveQuestion}
-                bookmarks={bookmarks}
-                toggleBookmark={toggleBookmark}
-                submittedAnswers={submittedAnswers}
-                setSubmittedAnswers={setSubmittedAnswers}
-                selectedAnswers={selectedAnswers}
-                setSelectedAnswers={setSelectedAnswers}
-                solvedCount={solvedCount}
-                setSolvedCount={setSolvedCount}
-                streak={streak}
-                setStreak={setStreak}
-              />
-            </motion.div>
-          )}
+
 
           {/* ====================================================================
               4. TAB: MOCK TESTS (Assessments center)
@@ -3560,157 +4029,949 @@ export default function StudentDashboard() {
             </motion.div>
           )}
 
-          {/* ====================================================================
-              5. TAB: CAREER HUB (Dedicated page with sub-filters)
-              ==================================================================== */}
           {activeSidebarTab === 'careerHub' && (
             <motion.div
-              key="careerHub"
+                key="careerHub"
+                variants={tabVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={tabTransition}
+                className="w-full space-y-8 select-none text-left"
+              >
+                {/* Header row & selector */}
+                <div className="flex justify-start gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-[9px] font-black uppercase text-slate-400 font-mono tracking-widest shrink-0">Select Target:</span>
+                    <select
+                      value={activeCompanyHub}
+                      onChange={(e) => {
+                        setActiveCompanyHub(e.target.value);
+                        playPreviewChime();
+                        setToastMsg(`Switched target hub to ${e.target.value.toUpperCase()}! 🎯`);
+                      }}
+                      className="py-2.5 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-205 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[var(--clr-primary)] cursor-pointer shadow-sm"
+                      style={{ colorScheme: theme }}
+                    >
+                      <option value="tcs">TCS NQT Prep Hub</option>
+                      <option value="infosys">Infosys SP/DSE Prep Hub</option>
+                      <option value="accenture">Accenture Masterclass</option>
+                      <option value="amazon">Amazon AWS/SDE Prep Hub</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Grid Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  
+                  {/* LEFT WIDE PANEL (8 cols) */}
+                  <div className="lg:col-span-8 space-y-8">
+                    
+                    {/* HUB HERO BLOCK */}
+                    <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-[2rem] p-6 md:p-8 relative overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-slate-950/20 text-left border border-slate-200 dark:border-slate-800">
+                      {/* Background design elements */}
+                      <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-tr from-[var(--clr-primary)]/10 to-[var(--clr-primary)]/20 blur-2xl rounded-full pointer-events-none" />
+                      <div className="space-y-4 relative z-10">
+                        <h3 className="text-2xl font-black uppercase tracking-tight leading-none">
+                          {currentHub.title}
+                        </h3>
+
+                        <div className="pt-2 flex flex-wrap items-center gap-6 text-slate-500 dark:text-slate-400 font-mono text-[10.5px]">
+                          <span>Duration: <strong className="text-slate-900 dark:text-white font-extrabold">{currentHub.metrics.duration}</strong></span>
+                          <span>•</span>
+                          <span>Total Items: <strong className="text-slate-900 dark:text-white font-extrabold">{currentHub.metrics.questionsCount} Qs</strong></span>
+                          <span>•</span>
+                          <span>Difficulty: <strong className="text-slate-900 dark:text-white font-extrabold">{currentHub.metrics.difficulty}</strong></span>
+                        </div>
+
+                        <div className="pt-4 flex gap-3">
+                          <button
+                            onClick={() => {
+                              playPreviewChime();
+                              setToastMsg("Resuming preparation checkpoints!");
+                            }}
+                            className="py-3 px-6 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-[var(--clr-primary-tint)]/25 cursor-pointer border-0"
+                          >
+                            Resume Preparation
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* PATTERN BREAKDOWN & EXAM INSIGHTS */}
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 backdrop-blur-md space-y-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-900/60 pb-4 gap-3">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                          Exam Blueprint & Metrics
+                        </h4>
+                        
+                        {/* Selector Toggles */}
+                        <div className="inline-flex bg-slate-100/80 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/60 dark:border-slate-900/60 relative">
+                          <button
+                            onClick={() => setSelectedHubInsightTab('breakdown')}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
+                              selectedHubInsightTab === 'breakdown'
+                                ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white'
+                                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent'
+                            }`}
+                          >
+                            Syllabus Breakdown
+                          </button>
+                          <button
+                            onClick={() => setSelectedHubInsightTab('pattern')}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer border-0 ${
+                              selectedHubInsightTab === 'pattern'
+                                ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white'
+                                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-transparent'
+                            }`}
+                          >
+                            Exam Pattern Insights
+                          </button>
+                        </div>
+                      </div>
+
+                      {selectedHubInsightTab === 'breakdown' ? (
+                        <div className="space-y-4">
+                          {currentHub.insights.weightage.map((item) => (
+                            <div key={item.category} className="space-y-1.5 text-left">
+                              <div className="flex justify-between items-center text-[10.5px] font-bold">
+                                <span className="text-slate-700 dark:text-slate-355">{item.category}</span>
+                                <span className="text-slate-900 dark:text-white font-extrabold">{item.value}% Focus Weightage</span>
+                              </div>
+                              <div className="w-full bg-slate-50 dark:bg-slate-955 h-2.5 rounded-full overflow-hidden border border-slate-100 dark:border-slate-900/60 p-0.5">
+                                <div className={`h-full rounded-full ${item.color}`} style={{ width: `${item.value}%` }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                          
+                          {/* Weightage Distribution */}
+                          <div className="space-y-4">
+                            <span className="text-[9px] font-black font-mono text-slate-405 dark:text-slate-500 uppercase tracking-widest block animate-fadeIn">Question Weightage Distribution</span>
+                            <div className="h-6 w-full flex rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                              <div className="bg-blue-500 flex items-center justify-center text-[8.5px] font-black text-white" style={{ width: '50%' }}>50% ARITHMETIC</div>
+                              <div className="bg-emerald-500 flex items-center justify-center text-[8.5px] font-black text-white" style={{ width: '20%' }}>20% VERBAL</div>
+                              <div className="bg-amber-500 flex items-center justify-center text-[8.5px] font-black text-white" style={{ width: '30%' }}>30% LOGICAL</div>
+                            </div>
+                            <div className="flex justify-between text-[9px] font-bold text-slate-400 font-mono">
+                              <span>Arithmetic</span>
+                              <span>Verbal Ability</span>
+                              <span>Logical Reasoning</span>
+                            </div>
+                          </div>
+
+                          {/* Difficulty Distribution */}
+                          <div className="space-y-4">
+                            <span className="text-[9px] font-black font-mono text-slate-405 dark:text-slate-500 uppercase tracking-widest block">Difficulty Spread</span>
+                            <div className="h-6 w-full flex rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                              {currentHub.insights.difficulty.map((d) => (
+                                <div key={d.level} className={`${d.color} flex items-center justify-center text-[8.5px] font-black text-white`} style={{ width: `${d.value}%` }}>
+                                  {d.value}% {d.level.toUpperCase()}
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex justify-between text-[9px] font-bold text-slate-455 font-mono">
+                              <span>Easy</span>
+                              <span>Medium</span>
+                              <span>Hard</span>
+                            </div>
+                          </div>
+
+                        </div>
+                      )}
+                    </div>
+
+                    {/* CURATED FOCUS FEED */}
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 backdrop-blur-md space-y-6">
+                      <div className="border-b border-slate-100 dark:border-slate-900/60 pb-3 text-left">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                          Curated Focus Feed
+                        </h4>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5">
+                          Solve dynamic questions tailored precisely to your selected target's pattern.
+                        </p>
+                      </div>
+
+                      <div className="space-y-6 text-left">
+                        {currentHub.focusFeed.map((q) => {
+                          const userAns = answeredFeedQuestions[q.id];
+                          const hasAnswered = userAns !== undefined;
+                          
+                          return (
+                            <div key={q.id} className="p-5 bg-slate-50/50 dark:bg-slate-955/30 border border-slate-200/60 dark:border-slate-850 rounded-2xl space-y-4">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[8px] font-black font-mono border px-1.5 py-0.5 rounded-md uppercase tracking-wider bg-orange-500/10 border-orange-500/20 text-orange-600 dark:text-orange-400">
+                                  {q.category}
+                                </span>
+                                {hasAnswered && (
+                                  <span className={`text-[8.5px] font-black uppercase font-mono px-2 py-0.5 rounded ${
+                                    userAns === q.correctIndex
+                                      ? 'bg-emerald-500/10 text-emerald-500'
+                                      : 'bg-red-500/10 text-red-500'
+                                  }`}>
+                                    {userAns === q.correctIndex ? 'Correct' : 'Incorrect'}
+                                  </span>
+                                )}
+                              </div>
+
+                              <p className="text-xs font-bold text-slate-850 dark:text-white leading-normal">
+                                {q.question}
+                              </p>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {q.options.map((opt, oIdx) => {
+                                  const isSelected = userAns === oIdx;
+                                  const isCorrect = oIdx === q.correctIndex;
+                                  
+                                  let buttonStyle = 'bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-355 hover:bg-slate-100/50 dark:hover:bg-slate-800/50';
+                                  if (hasAnswered) {
+                                    if (isCorrect) {
+                                      buttonStyle = 'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-450';
+                                    } else if (isSelected) {
+                                      buttonStyle = 'bg-red-500/15 border-red-500 text-red-650 dark:text-red-400';
+                                    } else {
+                                      buttonStyle = 'bg-white dark:bg-slate-900 border-slate-200/30 dark:border-slate-800/40 text-slate-400 opacity-60';
+                                    }
+                                  }
+
+                                  return (
+                                    <button
+                                      key={oIdx}
+                                      disabled={hasAnswered}
+                                      onClick={() => {
+                                        setAnsweredFeedQuestions({
+                                          ...answeredFeedQuestions,
+                                          [q.id]: oIdx
+                                        });
+                                        if (oIdx === q.correctIndex) {
+                                          playPreviewChime();
+                                          setSolvedCount(prev => prev + 1);
+                                          setToastMsg("Correct answer! Heatmap activity registered. 🏆");
+                                        } else {
+                                          setToastMsg("Incorrect. Review the solution details below.");
+                                        }
+                                      }}
+                                      className={`py-2.5 px-4 rounded-xl border text-[11px] font-bold text-left cursor-pointer transition-all duration-200 flex items-center justify-between gap-2 ${buttonStyle}`}
+                                    >
+                                      <span>{opt}</span>
+                                      {hasAnswered && isCorrect && <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
+                                      {hasAnswered && isSelected && !isCorrect && <X className="w-3.5 h-3.5 text-red-500 shrink-0" />}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {hasAnswered && q.solution && (
+                                <div className="mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-800/50 text-[10.5px] text-slate-500 dark:text-slate-400 bg-slate-100/40 dark:bg-slate-955/20 p-3 rounded-xl leading-relaxed animate-fadeIn">
+                                  <strong className="text-slate-700 dark:text-slate-350">Solution:</strong> {q.solution}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* RIGHT PANEL (4 cols) */}
+                  <div className="lg:col-span-4 space-y-8">
+                    
+                    {/* SUCCESS PROBABILITY Radial gauge card */}
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-center space-y-6 relative overflow-hidden backdrop-blur-md">
+                      <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-mono text-left">
+                        Success Probability
+                      </span>
+
+                      {/* Radial Gauge */}
+                      <div className="relative flex items-center justify-center py-2">
+                        <svg className="w-36 h-36 transform -rotate-90">
+                          <circle
+                            cx="72"
+                            cy="72"
+                            r="56"
+                            className="stroke-slate-100 dark:stroke-slate-800"
+                            strokeWidth="9"
+                            fill="transparent"
+                          />
+                          <circle
+                            cx="72"
+                            cy="72"
+                            r="56"
+                            className="stroke-[var(--clr-primary)]"
+                            strokeWidth="9"
+                            fill="transparent"
+                            strokeDasharray={2 * Math.PI * 56}
+                            strokeDashoffset={2 * Math.PI * 56 * (1 - currentHub.probability / 100)}
+                            strokeLinecap="round"
+                            style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-3xl font-black text-slate-900 dark:text-white font-mono leading-none">
+                            {currentHub.probability}%
+                          </span>
+                          <span className="text-[8px] font-black tracking-widest text-[var(--clr-primary)] uppercase mt-1 leading-none">
+                            {currentHub.probabilityLabel}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-xs font-bold text-slate-800 dark:text-white block uppercase">Probability Score</span>
+                        <span className="text-[9px] font-mono text-slate-450 dark:text-slate-500 block leading-tight">{currentHub.probabilitySub}</span>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          playPreviewChime();
+                          setToastMsg("Success probabilities boosted! Focus stats updated.");
+                        }}
+                        className="w-full py-3 px-4 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-[var(--clr-primary-tint)]/25 cursor-pointer border-0"
+                      >
+                        Boost Score
+                      </button>
+                    </div>
+
+                    {/* DIRECT MOCKS */}
+                    <div className="bg-white border border-slate-200/80 dark:bg-slate-900/40 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 text-left space-y-4">
+                      <span className="text-[9px] font-black text-slate-400 dark:text-slate-505 uppercase tracking-widest block font-mono">
+                        Direct Mocks
+                      </span>
+
+                      <div className="space-y-3.5">
+                        {currentHub.directMocks.map((mock) => {
+                          const isLocked = mock.status === 'Locked';
+                          return (
+                            <div key={mock.id} className="p-4 bg-slate-50 dark:bg-slate-955 border border-slate-200/60 dark:border-slate-850 rounded-2xl flex items-center justify-between gap-3 relative group">
+                              <div className="space-y-0.5 text-left truncate flex-1">
+                                <h4 className="text-xs font-black text-slate-850 dark:text-white uppercase truncate flex items-center gap-1.5">
+                                  {isLocked && <Lock className="w-3 h-3 text-slate-400" />} {mock.title}
+                                </h4>
+                                <p className="text-[10px] text-slate-400 dark:text-slate-505 truncate font-semibold leading-tight">{mock.desc}</p>
+                                <p className="text-[8px] text-slate-455 font-mono uppercase tracking-wider">{mock.questions} Qs · {mock.duration} Mins</p>
+                              </div>
+                              <button
+                                disabled={isLocked}
+                                onClick={() => {
+                                  playPreviewChime();
+                                  setToastMsg(`Starting simulator: ${mock.title}!`);
+                                }}
+                                className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-lg shrink-0 border-0 ${
+                                  isLocked
+                                    ? 'bg-slate-205 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                                    : 'bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white cursor-pointer shadow-sm shadow-[var(--clr-primary-tint)]/20'
+                                }`}
+                              >
+                                {isLocked ? 'Locked' : 'Take'}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </motion.div>
+          )}
+
+          {/* ====================================================================
+              STUDY LIBRARY TAB (Bookmarks & Notes Library)
+              ==================================================================== */}
+          {activeSidebarTab === 'library' && (
+            <motion.div
+              key="library"
               variants={tabVariants}
               initial="initial"
               animate="animate"
               exit="exit"
               transition={tabTransition}
-              className="w-full space-y-8"
+              className="w-full h-[calc(100vh-140px)] select-none text-left flex flex-col space-y-6"
             >
-
-
-
-              {/* Category sub-filters tabs */}
-              <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900 overflow-x-auto scrollbar-none whitespace-nowrap gap-1">
-                {['All', 'Hiring Drives', 'Internships', 'Government Exams', 'Hackathons', 'Placement Updates'].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setSelectedOpportunityType(type)}
-                    className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${selectedOpportunityType === type
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                      }`}
-                  >
-                    {type}
-                  </button>
-                ))}
+              {/* Header section */}
+              <div className="flex justify-start gap-4 border-b border-slate-100 dark:border-slate-900/60 pb-5 shrink-0">
+                <button
+                  onClick={() => {
+                    const newId = `note-${Date.now()}`;
+                    const newNote = {
+                      id: newId,
+                      category: 'aptitude',
+                      tag: `NOTE • #${libraryNotes.length + 1}`,
+                      title: 'New Saved Insight',
+                      snippet: 'Double-click to start writing...',
+                      content: 'Start writing your conceptual definitions, notes, formulas and key application points here.',
+                      addedDate: 'Today',
+                      revisedDate: 'Just now',
+                      folder: selectedLibraryFolder === 'archived' || selectedLibraryFolder === 'trash' ? 'all' : selectedLibraryFolder,
+                      equation: 'FormulaPreview = A \\times B'
+                    };
+                    setLibraryNotes(prev => [newNote, ...prev]);
+                    setActiveLibraryNoteId(newId);
+                    playPreviewChime();
+                    setToastMsg("Created new saved insight note! 📝");
+                  }}
+                  className="px-4 py-2.5 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95 border-0"
+                >
+                  <Plus className="w-4 h-4" /> New Note
+                </button>
               </div>
 
-              {/* Feed Grid */}
-              {oppsLoading || announcementsLoading ? (
-                <div className="py-14 flex flex-col items-center justify-center text-center">
-                  <div className="w-8 h-8 rounded-full border border-blue-600 border-t-transparent animate-spin mb-3" />
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Compiling opportunities files...</span>
-                </div>
-              ) : selectedOpportunityType === 'Placement Updates' ? (
-                // Display Placement Updates Announcements
-                <div className="space-y-4">
-                  {announcements.map((a) => (
-                    <div key={a.id} className="bg-white border border-slate-200 dark:bg-slate-900/15 dark:border-slate-900 p-5 rounded-2xl space-y-2.5 hover:border-slate-300 transition-colors">
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[9px] font-black text-indigo-600 bg-indigo-50 border border-indigo-200 dark:text-indigo-400 dark:bg-indigo-950/20 dark:border-indigo-900/30 px-2 py-0.5 rounded-lg uppercase">
-                            {a.type}
-                          </span>
-                          {a.priority === 'High' && (
-                            <span className="text-[8px] font-black bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/30 dark:text-rose-400 px-1.5 py-0.2 rounded uppercase animate-pulse">
-                              High Priority
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[9.5px] text-slate-500 font-semibold">{a.publisher} · {a.date || 'June 4'}</span>
-                      </div>
-                      <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase leading-snug">{a.title}</h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">{a.content}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : filteredOpportunities.length === 0 ? (
-                <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-2xl py-14 flex flex-col items-center justify-center text-center p-6">
-                  <Info className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-2.5" />
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">No Active Opportunities in this Category</span>
-                  <p className="text-[10px] text-slate-400 mt-1 leading-normal">Check back later for active portal drives.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredOpportunities.map((o) => {
-                    const isExpanded = expandedOpportunityId === o.id;
-                    const statusColor =
-                      o.status === 'Open' ? 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/25' :
-                        o.status === 'Closing Soon' ? 'text-amber-700 bg-amber-50/65 border-amber-200 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-900/25' :
-                          o.status === 'New' ? 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-900/25' :
-                            'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/20 dark:border-rose-900/25';
-
-                    const typeBadge =
-                      o.type === 'Hiring' ? 'Hiring Drive' :
-                        o.type === 'Internship' ? 'Internship' :
-                          o.type === 'Government Exam' ? 'Government Exam' :
-                            o.type === 'Hackathon' ? 'Hackathon' : o.type;
-
-                    return (
-                      <div
-                        key={o.id}
-                        className="bg-white border border-slate-200 hover:border-slate-300 dark:bg-slate-900/10 dark:border-slate-900 dark:hover:border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4 transition-all duration-200"
+              {/* Main Workspace split */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1 min-h-0 overflow-hidden">
+                
+                {/* 1. LEFT SIDEBAR (Folders) */}
+                <div className="lg:col-span-3 bg-white dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-900/80 rounded-[2rem] p-6 h-full flex flex-col justify-between overflow-y-auto backdrop-blur-md">
+                  <div className="space-y-6">
+                    {/* System Folders */}
+                    <div className="space-y-2">
+                      <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest block mb-2 font-mono">System Folders</span>
+                      <button
+                        onClick={() => setSelectedLibraryFolder('all')}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                          selectedLibraryFolder === 'all'
+                            ? 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)]'
+                            : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                        }`}
                       >
-                        <div className="space-y-3.5">
-                          <div className="flex items-center justify-between gap-1 flex-wrap">
-                            <span className="text-[8.5px] font-black px-2 py-0.5 rounded border bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 uppercase font-mono">
-                              {typeBadge}
-                            </span>
-                            <span className={`text-[8.5px] font-black px-2 py-0.5 rounded border uppercase font-mono ${statusColor}`}>
-                              {o.status}
-                            </span>
-                          </div>
+                        <Bookmark className="w-4 h-4" /> All Bookmarks
+                      </button>
+                      <button
+                        onClick={() => setSelectedLibraryFolder('last50')}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                          selectedLibraryFolder === 'last50'
+                            ? 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)]'
+                            : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                        }`}
+                      >
+                        <Clock className="w-4 h-4" /> Last 50
+                      </button>
+                      <button
+                        onClick={() => setSelectedLibraryFolder('high')}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                          selectedLibraryFolder === 'high'
+                            ? 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)]'
+                            : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                        }`}
+                      >
+                        <Flame className="w-4 h-4" /> High Difficulty
+                      </button>
+                    </div>
 
-                          <div className="space-y-1">
-                            <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight uppercase leading-snug">{o.title}</h3>
-                            <span className="text-xs text-slate-500 font-bold tracking-tight block">{o.organization}</span>
-                          </div>
-                        </div>
-
-                        <div className="border-t border-slate-100 dark:border-slate-900/60 pt-3 space-y-3 transition-colors duration-300">
-                          <div className="flex items-center justify-between text-[10.5px]">
-                            <div className="flex items-center gap-1 text-slate-500 font-semibold">
-                              <Calendar className="w-3.5 h-3.5" />
-                              <span>Till {o.deadline}</span>
-                            </div>
-                            {o.days_remaining > 0 ? (
-                              <span className="text-amber-600 dark:text-amber-400 font-bold font-mono">{o.days_remaining} Days Left</span>
-                            ) : (
-                              <span className="text-slate-400 dark:text-slate-500 font-bold uppercase font-mono">Closed</span>
-                            )}
-                          </div>
-
-                          {isExpanded && o.details && (
-                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed border border-slate-200 dark:border-slate-800 animate-fadeIn font-medium">
-                              {o.details}
-                            </div>
-                          )}
-
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => setExpandedOpportunityId(isExpanded ? null : o.id)}
-                              className="flex-1 py-2 px-3 bg-white hover:bg-slate-100 text-slate-700 font-bold text-[10px] uppercase rounded-lg border border-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300 dark:border-slate-800 transition-colors cursor-pointer text-center"
-                            >
-                              {isExpanded ? 'Hide' : 'Details'}
-                            </button>
-                            <a
-                              href={o.link}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] uppercase rounded-lg shadow-sm flex items-center justify-center gap-1 cursor-pointer transition-all"
-                            >
-                              <span>Apply</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          </div>
-                        </div>
+                    {/* Custom Folders */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between block mb-2">
+                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest font-mono">Custom Folders</span>
+                        <button
+                          onClick={() => setShowAddFolderModal(true)}
+                          className="p-1 hover:bg-slate-105 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-colors border-0 bg-transparent cursor-pointer"
+                          title="Add New Folder"
+                        >
+                          <FolderPlus className="w-4 h-4" />
+                        </button>
                       </div>
-                    );
-                  })}
+                      
+                      {libraryCustomFolders.map(folder => {
+                        const folderSlug = folder.toLowerCase().replace(/\s+/g, '-');
+                        return (
+                          <button
+                            key={folder}
+                            onClick={() => setSelectedLibraryFolder(folderSlug)}
+                            className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                              selectedLibraryFolder === folderSlug
+                                ? 'bg-[var(--clr-primary)]/10 text-[var(--clr-primary)]'
+                                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2.5 truncate">
+                              <Folder className="w-4 h-4 shrink-0" />
+                              <span className="truncate">{folder}</span>
+                            </span>
+                            <span className="text-[9px] opacity-60 font-mono">
+                              ({libraryNotes.filter(n => n.folder === folderSlug).length})
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Sidebar bottom (Archive / Trash) */}
+                  <div className="space-y-2 border-t border-slate-100 dark:border-slate-800/80 pt-4">
+                    <button
+                      onClick={() => setSelectedLibraryFolder('archived')}
+                      className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                        selectedLibraryFolder === 'archived'
+                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                          : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                      }`}
+                    >
+                      <Archive className="w-4 h-4" /> Archived
+                    </button>
+                    <button
+                      onClick={() => setSelectedLibraryFolder('trash')}
+                      className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                        selectedLibraryFolder === 'trash'
+                          ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                          : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                      }`}
+                    >
+                      <Trash2 className="w-4 h-4" /> Trash
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. MIDDLE REPOSITORY (Notes List) */}
+                <div className="lg:col-span-5 h-full flex flex-col space-y-4 overflow-hidden">
+                  
+                  {/* Search box */}
+                  <div className="relative shrink-0">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search across all bookmarks and notes..."
+                      value={librarySearchQuery}
+                      onChange={(e) => setLibrarySearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2.5 text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full focus:outline-none focus:border-slate-400 dark:focus:border-slate-700 transition-colors text-slate-800 dark:text-slate-100 placeholder-slate-400 shadow-xs"
+                    />
+                  </div>
+
+                  {/* Notes repository */}
+                  <div className="flex-1 overflow-y-auto space-y-3.5 pr-1.5 custom-scrollbar pb-8">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase text-slate-400 tracking-wider font-mono px-1">
+                      <span>{selectedLibraryFolder.replace('-', ' ')} folder</span>
+                      <span>{libraryNotes.filter(n => {
+                        if (librarySearchQuery) {
+                          const query = librarySearchQuery.toLowerCase();
+                          if (!n.title.toLowerCase().includes(query) && !n.content.toLowerCase().includes(query)) return false;
+                        }
+                        if (selectedLibraryFolder === 'all') return n.folder !== 'archived' && n.folder !== 'trash';
+                        if (selectedLibraryFolder === 'last50') return n.folder !== 'archived' && n.folder !== 'trash';
+                        if (selectedLibraryFolder === 'high') return n.category === 'aptitude' || n.category === 'logic';
+                        if (selectedLibraryFolder === 'archived') return n.folder === 'archived';
+                        if (selectedLibraryFolder === 'trash') return n.folder === 'trash';
+                        return n.folder.toLowerCase() === selectedLibraryFolder.toLowerCase();
+                      }).length} notes</span>
+                    </div>
+
+                    {libraryNotes.filter(n => {
+                      if (librarySearchQuery) {
+                        const query = librarySearchQuery.toLowerCase();
+                        if (!n.title.toLowerCase().includes(query) && !n.content.toLowerCase().includes(query)) return false;
+                      }
+                      if (selectedLibraryFolder === 'all') return n.folder !== 'archived' && n.folder !== 'trash';
+                      if (selectedLibraryFolder === 'last50') return n.folder !== 'archived' && n.folder !== 'trash';
+                      if (selectedLibraryFolder === 'high') return n.category === 'aptitude' || n.category === 'logic';
+                      if (selectedLibraryFolder === 'archived') return n.folder === 'archived';
+                      if (selectedLibraryFolder === 'trash') return n.folder === 'trash';
+                      return n.folder.toLowerCase() === selectedLibraryFolder.toLowerCase();
+                    }).length === 0 ? (
+                      <div className="bg-white dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-900/80 rounded-2xl p-12 text-center space-y-3">
+                        <span className="text-3xl block">📁</span>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">No notes found</h4>
+                        <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold max-w-xs mx-auto">
+                          There are no saved notes or bookmarks in this folder matching your query. Click "New Note" to create one.
+                        </p>
+                      </div>
+                    ) : (
+                      libraryNotes.filter(n => {
+                        if (librarySearchQuery) {
+                          const query = librarySearchQuery.toLowerCase();
+                          if (!n.title.toLowerCase().includes(query) && !n.content.toLowerCase().includes(query)) return false;
+                        }
+                        if (selectedLibraryFolder === 'all') return n.folder !== 'archived' && n.folder !== 'trash';
+                        if (selectedLibraryFolder === 'last50') return n.folder !== 'archived' && n.folder !== 'trash';
+                        if (selectedLibraryFolder === 'high') return n.category === 'aptitude' || n.category === 'logic';
+                        if (selectedLibraryFolder === 'archived') return n.folder === 'archived';
+                        if (selectedLibraryFolder === 'trash') return n.folder === 'trash';
+                        return n.folder.toLowerCase() === selectedLibraryFolder.toLowerCase();
+                      }).map((note) => {
+                        const isNoteActive = note.id === activeLibraryNoteId;
+                        const categoryColorMap: Record<string, string> = {
+                          aptitude: 'border-l-[4px] border-l-rose-500',
+                          logic: 'border-l-[4px] border-l-emerald-500',
+                          data: 'border-l-[4px] border-l-purple-500',
+                          verbal: 'border-l-[4px] border-l-blue-500'
+                        };
+
+                        return (
+                          <div
+                            key={note.id}
+                            onClick={() => setActiveLibraryNoteId(note.id)}
+                            className={`p-5 bg-white dark:bg-slate-900/40 border rounded-2xl text-left cursor-pointer transition-all duration-200 flex flex-col justify-between gap-3 relative hover:-translate-y-0.5 hover:shadow-md ${
+                              isNoteActive
+                                ? `border-[var(--clr-primary)] ring-1 ring-[var(--clr-primary)]/40 ${categoryColorMap[note.category] || 'border-l-[4px] border-l-slate-400'}`
+                                : `border-slate-200/80 dark:border-slate-900/80 ${categoryColorMap[note.category] || 'border-l-[4px] border-l-slate-400'}`
+                            }`}
+                          >
+                            <div className="space-y-1.5">
+                              <span className="text-[8.5px] font-mono font-black uppercase tracking-wider opacity-60">
+                                {note.tag}
+                              </span>
+                              <h4 className="text-sm font-extrabold text-slate-805 dark:text-white leading-tight">
+                                {note.title}
+                              </h4>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed italic">
+                                {note.snippet}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between text-[8.5px] font-mono font-black text-slate-400 uppercase tracking-widest pt-2 border-t border-slate-100/50 dark:border-slate-800/40">
+                              <span>Added {note.addedDate}</span>
+                              <span>Revised {note.revisedDate}</span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. RIGHT PANEL (Note Editor) */}
+                <div className="lg:col-span-4 h-full bg-white dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-900/80 rounded-[2rem] p-6 md:p-8 flex flex-col justify-between overflow-y-auto backdrop-blur-md">
+                  {activeLibraryNote ? (
+                    <div className="space-y-6 flex-1 flex flex-col justify-between">
+                      <div className="space-y-5">
+                        {/* Editor Header */}
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80 select-none">
+                          <span className="text-[8.5px] font-mono font-black uppercase text-slate-400 tracking-widest">
+                            {activeLibraryNote.tag} • Revised {activeLibraryNote.revisedDate}
+                          </span>
+                          <button
+                            onClick={() => setActiveLibraryNoteId('')}
+                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-slate-605 transition-colors border-0 bg-transparent cursor-pointer"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Title input */}
+                        <div className="space-y-1 text-left">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 font-mono">Insight Title</label>
+                          <input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            className="w-full py-1.5 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 rounded-xl text-xs font-bold text-slate-905 dark:text-white focus:outline-none focus:border-[var(--clr-primary)] transition-colors"
+                          />
+                        </div>
+
+                        {/* Formatting toolbar */}
+                        <div className="flex items-center gap-1.5 p-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-855 rounded-xl select-none">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const selected = text.substring(start, end);
+                              const prefix = '**';
+                              const suffix = '**';
+                              const replacement = prefix + (selected || 'text') + suffix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                              setTimeout(() => {
+                                textarea.selectionStart = start + prefix.length;
+                                textarea.selectionEnd = start + prefix.length + (selected || 'text').length;
+                              }, 0);
+                            }}
+                            title="Bold Text"
+                            className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+                          >
+                            <Bold className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const selected = text.substring(start, end);
+                              const prefix = '*';
+                              const suffix = '*';
+                              const replacement = prefix + (selected || 'text') + suffix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                              setTimeout(() => {
+                                textarea.selectionStart = start + prefix.length;
+                                textarea.selectionEnd = start + prefix.length + (selected || 'text').length;
+                              }, 0);
+                            }}
+                            title="Italic Text"
+                            className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+                          >
+                            <Italic className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const selected = text.substring(start, end);
+                              const prefix = '$';
+                              const suffix = '$';
+                              const replacement = prefix + (selected || 'Equation') + suffix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                              setTimeout(() => {
+                                textarea.selectionStart = start + prefix.length;
+                                textarea.selectionEnd = start + prefix.length + (selected || 'Equation').length;
+                              }, 0);
+                            }}
+                            title="Insert LaTeX Equation"
+                            className="px-2 py-0.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 font-black text-xs border-0 bg-transparent cursor-pointer"
+                          >
+                            &Sigma;
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const prefix = '\n- ';
+                              const replacement = prefix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                            }}
+                            title="Bullet List"
+                            className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+                          >
+                            <List className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const textarea = document.getElementById('note-textarea') as HTMLTextAreaElement;
+                              if (!textarea) return;
+                              const start = textarea.selectionStart;
+                              const end = textarea.selectionEnd;
+                              const text = textarea.value;
+                              const selected = text.substring(start, end);
+                              const prefix = '[';
+                              const suffix = '](url)';
+                              const replacement = prefix + (selected || 'link') + suffix;
+                              const newValue = text.substring(0, start) + replacement + text.substring(end);
+                              setEditingContent(newValue);
+                              textarea.focus();
+                              setTimeout(() => {
+                                textarea.selectionStart = start + prefix.length;
+                                textarea.selectionEnd = start + prefix.length + (selected || 'link').length;
+                              }, 0);
+                            }}
+                            title="Insert Link"
+                            className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+                          >
+                            <Link className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Editor body text */}
+                        <div className="space-y-1 text-left">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 font-mono">Content Notes</label>
+                          <textarea
+                            id="note-textarea"
+                            value={editingContent}
+                            onChange={(e) => setEditingContent(e.target.value)}
+                            rows={6}
+                            className="w-full py-2 px-3 bg-slate-50 dark:bg-slate-955 border border-slate-200/60 dark:border-slate-850 rounded-2xl text-xs text-slate-800 dark:text-slate-202 focus:outline-none focus:border-[var(--clr-primary)] transition-colors resize-none font-medium leading-relaxed font-sans"
+                          />
+                        </div>
+
+                        {/* LaTeX equation field */}
+                        <div className="space-y-1 text-left">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 font-mono">Active Equation (LaTeX)</label>
+                          <input
+                            type="text"
+                            value={editingEquation}
+                            onChange={(e) => setEditingEquation(e.target.value)}
+                            placeholder="e.g. x + y = z"
+                            className="w-full py-1.5 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-855 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[var(--clr-primary)]"
+                          />
+                        </div>
+
+                        {/* LaTeX Math Equation Preview block */}
+                        {editingEquation && (
+                          <div className="bg-slate-50 dark:bg-slate-950/80 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-850 my-1 font-mono text-xs text-center text-[var(--clr-primary)] animate-fadeIn">
+                            <div className="text-[7.5px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest mb-1.5 text-left font-mono">LaTeX Mathematical Preview</div>
+                            <div className="py-2.5 text-sm font-extrabold select-all flex justify-center items-center overflow-x-auto text-slate-800 dark:text-slate-100">
+                              <span className="px-2.5 py-1.5 bg-[var(--clr-primary-tint)] dark:bg-slate-900/60 rounded-xl border border-[var(--clr-primary)]/15 font-semibold text-xs tracking-wider">
+                                $ {editingEquation} $
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80 mt-6 select-none shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLibraryNotes(prev => prev.map(n => {
+                              if (n.id === activeLibraryNoteId) {
+                                return {
+                                  ...n,
+                                  title: editingTitle,
+                                  content: editingContent,
+                                  snippet: editingContent.substring(0, 75) + (editingContent.length > 75 ? '...' : ''),
+                                  equation: editingEquation,
+                                  revisedDate: 'Today'
+                                };
+                              }
+                              return n;
+                            }));
+                            playPreviewChime();
+                            setToastMsg("Changes saved to library! 💾");
+                          }}
+                          className="flex-1 py-3 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all shadow-md active:scale-95 border-0 cursor-pointer"
+                        >
+                          Save Changes
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLibraryNotes(prev => prev.map(n => {
+                              if (n.id === activeLibraryNoteId) {
+                                const newFold = n.folder === 'archived' ? 'all' : 'archived';
+                                setToastMsg(newFold === 'archived' ? "Moved note to archives! 📦" : "Restored note from archives! 📦");
+                                return { ...n, folder: newFold };
+                              }
+                              return n;
+                            }));
+                            playPreviewChime();
+                          }}
+                          className="px-4 py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-900 border border-slate-200/60 dark:border-slate-850 text-slate-700 dark:text-slate-350 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all active:scale-95 cursor-pointer"
+                        >
+                          {activeLibraryNote.folder === 'archived' ? 'Unarchive' : 'Archive'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLibraryNotes(prev => prev.map(n => {
+                              if (n.id === activeLibraryNoteId) {
+                                const newFold = n.folder === 'trash' ? 'all' : 'trash';
+                                setToastMsg(newFold === 'trash' ? "Moved note to trash! 🗑️" : "Restored note from trash! 🗑️");
+                                return { ...n, folder: newFold };
+                              }
+                              return n;
+                            }));
+                            playPreviewChime();
+                          }}
+                          className="p-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-955/40 text-rose-600 dark:text-rose-400 border border-rose-205 rounded-xl transition-all active:scale-95 cursor-pointer animate-fadeIn"
+                          title="Move to Trash"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center space-y-3.5 text-center py-16">
+                      <span className="text-4xl">📝</span>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">No Note Selected</h4>
+                      <p className="text-[10.5px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold max-w-[200px]">
+                        Select any saved note from the repository list to edit, format, or preview LaTeX formulas.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Add Custom Folder Modal */}
+              {showAddFolderModal && (
+                <div className="fixed inset-0 bg-slate-955/40 backdrop-blur-xs flex items-center justify-center z-50 animate-fadeIn">
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 w-80 text-left space-y-4 shadow-2xl">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <FolderPlus className="w-4 h-4 text-[var(--clr-primary)]" /> Create Folder
+                      </h4>
+                      <button
+                        onClick={() => {
+                          setShowAddFolderModal(false);
+                          setNewFolderName('');
+                        }}
+                        className="p-1 hover:bg-slate-105 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-slate-650 transition-colors border-0 bg-transparent cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <label className="text-[8.5px] font-black uppercase tracking-widest text-slate-400 font-mono">Folder Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Probability Logic"
+                        value={newFolderName}
+                        onChange={(e) => setNewFolderName(e.target.value)}
+                        className="w-full py-2 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-205 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[var(--clr-primary)]"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            if (newFolderName.trim()) {
+                              setLibraryCustomFolders(prev => [...prev, newFolderName.trim()]);
+                              playPreviewChime();
+                              setToastMsg(`Folder "${newFolderName}" created! 📁`);
+                              setNewFolderName('');
+                              setShowAddFolderModal(false);
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex gap-2.5 pt-2">
+                      <button
+                        onClick={() => {
+                          if (newFolderName.trim()) {
+                            setLibraryCustomFolders(prev => [...prev, newFolderName.trim()]);
+                            playPreviewChime();
+                            setToastMsg(`Folder "${newFolderName}" created! 📁`);
+                            setNewFolderName('');
+                            setShowAddFolderModal(false);
+                          }
+                        }}
+                        className="flex-1 py-2.5 bg-[var(--clr-primary)] hover:bg-[var(--clr-primary-dark)] text-white text-[9px] font-black uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer border-0"
+                      >
+                        Create Folder
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAddFolderModal(false);
+                          setNewFolderName('');
+                        }}
+                        className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-350 text-[9px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer border-0"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
+
             </motion.div>
           )}
 
           {/* ====================================================================
-              6. TAB: LEADERBOARD (College/Global/Friends)
+
+          {/* ====================================================================
+              5. TAB: LEADERBOARDS
               ==================================================================== */}
           {activeSidebarTab === 'leaderboards' && (
             <motion.div
@@ -3720,69 +4981,9 @@ export default function StudentDashboard() {
               animate="animate"
               exit="exit"
               transition={tabTransition}
-              className="w-full space-y-6"
+              className="w-full text-left"
             >
-
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-900 pb-3">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                  <h1 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Active Rankings</h1>
-                </div>
-
-                {/* Leaderboard sub-tabs */}
-                <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-900">
-                  {['global', 'friends'].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveLeaderboardTab(tab as any)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${activeLeaderboardTab === tab
-                          ? 'bg-blue-600 text-white'
-                          : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-                        }`}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Leaderboard lists */}
-              <div className="space-y-3">
-                {[
-                  { rank: 1, name: 'Sriram Neppalli', xp: '18,920 XP', progress: '94%', self: false },
-                  { rank: 2, name: 'Aditya Sen', xp: '16,400 XP', progress: '88%', self: false },
-                  { rank: 3, name: 'Rohan Sharma', xp: '14,200 XP', progress: '85%', self: false },
-                  { rank: 4, name: 'Ananya Roy', xp: '13,900 XP', progress: '82%', self: false },
-                  { rank: 5, name: 'Kunal Kapoor', xp: '13,500 XP', progress: '80%', self: false },
-                  { rank: 14, name: 'Vaishnavi Raparthy (You)', xp: '12,450 XP', progress: '72%', self: true }
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${item.self
-                        ? 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-900/10 dark:border-blue-950 dark:text-blue-400 shadow-sm'
-                        : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 dark:bg-slate-950/20 dark:border-slate-900/60 dark:hover:bg-slate-900/40 dark:text-slate-300'
-                      }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-xs ${item.rank === 1 ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' :
-                          item.rank === 2 ? 'bg-slate-200 text-slate-700 dark:bg-slate-400/20 dark:text-slate-400' :
-                            item.rank === 3 ? 'bg-amber-50 text-amber-900 dark:bg-amber-700/20 dark:text-amber-700' :
-                              'bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'
-                        }`}>
-                        {item.rank}
-                      </span>
-                      <span className="text-sm font-bold text-slate-900 dark:text-white">{item.name}</span>
-                    </div>
-
-                    <div className="flex items-center gap-4 text-xs">
-                      <span className="text-slate-500 font-semibold font-mono">{item.xp}</span>
-                      <span className="font-mono font-black text-blue-600 dark:text-blue-400">{item.progress}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+              <LeaderboardView />
             </motion.div>
           )}
 
@@ -3805,6 +5006,10 @@ export default function StudentDashboard() {
                 handleProfileSave={handleProfileSave}
                 saveSuccess={saveSuccess}
                 setSaveSuccess={setSaveSuccess}
+                customColor={customColor}
+                changeCustomColor={changeCustomColor}
+                themeMode={themeMode}
+                handleThemeChange={handleThemeChange}
               />
             </motion.div>
           )}
@@ -4006,7 +5211,7 @@ export default function StudentDashboard() {
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {([
-                          { id: 'blue', label: 'Sapphire', bg: 'bg-[#3B82F6]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
+                          { id: 'default', label: 'Default', bg: 'bg-gradient-to-tr from-[#3B82F6] via-[#8B5CF6] to-[#10B981]', activeClass: 'border-slate-300 dark:border-slate-700' },
                           { id: 'emerald', label: 'Emerald', bg: 'bg-[#10B981]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
                           { id: 'purple', label: 'Cyberpunk', bg: 'bg-[#8B5CF6]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
                           { id: 'amber', label: 'Amber', bg: 'bg-[#F59E0B]', activeClass: 'border-[var(--clr-primary)]/50 bg-[var(--clr-primary-tint)] text-[var(--clr-primary)]' },
@@ -4081,7 +5286,7 @@ export default function StudentDashboard() {
                       <div className="space-y-2 text-[10.5px] font-medium text-slate-500 mt-3.5">
                         <div className="flex justify-between border-b border-slate-100 dark:border-slate-950 pb-2">
                           <span>Host Connection Status</span>
-                          <span className="text-emerald-500 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Operational</span>
+                          <span className="text-emerald-500 font-bold flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Operational</span>
                         </div>
                         <div className="flex justify-between border-b border-slate-100 dark:border-slate-950 pb-2">
                           <span>SSL Sandbox Crypt</span>
@@ -4211,7 +5416,24 @@ export default function StudentDashboard() {
 
             </motion.div>
           )}
-        </AnimatePresence>
+        
+          {/* ====================================================================
+              5. TAB: STUDY PLANNER (Native Integration)
+              ==================================================================== */}
+          {activeSidebarTab === 'studyPlanner' && (
+            <motion.div
+              key="studyPlanner"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={tabTransition}
+              className="w-full max-w-7xl mx-auto space-y-6 text-slate-800 dark:text-slate-200"
+            >
+              <StudyPlannerTab />
+            </motion.div>
+          )}
+</AnimatePresence>
 
 
 
@@ -4293,7 +5515,7 @@ export default function StudentDashboard() {
 
             return (
               <div
-                className="fixed inset-0 bg-slate-950/98 backdrop-blur-2xl z-50 flex items-center justify-center animate-fadeIn"
+                className="fixed inset-0 bg-white/95 dark:bg-slate-950/98 backdrop-blur-2xl z-50 flex items-center justify-center animate-fadeIn"
                 onClick={() => setSelectedBadge(null)}
               >
                 {/* Floating Background Sparkles */}
@@ -4306,13 +5528,13 @@ export default function StudentDashboard() {
 
                 {/* Modal box */}
                 <div
-                  className="bg-slate-900 w-full h-full text-white overflow-y-auto relative animate-scaleUp grid grid-cols-1 md:grid-cols-12 rounded-none border-none"
+                  className="bg-white dark:bg-slate-900 w-full h-full text-slate-900 dark:text-white overflow-y-auto relative animate-scaleUp grid grid-cols-1 md:grid-cols-12 rounded-none border-none"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Close button */}
                   <button
                     onClick={() => setSelectedBadge(null)}
-                    className="absolute top-6 right-6 z-50 text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-950 p-3.5 rounded-full border border-slate-800 transition-all duration-200 cursor-pointer active:scale-90"
+                    className="absolute top-6 right-6 z-50 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/60 dark:bg-slate-950/60 hover:bg-slate-200 dark:hover:bg-slate-950 p-3.5 rounded-full border border-slate-200 dark:border-slate-800 transition-all duration-200 cursor-pointer active:scale-90"
                     title="Close Dialog"
                   >
                     <X className="w-5 h-5" />
@@ -4323,7 +5545,7 @@ export default function StudentDashboard() {
                     <div className="max-w-xl md:mx-auto w-full space-y-8">
                       {/* Meta Tags */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-300 bg-slate-950 border border-slate-800 px-4 py-1.5 rounded-full">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 px-4 py-1.5 rounded-full">
                           {getCategoryEmoji(selectedBadge.category)} {selectedBadge.category.replace('_', ' ')}
                         </span>
                         <span className={`text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-full border ${lvlInfo.color}`}>
@@ -4333,21 +5555,21 @@ export default function StudentDashboard() {
 
                       {/* Badge Name & Desc */}
                       <div className="space-y-3">
-                        <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight font-heading leading-tight">
+                        <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white uppercase tracking-tight font-heading leading-tight">
                           {selectedBadge.name}
                         </h3>
-                        <p className="text-sm sm:text-base text-slate-400 font-semibold leading-relaxed italic">
+                        <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 font-semibold leading-relaxed italic">
                           "{selectedBadge.description}"
                         </p>
                       </div>
 
                       {/* How to Earn */}
-                      <div className="space-y-3 pt-6 border-t border-slate-800/80">
-                        <h4 className="text-[11px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                      <div className="space-y-3 pt-6 border-t border-slate-200 dark:border-slate-800/80">
+                        <h4 className="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
                           <Award className="w-4 h-4 text-amber-500" />
                           How it is earned
                         </h4>
-                        <p className="text-sm text-slate-300 font-semibold leading-relaxed bg-slate-950/35 p-5 rounded-2xl border border-slate-800/50">
+                        <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold leading-relaxed bg-slate-50/80 dark:bg-slate-950/35 p-5 rounded-2xl border border-slate-200/50 dark:border-slate-800/50">
                           {earnMethod}
                         </p>
                       </div>
@@ -4355,12 +5577,12 @@ export default function StudentDashboard() {
                       {/* Lock/Unlock Progress */}
                       {(!isSelectedUnlocked || (selectedProgress.current < selectedProgress.target)) && (
                         <div className="space-y-3 pt-4">
-                          <div className="flex justify-between text-[11px] font-black uppercase text-slate-400 tracking-wider">
+                          <div className="flex justify-between text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
                             <span>Unlock Progress</span>
                             <span>{selectedProgress.current} / {selectedProgress.target} {selectedProgress.label}</span>
                           </div>
-                          <div className="w-full bg-slate-950 p-1 rounded-full border border-slate-800/50 overflow-hidden">
-                            <div className="bg-slate-800 h-2 rounded-full overflow-hidden">
+                          <div className="w-full bg-slate-100 dark:bg-slate-950 p-1 rounded-full border border-slate-200/50 dark:border-slate-800/50 overflow-hidden">
+                            <div className="bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                               <div
                                 className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-500"
                                 style={{ width: `${(selectedProgress.current / selectedProgress.target) * 100}%` }}
@@ -4373,7 +5595,7 @@ export default function StudentDashboard() {
 
                     {/* Footer Buttons */}
                     {!isSelectedUnlocked && (
-                      <div className="max-w-xl md:mx-auto w-full mt-10 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row gap-4">
+                      <div className="max-w-xl md:mx-auto w-full mt-10 pt-6 border-t border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row gap-4">
                         <button
                           onClick={() => {
                             setSelectedBadge(null);
@@ -4388,7 +5610,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Right Column (Badge Image) - Order-1 on mobile, Order-2 on desktop */}
-                  <div className="md:col-span-5 p-8 sm:p-12 md:p-20 flex flex-col items-center justify-center bg-slate-950/40 border-b md:border-b-0 md:border-l border-slate-800/60 relative order-1 md:order-2 overflow-hidden min-h-[45vh] md:min-h-screen">
+                  <div className="md:col-span-5 p-8 sm:p-12 md:p-20 flex flex-col items-center justify-center bg-slate-50/40 dark:bg-slate-950/40 border-b md:border-b-0 md:border-l border-slate-200 dark:border-slate-800/60 relative order-1 md:order-2 overflow-hidden min-h-[45vh] md:min-h-screen">
                     {/* Shimmer reflection sweep overlay */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full animate-reflection-sweep pointer-events-none z-20" />
 
@@ -4412,8 +5634,8 @@ export default function StudentDashboard() {
                         />
                       ) : (
                         <div className={`w-36 h-36 rounded-full flex items-center justify-center text-6xl border shadow-inner relative ${isSelectedUnlocked
-                            ? 'bg-slate-800 border-slate-700 text-white'
-                            : 'bg-slate-800/40 border-slate-800 text-slate-600'
+                            ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white'
+                            : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600'
                           }`}>
                           <span className="z-10">{getCategoryEmoji(selectedBadge.category)}</span>
                         </div>
@@ -4465,7 +5687,7 @@ export default function StudentDashboard() {
           {/* Mini-Lesson Challenge Modal */}
           <AnimatePresence>
             {activeChallengeNode && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+              <div key="challenge-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0, y: 30 }}
                   animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -4594,11 +5816,305 @@ export default function StudentDashboard() {
             )}
           </AnimatePresence>
 
+          {/* Calendar Day Badges List Modal */}
+          <AnimatePresence>
+            {dayBadgesToShow && (
+              <div 
+                key="day-badges-modal"
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+                onClick={() => setDayBadgesToShow(null)}
+              >
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0, y: 30 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.9, opacity: 0, y: 30 }}
+                  className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl relative space-y-4"
+                  onClick={e => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => setDayBadgesToShow(null)}
+                    className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+
+                  <div className="text-left">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400">Activity Calendar</span>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white mt-1">Badges Earned</h3>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-mono uppercase">{badgesToShowDateStr}</p>
+                  </div>
+
+                  <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
+                    {dayBadgesToShow.map(({ badge, count }) => (
+                      <div
+                        key={badge.id}
+                        onClick={() => {
+                          setSelectedBadge(badge);
+                          setDayBadgesToShow(null);
+                        }}
+                        className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950/50 dark:hover:bg-slate-950 border border-slate-150 dark:border-slate-800/80 rounded-2xl cursor-pointer transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                            {badge.image_url ? (
+                              <img src={badge.image_url} alt="" className="w-6 h-6 object-contain rounded-lg" />
+                            ) : (
+                              <span className="text-lg">{getCategoryEmoji(badge.category)}</span>
+                            )}
+                          </div>
+                          <div className="text-left leading-tight">
+                            <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                              {badge.name}
+                            </h4>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 line-clamp-1">{badge.description}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-blue-500 dark:text-blue-400 font-extrabold group-hover:translate-x-0.5 transition-transform">
+                            →
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
           {/* Celebration graphics canvas overlay */}
           {celebrationActive && <CanvasCelebration confettiStyle={confettiStyle} />}
 
         </div>
       </div>
+
+      {/* Floating Time Tracker */}
+      <motion.div
+        drag
+        dragMomentum={false}
+        dragElastic={0}
+        dragConstraints={mainContainerRef}
+        initial={{ opacity: 0, scale: 0.9, y: 50 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="fixed bottom-6 right-6 z-50 flex items-center bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur-xl border border-slate-700/40 dark:border-slate-800/40 text-white shadow-2xl select-none"
+        style={{ borderRadius: '9999px' }}
+      >
+        {timerCollapsed ? (
+          // Collapsed state: simple round icon
+          <button
+            onClick={() => setTimerCollapsed(false)}
+            className="w-12 h-12 flex items-center justify-center relative rounded-full hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none"
+            title="Expand Time Tracker"
+            type="button"
+          >
+            <Clock className="w-5 h-5 text-white" />
+            <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full border border-slate-900 dark:border-slate-950 ${
+              timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
+            }`} />
+          </button>
+        ) : (
+          // Expanded state: pill container
+          <div className="flex items-center gap-2.5 px-3.5 py-2.5">
+            {/* Drag Handle */}
+            <div className="cursor-grab active:cursor-grabbing text-slate-500 hover:text-slate-350 p-0.5 transition-colors">
+              <GripVertical className="w-3.5 h-3.5" />
+            </div>
+
+            {/* Status Dot */}
+            <span className={`w-2 h-2 rounded-full ${
+              timeTrackerIsRunning ? "bg-emerald-400" : "bg-rose-500"
+            }`} />
+
+            {/* Time Readout */}
+            <div className="flex flex-col text-left">
+              <span className="font-mono text-xs font-black tracking-tight leading-none text-white">
+                {formatTimeTracker(timeTrackerSeconds)}
+              </span>
+              <span className="text-[7.5px] text-slate-400 uppercase font-black tracking-wider mt-0.5 leading-none">
+                {timeTrackerIsRunning ? "Studying" : "Paused"}
+              </span>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center gap-1.5 ml-1 border-l border-slate-700/50 pl-2">
+              <button
+                onClick={() => setTimeTrackerIsRunning(!timeTrackerIsRunning)}
+                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+                  timeTrackerIsRunning
+                    ? "bg-rose-600 hover:bg-rose-500 text-white"
+                    : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                }`}
+                title={timeTrackerIsRunning ? "Pause Session" : "Start Study"}
+                type="button"
+              >
+                {timeTrackerIsRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+              </button>
+
+              <button
+                onClick={() => {
+                  setTimeTrackerIsRunning(false);
+                  setTimeTrackerSeconds(0);
+                }}
+                className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer text-slate-300 hover:text-white"
+                title="Reset Session"
+                type="button"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </button>
+
+              {/* Collapse Button */}
+              <button
+                onClick={() => setTimerCollapsed(true)}
+                className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700/60 flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer text-slate-400 hover:text-white"
+                title="Minimize"
+                type="button"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Dynamic Toast Feedback alerts */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            key="toast-msg"
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-6 right-6 z-50 bg-slate-900/90 dark:bg-white text-white dark:text-slate-900 px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-800 dark:border-slate-100 flex items-center gap-3 backdrop-blur-md"
+          >
+            <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-wider">{toastMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Premium Notification Center Modal */}
+      <AnimatePresence>
+        {showNotifications && (
+          <div key="notifications-modal" className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+            {/* Backdrop blur overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setShowNotifications(false)}
+              className="absolute inset-0 bg-slate-950/40 dark:bg-black/60 backdrop-blur-md cursor-pointer"
+            />
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-[95%] md:w-[80%] sm:max-w-[600px] h-[500px] bg-white/70 dark:bg-[#070b13]/85 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-[20px] shadow-2xl overflow-hidden flex flex-col text-left z-10"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-slate-200/40 dark:border-slate-900/60 flex items-center justify-between shrink-0">
+                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white font-heading">
+                  Notifications
+                </h3>
+                <div className="flex items-center gap-4">
+                  {notifications.some(n => !n.read) && (
+                    <button
+                      onClick={() => {
+                        setNotifications(notifications.map(n => ({ ...n, read: true })));
+                      }}
+                      className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer border-0 bg-transparent p-0 transition-colors"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowNotifications(false)}
+                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full text-slate-400 hover:text-slate-655 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Notification List */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4">
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center space-y-2 opacity-50">
+                    <Bell className="w-8 h-8 text-slate-400" />
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">No notifications yet.</p>
+                  </div>
+                ) : (
+                  notifications.map((n) => {
+                    let emoji = '🔔';
+                    if (n.title.includes('Milestone') || n.title.includes('🎓')) {
+                      emoji = '🎓';
+                    } else if (n.title.includes('Badge') || n.title.includes('🎖️')) {
+                      emoji = '🏆';
+                    } else if (n.title.includes('Streak') || n.title.includes('🔥')) {
+                      emoji = '🔥';
+                    } else if (n.title.includes('Performance') || n.title.includes('📊') || n.title.includes('Growth') || n.title.includes('📈')) {
+                      emoji = '📈';
+                    } else if (n.title.includes('Goal') || n.title.includes('🎯')) {
+                      emoji = '🎯';
+                    } else if (n.title.includes('Topic') || n.title.includes('📚')) {
+                      emoji = '📚';
+                    } else if (n.title.includes('Achievement') || n.title.includes('⭐')) {
+                      emoji = '⭐';
+                    }
+                    
+                    const cleanTitle = n.title.replace(/[🎓🎖️📊🏆🔥📈🎯📚⭐]/g, '').trim();
+
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => {
+                          setNotifications(notifications.map(item => item.id === n.id ? { ...item, read: true } : item));
+                        }}
+                        className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer flex items-start gap-4 relative hover:-translate-y-0.5 ${
+                          !n.read 
+                            ? 'bg-blue-500/5 border-blue-500/25 dark:bg-blue-500/10 dark:border-blue-900/40 hover:border-blue-500/40 dark:hover:border-blue-500/40 hover:shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
+                            : 'bg-slate-50/50 dark:bg-slate-900/10 border-slate-150 dark:border-slate-900/60 hover:bg-slate-100/50 dark:hover:bg-slate-900/30 hover:border-slate-355 dark:hover:border-slate-750 hover:shadow-[0_0_15px_rgba(255,255,255,0.03)]'
+                        }`}
+                      >
+                        {!n.read && (
+                          <span className="absolute top-4 right-4 w-2 h-2 bg-blue-600 dark:bg-blue-500 rounded-full" />
+                        )}
+
+                        {/* Icon Container */}
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center text-lg shrink-0 border border-slate-200/50 dark:border-white/5 shadow-inner">
+                          {emoji}
+                        </div>
+
+                        {/* Text Content */}
+                        <div className="flex-1 min-w-0 space-y-1 text-left pr-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                              {cleanTitle}
+                            </h4>
+                            <span className="text-[10px] text-slate-405 dark:text-slate-500 font-bold uppercase tracking-wider shrink-0">
+                              {n.time}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-505 dark:text-slate-400 leading-relaxed font-semibold">
+                            {n.message}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+
+
 
     </div>
   );

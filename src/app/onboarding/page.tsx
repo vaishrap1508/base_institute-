@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
+import RoleToggle from '@/components/RoleToggle';
 import { 
   Layers, 
   User, 
@@ -27,7 +29,6 @@ import { supabase } from '@/lib/supabase';
 import { createClient as createAuthClient } from '@/utils/supabase/client';
 import { siteConfig } from '@/config/site';
 import { INDIAN_STATES, INDIAN_COLLEGES } from '@/data/indianColleges';
-import ThemeToggle from '@/components/ThemeToggle';
 
 // Option lists
 const ALL_COUNTRIES = [
@@ -789,6 +790,7 @@ export default function OnboardingPage() {
       <AnimatePresence>
         {notification && (
           <motion.div 
+            key="notification-toast"
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -825,6 +827,7 @@ export default function OnboardingPage() {
           </div>
         </Link>
         <div className="flex items-center gap-4">
+          <RoleToggle />
           <ThemeToggle />
         </div>
       </header>
@@ -940,11 +943,6 @@ export default function OnboardingPage() {
                   {stepsConfig[currentStep - 1]?.desc}
                 </p>
               </div>
-            </div>
-            
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/40 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 select-none">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>Secure & Private</span>
             </div>
           </div>
 
@@ -1449,13 +1447,8 @@ export default function OnboardingPage() {
 
           {/* Stepper Buttons Panel (Card Footer) */}
           <div className="border-t border-slate-200/50 dark:border-slate-800/50 pt-5 flex flex-row items-center justify-between gap-4">
-            {/* Left section: Secure shield */}
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold shrink-0">
-              <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-600 shrink-0" />
-              <span className="text-[10px] uppercase tracking-wider hidden md:inline leading-none">
-                Data Fully Encrypted
-              </span>
-            </div>
+            {/* Left section: Spacer to keep center elements centered */}
+            <div className="w-[120px] shrink-0 hidden md:block" />
 
             {/* Center section: Pagination indicators */}
             <div className="flex flex-col items-center gap-1.5 select-none shrink-0">

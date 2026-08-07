@@ -76,7 +76,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
   // Render Sort Header Indicator
   const renderSortIndicator = (field: SortField) => {
     if (sortField !== field) {
-      return <ArrowUpDown className="w-3.5 h-3.5 ml-1.5 text-slate-400 group-hover:text-slate-600 transition-colors shrink-0" />;
+      return <ArrowUpDown className="w-3.5 h-3.5 ml-1.5 text-slate-500 dark:text-slate-400 group-hover:text-slate-600 transition-colors shrink-0" />;
     }
     return sortOrder === 'asc' 
       ? <ArrowUp className="w-3.5 h-3.5 ml-1.5 text-blue-600 shrink-0" />
@@ -225,9 +225,9 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
           </thead>
           <tbody className="divide-y divide-slate-150 dark:divide-slate-800">
             {paginatedQuestions.length > 0 ? (
-              paginatedQuestions.map((q) => (
+              paginatedQuestions.map((q, qIdx) => (
                 <tr
-                  key={q.id}
+                  key={`${q.id || 'q'}-${qIdx}`}
                   onClick={() => onEditQuestion(q)}
                   className="hover:bg-slate-50/50 dark:hover:bg-slate-950/40 transition-colors cursor-pointer group"
                 >
@@ -244,13 +244,13 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                           </span>
                           
                           {/* Detailed Taxonomical Hover Tooltip */}
-                          <div className="absolute left-0 bottom-full mb-2 hidden group-hover/id:flex flex-col bg-slate-950 text-white dark:bg-slate-950 text-[10px] font-medium p-2.5 rounded-lg shadow-xl border border-slate-800 dark:border-slate-900 z-35 min-w-[200px] leading-relaxed transition-all animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
+                          <div className="absolute left-0 bottom-full mb-2 hidden group-hover/id:flex flex-col bg-slate-950 text-slate-900 dark:text-white dark:bg-slate-950 text-[10px] font-medium p-2.5 rounded-lg shadow-xl border border-slate-800 dark:border-slate-900 z-35 min-w-[200px] leading-relaxed transition-all animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
                             <span className="font-bold text-blue-400 border-b border-slate-800 dark:border-slate-900 pb-1 mb-1 block uppercase">ID Specs</span>
                             <div className="space-y-0.5">
-                              <div><span className="text-slate-400 font-bold">Domain:</span> {getDomainFullName(q.domainId)}</div>
-                              <div><span className="text-slate-400 font-bold">Sub-Topic:</span> {getSubTopicFullName(q.domainId, q.subTopicId)}</div>
-                              <div><span className="text-slate-400 font-bold">Concept:</span> {getConceptFullName(q.domainId, q.subTopicId, q.conceptId)}</div>
-                              <div><span className="text-slate-400 font-bold font-mono">Seed:</span> {q.questionHashSeed || 0}</div>
+                              <div><span className="text-slate-500 dark:text-slate-400 font-bold">Domain:</span> {getDomainFullName(q.domainId)}</div>
+                              <div><span className="text-slate-500 dark:text-slate-400 font-bold">Sub-Topic:</span> {getSubTopicFullName(q.domainId, q.subTopicId)}</div>
+                              <div><span className="text-slate-500 dark:text-slate-400 font-bold">Concept:</span> {getConceptFullName(q.domainId, q.subTopicId, q.conceptId)}</div>
+                              <div><span className="text-slate-500 dark:text-slate-400 font-bold font-mono">Seed:</span> {q.questionHashSeed || 0}</div>
                               <div className="text-[9px] text-slate-500 font-mono mt-1 pt-1 border-t border-slate-900 dark:border-slate-900 break-all">UUID: {q.id}</div>
                             </div>
                           </div>
@@ -296,9 +296,9 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   {/* Company Tags */}
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1.5 max-w-[160px]">
-                      {q.companyTags.map((tag) => (
+                      {q.companyTags.map((tag, tagIdx) => (
                         <span
-                          key={tag}
+                          key={`${tag}-${tagIdx}`}
                           className="bg-slate-100 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 text-slate-600 px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wide"
                         >
                           {tag}
@@ -336,7 +336,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   <td className="px-6 py-4 text-center">
                     <div className="flex justify-center">
                       <button 
-                        className="p-1.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-400 group-hover:text-blue-600 group-hover:border-blue-200 dark:group-hover:text-blue-400 dark:group-hover:border-blue-900 transition-all"
+                        className="p-1.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-500 dark:text-slate-400 group-hover:text-blue-600 group-hover:border-blue-200 dark:group-hover:text-blue-400 dark:group-hover:border-blue-900 transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
                           onEditQuestion(q);
@@ -350,7 +350,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-6 py-16 text-center text-xs font-semibold text-slate-400 dark:text-slate-500 italic bg-slate-50/10">
+                <td colSpan={8} className="px-6 py-16 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 italic bg-slate-50/10">
                   No questions found matching your filter criteria. Try updating search text or filters.
                 </td>
               </tr>
@@ -386,7 +386,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                 return (
                   <span
                     key={`ellipsis-${idx}`}
-                    className="w-7.5 h-7.5 flex items-center justify-center text-slate-400 dark:text-slate-500 font-bold"
+                    className="w-7.5 h-7.5 flex items-center justify-center text-slate-500 dark:text-slate-400 dark:text-slate-500 font-bold"
                   >
                     ...
                   </span>
@@ -399,7 +399,7 @@ export default function QuestionTable({ questions, onEditQuestion }: QuestionTab
                   onClick={() => setCurrentPage(page as number)}
                   className={`w-7.5 h-7.5 rounded-lg flex items-center justify-center border transition-all cursor-pointer font-bold ${
                     currentPage === page
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                      ? 'bg-blue-600 border-blue-600 text-slate-900 dark:text-white shadow-sm'
                       : 'border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300'
                   }`}
                 >
@@ -458,7 +458,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 opacity-0 group-hover/id:opacity-100 focus:opacity-100 transition-all duration-200 cursor-pointer"
+      className="p-1 rounded hover:bg-slate-100 text-slate-500 dark:text-slate-400 hover:text-slate-600 opacity-0 group-hover/id:opacity-100 focus:opacity-100 transition-all duration-200 cursor-pointer"
       title="Copy binary ID"
     >
       {copied ? (

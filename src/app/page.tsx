@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
+import RoleToggle from '@/components/RoleToggle';
 import { siteConfig } from '@/config/site';
 import { 
   Layers, 
@@ -621,7 +622,7 @@ export default function LandingPage() {
     const storedRole = localStorage.getItem('aptitude_current_role');
     if (storedRole) {
       try {
-        const parsed = JSON.parse(storedRole);
+        let parsed = null; try { parsed = JSON.parse(storedRole); } catch(e) {}
         setIsAdmin(parsed.role === 'admin');
       } catch (e) {
         console.warn(e);
@@ -1174,7 +1175,7 @@ export default function LandingPage() {
           const localData = localStorage.getItem('aptitude_landing_page_settings');
           if (localData) {
             try {
-              const parsed = JSON.parse(localData);
+              let parsed = null; try { parsed = JSON.parse(localData); } catch(e) {}
               if (Array.isArray(parsed.faq_items) && parsed.faq_items.length < 12) {
                 localStorage.removeItem('aptitude_landing_page_settings');
               } else {
@@ -1188,7 +1189,7 @@ export default function LandingPage() {
         const localData = localStorage.getItem('aptitude_landing_page_settings');
         if (localData) {
           try {
-            const parsed = JSON.parse(localData);
+            let parsed = null; try { parsed = JSON.parse(localData); } catch(e) {}
             if (Array.isArray(parsed.faq_items) && parsed.faq_items.length < 12) {
               localStorage.removeItem('aptitude_landing_page_settings');
             } else {
@@ -1210,7 +1211,7 @@ export default function LandingPage() {
       const storedRole = localStorage.getItem('aptitude_current_role');
       if (storedRole) {
         try {
-          const parsed = JSON.parse(storedRole);
+          let parsed = null; try { parsed = JSON.parse(storedRole); } catch(e) {}
           if (parsed.role === 'admin') {
             setIsAdmin(true);
             showNotice("Clearance Verified: Admin Access Granted. Visual Editor Unlocked.", "info");
@@ -1413,6 +1414,7 @@ export default function LandingPage() {
               <button
                 key={num}
                 type="button"
+                suppressHydrationWarning
                 onClick={() => handleWorkspaceAnswer(num)}
                 className={`py-1 rounded text-[10px] font-black font-mono transition-all border ${
                   isSelected 
@@ -1481,6 +1483,7 @@ export default function LandingPage() {
               <button
                 key={num}
                 type="button"
+                suppressHydrationWarning
                 onClick={() => setActiveMilestone(num)}
                 className="flex flex-col items-center gap-1.5 z-10 transition-all duration-300 transform hover:scale-105"
               >
@@ -1619,6 +1622,7 @@ export default function LandingPage() {
           <div className="pt-0.5">
             <button
               type="button"
+              suppressHydrationWarning
               onClick={startAssessmentSim}
               disabled={assessmentStatus === 'running'}
               className="w-full py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-100 dark:disabled:bg-slate-900 text-white disabled:text-slate-400 dark:disabled:text-slate-500 text-[10px] font-black uppercase rounded-lg shadow-md transition-all duration-200 cursor-pointer active:scale-95 border border-transparent disabled:border-slate-200 dark:disabled:border-slate-800"
@@ -1747,19 +1751,32 @@ export default function LandingPage() {
         </nav>
 
         {/* Clearance Sync Dashboard CTA */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
+          <RoleToggle hideThemeToggle={true} />
+
           {/* Theme Toggle Button (Icon-Only Circular Button) */}
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:scale-110 hover:shadow-[0_0_12px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_0_12px_rgba(255,255,255,0.15)] transition-all duration-300 cursor-pointer select-none relative overflow-hidden"
             title="Toggle theme"
             suppressHydrationWarning
           >
-            {mounted && theme === 'light' ? (
-              <Sun className="w-[18px] h-[18px] text-amber-400 animate-fadeIn" />
-            ) : (
-              <Moon className="w-[18px] h-[18px] text-indigo-400 animate-fadeIn" />
-            )}
+            <span className="relative w-full h-full flex items-center justify-center">
+              <Sun
+                className={`absolute transition-all duration-500 ease-in-out ${
+                  mounted && theme === 'light'
+                    ? 'opacity-100 rotate-0 scale-100'
+                    : 'opacity-0 -rotate-90 scale-50'
+                } w-[18px] h-[18px] text-amber-400`}
+              />
+              <Moon
+                className={`absolute transition-all duration-500 ease-in-out ${
+                  mounted && theme === 'dark'
+                    ? 'opacity-100 rotate-0 scale-100'
+                    : 'opacity-0 rotate-90 scale-50'
+                } w-[18px] h-[18px] text-indigo-400`}
+              />
+            </span>
           </button>
 
           <Link
@@ -1793,10 +1810,6 @@ export default function LandingPage() {
             {content.hero_title.split(siteConfig.nameUpper)[1] || ''}
           </h1>
 
-          {/* Paragraph explanation */}
-          <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
-            {content.hero_paragraph}
-          </p>
 
           {/* Hero CTAs */}
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 w-full sm:w-auto">
@@ -2107,7 +2120,7 @@ export default function LandingPage() {
       {/* ==========================================
           EMPOWERING CAMPUSES - BENTO GRID & DUAL MARQUEE
           ========================================== */}
-      <section id="empowering-campuses" className="relative w-full py-20 px-6 sm:px-12 bg-white dark:bg-slate-950/50">
+      <section id="empowering-campuses" className="relative w-full py-24 px-6 sm:px-12 bg-white dark:bg-slate-950/50 scroll-mt-24">
         
         <div className="max-w-7xl mx-auto space-y-12">
           
@@ -2268,7 +2281,7 @@ export default function LandingPage() {
       {/* ==========================================
           CURRICULUM (INTERACTIVE ROADMAP & BENTO DETAILS)
           ========================================== */}
-      <section id="curriculum" className="relative w-full py-28 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950 overflow-hidden">
+      <section id="curriculum" className="relative w-full py-24 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950 overflow-hidden scroll-mt-24">
         
         {/* Soft background ambient gradient lights */}
         <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
@@ -2361,6 +2374,7 @@ export default function LandingPage() {
                   <button
                     key={idx}
                     type="button"
+                    suppressHydrationWarning
                     onClick={() => setActiveCurriculumPhase(idx)}
                     className={`w-9 h-9 rounded-full flex items-center justify-center border-2 text-[10px] font-black z-20 relative transition-all duration-300 cursor-pointer ${
                       isActive 
@@ -2576,7 +2590,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="coach" className="relative w-full py-24 px-6 sm:px-12 bg-white dark:bg-slate-950 overflow-hidden">
+      <section id="coach" className="relative w-full py-24 px-6 sm:px-12 bg-white dark:bg-slate-950 overflow-hidden scroll-mt-24">
         {/* Glowing visual backdrop */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
         <div className="absolute top-1/3 right-10 w-[300px] h-[300px] rounded-full bg-indigo-600/5 blur-[100px] pointer-events-none" />
@@ -2695,7 +2709,7 @@ export default function LandingPage() {
       {/* ==========================================
           FREQUENTLY ASKED QUESTIONS (FAQ)
           ========================================== */}
-      <section id="faq" className="relative w-full py-24 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950">
+      <section id="faq" className="relative w-full py-24 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950 scroll-mt-24">
         
         <div className="max-w-7xl mx-auto space-y-12">
           
@@ -2736,6 +2750,7 @@ export default function LandingPage() {
                       <button
                         key={cat.id}
                         type="button"
+                        suppressHydrationWarning
                         onClick={() => {
                           setActiveFaqCategory(cat.id);
                           setFaqSearch(''); // clear search when switching categories
@@ -2802,6 +2817,7 @@ export default function LandingPage() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input 
                     type="text" 
+                    suppressHydrationWarning
                     placeholder="Search questions across all categories..."
                     value={faqSearch}
                     onChange={(e) => setFaqSearch(e.target.value)}
@@ -2810,6 +2826,7 @@ export default function LandingPage() {
                   <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     {faqSearch && (
                       <button 
+                        suppressHydrationWarning
                         onClick={() => setFaqSearch('')}
                         className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
                       >
@@ -2829,6 +2846,7 @@ export default function LandingPage() {
                     <button
                       key={tag}
                       type="button"
+                      suppressHydrationWarning
                       onClick={() => setFaqSearch(tag)}
                       className="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:text-slate-900 dark:bg-slate-900 dark:border-slate-900 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all cursor-pointer text-[10px] font-semibold"
                     >
@@ -2869,6 +2887,7 @@ export default function LandingPage() {
                         />
 
                         <button
+                          suppressHydrationWarning
                           onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
                           className="w-full text-left px-6 py-4.5 flex items-center justify-between font-extrabold text-xs sm:text-sm text-slate-800 hover:text-slate-900 dark:text-slate-200 dark:hover:text-white group/faq-btn select-none cursor-pointer"
                         >
@@ -2918,6 +2937,7 @@ export default function LandingPage() {
                                   <>
                                     <button
                                       type="button"
+                                      suppressHydrationWarning
                                       onClick={() => setHelpfulVotes(prev => ({ ...prev, [faq.id]: 'yes' }))}
                                       className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 hover:border-slate-300 text-[10px] font-black text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
                                     >
@@ -2926,6 +2946,7 @@ export default function LandingPage() {
                                     </button>
                                     <button
                                       type="button"
+                                      suppressHydrationWarning
                                       onClick={() => setHelpfulVotes(prev => ({ ...prev, [faq.id]: 'no' }))}
                                       className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 hover:border-slate-300 text-[10px] font-black text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 dark:bg-slate-950 dark:border-slate-800 dark:hover:border-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
                                     >
@@ -2981,6 +3002,7 @@ export default function LandingPage() {
               {content.cta_btn_primary}
             </Link>
             <button 
+              suppressHydrationWarning
               onClick={() => showNotice("Connecting to support sandbox queue...", "info")}
               className="w-full sm:flex-1 py-3.5 px-8 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-xs border border-slate-200 dark:border-slate-800 rounded-2xl hover:scale-[1.02] active:scale-98 transition-all duration-300 cursor-pointer uppercase tracking-wider"
             >
@@ -2989,6 +3011,28 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ==========================================
+          FOOTER SECTION
+          ========================================== */}
+      <footer className="w-full py-12 px-6 sm:px-12 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-900/60 select-none">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white shadow-md">
+              <Layers className="w-4.5 h-4.5" />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-extrabold tracking-tight text-xs text-slate-800 dark:text-slate-200">{content.header_logo_text}</span>
+              <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">{content.header_logo_subtext}</span>
+            </div>
+          </div>
+          <div className="text-center md:text-right space-y-1.5">
+            <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 mt-2">
+              {content.footer_copyright}
+            </p>
+          </div>
+        </div>
+      </footer>
 
 
       {/* ==========================================
@@ -3000,6 +3044,7 @@ export default function LandingPage() {
       <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
         {isAdmin && (
           <button
+            suppressHydrationWarning
             onClick={() => setIsEditorOpen(true)}
             className="flex items-center gap-2.5 px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_25px_rgba(37,99,235,0.6)] cursor-pointer text-xs font-black transition-all active:scale-95 animate-pulse hover:animate-none"
           >
@@ -3093,15 +3138,6 @@ export default function LandingPage() {
                 <div className="space-y-4 pt-2">
                   <span className="text-[10px] font-extrabold text-slate-400 uppercase block border-b border-slate-800 pb-1.5">Footer Settings</span>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-extrabold text-slate-400 uppercase">Footer Badge clearance text</label>
-                    <input 
-                      type="text"
-                      value={content.footer_badge_text}
-                      onChange={(e) => setContent({ ...content, footer_badge_text: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-600 font-medium"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase">Footer Copyright text</label>
                     <input 
                       type="text"
@@ -3134,15 +3170,8 @@ export default function LandingPage() {
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-600 font-black uppercase"
                     />
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-extrabold text-slate-400 uppercase">Paragraph Copy</label>
-                    <textarea 
-                      rows={3}
-                      value={content.hero_paragraph}
-                      onChange={(e) => setContent({ ...content, hero_paragraph: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-600 font-medium"
-                    />
-                  </div>
+
+
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-extrabold text-slate-400 uppercase">Primary Button Label</label>

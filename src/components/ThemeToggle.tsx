@@ -13,9 +13,23 @@ export default function ThemeToggle({ floating = false }: ThemeToggleProps) {
 
   useEffect(() => {
     setMounted(true);
-    // Sync current active theme state based on the presence of .dark class
-    const isDark = document.documentElement.classList.contains('dark');
-    setTheme(isDark ? 'dark' : 'light');
+    const syncTheme = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'dark' : 'light');
+    };
+    syncTheme();
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          syncTheme();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => observer.disconnect();
   }, []);
 
   const toggleTheme = () => {
@@ -49,16 +63,27 @@ export default function ThemeToggle({ floating = false }: ThemeToggleProps) {
       type="button"
       className={
         floating
-          ? "w-11 h-11 rounded-full border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 select-none shrink-0"
-          : "w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 select-none shrink-0"
+          ? "w-11 h-11 rounded-full border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 select-none shrink-0 relative overflow-hidden"
+          : "w-8 h-8 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 select-none shrink-0 relative overflow-hidden"
       }
       aria-label="Toggle theme"
     >
-      {theme === 'light' ? (
-        <Sun className={floating ? "w-5 h-5 text-amber-500 animate-fadeIn" : "w-4 h-4 text-amber-500 animate-fadeIn"} />
-      ) : (
-        <Moon className={floating ? "w-5 h-5 text-indigo-400 animate-fadeIn" : "w-4 h-4 text-indigo-400 animate-fadeIn"} />
-      )}
+      <span className="relative w-full h-full flex items-center justify-center">
+        <Sun
+          className={`absolute transition-all duration-500 ease-in-out ${
+            mounted && theme === 'light'
+              ? 'opacity-100 rotate-0 scale-100'
+              : 'opacity-0 -rotate-90 scale-50'
+          } ${floating ? "w-5 h-5 text-amber-500" : "w-4 h-4 text-amber-500"}`}
+        />
+        <Moon
+          className={`absolute transition-all duration-500 ease-in-out ${
+            mounted && theme === 'dark'
+              ? 'opacity-100 rotate-0 scale-100'
+              : 'opacity-0 rotate-90 scale-50'
+          } ${floating ? "w-5 h-5 text-indigo-400" : "w-4 h-4 text-indigo-400"}`}
+        />
+      </span>
     </button>
   );
 }

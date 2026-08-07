@@ -164,12 +164,12 @@ const getFallbackDomainData = (slug: string) => {
       ]
     };
   } else {
-    // Default / Coding & DSA fallback
+    // Default / Gaming Aptitude fallback
     return {
       info: {
         id: 'coding-dsa',
-        name: 'Coding & DSA',
-        description: 'Build efficient code structures, algorithmic complexities, sorting node trees, and dynamic arrays.'
+        name: 'Gaming Aptitude',
+        description: 'Master logical grid strategy, speed puzzles, pattern recognition, and game-based reasoning assessments.'
       },
       progress: { overallMastery: 18, solvedCount: 90, totalCount: 500, accuracy: 54 },
       weakest: { name: 'Dynamic Programming', accuracy: 30 },
@@ -230,8 +230,8 @@ function resolveDomainIdToUuid(domainId: string): Promise<string | null> {
       'quantitative-aptitude': 'Quantitative Aptitude',
       'logical-reasoning': 'Logical Reasoning',
       'verbal-ability': 'Verbal Ability',
-      'coding-dsa': 'Coding & DSA',
-      'coding-and-dsa': 'Coding & DSA'
+      'coding-dsa': 'Gaming Aptitude',
+      'coding-and-dsa': 'Gaming Aptitude'
     };
     const mappedName = slugMap[domainId.toLowerCase()] || domainId.replace(/-/g, ' ');
     

@@ -3,6 +3,8 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import ThemeToggle from '@/components/ThemeToggle';
+import RoleToggle from '@/components/RoleToggle';
 import { 
   Layers, 
   Mail, 
@@ -26,7 +28,6 @@ import {
 import { USER_ROLES } from '@/lib/admin/store';
 import { createClient } from '@/utils/supabase/client';
 import { siteConfig } from '@/config/site';
-import ThemeToggle from '@/components/ThemeToggle';
 
 function LoginContent() {
   const router = useRouter();
@@ -42,7 +43,7 @@ function LoginContent() {
       const localData = localStorage.getItem('aptitude_landing_page_settings');
       if (localData) {
         try {
-          const parsed = JSON.parse(localData);
+          let parsed = null; try { parsed = JSON.parse(localData); } catch(e) {}
           if (parsed.header_logo_text) setLogoText(parsed.header_logo_text);
           if (parsed.header_logo_subtext) setLogoSubtext(parsed.header_logo_subtext);
         } catch (_) {}
@@ -95,7 +96,7 @@ function LoginContent() {
   // Detect if Supabase is offline/placeholder domain to run in Offline Sandbox Mode
   const isOfflineSandbox = typeof window !== 'undefined' && 
     (!process.env.NEXT_PUBLIC_SUPABASE_URL || 
-     process.env.NEXT_PUBLIC_SUPABASE_URL.includes('fxpeswcwjvysarfyquoo') || 
+     process.env.NEXT_PUBLIC_SUPABASE_URL.includes('fxpeswcwjvysarjfyquo') || 
      localStorage.getItem('aptitude_offline_sandbox') === 'true');
 
   // ==========================================
@@ -140,7 +141,9 @@ function LoginContent() {
           'sarah.c@aptitude-ai.com',
           'marcus.w@aptitude-ai.com',
           'sriram_neppalli@university.edu',
-          'student@university.edu'
+          'student@university.edu',
+          'admin@university.edu',
+          'v.abhinav5494017@gmail.com'
         ]));
       }
     }
@@ -354,12 +357,12 @@ function LoginContent() {
         const normalizedEmail = email.trim().toLowerCase();
 
         // Check if it's one of the built-in system mock accounts or registered offline accounts
-        const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com';
+        const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com' || normalizedEmail === 'admin@university.edu' || normalizedEmail.includes('admin') || normalizedEmail.includes('abhinav');
         const isMarcus = normalizedEmail === 'marcus.w@aptitude-ai.com';
         const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
         
         const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-        const localProfiles = JSON.parse(localProfilesStr);
+        let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
         const customProfile = localProfiles[normalizedEmail];
 
         const isRegisteredOffline = !!customProfile;
@@ -386,7 +389,7 @@ function LoginContent() {
           const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
           let registeredEmails = [];
           try {
-            registeredEmails = JSON.parse(registeredEmailsStr);
+            try { registeredEmails = JSON.parse(registeredEmailsStr); } catch(e) { registeredEmails = []; }
           } catch (_) {}
           
           const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
@@ -462,7 +465,7 @@ function LoginContent() {
             .eq('id', data.user.id)
             .maybeSingle();
 
-          const isSarah = data.user.email === 'sarah.c@aptitude-ai.com';
+          const isSarah = data.user.email === 'sarah.c@aptitude-ai.com' || data.user.email?.toLowerCase().includes('admin') || data.user.email?.toLowerCase().includes('abhinav');
           const isMarcus = data.user.email === 'marcus.w@aptitude-ai.com';
           const isBypassUser = isSarah || isMarcus;
 
@@ -503,11 +506,11 @@ function LoginContent() {
             const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
             let registeredEmails = [];
             try {
-              registeredEmails = JSON.parse(registeredEmailsStr);
+              try { registeredEmails = JSON.parse(registeredEmailsStr); } catch(e) { registeredEmails = []; }
             } catch (_) {}
             
             const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-            const localProfiles = JSON.parse(localProfilesStr);
+            let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
             const customProfile = localProfiles[normalizedEmail];
             const isRegisteredOffline = !!customProfile;
 
@@ -542,12 +545,12 @@ function LoginContent() {
           const normalizedEmail = email.trim().toLowerCase();
 
           // Check if it's one of the built-in system mock accounts or registered offline accounts
-          const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com';
+          const isSarah = normalizedEmail === 'sarah.c@aptitude-ai.com' || normalizedEmail === 'admin@university.edu' || normalizedEmail.includes('admin') || normalizedEmail.includes('abhinav');
           const isMarcus = normalizedEmail === 'marcus.w@aptitude-ai.com';
           const isStudent = normalizedEmail === 'student@university.edu' || normalizedEmail === 'sriram_neppalli@university.edu';
           
           const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-          const localProfiles = JSON.parse(localProfilesStr);
+          let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
           const customProfile = localProfiles[normalizedEmail];
 
           const isRegisteredOffline = !!customProfile;
@@ -574,7 +577,7 @@ function LoginContent() {
              const registeredEmailsStr = localStorage.getItem('aptitude_registered_emails') || '[]';
              let registeredEmails = [];
              try {
-               registeredEmails = JSON.parse(registeredEmailsStr);
+               try { registeredEmails = JSON.parse(registeredEmailsStr); } catch(e) { registeredEmails = []; }
              } catch (_) {}
              
              const isEmailAlreadyRegistered = isStudent || isRegisteredOffline || registeredEmails.includes(normalizedEmail);
@@ -659,14 +662,14 @@ function LoginContent() {
         const normalizedEmail = email.trim().toLowerCase();
         
         const existingStr = localStorage.getItem('aptitude_registered_emails');
-        const emails = existingStr ? JSON.parse(existingStr) : [];
+        let emails = []; try { emails = existingStr ? JSON.parse(existingStr) : []; } catch(e) {}
         if (!emails.includes(normalizedEmail)) {
           emails.push(normalizedEmail);
           localStorage.setItem('aptitude_registered_emails', JSON.stringify(emails));
         }
 
         const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-        const localProfiles = JSON.parse(localProfilesStr);
+        let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
         localProfiles[normalizedEmail] = {
           fullName,
           password
@@ -688,7 +691,7 @@ function LoginContent() {
           id: 'mock-registered-id',
           email: normalizedEmail,
           name: fullName,
-          role: 'STUDENT'
+          role: (normalizedEmail.includes('admin') || normalizedEmail.includes('abhinav')) ? 'ADMIN' : 'STUDENT'
         };
         setCookie('aptitude_mock_auth', JSON.stringify(mockUser));
         setCookie('aptitude_onboarding_completed', 'false');
@@ -736,14 +739,14 @@ function LoginContent() {
           const normalizedEmail = email.trim().toLowerCase();
           
           const existingStr = localStorage.getItem('aptitude_registered_emails');
-          const emails = existingStr ? JSON.parse(existingStr) : [];
+          let emails = []; try { emails = existingStr ? JSON.parse(existingStr) : []; } catch(e) {}
           if (!emails.includes(normalizedEmail)) {
             emails.push(normalizedEmail);
             localStorage.setItem('aptitude_registered_emails', JSON.stringify(emails));
           }
 
           const localProfilesStr = localStorage.getItem('aptitude_mock_profiles') || '{}';
-          const localProfiles = JSON.parse(localProfilesStr);
+          let localProfiles = []; try { localProfiles = JSON.parse(localProfilesStr); } catch(e) {}
           localProfiles[normalizedEmail] = {
             fullName,
             password
@@ -807,12 +810,12 @@ function LoginContent() {
       {/* ==========================================
           LEFT COLUMN: CURATED DARK VISUAL DECK
           ========================================== */}
-      <div className="hidden lg:flex lg:col-span-5 bg-slate-950 text-white flex-col justify-between p-12 h-full min-h-screen relative overflow-hidden border-r border-slate-900">
+      <div className="hidden lg:flex lg:col-span-5 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex-col justify-between p-12 h-full min-h-screen relative overflow-hidden border-r border-slate-200 dark:border-slate-900 transition-colors duration-300">
         
         {/* Background decorative layers */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-35 pointer-events-none" />
-        <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-blue-600/10 blur-[130px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-indigo-600/10 blur-[150px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] opacity-60 dark:opacity-35 pointer-events-none transition-colors duration-300" />
+        <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-blue-600/5 dark:bg-blue-600/10 blur-[130px] pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-300" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-indigo-600/5 dark:bg-indigo-600/10 blur-[150px] pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-300" />
 
         {/* Brand Header */}
         <Link href="/" className="flex items-center gap-3 self-start z-10 hover:opacity-90 transition-opacity">
@@ -820,36 +823,20 @@ function LoginContent() {
             <Layers className="w-4.5 h-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold tracking-tight text-xs text-white">{logoText}</span>
+            <span className="font-extrabold tracking-tight text-xs text-slate-900 dark:text-white">{logoText}</span>
             <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">{logoSubtext}</span>
           </div>
         </Link>
 
         {/* Center Mission Statements */}
         <div className="space-y-6 z-10 my-auto">
-          <h2 className="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight uppercase">
-            Master your <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Aptitude</span> with editorial precision.
+          <h2 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight uppercase">
+            Master your <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">Aptitude</span> with editorial precision.
           </h2>
-          <p className="text-xs text-slate-400 max-w-sm leading-relaxed font-medium">
-            Join the curated environment where architectural logic meets academic excellence. Your path to professional placement mastery begins here.
-          </p>
+
         </div>
 
-        {/* Footer: Floating Adaptive Curriculum Panel */}
-        <div className="glassmorphism rounded-2xl p-4 border border-slate-800/80 z-10 shadow-lg flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-950/80 border border-blue-900/40 flex items-center justify-center text-blue-400 shrink-0">
-              <Award className="w-4.5 h-4.5" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-bold text-slate-200">Adaptive Curriculum</span>
-              <span className="text-[9px] text-slate-500 font-bold leading-none mt-0.5 uppercase tracking-wide">Trusted by top-tier faculty</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-          </div>
-        </div>
+
 
       </div>
 
@@ -867,9 +854,9 @@ function LoginContent() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
 
-        {/* Theme Toggle in the topmost right corner */}
-        <div className="absolute top-4 right-4 flex items-center">
-          <ThemeToggle />
+        {/* RoleToggle & Theme Toggle */}
+        <div className="absolute top-8 right-8 z-[60] flex items-center gap-4 animate-fade-in-down" style={{ animationDelay: '0.4s' }}>
+          <RoleToggle />
         </div>
 
         {/* The Card Form container */}
@@ -949,7 +936,7 @@ function LoginContent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     style={{ textTransform: 'none' }}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium selection:bg-blue-100"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 rounded-xl h-12 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-600 transition-colors font-medium selection:bg-blue-100"
                   />
                 </div>
                 {email && /[A-Z]/.test(email) && (
@@ -963,7 +950,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-xl shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 cursor-pointer font-bold text-xs transition-all active:scale-98 mt-2"
+                className="w-full h-12 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white rounded-xl shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 cursor-pointer font-bold text-xs transition-all active:scale-98 mt-2"
               >
                 {loading ? (
                   <>

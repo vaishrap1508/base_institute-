@@ -57,6 +57,14 @@
   --color-background-primary: var(--clr-surface);
   --color-text-primary: var(--clr-text);
   --color-border-tertiary: var(--clr-border);
+
+  /* --- LAYOUT & SPACING TOKENS --- */
+  --space-gutter-py: 6rem;
+  --space-gutter-py-mobile: 4.5rem;
+  --space-card-padding: 1.5rem;
+  --space-card-padding-lg: 2rem;
+  --space-grid-gap: 1.5rem;
+  --layout-max-width: 1400px;
 }
 
 .dark {
@@ -191,6 +199,44 @@
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-10px) rotate(1.5deg); }
   }
+
+  /* Custom compatibility theme definitions for non-standard/typo utility colors in the legacy templates */
+  --color-slate-55: #f1f5f9;
+  --color-slate-105: #f1f5f9;
+  --color-slate-150: #e2e8f0;
+  --color-slate-205: #e2e8f0;
+  --color-slate-250: #cbd5e1;
+  --color-slate-350: #94a3b8;
+  --color-slate-355: #94a3b8;
+  --color-slate-405: #94a3b8;
+  --color-slate-450: #64748b;
+  --color-slate-455: #64748b;
+  --color-slate-505: #64748b;
+  --color-slate-550: #475569;
+  --color-slate-650: #334155;
+  --color-slate-655: #334155;
+  --color-slate-750: #1e293b;
+  --color-slate-808: #1e293b;
+  --color-slate-850: #1e293b;
+  --color-slate-855: #0f172a;
+  --color-slate-905: #020617;
+  --color-slate-955: #020617;
+
+  --color-rose-955: #4c0519;
+  --color-rose-505: #f43f5e;
+  --color-blue-955: #172554;
+  --color-blue-505: #3b82f6;
+  --color-blue-605: #2563eb;
+  --color-amber-955: #451a03;
+  --color-amber-650: #d97706;
+
+  /* Spacing and Layout mapping */
+  --space-gutter-py: var(--space-gutter-py);
+  --space-gutter-py-mobile: var(--space-gutter-py-mobile);
+  --space-card-padding: var(--space-card-padding);
+  --space-card-padding-lg: var(--space-card-padding-lg);
+  --space-grid-gap: var(--space-grid-gap);
+  --layout-max-width: var(--layout-max-width);
 }
 
 body {
@@ -198,6 +244,14 @@ body {
   color: var(--foreground);
   font-family: var(--font-secondary);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Buttery smooth theme transition */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, fill 0.5s ease, stroke 0.5s ease !important;
 }
 
 h1, h2, h3, h4, h5, h6, .font-heading {
@@ -1519,4 +1573,27 @@ article pre code {
   font-size: 0.85rem !important;
   line-height: 1.6 !important;
 }
+
+/* Custom layout spacing utility classes */
+@utility section-gutter-py {
+  padding-top: var(--space-gutter-py-mobile);
+  padding-bottom: var(--space-gutter-py-mobile);
+  @media (min-width: 1024px) {
+    padding-top: var(--space-gutter-py);
+    padding-bottom: var(--space-gutter-py);
+  }
+}
+
+@utility card-container-p {
+  padding: var(--space-card-padding);
+}
+
+@utility card-container-p-lg {
+  padding: var(--space-card-padding-lg);
+}
+
+@utility layout-grid-gap {
+  gap: var(--space-grid-gap);
+}
+
 

@@ -76,7 +76,7 @@ export default function DomainSelectors({
       {/* Domain Column */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
             Domain
           </label>
         </div>
@@ -114,7 +114,7 @@ export default function DomainSelectors({
               <button
                 type="button"
                 onClick={handleSaveDomain}
-                className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all"
+                className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-lg text-xs font-bold transition-all"
               >
                 Add
               </button>
@@ -124,7 +124,7 @@ export default function DomainSelectors({
                   setIsAddingDomain(false);
                   setNewDomainName('');
                 }}
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -145,7 +145,7 @@ export default function DomainSelectors({
       {/* Sub-Topic Column */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
             Sub-Topic
           </label>
         </div>
@@ -184,7 +184,7 @@ export default function DomainSelectors({
                 <button
                   type="button"
                   onClick={handleSaveSubTopic}
-                  className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all"
+                  className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-lg text-xs font-bold transition-all"
                 >
                   Add
                 </button>
@@ -194,7 +194,7 @@ export default function DomainSelectors({
                     setIsAddingSubTopic(false);
                     setNewSubTopicName('');
                   }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                  className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -216,7 +216,7 @@ export default function DomainSelectors({
       {/* Concept Column */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
             Concept
           </label>
         </div>
@@ -255,7 +255,7 @@ export default function DomainSelectors({
                 <button
                   type="button"
                   onClick={handleSaveConcept}
-                  className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all"
+                  className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-lg text-xs font-bold transition-all"
                 >
                   Add
                 </button>
@@ -265,7 +265,7 @@ export default function DomainSelectors({
                     setIsAddingConcept(false);
                     setNewConceptName('');
                   }}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                  className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

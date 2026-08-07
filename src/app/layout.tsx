@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import "@/env";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -33,9 +32,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <Script
+        <script
           id="theme-initializer"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               try {
@@ -47,6 +45,7 @@ export default function RootLayout({
 
                 var savedColor = localStorage.getItem('aptitude_custom_brand_color');
                 if (savedColor) {
+                  document.documentElement.classList.add('custom-color-active');
                   document.documentElement.style.setProperty('--clr-primary', savedColor);
                   var adjustColorBrightness = function(hex, percent) {
                     var color = hex.startsWith('#') ? hex.slice(1) : hex;
@@ -69,6 +68,8 @@ export default function RootLayout({
                   var g = parseInt(cleanColor.substring(2, 4), 16);
                   var b = parseInt(cleanColor.substring(4, 6), 16);
                   document.documentElement.style.setProperty('--clr-primary-rgb', r + ',' + g + ',' + b);
+                } else {
+                  document.documentElement.classList.remove('custom-color-active');
                 }
               } catch (_) {}
             `,

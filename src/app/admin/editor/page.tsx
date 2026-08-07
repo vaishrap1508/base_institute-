@@ -6,6 +6,7 @@ import { ShieldAlert, CheckCircle2, XCircle, ArrowRight, Database, Eye, Award, L
 // Import Custom Components
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
+import RoleToggle from '@/components/RoleToggle';
 import DomainSelectors from '@/components/admin/DomainSelectors';
 import MetaSelectors from '@/components/admin/MetaSelectors';
 import ResponseMatrix from '@/components/admin/ResponseMatrix';
@@ -224,7 +225,15 @@ export default function AdminContentCreator() {
       const stored = localStorage.getItem('aptitude_questions');
       if (stored) {
         try {
-          currentQuestions = JSON.parse(stored);
+          const parsed = JSON.parse(stored);
+          const parsedIds = new Set(parsed.map((q: any) => q.id));
+          const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+          if (missing.length > 0) {
+            currentQuestions = [...parsed, ...missing];
+            localStorage.setItem('aptitude_questions', JSON.stringify(currentQuestions));
+          } else {
+            currentQuestions = parsed;
+          }
           setQuestionsList(currentQuestions);
         } catch (e) {
           console.warn('Failed to parse questions from localStorage', e);
@@ -423,10 +432,7 @@ export default function AdminContentCreator() {
   // Option grid correct answer toggle
   const handleSetCorrectOption = (id: string) => {
     setOptions(
-      options.map((opt) => ({
-        ...opt,
-        isCorrect: opt.id === id
-      }))
+      options.map((opt) => (opt.id === id ? { ...opt, isCorrect: !opt.isCorrect } : opt))
     );
   };
 
@@ -468,10 +474,10 @@ export default function AdminContentCreator() {
       errors.push('Question stem content must contain at least 15 characters.');
     }
 
-    // Rule 2: Exactly one correct option
+    // Rule 2: At least one correct option
     const correctCount = options.filter((o) => o.isCorrect).length;
-    if (correctCount !== 1 && options.length > 0) {
-      errors.push('Exactly one response option must be designated as CORRECT.');
+    if (correctCount < 1 && options.length > 0) {
+      errors.push('At least one response option must be designated as CORRECT.');
     }
 
     // Rule 3: Option text completeness
@@ -602,7 +608,7 @@ export default function AdminContentCreator() {
 
       if (questionSearchError) throw questionSearchError;
 
-      const correctAnswerText = q.options?.find((o: any) => o.isCorrect)?.text || '';
+      const correctAnswerText = q.options?.filter((o: any) => o.isCorrect).map((o: any) => o.text).join(', ') || '';
 
       if (existingQuestions && existingQuestions.length > 0) {
         questionUuid = existingQuestions[0].id;
@@ -811,19 +817,8 @@ export default function AdminContentCreator() {
   const activeDomainName = domains.find((d) => d.id === domainId)?.name || 'Quantitative Aptitude';
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      {/* 1. Left Navigation Sidebar */}
-      <Sidebar
-        activeId="editor"
-        userRole={currentRole.role}
-      />
-
-      {/* Main Workspace Frame */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        {/* 2. Top Utility & Role Selection Header */}
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
-
-        {/* Transient banner updates */}
+    <>
+      {/* Transient banner updates */}
         {notification && (
           <div className="absolute top-20 right-8 z-50 animate-slideIn">
             <div className={`px-4.5 py-3.5 rounded-xl border shadow-lg flex items-center gap-3 max-w-md ${
@@ -894,6 +889,7 @@ export default function AdminContentCreator() {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
@@ -919,6 +915,7 @@ export default function AdminContentCreator() {
                   Synthesize and validate mathematical stems, markdown solutions, and multi-choice response matrices.
                 </p>
               </div>
+              <RoleToggle />
             </div>
 
             {/* A. Domain Selection Grid */}
@@ -1005,7 +1002,7 @@ export default function AdminContentCreator() {
             </div>
           </div>
         )}
-      </div>
+
 
       {/* 4. Publication Detail Confirmation Modal */}
       {showPublishModal && (
@@ -1065,7 +1062,7 @@ export default function AdminContentCreator() {
                   <div className="flex flex-col col-span-2">
                     <span className="text-slate-400 font-semibold text-[10px]">RESPONSE MATRIX OPTIONS</span>
                     <span className="text-slate-800 font-bold">
-                      {options.length} Choices / Correct Option: {options.find((o) => o.isCorrect)?.id}
+                      {options.length} Choices / Correct Option(s): {options.filter((o) => o.isCorrect).map((o) => o.id).join(', ') || 'None'}
                     </span>
                   </div>
                 </div>
@@ -1094,6 +1091,6 @@ export default function AdminContentCreator() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import { Plus, Download, Library, CheckCircle2, FileText, ShieldAlert, Lock, Ref
 // Custom Components
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
+import RoleToggle from '@/components/RoleToggle';
 import FilterDropdowns from '@/components/admin/directory/FilterDropdowns';
 import QuestionTable from '@/components/admin/directory/QuestionTable';
 
@@ -74,7 +75,8 @@ export default function QuestionDirectoryPage() {
           tags:question_companies (
             company:companies (name)
           )
-        `);
+        `)
+        .limit(200);
 
       if (error) {
         throw error;
@@ -147,7 +149,20 @@ export default function QuestionDirectoryPage() {
       } else {
         const stored = localStorage.getItem('aptitude_questions');
         if (stored) {
-          setQuestions(JSON.parse(stored));
+          try {
+            const parsed = JSON.parse(stored);
+            const parsedIds = new Set(parsed.map((q: any) => q.id));
+            const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+            if (missing.length > 0) {
+              const merged = [...parsed, ...missing];
+              localStorage.setItem('aptitude_questions', JSON.stringify(merged));
+              setQuestions(merged);
+            } else {
+              setQuestions(parsed);
+            }
+          } catch (e) {
+            setQuestions(SAMPLE_QUESTIONS);
+          }
         } else {
           setQuestions(SAMPLE_QUESTIONS);
           localStorage.setItem('aptitude_questions', JSON.stringify(SAMPLE_QUESTIONS));
@@ -158,7 +173,20 @@ export default function QuestionDirectoryPage() {
       console.warn('Failed to load questions from Supabase, falling back to local storage', err);
       const stored = localStorage.getItem('aptitude_questions');
       if (stored) {
-        setQuestions(JSON.parse(stored));
+        try {
+          const parsed = JSON.parse(stored);
+          const parsedIds = new Set(parsed.map((q: any) => q.id));
+          const missing = SAMPLE_QUESTIONS.filter(q => !parsedIds.has(q.id));
+          if (missing.length > 0) {
+            const merged = [...parsed, ...missing];
+            localStorage.setItem('aptitude_questions', JSON.stringify(merged));
+            setQuestions(merged);
+          } else {
+            setQuestions(parsed);
+          }
+        } catch (e) {
+          setQuestions(SAMPLE_QUESTIONS);
+        }
       } else {
         setQuestions(SAMPLE_QUESTIONS);
       }
@@ -309,38 +337,108 @@ export default function QuestionDirectoryPage() {
     router.push('/admin/editor?new=true');
   };
 
-  // Export Catalog Action: JSON Downloader (Enterprise Command Center Feature)
-  const handleExportCatalog = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredQuestions, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `Aptitude_Questions_Catalog_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+  const [showExportMenu, setShowExportMenu] = useState(false);
+
+  // Export Catalog Action: CSV Downloader
+  const handleExportCSV = () => {
+    const headers = [
+      'Question ID',
+      'Domain',
+      'Sub-Topic',
+      'Concept',
+      'Difficulty',
+      'Question Stem',
+      'Response Options',
+      'Correct Answer(s)',
+      'Company Tags',
+      'Status'
+    ];
+
+    const escapeCsv = (val: string) => `"${(val || '').replace(/"/g, '""')}"`;
+
+    const rows = filteredQuestions.map((q) => {
+      const domainName = DOMAINS_DATA.find((d) => d.id === q.domainId)?.name || q.domainId;
+      const subTopicObj = DOMAINS_DATA.flatMap((d) => d.subTopics).find((s) => s.id === q.subTopicId);
+      const subTopicName = subTopicObj?.name || q.subTopicId;
+      const conceptName = DOMAINS_DATA.flatMap((d) => d.subTopics).flatMap((s) => s.concepts).find((c) => c.id === q.conceptId)?.name || q.conceptId;
+
+      const optionsStr = q.options?.map((o) => `[${o.id}] ${o.text}`).join(' | ') || '';
+      const correctAnswers = q.options?.filter((o) => o.isCorrect).map((o) => `[${o.id}] ${o.text}`).join(', ') || '';
+      const companyTagsStr = q.companyTags?.join('; ') || '';
+
+      return [
+        escapeCsv(q.questionBinaryId || q.id),
+        escapeCsv(domainName),
+        escapeCsv(subTopicName),
+        escapeCsv(conceptName),
+        escapeCsv(q.difficulty),
+        escapeCsv(q.questionStem),
+        escapeCsv(optionsStr),
+        escapeCsv(correctAnswers),
+        escapeCsv(companyTagsStr),
+        escapeCsv(q.status || 'Draft')
+      ].join(',');
+    });
+
+    const csvData = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Aptitude_Catalog_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+  };
+
+  // Export Catalog Action: JSON Downloader
+  const handleExportJSON = () => {
+    const exportData = filteredQuestions.map((q) => {
+      const domainName = DOMAINS_DATA.find((d) => d.id === q.domainId)?.name || q.domainId;
+      const subTopicName = DOMAINS_DATA.flatMap((d) => d.subTopics).find((s) => s.id === q.subTopicId)?.name || q.subTopicId;
+      const conceptName = DOMAINS_DATA.flatMap((d) => d.subTopics).flatMap((s) => s.concepts).find((c) => c.id === q.conceptId)?.name || q.conceptId;
+
+      return {
+        id: q.id,
+        binaryId: q.questionBinaryId || q.id,
+        domain: domainName,
+        subTopic: subTopicName,
+        concept: conceptName,
+        difficulty: q.difficulty,
+        questionStem: q.questionStem,
+        hintText: q.hintText,
+        options: q.options,
+        correctAnswers: q.options?.filter((o) => o.isCorrect).map((o) => o.id),
+        companyTags: q.companyTags,
+        videoUrl: q.videoUrl,
+        status: q.status || 'Draft'
+      };
+    });
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Aptitude_Catalog_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
   };
 
   return (
-    <div className="flex h-screen bg-slate-100 text-slate-800 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      {/* 1. Left Navigation Sidebar */}
-      <Sidebar
-        activeId="directory"
-        userRole={currentRole.role}
-      />
-
-      {/* Main Workspace Frame */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        {/* 2. Top Utility Header */}
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
-
-        {/* Access control check matching Dynamic Content Creator constraints */}
+    <>
+      {/* Access control check matching Dynamic Content Creator constraints */}
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
             <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-8 flex flex-col items-center text-center gap-6 animate-scaleUp">
               {/* Lock Icon */}
               <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/50 flex items-center justify-center text-rose-500 shadow-inner relative">
                 <Lock className="w-7 h-7 animate-pulse" />
-                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-white flex items-center justify-center border-2 border-white shadow">
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-rose-600 text-[10px] font-black text-slate-900 dark:text-white flex items-center justify-center border-2 border-white shadow">
                   !
                 </span>
               </div>
@@ -348,7 +446,7 @@ export default function QuestionDirectoryPage() {
               {/* Clearance Violations Info */}
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-lg font-black text-slate-800 dark:text-white tracking-tight">Clearance Protocol Violation</h2>
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
+                <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
                   Secure Sandbox Sandbox v2.4
                 </p>
               </div>
@@ -356,7 +454,7 @@ export default function QuestionDirectoryPage() {
               {/* Details table */}
               <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl space-y-3.5 text-xs text-left">
                 <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800 pb-2">
-                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                     Clearance Token Status
                   </span>
                   <span className="text-[9px] font-extrabold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-500 uppercase tracking-wide">
@@ -366,17 +464,17 @@ export default function QuestionDirectoryPage() {
 
                 <div className="grid grid-cols-2 gap-y-3.5 gap-x-6 font-semibold">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted User</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold">{currentRole.name}</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Clearance Role</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold uppercase tracking-wider text-[11px] text-rose-600 dark:text-rose-400">
                       {currentRole.role}
                     </span>
                   </div>
                   <div className="flex flex-col col-span-2">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 dark:text-slate-500 font-semibold uppercase">Attempted Access Route</span>
                     <span className="text-slate-800 dark:text-slate-200 font-bold font-mono text-[11px]">/admin/directory</span>
                   </div>
                 </div>
@@ -384,12 +482,13 @@ export default function QuestionDirectoryPage() {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
                     if (admin) handleRoleChange(admin);
                   }}
-                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer"
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-xl text-xs font-bold shadow-md hover:shadow-blue-500/10 active:scale-98 transition-all cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5 animate-spin-hover" />
                   <span>Request Admin Clearance</span>
@@ -406,14 +505,6 @@ export default function QuestionDirectoryPage() {
               <div>
                 <div className="flex items-center gap-3">
                   <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Question Directory</h1>
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wide uppercase border dark:border-slate-800 shadow-inner ${
-                    dbSource === 'Supabase Cloud' 
-                      ? 'bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/20 dark:border-indigo-900/30 dark:text-indigo-400' 
-                      : 'bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-950/20 dark:border-amber-900/30 dark:text-amber-400'
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${dbSource === 'Supabase Cloud' ? 'bg-indigo-600 animate-pulse' : 'bg-amber-500'}`} />
-                    {dbSource}
-                  </span>
                 </div>
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">
                   Manage, search, organize, and monitor all platform questions.
@@ -422,20 +513,47 @@ export default function QuestionDirectoryPage() {
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3 shrink-0 self-start md:self-center">
-                {/* Export Catalog JSON */}
-                <button
-                  onClick={handleExportCatalog}
-                  disabled={filteredQuestions.length === 0}
-                  className="px-4 py-2.5 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200/90 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-xs active:scale-98 cursor-pointer dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-200"
-                >
-                  <Download className="w-4 h-4 text-slate-400" />
-                  <span>Export Catalog</span>
-                </button>
+                <RoleToggle />
+                
+                {/* Export Catalog Menu Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    disabled={filteredQuestions.length === 0}
+                    className="px-4 py-2.5 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200/90 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-xs active:scale-98 cursor-pointer dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-slate-800 dark:text-slate-200"
+                  >
+                    <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                    <span>Export Catalog</span>
+                  </button>
+
+                  {showExportMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 py-1 animate-fadeIn">
+                      <button
+                        onClick={handleExportCSV}
+                        className="w-full px-4 py-2.5 text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between cursor-pointer border-0 bg-transparent"
+                      >
+                        <span>Export as CSV</span>
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/30 font-mono">
+                          .CSV
+                        </span>
+                      </button>
+                      <button
+                        onClick={handleExportJSON}
+                        className="w-full px-4 py-2.5 text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between cursor-pointer border-0 bg-transparent"
+                      >
+                        <span>Export as JSON</span>
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30 font-mono">
+                          .JSON
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {/* Add Question Primary Button */}
                 <button
                   onClick={handleAddQuestion}
-                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4.5 py-2.5 text-xs font-bold flex items-center gap-2 transition-all shadow-md hover:shadow-blue-500/10 active:scale-98 cursor-pointer"
+                  className="bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-lg px-4.5 py-2.5 text-xs font-bold flex items-center gap-2 transition-all shadow-md hover:shadow-blue-500/10 active:scale-98 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add Question</span>
@@ -444,7 +562,7 @@ export default function QuestionDirectoryPage() {
             </div>
 
             {/* Premium Metrics Widgets Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
               {/* Stat 1: Total Catalog */}
               <div className="bg-white border border-slate-200/80 dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
@@ -452,7 +570,7 @@ export default function QuestionDirectoryPage() {
                   <Library className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
+                  <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Total In Directory
                   </span>
                   <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
@@ -467,7 +585,7 @@ export default function QuestionDirectoryPage() {
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
+                  <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Active Published
                   </span>
                   <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight mt-1">
@@ -482,26 +600,11 @@ export default function QuestionDirectoryPage() {
                   <FileText className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
+                  <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
                     Incomplete Drafts
                   </span>
                   <span className="text-2xl font-black text-slate-800 dark:text-slate-200 tracking-tight mt-1">
                     {stats.draft}
-                  </span>
-                </div>
-              </div>
-
-              {/* Stat 4: Taxonomy Coverage */}
-              <div className="bg-white border border-slate-200/80 dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex items-center gap-4.5 hover:shadow-sm transition-all duration-150">
-                <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-100 dark:bg-purple-950/20 dark:border-purple-900/30 flex items-center justify-center text-purple-600 shrink-0">
-                  <Compass className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider leading-none">
-                    Taxonomy Concepts
-                  </span>
-                  <span className="text-2xl font-black text-purple-700 dark:text-purple-400 tracking-tight mt-1">
-                    {stats.conceptsCount}
                   </span>
                 </div>
               </div>
@@ -529,10 +632,10 @@ export default function QuestionDirectoryPage() {
 
             {/* Scalable Table Grid */}
             {isLoading ? (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-[350px] bg-white border border-slate-200/85 rounded-2xl p-12 shadow-xs">
-                <RefreshCw className="w-9 h-9 text-indigo-600 animate-spin" />
-                <span className="text-xs font-bold text-slate-700 mt-3.5 uppercase tracking-wider">Syncing Supabase Schema...</span>
-                <span className="text-[10px] text-slate-400 font-semibold mt-1">Retrieving core taxonomy matrices and placement tags in real time</span>
+              <div className="flex-1 flex flex-col items-center justify-center min-h-[350px] bg-white dark:bg-[#0f1322] border border-slate-200 dark:border-[#151c2f] rounded-2xl p-12 shadow-xs">
+                <RefreshCw className="w-8 h-8 text-purple-500 animate-spin" />
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-3.5 uppercase tracking-wider">Loading Question Directory...</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mt-1">Retrieving question bank, taxonomy topics, and placement tags</span>
               </div>
             ) : (
               <QuestionTable
@@ -543,7 +646,6 @@ export default function QuestionDirectoryPage() {
 
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }

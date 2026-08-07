@@ -28,18 +28,18 @@ export async function recalculateLandingStats(): Promise<LandingStats> {
     // 1. Fetch real-time count of questions
     const { count: dbQuestionsCount, error: questionError } = await supabase
       .from('questions')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'estimated', head: true });
     
     // 2. Fetch count of active student profiles
     const { count: dbStudentsCount, error: studentError } = await supabase
       .from('profiles')
-      .select('*', { count: 'exact', head: true })
+      .select('*', { count: 'estimated', head: true })
       .eq('role', 'STUDENT');
 
     // 3. Fetch count of company tags
     const { count: dbCompaniesCount, error: companyError } = await supabase
       .from('companies')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'estimated', head: true });
 
     // 4. Fetch count of distinct colleges represented in profile directory
     let collegeCount = 0;
@@ -61,11 +61,11 @@ export async function recalculateLandingStats(): Promise<LandingStats> {
       console.warn("Could not determine dynamic college count, using offset fallback", e);
     }
 
-    // Determine values, using baseline offsets to simulate staging catalog scale
-    const finalQuestions = (dbQuestionsCount || 0) + 10420;
-    const finalStudents = (dbStudentsCount || 0) + 204120;
-    const finalCompanies = (dbCompaniesCount || 0) + 512;
-    const finalColleges = collegeCount > 0 ? collegeCount + 150 : 156;
+    // Use direct counts, no fallback inflation
+    const finalQuestions = dbQuestionsCount || 0;
+    const finalStudents = dbStudentsCount || 0;
+    const finalCompanies = dbCompaniesCount || 0;
+    const finalColleges = collegeCount || 0;
 
     const newStats: Omit<LandingStats, 'source'> = {
       active_students: finalStudents,
@@ -97,13 +97,12 @@ export async function recalculateLandingStats(): Promise<LandingStats> {
   } catch (err) {
     console.warn("Recalculate stats error. Database schema might not be migrated. Utilizing local calculations.", err);
     
-    // In local mode, we base counts on our code's local state (e.g. SAMPLE_QUESTIONS)
-    const localQuestionsCount = SAMPLE_QUESTIONS.length;
+    // In local mode, we base counts strictly on the database schema
     const localStats: LandingStats = {
-      active_students: 204580,
-      question_pool: 10480 + localQuestionsCount,
-      company_tags: 520,
-      college_partnerships: 154,
+      active_students: 0,
+      question_pool: 0,
+      company_tags: 0,
+      college_partnerships: 0,
       last_calculated_at: new Date().toISOString(),
       source: 'local_fallback'
     };

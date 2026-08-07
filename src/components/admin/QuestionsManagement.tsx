@@ -191,7 +191,7 @@ export default function QuestionsManagement({
 
         <button
           onClick={onAddQuestion}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4.5 py-2.5 text-xs font-bold flex items-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer shrink-0 self-start md:self-center"
+          className="bg-blue-600 hover:bg-blue-700 text-slate-900 dark:text-white rounded-lg px-4.5 py-2.5 text-xs font-bold flex items-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer shrink-0 self-start md:self-center"
         >
           <Plus className="w-4 h-4" />
           <span>Add Question</span>
@@ -202,7 +202,7 @@ export default function QuestionsManagement({
       <div className="space-y-4">
         {/* Search Input bar */}
         <div className="relative w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-4.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-slate-500 dark:text-slate-400 absolute left-4.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
@@ -211,7 +211,7 @@ export default function QuestionsManagement({
               setCurrentPage(1);
             }}
             placeholder="Search questions by ID, topic, keywords, company tags..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all"
+            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-950 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all"
           />
         </div>
 
@@ -219,7 +219,7 @@ export default function QuestionsManagement({
         <div className="bg-white border border-slate-200 rounded-xl p-4.5 shadow-sm flex flex-wrap items-end gap-4.5">
           {/* Domain Dropdown */}
           <div className="flex-1 min-w-[150px] flex flex-col gap-1.5">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Domain</span>
+            <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Domain</span>
             <select
               value={selectedDomain}
               onChange={handleDomainChange}
@@ -234,7 +234,7 @@ export default function QuestionsManagement({
 
           {/* Sub-Topic Dropdown */}
           <div className="flex-1 min-w-[150px] flex flex-col gap-1.5">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Sub-Topic</span>
+            <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sub-Topic</span>
             <select
               value={selectedSubTopic}
               onChange={handleSubTopicChange}
@@ -250,7 +250,7 @@ export default function QuestionsManagement({
 
           {/* Concept Dropdown */}
           <div className="flex-1 min-w-[150px] flex flex-col gap-1.5">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Concept</span>
+            <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Concept</span>
             <select
               value={selectedConcept}
               onChange={(e) => {
@@ -269,7 +269,7 @@ export default function QuestionsManagement({
 
           {/* Difficulty Dropdown */}
           <div className="flex-1 min-w-[150px] flex flex-col gap-1.5">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Difficulty</span>
+            <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Difficulty</span>
             <select
               value={selectedDifficulty}
               onChange={(e) => {
@@ -287,7 +287,7 @@ export default function QuestionsManagement({
 
           {/* Company Tag Dropdown */}
           <div className="flex-1 min-w-[150px] flex flex-col gap-1.5">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Company Tag</span>
+            <span className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Company Tag</span>
             <select
               value={selectedCompany}
               onChange={(e) => {
@@ -331,7 +331,7 @@ export default function QuestionsManagement({
           <div className="overflow-x-auto overflow-y-scroll max-h-[380px] custom-scrollbar relative">
             <table className="w-full border-collapse text-left">
             <thead className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur-xs shadow-xs">
-              <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
+              <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none">
                 <th className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-32 border-b border-slate-200/80">Question ID</th>
                 <th className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 min-w-[320px] border-b border-slate-200/80">Question Title / Preview</th>
                 <th className="sticky top-0 bg-slate-50/95 backdrop-blur-xs z-10 px-6 py-4.5 w-36 border-b border-slate-200/80">Domain</th>
@@ -361,13 +361,13 @@ export default function QuestionsManagement({
                             </span>
                             
                             {/* Detailed Taxonomical Hover Tooltip */}
-                            <div className="absolute left-0 bottom-full mb-2 hidden group-hover/id:flex flex-col bg-slate-950 text-white text-[10px] font-medium p-2.5 rounded-lg shadow-xl border border-slate-800 z-35 min-w-[200px] leading-relaxed transition-all animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
+                            <div className="absolute left-0 bottom-full mb-2 hidden group-hover/id:flex flex-col bg-slate-950 text-slate-900 dark:text-white text-[10px] font-medium p-2.5 rounded-lg shadow-xl border border-slate-800 z-35 min-w-[200px] leading-relaxed transition-all animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
                               <span className="font-bold text-blue-400 border-b border-slate-800 pb-1 mb-1 block uppercase">ID Specs</span>
                               <div className="space-y-0.5">
-                                <div><span className="text-slate-400 font-bold">Domain:</span> {getDomainFullName(q.domainId)}</div>
-                                <div><span className="text-slate-400 font-bold">Sub-Topic:</span> {getSubTopicFullName(q.domainId, q.subTopicId)}</div>
-                                <div><span className="text-slate-400 font-bold">Concept:</span> {getConceptFullName(q.domainId, q.subTopicId, q.conceptId)}</div>
-                                <div><span className="text-slate-400 font-bold font-mono">Seed:</span> {q.questionHashSeed || 0}</div>
+                                <div><span className="text-slate-500 dark:text-slate-400 font-bold">Domain:</span> {getDomainFullName(q.domainId)}</div>
+                                <div><span className="text-slate-500 dark:text-slate-400 font-bold">Sub-Topic:</span> {getSubTopicFullName(q.domainId, q.subTopicId)}</div>
+                                <div><span className="text-slate-500 dark:text-slate-400 font-bold">Concept:</span> {getConceptFullName(q.domainId, q.subTopicId, q.conceptId)}</div>
+                                <div><span className="text-slate-500 dark:text-slate-400 font-bold font-mono">Seed:</span> {q.questionHashSeed || 0}</div>
                                 <div className="text-[9px] text-slate-500 font-mono mt-1 pt-1 border-t border-slate-900 break-all">UUID: {q.id}</div>
                               </div>
                             </div>
@@ -447,7 +447,7 @@ export default function QuestionsManagement({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-xs font-semibold text-slate-400 italic">
+                  <td colSpan={7} className="px-6 py-12 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 italic">
                     No questions found matching the filter criteria.
                   </td>
                 </tr>
@@ -485,7 +485,7 @@ export default function QuestionsManagement({
                   onClick={() => setCurrentPage(pageNum)}
                   className={`w-7.5 h-7.5 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
                     currentPage === pageNum
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                      ? 'bg-blue-600 border-blue-600 text-slate-900 dark:text-white shadow-sm'
                       : 'border-slate-200 hover:bg-slate-100 text-slate-700'
                   }`}
                 >
@@ -516,7 +516,7 @@ export default function QuestionsManagement({
                 setIsDecoderOpen(false);
                 setDecodeInput('');
               }}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -528,13 +528,13 @@ export default function QuestionsManagement({
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900 leading-tight">Admin Question ID Decoder</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Fixed 16-Bit Reverse Lookup</p>
+                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-0.5">Fixed 16-Bit Reverse Lookup</p>
               </div>
             </div>
 
             {/* Input Field */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                 Enter Binary Question ID
               </label>
               <input
@@ -542,7 +542,7 @@ export default function QuestionsManagement({
                 value={decodeInput}
                 onChange={(e) => setDecodeInput(e.target.value)}
                 placeholder="e.g. 0001-1010-1100-0101"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all uppercase"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono text-slate-800 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all uppercase"
                 autoFocus
               />
             </div>
@@ -551,8 +551,8 @@ export default function QuestionsManagement({
             <div className="mt-5 flex-1 min-h-[140px]">
               {decodeInput.trim() === '' ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-4 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Awaiting Input</span>
-                  <p className="text-[11px] text-slate-400 font-medium max-w-[200px] mt-1 leading-relaxed">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Awaiting Input</span>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium max-w-[200px] mt-1 leading-relaxed">
                     Type or paste a 16-bit binary question ID to instantly reverse-lookup its metadata hierarchy.
                   </p>
                 </div>
@@ -570,23 +570,23 @@ export default function QuestionsManagement({
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Domain</span>
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Domain</span>
                       <span className="text-slate-800 text-right max-w-[200px] truncate">{decodedResult.domain}</span>
                     </div>
                     <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sub-Topic</span>
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sub-Topic</span>
                       <span className="text-slate-800 text-right max-w-[200px] truncate">{decodedResult.subTopic}</span>
                     </div>
                     <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Concept</span>
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Concept</span>
                       <span className="text-slate-800 text-right max-w-[200px] truncate">{decodedResult.concept}</span>
                     </div>
                     <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Difficulty</span>
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Difficulty</span>
                       <span className="text-slate-800 uppercase">{decodedResult.question?.difficulty}</span>
                     </div>
                     <div className="flex flex-col bg-white p-2.5 rounded-lg border border-slate-100 space-y-1">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Registry UUID</span>
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Registry UUID</span>
                       <span className="text-[10px] font-mono text-slate-600 font-medium select-all break-all">{decodedResult.question?.id}</span>
                     </div>
                   </div>
@@ -635,7 +635,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 opacity-0 group-hover/id:opacity-100 focus:opacity-100 transition-all duration-200 cursor-pointer"
+      className="p-1 rounded hover:bg-slate-100 text-slate-500 dark:text-slate-400 hover:text-slate-600 opacity-0 group-hover/id:opacity-100 focus:opacity-100 transition-all duration-200 cursor-pointer"
       title="Copy binary ID"
     >
       {copied ? (

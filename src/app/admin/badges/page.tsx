@@ -1,5 +1,9 @@
 'use client';
 
+import { USER_ROLES } from '@/lib/admin/store';
+import { UserRole } from '@/lib/admin/types';
+import { useAdmin } from '@/app/admin/AdminContext';
+import RoleToggle from '@/components/RoleToggle';
 import React, { useState, useEffect } from 'react';
 import { 
   Award, 
@@ -19,11 +23,6 @@ import {
   CheckCircle,
   Eye
 } from 'lucide-react';
-import Sidebar from '@/components/admin/Sidebar';
-import Header from '@/components/admin/Header';
-import { USER_ROLES } from '@/lib/admin/store';
-import { UserRole } from '@/lib/admin/types';
-
 interface BadgeStats {
   totalAvailable: number;
   totalCompleted: number;
@@ -149,8 +148,8 @@ const TransparentBadgeImage = ({ src, alt, className, style }: any) => {
 };
 
 export default function AdminBadgesPage() {
-  const [currentRole, setCurrentRole] = useState<UserRole>(USER_ROLES[0]);
-  const [badges, setBadges] = useState<any[]>([]);
+  const { currentRole, handleRoleChange } = useAdmin();
+const [badges, setBadges] = useState<any[]>([]);
   const [stats, setStats] = useState<BadgeStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -168,34 +167,18 @@ export default function AdminBadgesPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
 
   // Sync role
-  useEffect(() => {
-    const storedRole = localStorage.getItem('aptitude_current_role');
-    if (storedRole) {
-      try {
-        const parsed = JSON.parse(storedRole);
-        const matched = USER_ROLES.find(r => r.role === parsed.role);
-        if (matched) setCurrentRole(matched);
-      } catch (e) {
-        console.warn(e);
-      }
-    }
-  }, []);
 
   const fetchBadgesAndStats = async () => {
     setLoading(true);
     try {
-      // Fetch stats
       const statsRes = await fetch('/api/admin/badges/stats');
       const statsData = await statsRes.json();
       if (statsRes.ok && statsData.success) {
         setStats(statsData);
       }
-
-      // Fetch all badges (directly from server API)
       const badgesRes = await fetch('/api/badges');
       const badgesData = await badgesRes.json();
       if (badgesRes.ok && badgesData.badges) {
-        // Mapped badges (extract actual badge entity)
         const mapped = badgesData.badges.map((ub: any) => ub.badge || ub);
         setBadges(mapped);
       }
@@ -209,11 +192,6 @@ export default function AdminBadgesPage() {
   useEffect(() => {
     fetchBadgesAndStats();
   }, []);
-
-  const handleRoleChange = (role: UserRole) => {
-    setCurrentRole(role);
-    localStorage.setItem('aptitude_current_role', JSON.stringify(role));
-  };
 
   // Toggles active state in database
   const handleToggleBadge = async (badgeId: string, currentStatus: boolean) => {
@@ -287,11 +265,7 @@ export default function AdminBadgesPage() {
   });
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-[#030712] dark:text-slate-100 font-sans overflow-hidden antialiased transition-colors duration-300">
-      <Sidebar activeId="badges" userRole={currentRole.role} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        <Header currentRole={currentRole} onRoleChange={handleRoleChange} />
+    <>
 
         {currentRole.role !== 'admin' ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-[#030712]">
@@ -325,6 +299,7 @@ export default function AdminBadgesPage() {
                 </div>
               </div>
               <div className="flex items-center justify-center gap-3 w-full mt-2">
+                <RoleToggle />
                 <button
                   onClick={() => {
                     const admin = USER_ROLES.find(r => r.role === 'admin');
@@ -349,6 +324,7 @@ export default function AdminBadgesPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3 shrink-0">
+                <RoleToggle />
                 <button
                   onClick={fetchBadgesAndStats}
                   className="px-4 py-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:bg-slate-50"
@@ -686,7 +662,6 @@ export default function AdminBadgesPage() {
 
           </div>
         )}
-      </div>
-    </div>
+      </>
   );
 }

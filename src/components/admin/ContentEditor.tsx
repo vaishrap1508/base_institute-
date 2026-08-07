@@ -231,7 +231,7 @@ export default function ContentEditor({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm flex flex-col h-full overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-sm flex flex-col">
       {/* Editor Header & Toolbar */}
       <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/20">
         <div className="flex items-center gap-2">
@@ -245,7 +245,7 @@ export default function ContentEditor({
             type="button"
             onMouseDown={handleBold}
             title="Bold"
-            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer ${
+            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-800 dark:text-slate-200 transition-colors cursor-pointer ${
               activeFormats.bold ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800 shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -255,7 +255,7 @@ export default function ContentEditor({
             type="button"
             onMouseDown={handleItalic}
             title="Italic"
-            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer ${
+            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-800 dark:text-slate-200 transition-colors cursor-pointer ${
               activeFormats.italic ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800 shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -265,7 +265,7 @@ export default function ContentEditor({
             type="button"
             onMouseDown={handleCode}
             title="Inline Code"
-            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer ${
+            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-800 dark:text-slate-200 transition-colors cursor-pointer ${
               activeFormats.code ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800 shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -275,7 +275,7 @@ export default function ContentEditor({
             type="button"
             onMouseDown={handleMath}
             title="LaTeX Math"
-            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors text-xs font-semibold leading-none w-5.5 h-5.5 flex items-center justify-center cursor-pointer ${
+            className={`p-1 rounded text-slate-500 hover:text-slate-800 dark:hover:text-slate-800 dark:text-slate-200 transition-colors text-xs font-semibold leading-none w-5.5 h-5.5 flex items-center justify-center cursor-pointer ${
               activeFormats.math ? 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800 shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
@@ -285,10 +285,10 @@ export default function ContentEditor({
       </div>
 
       {/* Editor Body */}
-      <div className="flex-1 p-5 overflow-y-auto space-y-5">
+      <div className="flex-1 p-5 space-y-5">
         {/* Question Stem Text Area */}
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
             Question Stem (Visual WYSIWYG Editor)
           </label>
           
@@ -304,11 +304,11 @@ export default function ContentEditor({
                 setIsFocused(false);
                 handleInput();
               }}
-              className="w-full min-h-[14rem] max-h-[16rem] p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 overflow-y-auto resize-none leading-relaxed transition-all prose max-w-none focus:bg-white dark:focus:bg-slate-900 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-slate-800 dark:prose-code:text-slate-200"
+              className="w-full min-h-[14rem] max-h-[16rem] p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 overflow-y-auto resize-none leading-relaxed transition-all prose max-w-none focus:bg-white dark:focus:bg-slate-900 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-slate-800 dark:prose-code:text-slate-800 dark:text-slate-200"
               style={{ outline: 'none' }}
             />
             {!questionStem && (
-              <div className="absolute top-4 left-4 text-sm text-slate-400 dark:text-slate-500 pointer-events-none font-sans max-w-[90%]">
+              <div className="absolute top-4 left-4 text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 pointer-events-none font-sans max-w-[90%]">
                 Type your question prompt, mathematical equations in $...$ or $$...$$, and step-by-step solutions here...
               </div>
             )}
@@ -317,7 +317,7 @@ export default function ContentEditor({
 
         {/* Hint Text input */}
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+          <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">
             Student Hint (Markdown Support)
           </label>
           <textarea
@@ -325,13 +325,13 @@ export default function ContentEditor({
             onChange={(e) => onChangeHintText(e.target.value)}
             placeholder="Enter a helpful tip or prompt suggestion (e.g. Express new price in terms of x)"
             rows={2}
-            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none overflow-y-auto break-words leading-relaxed"
+            className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-500 dark:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none overflow-y-auto break-words leading-relaxed"
           />
         </div>
 
         {/* Video solution reference input */}
         <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+          <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
             Video Solution Reference (YouTube URL)
           </label>
           <div className="relative flex items-center">
@@ -343,7 +343,7 @@ export default function ContentEditor({
               value={videoUrl}
               onChange={(e) => onChangeVideoUrl(e.target.value)}
               placeholder="https://youtube.com/watch?v=..."
-              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono"
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-500 dark:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono"
             />
           </div>
         </div>
@@ -372,14 +372,14 @@ export default function ContentEditor({
           onClick={onSaveDraft}
           className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer"
         >
-          <Save className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+          <Save className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 dark:text-slate-500" />
           <span>Save Draft</span>
         </button>
 
         <button
           type="button"
           onClick={onPublish}
-          className={`flex items-center gap-2 px-5 py-2.5 text-white rounded-lg text-xs font-bold shadow-md transition-all duration-200 ${
+          className={`flex items-center gap-2 px-5 py-2.5 text-slate-900 dark:text-white rounded-lg text-xs font-bold shadow-md transition-all duration-200 ${
             isValid
               ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/10 cursor-pointer active:scale-98'
               : 'bg-slate-400 opacity-60 cursor-not-allowed shadow-none'
